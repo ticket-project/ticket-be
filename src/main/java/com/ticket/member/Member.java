@@ -1,9 +1,7 @@
 package com.ticket.member;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.ticket.member.vo.Email;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,15 +15,16 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String email;
+    @Embedded
+    private Email email;
     private String name;
     private String password;
 
     public static Member register(final String email, final String password, final String name) {
-        return new Member(email, password, name);
+        return new Member(new Email(email), password, name);
     }
 
-    private Member(final String email, final String password, final String name) {
+    private Member(final Email email, final String password, final String name) {
         this.email = email;
         this.password = password;
         this.name = name;

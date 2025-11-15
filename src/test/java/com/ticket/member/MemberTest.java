@@ -1,8 +1,9 @@
 package com.ticket.member;
 
+import com.ticket.member.vo.Email;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MemberTest {
 
@@ -12,15 +13,11 @@ public class MemberTest {
         String email = "test@test.com";
         String password = "1234";
         String name = "ANONYMOUS";
-
         //when
         Member member = Member.register(email, password, name);
-
         //then
-        assertThat(email).isEqualTo(member.getEmail());
-        assertThat(password).isEqualTo(member.getPassword());
-        assertThat(name).isEqualTo(member.getName());
+        assertThat(member.getEmail()).isEqualTo(new Email(email));
+        assertThat(member.getPassword()).isEqualTo(password);
+        assertThat(member.getName()).isEqualTo(name);
     }
-
-
 }
