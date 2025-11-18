@@ -15,7 +15,7 @@ public class MemberTest {
         String password = "1234";
         String name = "ANONYMOUS";
         //when
-        Member member = Member.register(email, password, name);
+        Member member = Member.register(new Email(email), password, name);
         //then
         assertThat(member.getEmail()).isEqualTo(new Email(email));
         assertThat(member.getPassword()).isEqualTo(password);

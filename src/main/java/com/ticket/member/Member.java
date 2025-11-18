@@ -21,8 +21,8 @@ public class Member {
     private String name;
     private String password;
 
-    public static Member register(final String email, final String password, final String name) {
-        return new Member(new Email(email), password, name);
+    public static Member register(final Email email, final String password, final String name) {
+        return new Member(email, password, name);
     }
 
     private Member(final Email email, final String password, final String name) {
