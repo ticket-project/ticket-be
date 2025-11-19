@@ -1,1 +1,23 @@
+pluginManagement {
+    def springBootVersion = settings.hasProperty('springBootVersion') ? settings.springBootVersion : '3.2.0'
+    def springDependencyManagementVersion = settings.hasProperty('springDependencyManagementVersion') ? settings.springDependencyManagementVersion : '1.1.0'
+
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == 'org.springframework.boot') {
+                useVersion springBootVersion
+            }
+            if (requested.id.id == 'io.spring.dependency-management') {
+                useVersion springDependencyManagementVersion
+            }
+        }
+    }
+}
+
 rootProject.name = 'ticket'
+
+include(
+        'core:core-enum',
+        'core:core-api',
+        'storage:db-core'
+)
