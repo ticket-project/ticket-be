@@ -1,8 +1,7 @@
 package com.ticket.member.controller;
 
-import com.ticket.member.dto.MemberCreateRequest;
-import com.ticket.member.dto.MemberResponse;
-import com.ticket.member.service.MemberService;
+import com.ticket.member.dto.AddMemberRequest;
+import com.ticket.domain.member.MemberService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +20,7 @@ public class MemberController {
     }
 
     @PostMapping
-    public ResponseEntity<MemberResponse> register(@RequestBody @Valid MemberCreateRequest memberCreateRequest) {
-        return ResponseEntity.ok().body(memberService.register(memberCreateRequest.toCommand()));
+    public ResponseEntity<Long> register(@RequestBody @Valid AddMemberRequest request) {
+        return ResponseEntity.ok().body(memberService.register(request.toAddMember()));
     }
 }

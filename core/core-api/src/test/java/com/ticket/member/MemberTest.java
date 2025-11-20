@@ -1,6 +1,7 @@
 package com.ticket.member;
 
-import com.ticket.member.vo.Email;
+import com.ticket.domain.member.Member;
+import com.ticket.domain.member.vo.Email;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

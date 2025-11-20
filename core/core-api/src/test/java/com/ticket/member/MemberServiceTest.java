@@ -1,11 +1,12 @@
 package com.ticket.member;
 
+import com.ticket.domain.member.Member;
 import com.ticket.exception.DuplicateEmailException;
-import com.ticket.member.dto.MemberCreateRequest;
+import com.ticket.member.dto.AddMemberRequest;
 import com.ticket.member.dto.MemberResponse;
-import com.ticket.member.repository.MemberRepository;
-import com.ticket.member.service.MemberService;
-import com.ticket.member.vo.Email;
+import com.ticket.storage.db.core.MemberRepository;
+import com.ticket.domain.member.MemberService;
+import com.ticket.domain.member.vo.Email;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,7 +39,7 @@ public class MemberServiceTest {
     @Test
     void 회원가입시_비밀번호는_암호화된_값으로_저장된다() {
         //given
-        MemberCreateRequest.MemberCreateCommand command = new MemberCreateRequest.MemberCreateCommand("test@test.com", "1234", "ANONYMOUS");
+        AddMemberRequest.MemberCreateCommand command = new AddMemberRequest.MemberCreateCommand("test@test.com", "1234", "ANONYMOUS");
         when(passwordEncoder.encode("1234")).thenReturn("ENC(1234)");
         when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
         //when
@@ -58,7 +59,7 @@ public class MemberServiceTest {
     @Test
     void 이미_존재하는_이메일이면_회원가입에_실패한다() {
         //given
-        MemberCreateRequest.MemberCreateCommand command = new MemberCreateRequest.MemberCreateCommand("test@test.com", "1234", "ANONYMOUS");
+        AddMemberRequest.MemberCreateCommand command = new AddMemberRequest.MemberCreateCommand("test@test.com", "1234", "ANONYMOUS");
         when(memberRepository.existsByEmailAddress("test@test.com")).thenReturn(true);
         //then
         assertThatThrownBy(() -> memberService.register(command)).isInstanceOf(DuplicateEmailException.class);
@@ -72,7 +73,7 @@ public class MemberServiceTest {
     @ValueSource(strings = {"123", "lhs"})
     void 비밀번호가_정책에_맞지않으면_회원가입에_실패한다(final String password) {
         //given
-        MemberCreateRequest.MemberCreateCommand command = new MemberCreateRequest.MemberCreateCommand("test@test.com", password, "ANONYMOUS");
+        AddMemberRequest.MemberCreateCommand command = new AddMemberRequest.MemberCreateCommand("test@test.com", password, "ANONYMOUS");
         //then
         assertThatThrownBy(() -> memberService.register(command)).isInstanceOf(IllegalArgumentException.class);
 

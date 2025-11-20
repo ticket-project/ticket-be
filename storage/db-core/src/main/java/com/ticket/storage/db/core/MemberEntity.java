@@ -1,29 +1,22 @@
-package com.ticket.member;
+package com.ticket.storage.db.core;
 
-import com.ticket.member.vo.Email;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "MEMBERS")
-public class Member {
+public class MemberEntity {
 
     @Id
     @GeneratedValue
     private Long id;
 
-    @Embedded
-    private Email email;
+    private String email;
     private String name;
     private String password;
 
-    protected Member() {
-    }
+    protected MemberEntity() {}
 
-    public static Member register(final Email email, final String password, final String name) {
-        return new Member(email, password, name);
-    }
-
-    private Member(final Email email, final String password, final String name) {
+    public MemberEntity(final String email, final String password, final String name) {
         this.email = email;
         this.password = password;
         this.name = name;
@@ -33,7 +26,7 @@ public class Member {
         return id;
     }
 
-    public Email getEmail() {
+    public String getEmail() {
         return email;
     }
 

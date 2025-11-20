@@ -1,6 +1,6 @@
 package com.ticket.member.dto;
 
-import com.ticket.member.Member;
+import com.ticket.domain.member.Member;
 
 public class MemberResponse {
 
