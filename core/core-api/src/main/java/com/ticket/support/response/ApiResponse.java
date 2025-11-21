@@ -9,7 +9,7 @@ public class ApiResponse<T> {
     private final T data;
     private final ErrorMessage error;
 
-    public ApiResponse(final ResultType result, final T data, final ErrorMessage error) {
+    private ApiResponse(final ResultType result, final T data, final ErrorMessage error) {
         this.result = result;
         this.data = data;
         this.error = error;
