@@ -25,6 +25,7 @@ public class MemberService {
 
     @Transactional
     public MemberResponse register(final MemberCreateRequest.MemberCreateCommand command) {
+        if (true) throw new IllegalArgumentException("zz");
         PasswordPolicy.validate(command.getPassword());
         final Email email = new Email(command.getEmail());
         if (memberRepository.existsByEmailAddress(email.getEmail())) {
