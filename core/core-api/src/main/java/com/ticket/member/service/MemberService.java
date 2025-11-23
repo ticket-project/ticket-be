@@ -1,12 +1,13 @@
 package com.ticket.member.service;
 
-import com.ticket.exception.DuplicateEmailException;
 import com.ticket.member.Member;
 import com.ticket.member.PasswordPolicy;
 import com.ticket.member.dto.MemberCreateRequest;
 import com.ticket.member.dto.MemberResponse;
 import com.ticket.member.repository.MemberRepository;
 import com.ticket.member.vo.Email;
+import com.ticket.support.exception.DuplicateEmailException;
+import com.ticket.support.exception.ErrorType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ public class MemberService {
         PasswordPolicy.validate(command.getPassword());
         final Email email = new Email(command.getEmail());
         if (memberRepository.existsByEmailAddress(email.getEmail())) {
-            throw new DuplicateEmailException("중복 이메일은 허용되지 않습니다.");
+            throw new DuplicateEmailException(ErrorType.DUPLICATE_EMAIL_ERROR);
         }
         final Member member = Member.register(email, passwordEncoder.encode(command.getPassword()), command.getName());
         return MemberResponse.of(memberRepository.save(member));
