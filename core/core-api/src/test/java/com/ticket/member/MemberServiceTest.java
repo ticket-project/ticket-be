@@ -8,6 +8,7 @@ import com.ticket.storage.db.core.MemberEntity;
 import com.ticket.storage.db.core.MemberRepository;
 import com.ticket.support.exception.DuplicateEmailException;
 import com.ticket.support.exception.NotFoundException;
+import com.ticket.support.exception.PasswordInvalidException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -135,11 +136,24 @@ public class MemberServiceTest {
         String password = "1234";
         final MemberEntity memberEntity = new MemberEntity(email, "ENC(1234)", "ANONYMOUS");
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(memberEntity));
+        when(passwordEncoder.matches(password, memberEntity.getPassword())).thenReturn(true);
         //when
         Member loginMember = memberService.login(email, password);
         //then
         assertThat(loginMember.getEmail().getEmail()).isEqualTo(email);
         assertThat(loginMember.getName()).isEqualTo("ANONYMOUS");
         verify(memberRepository).findByEmail(email);
+    }
+
+    @Test
+    void 비밀번호가_일치하지_않으면_로그인이_실패한다() {
+        //given
+        String email = "test@test.com";
+        String password = "wrongPassword";
+        MemberEntity memberEntity = new MemberEntity(email, "rightPassword", "ANONYMOUS");
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(memberEntity));
+        when(passwordEncoder.matches(password, memberEntity.getPassword())).thenReturn(false);
+        //then
+        assertThatThrownBy(() -> memberService.login(email, password)).isInstanceOf(PasswordInvalidException.class);
     }
 }

@@ -6,6 +6,7 @@ import com.ticket.storage.db.core.MemberRepository;
 import com.ticket.support.exception.DuplicateEmailException;
 import com.ticket.support.exception.ErrorType;
 import com.ticket.support.exception.NotFoundException;
+import com.ticket.support.exception.PasswordInvalidException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,10 @@ public class MemberService {
     public Member login(final String email, final String password) {
         final MemberEntity foundMemberEntity = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND));
+
+        if (!passwordEncoder.matches(password, foundMemberEntity.getPassword())) {
+            throw new PasswordInvalidException(ErrorType.INVALID_PASSWORD);
+        }
         return new Member(foundMemberEntity.getId(), new Email(foundMemberEntity.getEmail()), foundMemberEntity.getName());
     }
 }
