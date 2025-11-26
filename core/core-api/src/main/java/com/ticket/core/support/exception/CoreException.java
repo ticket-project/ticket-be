@@ -1,15 +1,15 @@
-package com.ticket.support.exception;
+package com.ticket.core.support.exception;
 
-public class DuplicateEmailException extends RuntimeException {
+public class CoreException extends RuntimeException {
 
     private final ErrorType errorType;
     private final Object data;
 
-    public DuplicateEmailException(final ErrorType errorType) {
+    public CoreException(final ErrorType errorType) {
         this(errorType, null);
     }
 
-    public DuplicateEmailException(final ErrorType errorType, Object data) {
+    public CoreException(final ErrorType errorType, Object data) {
         super(errorType.getMessage());
         this.errorType = errorType;
         this.data = data;

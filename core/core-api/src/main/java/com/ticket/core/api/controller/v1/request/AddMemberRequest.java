@@ -1,6 +1,6 @@
-package com.ticket.api.controller.v1.request;
+package com.ticket.core.api.controller.v1.request;
 
-import com.ticket.domain.member.AddMember;
+import com.ticket.core.domain.member.AddMember;
 import jakarta.validation.constraints.Email;
 
 public class AddMemberRequest {

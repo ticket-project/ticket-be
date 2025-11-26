@@ -1,18 +1,18 @@
-package com.ticket.api.controller.v1.response;
+package com.ticket.core.api.controller.v1.response;
 
 public class MemberResponse {
-    private final Long id;
+    private final Long memberId;
     private final String email;
     private final String name;
 
-    public MemberResponse(final Long id, final String email, final String name) {
-        this.id = id;
+    public MemberResponse(final Long memberId, final String email, final String name) {
+        this.memberId = memberId;
         this.email = email;
         this.name = name;
     }
 
-    public Long getId() {
-        return id;
+    public Long getMemberId() {
+        return memberId;
     }
 
     public String getEmail() {

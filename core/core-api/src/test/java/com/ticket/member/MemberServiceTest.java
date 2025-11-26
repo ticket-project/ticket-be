@@ -1,13 +1,12 @@
 package com.ticket.member;
 
-import com.ticket.domain.member.AddMember;
-import com.ticket.domain.member.Member;
-import com.ticket.domain.member.MemberService;
-import com.ticket.domain.member.PasswordPolicyValidator;
+import com.ticket.core.domain.member.AddMember;
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberService;
+import com.ticket.core.domain.member.PasswordPolicyValidator;
 import com.ticket.storage.db.core.MemberEntity;
 import com.ticket.storage.db.core.MemberRepository;
-import com.ticket.support.exception.DuplicateEmailException;
-import com.ticket.support.exception.NotFoundException;
+import com.ticket.core.support.exception.CoreException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -95,7 +94,7 @@ public class MemberServiceTest {
         final AddMember addMember = new AddMember("test@test.com", "1234", "ANONYMOUS");
         when(memberRepository.existsByEmailAddress("test@test.com")).thenReturn(true);
         //then
-        assertThatThrownBy(() -> memberService.register(addMember)).isInstanceOf(DuplicateEmailException.class);
+        assertThatThrownBy(() -> memberService.register(addMember)).isInstanceOf(CoreException.class);
         verify(memberRepository, times(1)).existsByEmailAddress("test@test.com");
         verify(memberRepository, never()).save(any(MemberEntity.class));
         verify(passwordEncoder, never()).encode(anyString());
@@ -125,6 +124,44 @@ public class MemberServiceTest {
         Long memberId = 999L;
         when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
         //then
-        assertThatThrownBy(() -> memberService.findById(memberId)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> memberService.findById(memberId)).isInstanceOf(CoreException.class);
+    }
+
+    @Test
+    void 정상적인_값이라면_로그인을_성공한다() {
+        //given
+        String email = "test@test.com";
+        String password = "1234";
+        final MemberEntity memberEntity = new MemberEntity(email, "ENC(1234)", "ANONYMOUS");
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(memberEntity));
+        when(passwordEncoder.matches(password, memberEntity.getPassword())).thenReturn(true);
+        //when
+        Member loginMember = memberService.login(email, password);
+        //then
+        assertThat(loginMember.getEmail().getEmail()).isEqualTo(email);
+        assertThat(loginMember.getName()).isEqualTo("ANONYMOUS");
+        verify(memberRepository).findByEmail(email);
+    }
+
+    @Test
+    void 비밀번호가_일치하지_않으면_로그인이_실패한다() {
+        //given
+        String email = "test@test.com";
+        String password = "wrongPassword";
+        MemberEntity memberEntity = new MemberEntity(email, "rightPassword", "ANONYMOUS");
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(memberEntity));
+        when(passwordEncoder.matches(password, memberEntity.getPassword())).thenReturn(false);
+        //then
+        assertThatThrownBy(() -> memberService.login(email, password)).isInstanceOf(CoreException.class);
+    }
+
+    @Test
+    void 존재하지_않는_이메일로_로그인하면_실패한다() {
+        //given
+        String email = "notExist@test.com";
+        String password = "1234";
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.empty());
+        //then
+        assertThatThrownBy(() -> memberService.login(email, password)).isInstanceOf(CoreException.class);
     }
 }

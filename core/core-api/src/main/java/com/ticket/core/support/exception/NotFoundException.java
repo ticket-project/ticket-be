@@ -1,4 +1,4 @@
-package com.ticket.support.exception;
+package com.ticket.core.support.exception;
 
 public class NotFoundException extends RuntimeException {
 
