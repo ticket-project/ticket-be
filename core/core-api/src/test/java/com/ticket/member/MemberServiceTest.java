@@ -156,4 +156,14 @@ public class MemberServiceTest {
         //then
         assertThatThrownBy(() -> memberService.login(email, password)).isInstanceOf(PasswordInvalidException.class);
     }
+
+    @Test
+    void 존재하지_않는_이메일로_로그인하면_실패한다() {
+        //given
+        String email = "notExist@test.com";
+        String password = "1234";
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.empty());
+        //then
+        assertThatThrownBy(() -> memberService.login(email, password)).isInstanceOf(NotFoundException.class);
+    }
 }
