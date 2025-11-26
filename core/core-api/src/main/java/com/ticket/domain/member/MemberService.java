@@ -44,4 +44,10 @@ public class MemberService {
         final MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND));
         return new Member(memberEntity.getId(), new Email(memberEntity.getEmail()), memberEntity.getName());
     }
+
+    public Member login(final String email, final String password) {
+        final MemberEntity foundMemberEntity = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND));
+        return new Member(foundMemberEntity.getId(), new Email(foundMemberEntity.getEmail()), foundMemberEntity.getName());
+    }
 }

@@ -127,4 +127,19 @@ public class MemberServiceTest {
         //then
         assertThatThrownBy(() -> memberService.findById(memberId)).isInstanceOf(NotFoundException.class);
     }
+
+    @Test
+    void 정상적인_값이라면_로그인을_성공한다() {
+        //given
+        String email = "test@test.com";
+        String password = "1234";
+        final MemberEntity memberEntity = new MemberEntity(email, "ENC(1234)", "ANONYMOUS");
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(memberEntity));
+        //when
+        Member loginMember = memberService.login(email, password);
+        //then
+        assertThat(loginMember.getEmail().getEmail()).isEqualTo(email);
+        assertThat(loginMember.getName()).isEqualTo("ANONYMOUS");
+        verify(memberRepository).findByEmail(email);
+    }
 }
