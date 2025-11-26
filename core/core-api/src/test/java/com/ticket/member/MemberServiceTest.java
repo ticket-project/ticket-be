@@ -1,12 +1,12 @@
 package com.ticket.member;
 
-import com.ticket.domain.member.AddMember;
-import com.ticket.domain.member.Member;
-import com.ticket.domain.member.MemberService;
-import com.ticket.domain.member.PasswordPolicyValidator;
+import com.ticket.core.domain.member.AddMember;
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberService;
+import com.ticket.core.domain.member.PasswordPolicyValidator;
 import com.ticket.storage.db.core.MemberEntity;
 import com.ticket.storage.db.core.MemberRepository;
-import com.ticket.support.exception.CoreException;
+import com.ticket.core.support.exception.CoreException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

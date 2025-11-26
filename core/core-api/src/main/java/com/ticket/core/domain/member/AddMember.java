@@ -1,4 +1,4 @@
-package com.ticket.domain.member;
+package com.ticket.core.domain.member;
 
 public class AddMember {
 

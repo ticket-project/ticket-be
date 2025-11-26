@@ -1,11 +1,11 @@
-package com.ticket.api.controller.v1;
+package com.ticket.core.api.controller.v1;
 
-import com.ticket.api.controller.v1.request.AddMemberRequest;
-import com.ticket.api.controller.v1.request.LoginMemberRequest;
-import com.ticket.api.controller.v1.response.MemberResponse;
-import com.ticket.domain.member.Member;
-import com.ticket.domain.member.MemberService;
-import com.ticket.support.response.ApiResponse;
+import com.ticket.core.api.controller.v1.request.AddMemberRequest;
+import com.ticket.core.api.controller.v1.request.LoginMemberRequest;
+import com.ticket.core.api.controller.v1.response.MemberResponse;
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberService;
+import com.ticket.core.support.response.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 

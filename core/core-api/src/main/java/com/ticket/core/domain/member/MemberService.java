@@ -1,6 +1,8 @@
-package com.ticket.domain.member;
+package com.ticket.core.domain.member;
 
-import com.ticket.domain.member.vo.Email;
+import com.ticket.core.domain.member.vo.Email;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import com.ticket.storage.db.core.MemberEntity;
 import com.ticket.storage.db.core.MemberRepository;
 import com.ticket.support.exception.*;

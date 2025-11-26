@@ -1,8 +1,8 @@
-package com.ticket.support;
+package com.ticket.core.support;
 
-import com.ticket.support.exception.CoreException;
-import com.ticket.support.exception.ErrorType;
-import com.ticket.support.response.ApiResponse;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
+import com.ticket.core.support.response.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

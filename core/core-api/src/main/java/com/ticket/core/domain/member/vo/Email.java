@@ -1,4 +1,4 @@
-package com.ticket.domain.member.vo;
+package com.ticket.core.domain.member.vo;
 
 import jakarta.persistence.Embeddable;
 

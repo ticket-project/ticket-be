@@ -3,16 +3,17 @@ package com.ticket.storage.db.core;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "MEMBERS")
+@Table(name = "MEMBER")
 public class MemberEntity {
 
     @Id
     @GeneratedValue
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String email;
-    private String name;
     private String password;
+    private String name;
 
     protected MemberEntity() {}
 

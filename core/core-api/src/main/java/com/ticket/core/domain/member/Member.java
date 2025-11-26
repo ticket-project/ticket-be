@@ -1,6 +1,6 @@
-package com.ticket.domain.member;
+package com.ticket.core.domain.member;
 
-import com.ticket.domain.member.vo.Email;
+import com.ticket.core.domain.member.vo.Email;
 
 public class Member {
 

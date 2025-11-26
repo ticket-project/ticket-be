@@ -1,4 +1,4 @@
-package com.ticket.api.controller.v1.request;
+package com.ticket.core.api.controller.v1.request;
 
 public class LoginMemberRequest {
     private final String email;
