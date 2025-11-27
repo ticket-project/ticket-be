@@ -6,9 +6,12 @@ public enum ErrorType {
     DEFAULT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.E500, "알 수 없는 에러입니다."),
     NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "요청하신 정보를 찾을 수 없습니다."),
 
-    //회원,
-    DUPLICATE_EMAIL_ERROR(HttpStatus.CONFLICT, ErrorCode.E409, "중복된 이메일은 불가능합니다."),
-    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "잘못된 비밀번호입니다.");
+    //회원
+    DUPLICATE_EMAIL_ERROR(HttpStatus.CONFLICT, ErrorCode.E1000, "중복된 이메일은 불가능합니다."),
+    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, ErrorCode.E1001, "잘못된 비밀번호입니다."),
+
+    //회차
+    IS_NOT_VALID_PERFORMANCE(HttpStatus.BAD_REQUEST, ErrorCode.E2000, "유효하지 않은 회차 정보입니다.");
 
     private final HttpStatus status;
     private final ErrorCode errorCode;
