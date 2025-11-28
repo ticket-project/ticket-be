@@ -9,26 +9,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class PerformanceSeat {
     private final Performance performance;
-    private final AtomicInteger count;
+    private final AtomicInteger performanceSeatCount;
 
-    public PerformanceSeat(final Performance performance, final int count) {
+    public PerformanceSeat(final Performance performance, final int performanceSeatCount) {
         this.performance = performance;
-        this.count = new AtomicInteger(count);
+        this.performanceSeatCount = new AtomicInteger(performanceSeatCount);
     }
 
-    public AtomicInteger getCount() {
-        return count;
+    public AtomicInteger getPerformanceSeatCount() {
+        return performanceSeatCount;
     }
 
     private boolean canReservation() {
-        return this.count.get() > 0;
+        return this.performanceSeatCount.get() > 0;
     }
 
-    public boolean reserve(final Long userId, final LocalDateTime now) {
+    public boolean reserve(final Long memberId, final LocalDateTime now) {
         if (!canReservation()) return false;
         if (performance.isPastPerformance(now)) throw new CoreException(ErrorType.IS_PAST_PERFORMANCE);
         if (performance.notYetCanReserveTime(now)) throw new CoreException(ErrorType.NOT_YET_RESERVE_TIME);
-        this.count.decrementAndGet();
+        this.performanceSeatCount.decrementAndGet();
         return true;
     }
 }
