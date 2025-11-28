@@ -2,13 +2,11 @@ package com.ticket.reservation;
 
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performanceseat.PerformanceSeat;
-import com.ticket.core.support.exception.CoreException;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
 import static com.ticket.util.TestCommonUtils.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -19,12 +17,13 @@ public class ReservationTest {
         //given
         Long userId = 1L;
         int seatCount = 4;
-        final Performance performance = new Performance(currentTime().minusHours(10), currentTime().minusHours(5), reserveOpenTime(), reserveCloseTime());
+        final Performance performance = new Performance(performanceStartTime(), performanceEndTime(), reserveOpenTimeCurrent(), reserveCloseTimeCurrent());
         final PerformanceSeat performanceSeat = new PerformanceSeat(performance, seatCount);
-
+        //when
         final LocalDateTime currTime = currentTime();
+        final boolean isReserved = performanceSeat.reserve(userId, currTime);
         //then
-        assertThatThrownBy(() -> performanceSeat.reserve(userId, currTime)).isInstanceOf(CoreException.class);
+        assertThat(isReserved).isTrue();
     }
 
     @Test
@@ -32,7 +31,7 @@ public class ReservationTest {
         //given
         Long userId = 1L;
         int seatCount = 0;
-        final Performance performance = new Performance(currentTime().minusHours(10), currentTime().minusHours(5), reserveOpenTime(), reserveCloseTime());
+        final Performance performance = new Performance(currentTime().minusHours(10), currentTime().minusHours(5), reserveOpenTimeFuture(), reserveCloseTimeFuture());
         final PerformanceSeat performanceSeat = new PerformanceSeat(performance, seatCount);
 
         final LocalDateTime currTime = currentTime();
@@ -47,7 +46,7 @@ public class ReservationTest {
         //given
         Long userId = 1L;
         int seatCount = 0;
-        final Performance performance = new Performance(currentTime().minusHours(10), currentTime().minusHours(5), reserveOpenTime(), reserveCloseTime());
+        final Performance performance = new Performance(currentTime().minusHours(10), currentTime().minusHours(5), reserveOpenTimeFuture(), reserveCloseTimeFuture());
         final PerformanceSeat performanceSeat = new PerformanceSeat(performance, seatCount);
 
         final LocalDateTime currTime = currentTime();

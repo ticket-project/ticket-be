@@ -16,11 +16,19 @@ public class TestCommonUtils {
         return LocalDateTime.of(2026, 1, 20, 12, 0, 0);
     }
 
-    public static LocalDateTime reserveOpenTime() {
+    public static LocalDateTime reserveOpenTimeCurrent() {
+        return LocalDateTime.now().minusHours(1);
+    }
+
+    public static LocalDateTime reserveCloseTimeCurrent() {
+        return reserveOpenTimeCurrent().plusHours(2);
+    }
+
+    public static LocalDateTime reserveOpenTimeFuture() {
         return LocalDateTime.of(2026, 1, 1, 10, 0, 0);
     }
 
-    public static LocalDateTime reserveCloseTime() {
-        return reserveOpenTime().plusHours(1);
+    public static LocalDateTime reserveCloseTimeFuture() {
+        return reserveOpenTimeFuture().plusHours(1);
     }
 }

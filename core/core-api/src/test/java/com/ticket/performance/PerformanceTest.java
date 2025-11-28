@@ -14,7 +14,7 @@ public class PerformanceTest {
     @Test
     void 회차_시작_시간이_종료_시간보다_느리면_예외가_발생한다() {
         //then
-        assertThatThrownBy(() -> new Performance(currentTime(), currentTime().minusHours(1), reserveOpenTime(), reserveCloseTime())).isInstanceOf(CoreException.class);
+        assertThatThrownBy(() -> new Performance(currentTime(), currentTime().minusHours(1), reserveOpenTimeFuture(), reserveCloseTimeFuture())).isInstanceOf(CoreException.class);
     }
 
     @Test
@@ -23,7 +23,7 @@ public class PerformanceTest {
         //given
         int seatCount = 4;
         Long userId = 1L;
-        final Performance performance = new Performance(performanceStartTime(), performanceEndTime(), reserveOpenTime(), reserveCloseTime());
+        final Performance performance = new Performance(performanceStartTime(), performanceEndTime(), reserveOpenTimeFuture(), reserveCloseTimeFuture());
         final PerformanceSeat performanceSeat = new PerformanceSeat(performance, seatCount);
         //then
         AssertionsForClassTypes.assertThatThrownBy(() -> performanceSeat.reserve(userId, currentTime())).isInstanceOf(CoreException.class);
