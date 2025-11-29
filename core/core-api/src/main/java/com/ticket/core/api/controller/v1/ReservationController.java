@@ -1,7 +1,6 @@
 package com.ticket.core.api.controller.v1;
 
 import com.ticket.core.api.controller.v1.request.AddReservationRequest;
-import com.ticket.core.domain.reservation.AddReservation;
 import com.ticket.core.domain.reservation.ReservationService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +16,12 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
+    /**
+     * 선점
+     * @param request
+     */
     @PostMapping
     public void reserve(@RequestBody @Valid AddReservationRequest request) {
-        reservationService.reserve(new AddReservation(request.getMemberId(), request.getPerformanceId(), request.getSeatIds()));
+        reservationService.reserve(request.toAddReservation());
     }
 }
