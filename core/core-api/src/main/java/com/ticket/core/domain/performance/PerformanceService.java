@@ -6,6 +6,7 @@ import com.ticket.core.support.exception.NotFoundException;
 import com.ticket.storage.db.core.PerformanceEntity;
 import com.ticket.storage.db.core.PerformanceRepository;
 import com.ticket.storage.db.core.SeatRepository;
+import com.ticket.storage.db.core.SeatStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,7 +26,7 @@ public class PerformanceService {
     }
 
     public void findAllSeatByPerformance(final Long performanceId) {
-        final Long availableCount = seatRepository.countByPerformanceIdAndStatus(performanceId, "available");
+        final Long availableCount = seatRepository.countByPerformanceIdAndStatus(performanceId, SeatStatus.AVAILABLE);
         if (availableCount <= 0) throw new CoreException(ErrorType.NOT_EXIST_AVAILABLE_SEAT);
 
     }
