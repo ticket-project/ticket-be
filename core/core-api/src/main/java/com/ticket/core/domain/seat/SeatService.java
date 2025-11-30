@@ -17,6 +17,6 @@ public class SeatService {
 
     public Seat findById(final Long id) {
         final SeatEntity seatEntity = seatRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND));
-        return new Seat(seatEntity.getId(), seatEntity.getX(), seatEntity.getY());
+        return new Seat(seatEntity.getId(), seatEntity.getPerformanceId(), seatEntity.getX(), seatEntity.getY(), seatEntity.getStatus());
     }
 }

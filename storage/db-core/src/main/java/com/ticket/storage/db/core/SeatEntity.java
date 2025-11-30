@@ -18,7 +18,15 @@ public class SeatEntity {
     //열
     private String y;
 
-    private String status;
+    private SeatStatus status;
+
+    public SeatEntity(final Long id, final Long performanceId, final String x, final String y, final SeatStatus status) {
+        this.id = id;
+        this.performanceId = performanceId;
+        this.x = x;
+        this.y = y;
+        this.status = status;
+    }
 
     public Long getId() {
         return id;
@@ -30,5 +38,13 @@ public class SeatEntity {
 
     public String getY() {
         return y;
+    }
+
+    public Long getPerformanceId() {
+        return performanceId;
+    }
+
+    public SeatStatus getStatus() {
+        return status;
     }
 }
