@@ -1,8 +1,6 @@
 package com.ticket.storage.db.core;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class SeatEntity {
@@ -18,7 +16,10 @@ public class SeatEntity {
     //열
     private String y;
 
+    @Enumerated(EnumType.STRING)
     private SeatStatus status;
+
+    protected SeatEntity() {}
 
     public SeatEntity(final Long id, final Long performanceId, final String x, final String y, final SeatStatus status) {
         this.id = id;
