@@ -27,6 +27,13 @@
 6. 같은 회차의 같은 좌석을 예매하려고 하면 실패한다.
 
 
+### 테이블 연관관계 정리
+1. Performances(회차) <-> PerformanceSeat(회차별 좌석) (1 : N)
+2. seat(좌석) <-> PerformanceSeat(회차별 좌석) (1 : N)
+3. Performance(회차) <-> Reservation(예매 정보) (1 : N)
+4. Reservation(예매 정보) <-> ReservationSeat(예매별 좌석) (1 : N)
+5. ReservationSeat(예매별 좌석) <-> PerformanceSeat(회차별 좌석) (1 : 1)
+
 - [ ] 관리자
   - [ ] 특정 공연에 대해 좌석, 티켓 종류와 최대 판매 수량을 설정한다.
 
