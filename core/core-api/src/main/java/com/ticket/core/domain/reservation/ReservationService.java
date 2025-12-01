@@ -1,19 +1,20 @@
 package com.ticket.core.domain.reservation;
 
-import com.ticket.storage.db.core.ReservationRepository;
-import com.ticket.storage.db.core.SeatRepository;
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberFinder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ReservationService {
 
-    private final ReservationRepository reservationRepository;
-    private final SeatRepository seatRepository;
+    private final MemberFinder memberFinder;
 
-    public ReservationService(final ReservationRepository reservationRepository,
-                              final SeatRepository seatRepository) {
-        this.reservationRepository = reservationRepository;
-        this.seatRepository = seatRepository;
+    public ReservationService(final MemberFinder memberFinder) {
+        this.memberFinder = memberFinder;
     }
 
+    public void reserve(final Member member, final NewReservation newReservation) {
+        final Member foundMember = memberFinder.find(member.getId());
+
+    }
 }
