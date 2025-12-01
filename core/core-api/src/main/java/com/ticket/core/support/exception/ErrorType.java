@@ -14,7 +14,10 @@ public enum ErrorType {
     IS_NOT_VALID_PERFORMANCE(HttpStatus.BAD_REQUEST, ErrorCode.E2000, "유효하지 않은 공연 정보입니다."),
     IS_PAST_PERFORMANCE(HttpStatus.BAD_REQUEST, ErrorCode.E2001, "과거 공연은 예매할 수 없습니다."),
     NOT_YET_RESERVE_TIME(HttpStatus.BAD_REQUEST, ErrorCode.E2002, "아직 예매가 오픈되지 않았습니다."),
-    NOT_EXIST_AVAILABLE_SEAT(HttpStatus.BAD_REQUEST, ErrorCode.E2003, "이용 가능한 좌석이 없습니다.");
+    NOT_EXIST_AVAILABLE_SEAT(HttpStatus.BAD_REQUEST, ErrorCode.E2003, "이용 가능한 좌석이 없습니다."),
+
+    //좌석
+    SEAT_MISMATCH_IN_PERFORMANCE(HttpStatus.BAD_REQUEST, ErrorCode.E3000, "요청한 좌석 정보와 일치하지 않습니다.");
 
     private final HttpStatus status;
     private final ErrorCode errorCode;

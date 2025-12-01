@@ -44,9 +44,8 @@ public class PerformanceServiceTest {
     @Test
     void 회차의_재고가_1이상이라면_예매_가능한_전체_좌석_조회는_성공한다() {
         //given
-        Long performanceId = 1L;
         SeatStatus status = SeatStatus.AVAILABLE;
-        final List<SeatEntity> seats = List.of(new SeatEntity(1L, performanceId, "x1", "y1", SeatStatus.AVAILABLE), new SeatEntity(2L, performanceId, "x2", "y2", SeatStatus.AVAILABLE));
+        final List<SeatEntity> seats = List.of(new SeatEntity(1L, "x1", "y1", SeatStatus.AVAILABLE), new SeatEntity(2L, performanceId, "x2", "y2", SeatStatus.AVAILABLE));
         when(seatRepository.findByPerformanceId(performanceId)).thenReturn(seats);
         when(seatRepository.countByPerformanceIdAndStatus(performanceId, status)).thenReturn(1L);
         //when
