@@ -1,30 +1,26 @@
 package com.ticket.core.api.controller.v1.request;
 
-import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.reservation.NewReservation;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 
 import java.util.List;
 
 public class CreateReservationRequest {
-    @NotNull
-    @Positive
-    private Long performanceId;
+
+    private Long memberId;
 
     @NotEmpty
     private List<Long> seatIds;
 
-    public Long getPerformanceId() {
-        return performanceId;
+    public Long getMemberId() {
+        return memberId;
     }
 
     public List<Long> getSeatIds() {
         return seatIds;
     }
 
-    public NewReservation toNewReservation(final Member member) {
-        return new NewReservation(member.getId(), performanceId, seatIds);
+    public NewReservation toNewReservation(final Long performanceId) {
+        return new NewReservation(memberId, performanceId, seatIds);
     }
 }
