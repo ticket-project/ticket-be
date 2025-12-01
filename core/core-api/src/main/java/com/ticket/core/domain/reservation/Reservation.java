@@ -4,20 +4,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Reservation {
-    private final Long userId;
+    private final Long memberId;
     private final Long performanceId;
     private final List<Long> seatIds;
     private final LocalDateTime reservationTime;
 
-    public Reservation(final Long userId, final Long performanceId, final List<Long> seatIds, final LocalDateTime reservationTime) {
-        this.userId = userId;
+    public Reservation(final Long memberId, final Long performanceId, final List<Long> seatIds, final LocalDateTime reservationTime) {
+        this.memberId = memberId;
         this.performanceId = performanceId;
         this.seatIds = seatIds;
         this.reservationTime = reservationTime;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getMemberId() {
+        return memberId;
     }
 
     public Long getPerformanceId() {
