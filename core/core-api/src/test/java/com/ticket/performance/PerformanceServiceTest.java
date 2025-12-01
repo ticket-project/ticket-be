@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 
@@ -48,7 +47,7 @@ public class PerformanceServiceTest {
         Long performanceId = 1L;
         SeatStatus status = SeatStatus.AVAILABLE;
         final List<SeatEntity> seats = List.of(new SeatEntity(1L, performanceId, "x1", "y1", SeatStatus.AVAILABLE), new SeatEntity(2L, performanceId, "x2", "y2", SeatStatus.AVAILABLE));
-        when(seatRepository.findByPerformanceId(performanceId)).thenReturn(Optional.of(seats));
+        when(seatRepository.findByPerformanceId(performanceId)).thenReturn(seats);
         when(seatRepository.countByPerformanceIdAndStatus(performanceId, status)).thenReturn(1L);
         //when
         List<Seat> seatList = performanceService.findAllSeatByPerformance(performanceId);

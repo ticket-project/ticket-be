@@ -28,7 +28,10 @@ public class PerformanceService {
     public List<Seat> findAllSeatByPerformance(final Long performanceId) {
         final Long availableCount = seatRepository.countByPerformanceIdAndStatus(performanceId, SeatStatus.AVAILABLE);
         if (availableCount <= 0) throw new CoreException(ErrorType.NOT_EXIST_AVAILABLE_SEAT);
-        final List<SeatEntity> seatEntities = seatRepository.findByPerformanceId(performanceId).orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND));
+        final List<SeatEntity> seatEntities = seatRepository.findByPerformanceId(performanceId);
+        if (seatEntities.isEmpty()) {
+            throw new NotFoundException(ErrorType.NOT_FOUND);
+        }
         return seatEntities.stream()
                 .map(e -> new Seat(e.getId(),
                         e.getPerformanceId(),
