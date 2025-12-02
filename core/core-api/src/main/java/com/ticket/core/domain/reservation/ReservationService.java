@@ -7,6 +7,7 @@ import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.enums.PerformanceSeatStatus;
 import com.ticket.storage.db.core.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class ReservationService {
         this.reservationDetailRepository = reservationDetailRepository;
     }
 
+    @Transactional
     public void reserve(final NewReservation newReservation) {
         final Member foundMember = memberFinder.find(newReservation.getMemberId());
         final Performance foundPerformance = performanceFinder.find(newReservation.getPerformanceId());
