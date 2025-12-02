@@ -41,6 +41,8 @@ public class ReservationService {
                 newReservation.getPerformanceId(), newReservation.getSeatIds(), PerformanceSeatStatus.AVAILABLE
         );
 
+        performanceSeats.forEach(PerformanceSeatEntity::reserve);
+
         final ReservationEntity savedReservation = reservationRepository.save(new ReservationEntity(foundMember.getId(), foundPerformance.getId()));
         reservationDetailRepository.saveAll(
                 performanceSeats.stream()

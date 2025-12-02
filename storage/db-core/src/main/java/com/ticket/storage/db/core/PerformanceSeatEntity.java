@@ -34,4 +34,11 @@ public class PerformanceSeatEntity {
     public PerformanceSeatStatus getStatus() {
         return status;
     }
+
+    public void reserve() {
+        if (this.status == PerformanceSeatStatus.RESERVED) {
+            throw new IllegalStateException("이미 예약된 좌석입니다."); //TODO 여기 예외 처리 어떻게?
+        }
+        this.status = PerformanceSeatStatus.RESERVED;
+    }
 }
