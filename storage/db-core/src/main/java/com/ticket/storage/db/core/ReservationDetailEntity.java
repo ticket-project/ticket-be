@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 public class ReservationDetailEntity {
 
     @Id @GeneratedValue
-    private Long reservationDetailId;
+    private Long id;
 
     private Long reservationId;
 
