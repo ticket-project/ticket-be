@@ -19,5 +19,6 @@ rootProject.name = 'ticket'
 include(
         'core:core-enum',
         'core:core-api',
-        'storage:db-core'
+        'storage:db-core',
+        'support:logging'
 )
