@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 @Table(name = "PERFORMANCE_SEAT")
 public class PerformanceSeatEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long performanceId;
