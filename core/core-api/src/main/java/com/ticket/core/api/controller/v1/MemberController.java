@@ -5,7 +5,7 @@ import com.ticket.core.api.controller.v1.request.LoginMemberRequest;
 import com.ticket.core.api.controller.v1.response.MemberResponse;
 import com.ticket.core.domain.auth.SessionConst;
 import com.ticket.core.domain.member.Member;
-import com.ticket.core.domain.member.LoginMember;
+import com.ticket.core.domain.member.MemberDetails;
 import com.ticket.core.domain.member.MemberService;
 import com.ticket.core.support.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,9 +41,9 @@ public class MemberController {
     }
 
     @GetMapping
-    public ApiResponse<MemberResponse> findById(LoginMember loginMember) {
-        log.info("loginMember={}", loginMember);
-        final Member findMember = memberService.findById(loginMember.getMemberId());
+    public ApiResponse<MemberResponse> findById(MemberDetails memberDetails) {
+        log.info("loginMember={}", memberDetails);
+        final Member findMember = memberService.findById(memberDetails.getMemberId());
         return ApiResponse.success(new MemberResponse(findMember.getId(), findMember.getEmail().getEmail(), findMember.getName()));
     }
 }

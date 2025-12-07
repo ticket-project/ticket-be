@@ -34,14 +34,15 @@ public class MemberService {
         final MemberEntity savedMember = memberRepository.save(new MemberEntity(
                 addMember.getEmail(),
                 passwordEncoder.encode(addMember.getPassword()),
-                addMember.getName()
+                addMember.getName(),
+                addMember.getRole()
         ));
         return savedMember.getId();
     }
 
     public Member findById(final Long memberId) {
         final MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND));
-        return new Member(memberEntity.getId(), new Email(memberEntity.getEmail()), memberEntity.getName());
+        return new Member(memberEntity.getId(), new Email(memberEntity.getEmail()), memberEntity.getName(), memberEntity.getRole());
     }
 
     public Member login(final String email, final String password) {
@@ -51,6 +52,6 @@ public class MemberService {
         if (!passwordEncoder.matches(password, foundMemberEntity.getPassword())) {
             throw new CoreException(ErrorType.INVALID_PASSWORD);
         }
-        return new Member(foundMemberEntity.getId(), new Email(foundMemberEntity.getEmail()), foundMemberEntity.getName());
+        return new Member(foundMemberEntity.getId(), new Email(foundMemberEntity.getEmail()), foundMemberEntity.getName(), foundMemberEntity.getRole());
     }
 }

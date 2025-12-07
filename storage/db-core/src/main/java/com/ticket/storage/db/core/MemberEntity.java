@@ -1,5 +1,6 @@
 package com.ticket.storage.db.core;
 
+import com.ticket.core.enums.Role;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,13 +15,16 @@ public class MemberEntity {
     private String email;
     private String password;
     private String name;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     protected MemberEntity() {}
 
-    public MemberEntity(final String email, final String password, final String name) {
+    public MemberEntity(final String email, final String password, final String name, final Role role) {
         this.email = email;
         this.password = password;
         this.name = name;
+        this.role = role;
     }
 
     public Long getId() {
@@ -37,5 +41,9 @@ public class MemberEntity {
 
     public String getPassword() {
         return password;
+    }
+
+    public Role getRole() {
+        return role;
     }
 }

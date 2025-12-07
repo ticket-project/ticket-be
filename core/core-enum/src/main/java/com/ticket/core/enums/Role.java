@@ -1,6 +1,6 @@
 package com.ticket.core.enums;
 
-public enum Roles {
+public enum Role {
     ADMIN,
     MEMBER
 }

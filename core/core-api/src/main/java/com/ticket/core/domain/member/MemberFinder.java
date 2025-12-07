@@ -18,6 +18,6 @@ public class MemberFinder {
 
     public Member find(final Long id) {
         final MemberEntity memberEntity = memberRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND));
-        return new Member(memberEntity.getId(), new Email(memberEntity.getEmail()), memberEntity.getName());
+        return new Member(memberEntity.getId(), new Email(memberEntity.getEmail()), memberEntity.getName(), memberEntity.getRole());
     }
 }
