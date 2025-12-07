@@ -1,9 +1,9 @@
 package com.ticket.core.domain.member;
 
-public class LoginMember {
+public class MemberDetails {
     private final Long memberId;
 
-    public LoginMember(Long memberId) {
+    public MemberDetails(Long memberId) {
         this.memberId = memberId;
     }
 

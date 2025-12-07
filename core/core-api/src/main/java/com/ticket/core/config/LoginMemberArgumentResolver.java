@@ -1,7 +1,7 @@
 package com.ticket.core.config;
 
 import com.ticket.core.domain.auth.SessionConst;
-import com.ticket.core.domain.member.LoginMember;
+import com.ticket.core.domain.member.MemberDetails;
 import com.ticket.core.domain.member.Member;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -14,7 +14,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(final MethodParameter parameter) {
-        return LoginMember.class.isAssignableFrom(parameter.getParameterType());
+        return MemberDetails.class.isAssignableFrom(parameter.getParameterType());
     }
 
     @Override
@@ -31,6 +31,6 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
             return null;
         }
 
-        return new LoginMember(member.getId());
+        return new MemberDetails(member.getId());
     }
 }
