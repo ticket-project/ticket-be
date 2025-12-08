@@ -34,6 +34,10 @@ public class AuthController {
     public ApiResponse<Long> login(@RequestBody @Valid LoginMemberRequest request, HttpServletRequest httpRequest) {
         final Member loginedMember = memberService.login(request.getEmail(), request.getPassword());
 
+        final HttpSession oldSession = httpRequest.getSession(false);
+        if (oldSession != null) {
+            oldSession.invalidate();
+        }
         final HttpSession session = httpRequest.getSession();
         session.setAttribute(SessionConst.LOGIN_MEMBER, new MemberDetails(loginedMember.getId(), loginedMember.getRole()));
         return ApiResponse.success(loginedMember.getId());
