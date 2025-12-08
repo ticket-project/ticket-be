@@ -10,7 +10,6 @@ public class AddMemberRequest {
     private String email;
     private String password;
     private String name;
-    private String role;
 
     public AddMemberRequest() {}
 
@@ -26,10 +25,6 @@ public class AddMemberRequest {
         return name;
     }
 
-    public String getRole() {
-        return role;
-    }
-
     public AddMember toAddMember() {
         if (password.isEmpty()) {
             throw new IllegalArgumentException("비밀번호는 공백일 수 없습니다.");
@@ -39,9 +34,6 @@ public class AddMemberRequest {
         }
         if (name.isEmpty()) {
             throw new IllegalArgumentException("이름은 공백일 수 없습니다.");
-        }
-        if (Role.ADMIN.name().equals(role)) {
-            return new AddMember(email, password, name, Role.ADMIN);
         }
         return new AddMember(email, password, name, Role.MEMBER);
     }
