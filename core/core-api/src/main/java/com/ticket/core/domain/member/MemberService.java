@@ -14,11 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final MemberFinder memberFinder;
     private final PasswordEncoder passwordEncoder;
     private final PasswordPolicyValidator passwordPolicyValidator;
 
-    public MemberService(final MemberRepository memberRepository, final PasswordEncoder passwordEncoder, final PasswordPolicyValidator passwordPolicyValidator) {
+    public MemberService(final MemberRepository memberRepository, final MemberFinder memberFinder, final PasswordEncoder passwordEncoder, final PasswordPolicyValidator passwordPolicyValidator) {
         this.memberRepository = memberRepository;
+        this.memberFinder = memberFinder;
         this.passwordEncoder = passwordEncoder;
         this.passwordPolicyValidator = passwordPolicyValidator;
     }
@@ -41,8 +43,7 @@ public class MemberService {
     }
 
     public Member findById(final Long memberId) {
-        final MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND));
-        return new Member(memberEntity.getId(), new Email(memberEntity.getEmail()), memberEntity.getName(), memberEntity.getRole());
+        return memberFinder.find(memberId);
     }
 
     public Member login(final String email, final String password) {
