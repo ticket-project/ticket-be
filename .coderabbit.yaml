@@ -93,5 +93,3 @@ tools:
     enabled: true
   sqlfluff:
     enabled: true
-  oxc:
-    enabled: true
