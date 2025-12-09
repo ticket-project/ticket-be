@@ -1,4 +1,4 @@
-package com.ticket.core.domain.auth;
+package com.ticket.core.domain.member;
 
 import com.ticket.core.domain.member.vo.Password;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -2,6 +2,7 @@ package com.ticket.core.domain.auth;
 
 import com.ticket.core.domain.member.AddMember;
 import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.PasswordService;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
