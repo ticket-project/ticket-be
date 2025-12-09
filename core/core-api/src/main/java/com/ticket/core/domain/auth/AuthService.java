@@ -2,7 +2,6 @@ package com.ticket.core.domain.auth;
 
 import com.ticket.core.domain.member.AddMember;
 import com.ticket.core.domain.member.Member;
-import com.ticket.core.domain.member.PasswordPolicyValidator;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
@@ -47,7 +46,7 @@ public class AuthService {
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND));
 
         if (!passwordEncoder.matches(password, foundMemberEntity.getPassword())) {
-            throw new CoreException(ErrorType.INVALID_PASSWORD);
+            throw new CoreException(ErrorType.NOT_MATCH_PASSWORD);
         }
         return new Member(foundMemberEntity.getId(), new Email(foundMemberEntity.getEmail()), foundMemberEntity.getName(), foundMemberEntity.getRole());
     }

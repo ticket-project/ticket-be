@@ -12,7 +12,8 @@ public enum ErrorType {
 
     //회원
     DUPLICATE_EMAIL_ERROR(HttpStatus.CONFLICT, ErrorCode.E2000, "중복된 이메일은 불가능합니다."),
-    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, ErrorCode.E2001, "잘못된 비밀번호입니다."),
+    NOT_MATCH_PASSWORD(HttpStatus.UNAUTHORIZED, ErrorCode.E2001, "비밀번호가 일치하지 않습니다."),
+    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, ErrorCode.E2002, "비밀번호 양식이 맞지 않습니다."),
 
     //회차
     IS_NOT_VALID_PERFORMANCE(HttpStatus.BAD_REQUEST, ErrorCode.E3000, "유효하지 않은 공연 정보입니다."),

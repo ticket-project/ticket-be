@@ -1,5 +1,7 @@
-package com.ticket.core.domain.member;
+package com.ticket.core.domain.auth;
 
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -9,13 +11,13 @@ public class PasswordPolicyValidator {
 
     public void validateAdd(final String password) {
         if (password == null) {
-            throw new IllegalArgumentException("비밀번호는 null일 수 없습니다.");
+            throw new CoreException(ErrorType.INVALID_PASSWORD);
         }
         if (password.trim().isEmpty()) {
-            throw new IllegalArgumentException("비밀번호는 공백일 수 없습니다.");
+            throw new CoreException(ErrorType.INVALID_PASSWORD);
         }
         if (password.length() < MINIMUM_PASSWORD_LENGTH) {
-            throw new IllegalArgumentException("비밀번호는 최소 " + MINIMUM_PASSWORD_LENGTH + "자 이상이어야 합니다.");
+            throw new CoreException(ErrorType.INVALID_PASSWORD);
         }
     }
 }

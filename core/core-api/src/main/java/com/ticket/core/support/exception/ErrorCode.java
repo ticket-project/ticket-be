@@ -11,6 +11,7 @@ public enum ErrorCode {
     //회원
     E2000,
     E2001,
+    E2002,
 
     //회차
     E3000,
