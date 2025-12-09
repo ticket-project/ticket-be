@@ -5,4 +5,4 @@ spring:
       - logging.yml
 
   profiles:
-    active: local
+    active: test
