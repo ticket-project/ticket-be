@@ -21,8 +21,8 @@ public class Member {
         return id;
     }
 
-    public Email getEmail() {
-        return email;
+    public String getEmailValue() {
+        return email.getEmail();
     }
 
     public String getName() {

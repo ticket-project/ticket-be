@@ -11,7 +11,11 @@ public class Email {
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
-    public Email(String email) {
+    public Email(final String email) {
+        this.email = validate(email);
+    }
+
+    private static String validate(final String email) {
         if (email == null) {
             throw new IllegalArgumentException("email은 null일 수 없습니다.");
         }
@@ -22,8 +26,7 @@ public class Email {
         if (!EMAIL_PATTERN.matcher(trimmed).matches()) {
             throw new IllegalArgumentException("올바르지 않은 email 형식입니다.");
         }
-
-        this.email = trimmed;
+        return trimmed;
     }
 
     public String getEmail() {

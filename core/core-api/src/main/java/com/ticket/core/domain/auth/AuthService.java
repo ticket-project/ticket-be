@@ -23,11 +23,11 @@ public class AuthService {
 
     @Transactional
     public Long register(final AddMember addMember) {
-        if (memberRepository.existsByEmail(addMember.getEmail())) {
+        if (memberRepository.existsByEmail(addMember.getEmailValue())) {
             throw new CoreException(ErrorType.DUPLICATE_EMAIL_ERROR);
         }
         final MemberEntity savedMember = memberRepository.save(new MemberEntity(
-                addMember.getEmail(),
+                addMember.getEmailValue(),
                 passwordService.encode(addMember.getPassword()),
                 addMember.getName(),
                 addMember.getRole()
