@@ -3,6 +3,8 @@ package com.ticket.core.domain.auth;
 import com.ticket.core.domain.member.AddMember;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.PasswordService;
+import com.ticket.core.domain.member.vo.Email;
+import com.ticket.core.domain.member.vo.Password;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.storage.db.core.MemberEntity;
@@ -14,6 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -69,19 +73,31 @@ class AuthServiceTest {
 
     }
 
-    @Test
-    void 로그인에_성공한다() {
-        //given
-        final AddMember addMember = new AddMember("test@test.com", "1234", "test", Role.MEMBER);
-        authService.register(addMember);
+    @Nested
+    class 로그인 {
 
-        final String email = "test@test.com";
-        final String password = "1234";
-        //when
-        final Member loggedInMember = authService.login(email, password);
-        //then
-        assertThat(loggedInMember.getEmailValue()).isEqualTo("test@test.com");
-        assertThat(loggedInMember.getName()).isEqualTo("test");
+        @Test
+        void 올바른_입력값이면_성공한다() {
+            //given
+            final Email email = Email.create("test@test.com");
+            final Password password = Password.create("encoded(1234)");
+            final MemberEntity memberEntity = new MemberEntity(
+                    email.getValue(),
+                    password.getValue(),
+                    "test",
+                    Role.MEMBER
+            );
+            when(memberRepository.findByEmail(email.getValue())).thenReturn(Optional.of(memberEntity));
+            when(passwordService.matches(password.getValue(), memberEntity.getPassword())).thenReturn(true);
+            //when
+            final Member loggedInMember = authService.login(email, password);
+            //then
+            assertThat(loggedInMember.getEmail()).isEqualTo("test@test.com");
+            assertThat(loggedInMember.getName()).isEqualTo("test");
+            assertThat(loggedInMember.getRole()).isEqualTo(Role.MEMBER);
+        }
     }
+
+
 
 }
