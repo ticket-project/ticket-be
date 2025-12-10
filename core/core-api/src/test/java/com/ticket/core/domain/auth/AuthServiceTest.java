@@ -96,6 +96,16 @@ class AuthServiceTest {
             assertThat(loggedInMember.getName()).isEqualTo("test");
             assertThat(loggedInMember.getRole()).isEqualTo(Role.MEMBER);
         }
+
+        @Test
+        void 입력받은_email에_해당하는_회원이_없으면_예외를_터트린다() {
+            //given
+            final Email email = Email.create("test@test.com");
+            final Password password = Password.create("encoded(1234)");
+            when(memberRepository.findByEmail(email.getValue())).thenReturn(Optional.empty());
+            //then
+            assertThatThrownBy(() -> authService.login(email, password)).isInstanceOf(CoreException.class);
+        }
     }
 
 
