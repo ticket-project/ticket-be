@@ -1,20 +1,19 @@
 package com.ticket.core.domain.member;
 
 import com.ticket.core.domain.member.vo.Email;
-import com.ticket.core.domain.member.vo.MemberName;
 import com.ticket.core.enums.Role;
 
 public class Member {
 
     private final Long id;
     private final Email email;
-    private final MemberName name;
+    private final String name;
     private final Role role;
 
     public Member(final Long id, final Email email, final String name, final Role role) {
         this.id = id;
         this.email = email;
-        this.name = new MemberName(name);
+        this.name = name;
         this.role = role;
     }
 
@@ -27,7 +26,7 @@ public class Member {
     }
 
     public String getName() {
-        return name.getValue();
+        return name;
     }
 
     public Role getRole() {

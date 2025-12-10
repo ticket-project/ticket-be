@@ -1,21 +1,25 @@
 package com.ticket.core.domain.member;
 
 import com.ticket.core.domain.member.vo.Email;
-import com.ticket.core.domain.member.vo.MemberName;
 import com.ticket.core.domain.member.vo.Password;
 import com.ticket.core.enums.Role;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 
 public class AddMember {
 
     private final Email email;
     private final Password password;
-    private final MemberName name;
+    private final String name;
     private final Role role;
 
     public AddMember(final String email, final String rawPassword, final String name, final Role role) {
+        if (name == null || name.trim().isBlank()) {
+            throw new CoreException(ErrorType.VALIDATION_ERROR, "이름은 공백일 수 없습니다.");
+        }
         this.email = new Email(email);
         this.password = new Password(rawPassword);
-        this.name = new MemberName(name);
+        this.name = name;
         this.role = role;
     }
 
@@ -28,7 +32,7 @@ public class AddMember {
     }
 
     public String getName() {
-        return name.getValue();
+        return name;
     }
 
     public Role getRole() {
