@@ -15,13 +15,13 @@ public class Password {
 
     private void validate(final String rawValue) {
         if (rawValue == null) {
-            throw new CoreException(ErrorType.INVALID_PASSWORD);
+            throw new CoreException(ErrorType.VALIDATION_ERROR, "password는 null일 수 없습니다.");
         }
         if (rawValue.trim().isEmpty()) {
-            throw new CoreException(ErrorType.INVALID_PASSWORD);
+            throw new CoreException(ErrorType.VALIDATION_ERROR, "password는 빈 값일 수 없습니다.");
         }
         if (rawValue.length() < MINIMUM_PASSWORD_LENGTH) {
-            throw new CoreException(ErrorType.INVALID_PASSWORD);
+            throw new CoreException(ErrorType.VALIDATION_ERROR, "password는 4자 이상이어야 합니다.");
         }
     }
 

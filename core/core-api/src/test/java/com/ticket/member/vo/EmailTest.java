@@ -29,7 +29,7 @@ class EmailTest {
         //when
         final Email result = new Email(email);
         //then
-        assertThat(result.getEmail()).isEqualTo(email.trim());
+        assertThat(result.getValue()).isEqualTo(email.trim());
     }
 
 }

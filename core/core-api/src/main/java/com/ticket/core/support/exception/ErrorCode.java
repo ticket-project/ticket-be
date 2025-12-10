@@ -1,6 +1,7 @@
 package com.ticket.core.support.exception;
 
 public enum ErrorCode {
+    E400,
     E404,
     E500,
 
