@@ -4,6 +4,7 @@ import com.ticket.core.domain.member.AddMember;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.PasswordService;
 import com.ticket.core.domain.member.vo.Email;
+import com.ticket.core.domain.member.vo.Password;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.storage.db.core.MemberEntity;
@@ -36,13 +37,13 @@ public class AuthService {
         return savedMember.getId();
     }
 
-    public Member login(final String email, final String password) {
-        final MemberEntity foundMemberEntity = memberRepository.findByEmail(email)
+    public Member login(final Email email, final Password password) {
+        final MemberEntity foundMemberEntity = memberRepository.findByEmail(email.getValue())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND));
 
-        if (!passwordService.matches(password, foundMemberEntity.getPassword())) {
+        if (!passwordService.matches(password.getValue(), foundMemberEntity.getPassword())) {
             throw new CoreException(ErrorType.NOT_MATCH_PASSWORD);
         }
-        return new Member(foundMemberEntity.getId(), new Email(foundMemberEntity.getEmail()), foundMemberEntity.getName(), foundMemberEntity.getRole());
+        return new Member(foundMemberEntity.getId(), foundMemberEntity.getEmail(), foundMemberEntity.getName(), foundMemberEntity.getRole());
     }
 }

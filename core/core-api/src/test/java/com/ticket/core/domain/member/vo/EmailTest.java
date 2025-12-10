@@ -15,6 +15,6 @@ class EmailTest {
     @ValueSource(strings = {" ", "test", "test@test", "test@test."})
     void 올바르지_않은_이메일이면_Email_생성에_실패한다(final String email) {
         //then
-        assertThatThrownBy(() -> new Email(email)).isInstanceOf(CoreException.class);
+        assertThatThrownBy(() -> Email.create(email)).isInstanceOf(CoreException.class);
     }
 }

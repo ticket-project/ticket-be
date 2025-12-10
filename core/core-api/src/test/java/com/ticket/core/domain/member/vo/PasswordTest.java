@@ -14,6 +14,6 @@ class PasswordTest {
     @ValueSource(strings = {" ", "123", "abc"})
     void 비밀번호가_null이거나_공백이거나_4자_미만이면_실패한다(final String value) {
         //then
-        Assertions.assertThatThrownBy(() -> new Password(value)).isInstanceOf(CoreException.class);
+        Assertions.assertThatThrownBy(() -> Password.create(value)).isInstanceOf(CoreException.class);
     }
 }

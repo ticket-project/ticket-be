@@ -26,6 +26,6 @@ public class MemberController {
     public ApiResponse<MemberResponse> findById(MemberDetails memberDetails) {
         log.info("loginMember={}", memberDetails);
         final Member findMember = memberService.findById(memberDetails.getMemberId());
-        return ApiResponse.success(new MemberResponse(findMember.getId(), findMember.getEmailValue(), findMember.getName(), findMember.getRole().toString()));
+        return ApiResponse.success(new MemberResponse(findMember.getId(), findMember.getEmail(), findMember.getName(), findMember.getRole().toString()));
     }
 }

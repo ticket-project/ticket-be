@@ -8,9 +8,13 @@ public class Password {
 
     private final String value;
 
-    public Password(final String value) {
+    private Password(final String value) {
         validate(value);
         this.value = value;
+    }
+
+    public static Password create(final String value) {
+        return new Password(value);
     }
 
     private void validate(final String rawValue) {

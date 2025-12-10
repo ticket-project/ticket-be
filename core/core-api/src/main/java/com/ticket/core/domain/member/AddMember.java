@@ -17,8 +17,8 @@ public class AddMember {
         if (name == null || name.trim().isBlank()) {
             throw new CoreException(ErrorType.VALIDATION_ERROR, "이름은 공백일 수 없습니다.");
         }
-        this.email = new Email(email);
-        this.password = new Password(rawPassword);
+        this.email = Email.create(email);
+        this.password = Password.create(rawPassword);
         this.name = name;
         this.role = role;
     }

@@ -13,7 +13,7 @@ public class Email {
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
-    public Email(final String value) {
+    private Email(final String value) {
         this.value = validate(value);
     }
 
@@ -29,6 +29,10 @@ public class Email {
             throw new CoreException(ErrorType.VALIDATION_ERROR, "올바르지 않은 email 형식입니다.");
         }
         return trimmed;
+    }
+
+    public static Email create(final String value) {
+        return new Email(value);
     }
 
     public String getValue() {

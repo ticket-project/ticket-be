@@ -1,6 +1,5 @@
 package com.ticket.core.domain.member;
 
-import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.exception.NotFoundException;
 import com.ticket.storage.db.core.MemberEntity;
@@ -18,6 +17,6 @@ public class MemberFinder {
 
     public Member find(final Long id) {
         final MemberEntity memberEntity = memberRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND));
-        return new Member(memberEntity.getId(), new Email(memberEntity.getEmail()), memberEntity.getName(), memberEntity.getRole());
+        return new Member(memberEntity.getId(), memberEntity.getEmail(), memberEntity.getName(), memberEntity.getRole());
     }
 }
