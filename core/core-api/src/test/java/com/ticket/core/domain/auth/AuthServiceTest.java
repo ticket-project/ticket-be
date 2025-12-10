@@ -106,6 +106,23 @@ class AuthServiceTest {
             //then
             assertThatThrownBy(() -> authService.login(email, password)).isInstanceOf(CoreException.class);
         }
+
+        @Test
+        void 비밀번호가_일치하지_않으면_예외를_터트린다() {
+            //given
+            final Email email = Email.create("test@test.com");
+            final Password password = Password.create("encoded(1234)");
+            final MemberEntity memberEntity = new MemberEntity(
+                    email.getValue(),
+                    password.getValue(),
+                    "test",
+                    Role.MEMBER
+            );
+            when(memberRepository.findByEmail(email.getValue())).thenReturn(Optional.of(memberEntity));
+            when(passwordService.matches(password.getValue(), "encoded(1234)")).thenReturn(false);
+            //then
+            assertThatThrownBy(() -> authService.login(email, password)).isInstanceOf(CoreException.class);
+        }
     }
 
 
