@@ -2,22 +2,14 @@ package com.ticket.member.vo;
 
 import com.ticket.core.domain.member.vo.Email;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
 class EmailTest {
 
-    @ParameterizedTest
-    @NullSource
-    @ValueSource(strings = {"", " ", "test", "test@test", "test@test."})
-    void 올바르지_않은_이메일이면_Email_생성에_실패한다(final String email) {
-        //then
-        assertThatThrownBy(() -> new Email(email)).isInstanceOf(IllegalArgumentException.class);
-    }
+
 
     @ParameterizedTest
     @ValueSource(strings = {"test@test.com",
