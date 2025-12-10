@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -38,15 +39,14 @@ class AuthServiceTest {
             final AddMember addMember = new AddMember("test@test.com", "1234", "test", Role.MEMBER);
             when(memberRepository.existsByEmail(any())).thenReturn(false);
             when(passwordService.encode(any())).thenReturn("encoded");
-            when(memberRepository.save(any(MemberEntity.class)))
-                    .thenReturn(MemberEntity.builder()
-                            .id(1L)
-                            .email(addMember.getEmailValue())
-                            .password("encoded")
-                            .name(addMember.getName())
-                            .role(addMember.getRole())
-                            .build()
-                    );
+            final MemberEntity savedMemberEntity = new MemberEntity(
+                    addMember.getEmailValue(),
+                    addMember.getName(),
+                    addMember.getPassword().getValue(),
+                    addMember.getRole()
+            );
+            ReflectionTestUtils.setField(savedMemberEntity, "id", 1L);
+            when(memberRepository.save(any(MemberEntity.class))).thenReturn(savedMemberEntity);
             //when
             final Long id = authService.register(addMember);
             //then

@@ -27,56 +27,6 @@ public class MemberEntity {
         this.role = role;
     }
 
-    //(테스트 전용)
-    private MemberEntity(Builder builder) {
-        this.id = builder.id;
-        this.email = builder.email;
-        this.password = builder.password;
-        this.name = builder.name;
-        this.role = builder.role;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private Long id;
-        private String email;
-        private String password;
-        private String name;
-        private Role role;
-
-        public Builder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder email(String email) {
-            this.email = email;
-            return this;
-        }
-
-        public Builder password(String password) {
-            this.password = password;
-            return this;
-        }
-
-        public Builder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder role(Role role) {
-            this.role = role;
-            return this;
-        }
-
-        public MemberEntity build() {
-            return new MemberEntity(this);
-        }
-    }
-
     public Long getId() {
         return id;
     }
