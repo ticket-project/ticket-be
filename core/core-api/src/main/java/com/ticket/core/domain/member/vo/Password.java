@@ -3,6 +3,8 @@ package com.ticket.core.domain.member.vo;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 
+import java.util.Objects;
+
 public class Password {
     private static final int MINIMUM_PASSWORD_LENGTH = 4;
 
@@ -31,5 +33,17 @@ public class Password {
 
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        final Password password = (Password) o;
+        return Objects.equals(value, password.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(value);
     }
 }
