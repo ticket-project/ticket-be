@@ -16,7 +16,7 @@ public class PasswordService {
         return passwordEncoder.encode(password.getValue());
     }
 
-    public boolean matches(final String requestPassword, final String realPassword) {
-        return passwordEncoder.matches(requestPassword, realPassword);
+    public boolean matches(final String rawPassword, final String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 }
