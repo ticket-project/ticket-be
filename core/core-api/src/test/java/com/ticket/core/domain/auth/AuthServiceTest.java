@@ -47,8 +47,8 @@ class AuthServiceTest {
             when(passwordService.encode(any())).thenReturn("encoded");
             final MemberEntity savedMemberEntity = new MemberEntity(
                     addMember.getEmailValue(),
-                    addMember.getName(),
                     addMember.getPassword().getValue(),
+                    addMember.getName(),
                     addMember.getRole()
             );
             ReflectionTestUtils.setField(savedMemberEntity, "id", 1L);
