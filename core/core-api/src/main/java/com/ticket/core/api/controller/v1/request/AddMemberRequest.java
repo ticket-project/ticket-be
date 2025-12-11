@@ -2,12 +2,11 @@ package com.ticket.core.api.controller.v1.request;
 
 import com.ticket.core.domain.member.AddMember;
 import com.ticket.core.enums.Role;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public class AddMemberRequest {
 
-    @Email
+    @NotBlank
     private String email;
     @NotBlank
     private String password;
