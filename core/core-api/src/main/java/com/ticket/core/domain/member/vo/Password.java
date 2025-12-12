@@ -27,7 +27,7 @@ public class Password {
             throw new CoreException(ErrorType.INVALID_REQUEST, "password는 빈 값일 수 없습니다.");
         }
         if (trimmedValue.length() < MINIMUM_PASSWORD_LENGTH) {
-            throw new CoreException(ErrorType.INVALID_REQUEST, "password는 4자 이상이어야 합니다.");
+            throw new CoreException(ErrorType.INVALID_REQUEST, "password는 " + MINIMUM_PASSWORD_LENGTH + "자 이상이어야 합니다.");
         }
         return trimmedValue;
     }
