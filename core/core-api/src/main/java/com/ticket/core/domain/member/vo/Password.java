@@ -11,15 +11,14 @@ public class Password {
     private final String value;
 
     private Password(final String value) {
-        validate(value);
-        this.value = value;
+        this.value = validateAndNormalize(value);
     }
 
     public static Password create(final String value) {
         return new Password(value);
     }
 
-    private void validate(final String rawValue) {
+    private String validateAndNormalize(final String rawValue) {
         if (rawValue == null) {
             throw new CoreException(ErrorType.INVALID_REQUEST, "password는 null일 수 없습니다.");
         }
@@ -30,6 +29,7 @@ public class Password {
         if (trimmedValue.length() < MINIMUM_PASSWORD_LENGTH) {
             throw new CoreException(ErrorType.INVALID_REQUEST, "password는 4자 이상이어야 합니다.");
         }
+        return trimmedValue;
     }
 
     public String getValue() {
