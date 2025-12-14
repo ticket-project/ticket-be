@@ -18,14 +18,16 @@ INSERT INTO PERFORMANCE (
     start_time,
     end_time,
     reserve_open_time,
-    reserve_close_time
+    reserve_close_time,
+    status
 ) VALUES (
              1,
              100,
              '2025-12-24 19:00:00',
              '2025-12-24 21:30:00',
              '2025-12-01 10:00:00',
-             '2025-12-24 18:00:00'
+             '2025-12-24 18:00:00',
+             'active'
          );
 
 INSERT INTO PERFORMANCE (
