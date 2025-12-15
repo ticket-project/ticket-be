@@ -3,7 +3,7 @@ package com.ticket.storage.db.core;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "SHOW")
+@Table(name = "SHOWS")
 public class ShowEntity extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
