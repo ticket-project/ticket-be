@@ -22,7 +22,11 @@ public enum ErrorType {
     NOT_EXIST_AVAILABLE_SEAT(HttpStatus.BAD_REQUEST, ErrorCode.E3003, "이용 가능한 좌석이 없습니다."),
 
     //좌석
-    SEAT_MISMATCH_IN_PERFORMANCE(HttpStatus.BAD_REQUEST, ErrorCode.E4000, "요청한 좌석 정보와 일치하지 않습니다.");
+    SEAT_MISMATCH_IN_PERFORMANCE(HttpStatus.BAD_REQUEST, ErrorCode.E4000, "요청한 좌석 정보와 일치하지 않습니다."),
+
+    //예매
+    OVER_RESERVATION_COUNT(HttpStatus.BAD_REQUEST, ErrorCode.E5000, "총 예매 가능 좌석을 초과하였습니다."),
+    SEAT_COUNT_MISMATCH(HttpStatus.CONFLICT, ErrorCode.E5001, "요청한 좌석 중 일부가 예약 불가능합니다."),;
 
     private final HttpStatus status;
     private final ErrorCode errorCode;

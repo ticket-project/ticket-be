@@ -21,4 +21,8 @@ public enum ErrorCode {
 
     //좌석
     E4000,
+
+    //예매
+    E5000,
+    E5001,
 }
