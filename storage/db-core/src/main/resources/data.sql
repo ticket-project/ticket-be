@@ -36,7 +36,8 @@ INSERT INTO PERFORMANCE (id,
                          reserve_open_time,
                          reserve_close_time,
                          state,
-                         status)
+                         status,
+                         max_can_reserve_count)
 VALUES (1,
         1,
         '2025-12-24 19:00:00',
@@ -44,7 +45,8 @@ VALUES (1,
         '2025-12-01 10:00:00',
         '2025-12-24 18:00:00',
         'OPEN',
-        'ACTIVE');
+        'ACTIVE',
+        4);
 
 INSERT INTO PERFORMANCE (id,
                          show_id,
@@ -53,7 +55,8 @@ INSERT INTO PERFORMANCE (id,
                          reserve_open_time,
                          reserve_close_time,
                          state,
-                         status)
+                         status,
+                         max_can_reserve_count)
 VALUES (2,
         1,
         '2025-12-25 14:00:00',
@@ -61,7 +64,8 @@ VALUES (2,
         '2025-12-01 10:00:00',
         '2025-12-25 13:00:00',
         'OPEN',
-        'ACTIVE');
+        'ACTIVE',
+        4);
 
 -- ==========================
 -- 회차 1번(performance_id = 1)의 좌석 상태
