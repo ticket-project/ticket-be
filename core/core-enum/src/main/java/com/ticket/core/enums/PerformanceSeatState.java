@@ -1,6 +1,6 @@
 package com.ticket.core.enums;
 
-public enum PerformanceSeatStatus {
+public enum PerformanceSeatState {
     AVAILABLE,
     RESERVED,
 }

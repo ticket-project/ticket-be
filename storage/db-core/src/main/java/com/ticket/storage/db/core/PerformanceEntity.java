@@ -1,6 +1,6 @@
 package com.ticket.storage.db.core;
 
-import com.ticket.core.enums.PerformanceStatus;
+import com.ticket.core.enums.PerformanceState;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -23,7 +23,7 @@ public class PerformanceEntity extends BaseEntity {
     private LocalDateTime reserveCloseTime;
 
     @Enumerated(value = EnumType.STRING)
-    private PerformanceStatus status;
+    private PerformanceState state;
 
     public Long getId() {
         return id;
@@ -49,7 +49,7 @@ public class PerformanceEntity extends BaseEntity {
         return reserveCloseTime;
     }
 
-    public PerformanceStatus getStatus() {
-        return status;
+    public PerformanceState getState() {
+        return state;
     }
 }

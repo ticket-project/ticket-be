@@ -1,6 +1,6 @@
 package com.ticket.storage.db.core;
 
-import com.ticket.core.enums.PerformanceSeatStatus;
+import com.ticket.core.enums.PerformanceSeatState;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,7 +15,7 @@ public class PerformanceSeatEntity extends BaseEntity {
     private Long seatId;
 
     @Enumerated(EnumType.STRING)
-    private PerformanceSeatStatus status;
+    private PerformanceSeatState state;
 
     protected PerformanceSeatEntity() {}
 
@@ -31,14 +31,14 @@ public class PerformanceSeatEntity extends BaseEntity {
         return seatId;
     }
 
-    public PerformanceSeatStatus getStatus() {
-        return status;
+    public PerformanceSeatState getState() {
+        return state;
     }
 
     public void reserve() {
-        if (this.status == PerformanceSeatStatus.RESERVED) {
+        if (this.state == PerformanceSeatState.RESERVED) {
             throw new IllegalStateException("이미 예약된 좌석입니다."); //TODO 여기 예외 처리 어떻게?
         }
-        this.status = PerformanceSeatStatus.RESERVED;
+        this.state = PerformanceSeatState.RESERVED;
     }
 }
