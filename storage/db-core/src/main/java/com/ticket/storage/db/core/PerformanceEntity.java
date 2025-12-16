@@ -59,7 +59,7 @@ public class PerformanceEntity extends BaseEntity {
         return maxCanReserveCount;
     }
 
-    public boolean isOverCount(final long reservedCount) {
-        return reservedCount > maxCanReserveCount;
+    public boolean isOverCount(final long requestReserveCount) {
+        return requestReserveCount > maxCanReserveCount;
     }
 }
