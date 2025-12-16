@@ -14,7 +14,7 @@ public class AddReservationRequest {
     private Long performanceId;
 
     @NotEmpty
-    private List<Long> seatIds;
+    private List<@Positive @NotNull Long> seatIds;
 
     public AddReservationRequest() {}
 
