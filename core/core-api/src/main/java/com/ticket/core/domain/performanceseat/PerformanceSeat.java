@@ -1,26 +1,16 @@
 package com.ticket.core.domain.performanceseat;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import com.ticket.core.enums.PerformanceSeatState;
 
 public class PerformanceSeat {
-    private final Long id;
     private final Long performanceId;
     private final Long seatId;
-    private final AtomicInteger performanceSeatCount;
+    private final PerformanceSeatState state;
 
-    public PerformanceSeat(final Long id, final Long performanceId, final Long seatId, final AtomicInteger performanceSeatCount) {
-        this.id = id;
+    public PerformanceSeat(final Long performanceId, final Long seatId, final PerformanceSeatState state) {
         this.performanceId = performanceId;
         this.seatId = seatId;
-        this.performanceSeatCount = performanceSeatCount;
-    }
-
-    private boolean canReservation() {
-        return this.performanceSeatCount.get() > 0;
-    }
-
-    public Long getId() {
-        return id;
+        this.state = state;
     }
 
     public Long getPerformanceId() {
@@ -31,8 +21,7 @@ public class PerformanceSeat {
         return seatId;
     }
 
-    public AtomicInteger getPerformanceSeatCount() {
-        return performanceSeatCount;
+    public PerformanceSeatState getState() {
+        return state;
     }
-
 }
