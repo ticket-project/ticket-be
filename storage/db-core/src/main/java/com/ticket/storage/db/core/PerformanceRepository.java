@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface PerformanceRepository extends JpaRepository<PerformanceEntity, Long> {
-    Optional<PerformanceEntity> findByIdAndShowIdAndStateAndStatus(Long performanceId, Long showId, PerformanceState state, EntityStatus status);
+    Optional<PerformanceEntity> findByIdAndStateAndStatus(Long performanceId, PerformanceState state, EntityStatus status);
 }

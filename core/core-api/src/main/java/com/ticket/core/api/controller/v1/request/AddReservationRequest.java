@@ -11,20 +11,12 @@ public class AddReservationRequest {
 
     @Positive
     @NotNull
-    private Long showId;
-
-    @Positive
-    @NotNull
     private Long performanceId;
 
     @NotEmpty
     private List<Long> seatIds;
 
     public AddReservationRequest() {}
-
-    public Long getShowId() {
-        return showId;
-    }
 
     public Long getPerformanceId() {
         return performanceId;
@@ -35,6 +27,6 @@ public class AddReservationRequest {
     }
 
     public NewReservation toNewReservation(final Long memberId) {
-        return new NewReservation(memberId, showId, performanceId, seatIds);
+        return new NewReservation(memberId, performanceId, seatIds);
     }
 }
