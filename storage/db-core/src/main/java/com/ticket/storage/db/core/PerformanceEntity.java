@@ -22,7 +22,7 @@ public class PerformanceEntity extends BaseEntity {
 
     private LocalDateTime reserveCloseTime;
 
-    private Integer maxCanReserveCount;
+    private int maxCanReserveCount;
 
     @Enumerated(value = EnumType.STRING)
     private PerformanceState state;
@@ -55,7 +55,7 @@ public class PerformanceEntity extends BaseEntity {
         return state;
     }
 
-    public Integer getMaxCanReserveCount() {
+    public int getMaxCanReserveCount() {
         return maxCanReserveCount;
     }
 
