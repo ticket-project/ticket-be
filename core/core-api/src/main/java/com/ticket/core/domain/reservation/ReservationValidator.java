@@ -25,16 +25,17 @@ public class ReservationValidator {
                             final List<PerformanceSeatEntity> performanceSeats) {
         final int reserveRequestSeatSize = newReservation.getSeatIds().size();
         if (reserveRequestSeatSize > performance.getMaxCanReserveCount()) {
-            throw new CoreException(ErrorType.OVER_RESERVATION_COUNT);
+            throw new CoreException(ErrorType.EXCEED_AVAILABLE_SEATS);
         }
 
-        final List<Long> reservationIds = reservationRepository.findAllByMemberIdAndPerformanceId(member.getId(), performance.getId()).stream()
+        final List<Long> reservationIds = reservationRepository.findAllByMemberIdAndPerformanceId(
+                 member.getId(), performance.getId()).stream()
                 .map(ReservationEntity::getId)
                 .toList();
         final long reservedCount = reservationDetailRepository.findAllByReservationIdIn(reservationIds).size();
 
         if (performance.isOverCount(reservedCount + reserveRequestSeatSize)) {
-            throw new CoreException(ErrorType.OVER_RESERVATION_COUNT);
+            throw new CoreException(ErrorType.EXCEED_AVAILABLE_SEATS);
         }
 
         if (performanceSeats.size() != reserveRequestSeatSize) {
