@@ -19,6 +19,6 @@ public class ReservationController {
 
     @PostMapping("/api/v1/reserve")
     public void reserve(MemberDetails memberDetails, @RequestBody @Valid AddReservationRequest request) {
-        reservationService.addReservation(request.toNewReservation(memberDetails.getMemberId()));
+        reservationService.addReservation(memberDetails.getMemberId(), request.toNewReservation());
     }
 }
