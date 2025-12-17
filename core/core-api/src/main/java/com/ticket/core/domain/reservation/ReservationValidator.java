@@ -11,11 +11,9 @@ import java.util.List;
 @Component
 public class ReservationValidator {
 
-    private final ReservationRepository reservationRepository;
     private final ReservationDetailRepository reservationDetailRepository;
 
-    public ReservationValidator(final ReservationRepository reservationRepository, final ReservationDetailRepository reservationDetailRepository) {
-        this.reservationRepository = reservationRepository;
+    public ReservationValidator(final ReservationDetailRepository reservationDetailRepository) {
         this.reservationDetailRepository = reservationDetailRepository;
     }
 
@@ -28,11 +26,7 @@ public class ReservationValidator {
             throw new CoreException(ErrorType.EXCEED_AVAILABLE_SEATS);
         }
 
-        final List<Long> reservationIds = reservationRepository.findAllByMemberIdAndPerformanceId(
-                 member.getId(), performance.getId()).stream()
-                .map(ReservationEntity::getId)
-                .toList();
-        final long reservedCount = reservationDetailRepository.countByReservationIdIn(reservationIds);
+        final long reservedCount = reservationDetailRepository.countByMemberIdAndPerformanceId(member.getId(), performance.getId());
 
         if (performance.isOverCount(reservedCount + reserveRequestSeatSize)) {
             throw new CoreException(ErrorType.EXCEED_AVAILABLE_SEATS);
