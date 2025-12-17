@@ -17,17 +17,17 @@ public class ReservationManager {
         this.reservationDetailRepository = reservationDetailRepository;
     }
 
-    public void add(final Member member, final PerformanceEntity performance, final List<PerformanceSeatEntity> performanceSeats) {
-        performanceSeats.forEach(PerformanceSeatEntity::reserve);
+    public void add(final Member member, final ReservationKey reservationKey) {
+        reservationKey.getPerformanceSeats().forEach(PerformanceSeatEntity::reserve);
 
-        final ReservationEntity savedReservation = saveReservation(member, performance);
-        saveReservationDetails(performanceSeats, savedReservation.getId());
+        final ReservationEntity savedReservation = saveReservation(member, reservationKey);
+        saveReservationDetails(reservationKey.getPerformanceSeats(), savedReservation.getId());
     }
 
-    private ReservationEntity saveReservation(final Member member, final PerformanceEntity performance) {
+    private ReservationEntity saveReservation(final Member member, final ReservationKey reservationKey) {
         return reservationRepository.save(new ReservationEntity(
                 member.getId(),
-                performance.getId()
+                reservationKey.getPerformanceId()
         ));
     }
 
