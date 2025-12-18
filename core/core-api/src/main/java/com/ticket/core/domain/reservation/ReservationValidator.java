@@ -22,13 +22,10 @@ public class ReservationValidator {
                             final PerformanceEntity performance,
                             final List<PerformanceSeatEntity> performanceSeats) {
         final int reserveRequestSeatSize = newReservation.getSeatIds().size();
-        if (reserveRequestSeatSize > performance.getMaxCanReserveCount()) {
-            throw new CoreException(ErrorType.EXCEED_AVAILABLE_SEATS);
-        }
 
         final long reservedCount = reservationDetailRepository.countByMemberIdAndPerformanceId(member.getId(), performance.getId());
 
-        if (performance.isOverCount(reservedCount + reserveRequestSeatSize)) {
+        if (performance.isOverCount(reservedCount + reserveRequestSeatSize) || performance.isOverCount(reserveRequestSeatSize)) {
             throw new CoreException(ErrorType.EXCEED_AVAILABLE_SEATS);
         }
 
