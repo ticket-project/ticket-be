@@ -24,10 +24,7 @@ public class ReservationManager {
     }
 
     private ReservationEntity saveReservation(final Long memberId, final Long performanceId) {
-        return reservationRepository.save(new ReservationEntity(
-                memberId,
-                performanceId
-        ));
+        return reservationRepository.save(new ReservationEntity(memberId, performanceId));
     }
 
     private void saveReservationDetails(final List<PerformanceSeatEntity> foundPerformanceSeats, final Long reservationId) {

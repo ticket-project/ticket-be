@@ -41,8 +41,8 @@ public class ReservationService {
     @Transactional
     public void addReservation(final NewReservation newReservation) {
         final Member foundMember = memberFinder.find(newReservation.getMemberId());
-        final PerformanceEntity foundPerformance = findPerformance(newReservation.getPerformanceId());
-        final List<PerformanceSeatEntity> foundPerformanceSeats = findPerformanceSeats(
+        final PerformanceEntity foundPerformance = findOpenPerformance(newReservation.getPerformanceId());
+        final List<PerformanceSeatEntity> foundPerformanceSeats = findAvailablePerformanceSeats(
                 newReservation.getSeatIds(),
                 foundPerformance.getId()
         );
@@ -56,7 +56,7 @@ public class ReservationService {
         reservationManager.add(foundMember.getId(), foundPerformance.getId(), foundPerformanceSeats);
     }
 
-    private PerformanceEntity findPerformance(final Long performanceId) {
+    private PerformanceEntity findOpenPerformance(final Long performanceId) {
         return performanceRepository.findByIdAndStateAndStatus(
                         performanceId,
                         PerformanceState.OPEN,
@@ -65,12 +65,16 @@ public class ReservationService {
                 .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND_DATA));
     }
 
-    private List<PerformanceSeatEntity> findPerformanceSeats(final List<Long> seatIds, final Long performanceId) {
-        return performanceSeatRepository.findByPerformanceIdAndSeatIdInAndState(
+    private List<PerformanceSeatEntity> findAvailablePerformanceSeats(final List<Long> seatIds, final Long performanceId) {
+        final List<PerformanceSeatEntity> performanceSeatEntities = performanceSeatRepository.findByPerformanceIdAndSeatIdInAndState(
                 performanceId,
                 seatIds,
                 PerformanceSeatState.AVAILABLE
         );
+        if (performanceSeatEntities == null || performanceSeatEntities.isEmpty()) {
+            return List.of();
+        }
+        return performanceSeatEntities;
     }
 
 }
