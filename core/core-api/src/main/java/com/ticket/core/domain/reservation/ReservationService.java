@@ -46,8 +46,14 @@ public class ReservationService {
                 newReservation.getSeatIds(),
                 foundPerformance.getId()
         );
-        reservationValidator.validateNew(newReservation, foundMember, foundPerformance, foundPerformanceSeats);
-        reservationManager.add(foundMember, foundPerformance, foundPerformanceSeats);
+
+        reservationValidator.validateNew(
+                newReservation.getSeatIds().size(),
+                foundMember.getId(),
+                foundPerformance,
+                foundPerformanceSeats.size()
+        );
+        reservationManager.add(foundMember.getId(), foundPerformance.getId(), foundPerformanceSeats);
     }
 
     private PerformanceEntity findPerformance(final Long performanceId) {

@@ -1,6 +1,5 @@
 package com.ticket.core.domain.reservation;
 
-import com.ticket.core.domain.member.Member;
 import com.ticket.storage.db.core.*;
 import org.springframework.stereotype.Component;
 
@@ -17,17 +16,17 @@ public class ReservationManager {
         this.reservationDetailRepository = reservationDetailRepository;
     }
 
-    public void add(final Member member, final PerformanceEntity performance, final List<PerformanceSeatEntity> performanceSeats) {
+    public void add(final Long memberId, final Long performanceId, final List<PerformanceSeatEntity> performanceSeats) {
         performanceSeats.forEach(PerformanceSeatEntity::reserve);
 
-        final ReservationEntity savedReservation = saveReservation(member, performance);
+        final ReservationEntity savedReservation = saveReservation(memberId, performanceId);
         saveReservationDetails(performanceSeats, savedReservation.getId());
     }
 
-    private ReservationEntity saveReservation(final Member member, final PerformanceEntity performance) {
+    private ReservationEntity saveReservation(final Long memberId, final Long performanceId) {
         return reservationRepository.save(new ReservationEntity(
-                member.getId(),
-                performance.getId()
+                memberId,
+                performanceId
         ));
     }
 

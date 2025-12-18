@@ -1,12 +1,10 @@
 package com.ticket.core.domain.reservation;
 
-import com.ticket.core.domain.member.Member;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
-import com.ticket.storage.db.core.*;
+import com.ticket.storage.db.core.PerformanceEntity;
+import com.ticket.storage.db.core.ReservationDetailRepository;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class ReservationValidator {
@@ -17,19 +15,17 @@ public class ReservationValidator {
         this.reservationDetailRepository = reservationDetailRepository;
     }
 
-    public void validateNew(final NewReservation newReservation,
-                            final Member member,
+    public void validateNew(final int reserveRequestSeatSize,
+                            final Long memberId,
                             final PerformanceEntity performance,
-                            final List<PerformanceSeatEntity> performanceSeats) {
-        final int reserveRequestSeatSize = newReservation.getSeatIds().size();
-
-        final long reservedCount = reservationDetailRepository.countByMemberIdAndPerformanceId(member.getId(), performance.getId());
+                            final int canReservePerformanceSeatsSize) {
+        final long reservedCount = reservationDetailRepository.countByMemberIdAndPerformanceId(memberId, performance.getId());
 
         if (performance.isOverCount(reservedCount + reserveRequestSeatSize) || performance.isOverCount(reserveRequestSeatSize)) {
             throw new CoreException(ErrorType.EXCEED_AVAILABLE_SEATS);
         }
 
-        if (performanceSeats.size() != reserveRequestSeatSize) {
+        if (canReservePerformanceSeatsSize != reserveRequestSeatSize) {
             throw new CoreException(ErrorType.SEAT_COUNT_MISMATCH);
         }
     }
