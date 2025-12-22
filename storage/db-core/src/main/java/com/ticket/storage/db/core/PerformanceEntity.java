@@ -27,6 +27,18 @@ public class PerformanceEntity extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private PerformanceState state;
 
+    protected PerformanceEntity() {}
+
+    public PerformanceEntity(final Long showId, final LocalDateTime startTime, final LocalDateTime endTime, final LocalDateTime reserveOpenTime, final LocalDateTime reserveCloseTime, final int maxCanReserveCount, final PerformanceState state) {
+        this.showId = showId;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.reserveOpenTime = reserveOpenTime;
+        this.reserveCloseTime = reserveCloseTime;
+        this.maxCanReserveCount = maxCanReserveCount;
+        this.state = state;
+    }
+
     public Long getId() {
         return id;
     }

@@ -19,6 +19,12 @@ public class PerformanceSeatEntity extends BaseEntity {
 
     protected PerformanceSeatEntity() {}
 
+    public PerformanceSeatEntity(final Long performanceId, final Long seatId, final PerformanceSeatState state) {
+        this.performanceId = performanceId;
+        this.seatId = seatId;
+        this.state = state;
+    }
+
     public Long getId() {
         return id;
     }
