@@ -4,6 +4,7 @@ import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.TestDataFactory;
 import com.ticket.storage.db.core.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -39,7 +40,6 @@ class ReservationConcurrencyServiceTest {
     private PerformanceEntity savedPerformance;
     private List<PerformanceSeatEntity> savedPerformanceSeats;
 
-    //todo 이거 미리 테스트 db에 데이터 세팅해놓고 테스트하자. 매번 생성하는 것 보다 나을듯.
     @BeforeEach
     void setUp() {
         savedMember = memberRepository.save(TestDataFactory.createMember());
@@ -52,8 +52,17 @@ class ReservationConcurrencyServiceTest {
                 .toList();
     }
 
+    @AfterEach
+    void tearDown() {
+        reservationDetailRepository.deleteAllInBatch();
+        reservationRepository.deleteAllInBatch();
+        performanceSeatRepository.deleteAllInBatch();
+        performanceRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
+    }
+
     @Test
-    void 재고가_1개일때_여러_요청이_동시에_들어오면_예매가_오버셀된다() throws InterruptedException {
+    void 재고가_1개일때_여러_요청이_동시에_들어오면_비관적_락에_의해_예매가_오버셀되지_않는다() throws InterruptedException {
         // given
         final int threadCount = 100;
         final ExecutorService es = Executors.newFixedThreadPool(32);
