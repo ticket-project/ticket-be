@@ -65,8 +65,10 @@ class ReservationConcurrencyServiceTest {
     void 재고가_1개일때_여러_요청이_동시에_들어오면_비관적_락에_의해_예매가_오버셀되지_않는다() throws InterruptedException {
         // given
         final int threadCount = 100;
-        final ExecutorService es = Executors.newFixedThreadPool(32);
-        final CountDownLatch latch = new CountDownLatch(threadCount);
+        final ExecutorService es = Executors.newVirtualThreadPerTaskExecutor();
+        CountDownLatch ready = new CountDownLatch(threadCount);
+        CountDownLatch start = new CountDownLatch(1);
+        CountDownLatch done = new CountDownLatch(threadCount);
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failCount = new AtomicInteger(0);
 
@@ -74,6 +76,8 @@ class ReservationConcurrencyServiceTest {
             int idx = i;
             es.submit(() -> {
                 try {
+                    ready.countDown();
+                    start.await();
                     final NewReservation request = new NewReservation(
                             saveMembers.get(idx).getId(),
                             savedPerformance.getId(),
@@ -85,11 +89,13 @@ class ReservationConcurrencyServiceTest {
                     log.error("예약 실패: {}", e.getMessage(), e);
                     failCount.incrementAndGet();
                 } finally {
-                    latch.countDown();
+                    done.countDown();
                 }
             });
         }
-        latch.await();
+        ready.await();
+        start.countDown();
+        done.await();
         System.out.println("result: " + successCount.get() + " / " + failCount.get());
         assertThat(successCount.get()).isEqualTo(1);
         final long reservationCount = reservationRepository.count();

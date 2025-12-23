@@ -9,9 +9,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 통합 테스트용 테스트 데이터 생성 헬퍼 클래스
- */
 public class TestDataFactory {
 
     // ===== Member =====
