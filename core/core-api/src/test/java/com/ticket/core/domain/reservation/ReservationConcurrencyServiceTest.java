@@ -65,7 +65,7 @@ class ReservationConcurrencyServiceTest {
     void 재고가_1개일때_여러_요청이_동시에_들어오면_비관적_락에_의해_예매가_오버셀되지_않는다() throws InterruptedException {
         // given
         final int threadCount = 100;
-        final ExecutorService es = Executors.newVirtualThreadPerTaskExecutor();
+        try (final ExecutorService es = Executors.newVirtualThreadPerTaskExecutor()) {
         CountDownLatch ready = new CountDownLatch(threadCount);
         CountDownLatch start = new CountDownLatch(1);
         CountDownLatch done = new CountDownLatch(threadCount);
@@ -100,5 +100,6 @@ class ReservationConcurrencyServiceTest {
         assertThat(successCount.get()).isEqualTo(1);
         final long reservationCount = reservationRepository.count();
         assertThat(reservationCount).isEqualTo(1);
+        }
     }
 }
