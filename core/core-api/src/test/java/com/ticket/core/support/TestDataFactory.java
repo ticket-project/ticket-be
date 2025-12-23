@@ -11,6 +11,8 @@ import java.util.List;
 
 public class TestDataFactory {
 
+    public static final LocalDateTime BASE_TIME = LocalDateTime.of(2026, 1, 1, 0, 0);
+
     // ===== Member =====
     public static MemberEntity createMember() {
         return createMember("test@example.com", "password123", "테스트유저", Role.MEMBER);
@@ -30,13 +32,12 @@ public class TestDataFactory {
     }
 
     public static PerformanceEntity createPerformance(Long showId, PerformanceState state) {
-        LocalDateTime now = LocalDateTime.now();
         return new PerformanceEntity(
                 showId,
-                now.plusDays(7),
-                now.plusDays(7).plusHours(2),
-                now.minusDays(1),
-                now.plusDays(6),
+                BASE_TIME.plusDays(7),
+                BASE_TIME.plusDays(7).plusHours(2),
+                BASE_TIME.minusDays(1),
+                BASE_TIME.plusDays(6),
                 4,
                 state
         );
@@ -69,11 +70,9 @@ public class TestDataFactory {
     }
 
     public static List<PerformanceSeatEntity> createAvailableSeats(Long performanceId, List<Long> seatIds) {
-        List<PerformanceSeatEntity> seats = new ArrayList<>();
-        for (Long seatId : seatIds) {
-            seats.add(createAvailableSeat(performanceId, seatId));
-        }
-        return seats;
+        return seatIds.stream()
+                .map(seatId -> createAvailableSeat(performanceId, seatId))
+                .toList();
     }
 
     // ===== Reservation (예매) =====
