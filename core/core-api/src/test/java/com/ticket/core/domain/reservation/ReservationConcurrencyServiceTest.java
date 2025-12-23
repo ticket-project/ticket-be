@@ -1,6 +1,5 @@
 package com.ticket.core.domain.reservation;
 
-import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.TestDataFactory;
 import com.ticket.storage.db.core.*;
@@ -11,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -23,7 +21,6 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Import({ReservationService.class, MemberFinder.class, ReservationValidator.class, ReservationManager.class})
 @SuppressWarnings("NonAsciiCharacters")
 class ReservationConcurrencyServiceTest {
 

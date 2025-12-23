@@ -1,21 +1,18 @@
 package com.ticket.core.domain.reservation;
 
-import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.support.TestDataFactory;
 import com.ticket.storage.db.core.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-@Import({ReservationService.class, MemberFinder.class, ReservationValidator.class, ReservationManager.class})
+@SpringBootTest
 @SuppressWarnings("NonAsciiCharacters")
 class ReservationServiceTest {
 
