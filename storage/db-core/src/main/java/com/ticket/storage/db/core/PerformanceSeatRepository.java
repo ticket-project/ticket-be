@@ -12,7 +12,7 @@ import java.util.List;
 public interface PerformanceSeatRepository extends JpaRepository<PerformanceSeatEntity, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @QueryHints({
-            @QueryHint(name = "javax.persistence.lock.timeout", value = "3000")
+            @QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")
     })
     List<PerformanceSeatEntity> findByPerformanceIdAndSeatIdInAndState(Long performanceId, List<Long> seatIds, PerformanceSeatState state);
 }
