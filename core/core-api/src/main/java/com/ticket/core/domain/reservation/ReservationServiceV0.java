@@ -18,11 +18,11 @@ import java.util.List;
 //@Service
 public class ReservationServiceV0 implements ReservationService {
 
-    final MemberFinder memberFinder;
-    final PerformanceRepository performanceRepository;
-    final PerformanceSeatRepository performanceSeatRepository;
-    final ReservationValidator reservationValidator;
-    final ReservationManager reservationManager;
+    private final MemberFinder memberFinder;
+    private final PerformanceRepository performanceRepository;
+    private final PerformanceSeatRepository performanceSeatRepository;
+    private final ReservationValidator reservationValidator;
+    private final ReservationManager reservationManager;
 
     public ReservationServiceV0(final MemberFinder memberFinder,
                                 final PerformanceRepository performanceRepository,

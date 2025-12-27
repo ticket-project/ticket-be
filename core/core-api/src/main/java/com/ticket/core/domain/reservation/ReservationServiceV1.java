@@ -11,19 +11,18 @@ import com.ticket.storage.db.core.PerformanceEntity;
 import com.ticket.storage.db.core.PerformanceRepository;
 import com.ticket.storage.db.core.PerformanceSeatEntity;
 import com.ticket.storage.db.core.PerformanceSeatRepository;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
+//@Service
 public class ReservationServiceV1 implements ReservationService {
 
-    final MemberFinder memberFinder;
-    final PerformanceRepository performanceRepository;
-    final PerformanceSeatRepository performanceSeatRepository;
-    final ReservationValidator reservationValidator;
-    final ReservationManager reservationManager;
+    private final MemberFinder memberFinder;
+    private final PerformanceRepository performanceRepository;
+    private final PerformanceSeatRepository performanceSeatRepository;
+    private final ReservationValidator reservationValidator;
+    private final ReservationManager reservationManager;
 
     public ReservationServiceV1(final MemberFinder memberFinder,
                                 final PerformanceRepository performanceRepository,
