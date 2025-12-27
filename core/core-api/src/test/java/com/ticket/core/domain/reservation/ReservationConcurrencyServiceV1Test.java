@@ -22,10 +22,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @SuppressWarnings("NonAsciiCharacters")
-class ReservationConcurrencyServiceTest {
+class ReservationConcurrencyServiceV1Test {
 
-    private static final Logger log = LoggerFactory.getLogger(ReservationConcurrencyServiceTest.class);
-    @Autowired private ReservationService reservationService;
+    private static final Logger log = LoggerFactory.getLogger(ReservationConcurrencyServiceV1Test.class);
+    @Autowired private ReservationServiceV1 reservationService;
     @Autowired private MemberRepository memberRepository;
     @Autowired private PerformanceRepository performanceRepository;
     @Autowired private PerformanceSeatRepository performanceSeatRepository;
