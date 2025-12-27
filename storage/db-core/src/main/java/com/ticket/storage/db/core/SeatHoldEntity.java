@@ -11,9 +11,17 @@ public class SeatHoldEntity extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long performanceSeatId;
-
     private Long memberId;
 
+    private Long performanceSeatId;
+
     private LocalDateTime expireAt;
+
+    protected SeatHoldEntity() {}
+
+    public SeatHoldEntity(final Long memberId, final Long performanceSeatId, final LocalDateTime expireAt) {
+        this.memberId = memberId;
+        this.performanceSeatId = performanceSeatId;
+        this.expireAt = expireAt;
+    }
 }
