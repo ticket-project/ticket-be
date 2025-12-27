@@ -23,4 +23,12 @@ public interface PerformanceSeatRepository extends JpaRepository<PerformanceSeat
             AND ps.seatId IN :seatIds
     """)
     int updateState(Long performanceId, List<Long> seatIds, PerformanceSeatState performanceSeatState);
+
+    @Modifying
+    @Query("""
+            UPDATE PerformanceSeatEntity ps
+            SET ps.state = 'AVAILABLE'
+            WHERE ps.id IN :performanceSeatIds
+            """)
+    void changeStateToAvailable(List<Long> performanceSeatIds);
 }
