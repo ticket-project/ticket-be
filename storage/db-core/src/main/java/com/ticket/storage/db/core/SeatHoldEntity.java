@@ -24,4 +24,20 @@ public class SeatHoldEntity extends BaseEntity {
         this.performanceSeatId = performanceSeatId;
         this.expireAt = expireAt;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getMemberId() {
+        return memberId;
+    }
+
+    public Long getPerformanceSeatId() {
+        return performanceSeatId;
+    }
+
+    public LocalDateTime getExpireAt() {
+        return expireAt;
+    }
 }
