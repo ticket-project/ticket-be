@@ -1,4 +1,4 @@
-package com.ticket.core.api.controller.v1.response;
+package com.ticket.core.api.controller.response;
 
 public class MemberResponse {
     private final Long memberId;

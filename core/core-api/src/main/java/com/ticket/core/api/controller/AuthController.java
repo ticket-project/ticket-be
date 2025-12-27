@@ -1,7 +1,7 @@
-package com.ticket.core.api.controller.v1;
+package com.ticket.core.api.controller;
 
-import com.ticket.core.api.controller.v1.request.AddMemberRequest;
-import com.ticket.core.api.controller.v1.request.LoginMemberRequest;
+import com.ticket.core.api.controller.request.AddMemberRequest;
+import com.ticket.core.api.controller.request.LoginMemberRequest;
 import com.ticket.core.domain.auth.AuthService;
 import com.ticket.core.domain.auth.SessionConst;
 import com.ticket.core.domain.member.Member;

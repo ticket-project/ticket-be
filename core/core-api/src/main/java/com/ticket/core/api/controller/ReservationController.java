@@ -1,6 +1,6 @@
-package com.ticket.core.api.controller.v1;
+package com.ticket.core.api.controller;
 
-import com.ticket.core.api.controller.v1.request.AddReservationRequest;
+import com.ticket.core.api.controller.request.AddReservationRequest;
 import com.ticket.core.domain.member.MemberDetails;
 import com.ticket.core.domain.reservation.ReservationService;
 import jakarta.validation.Valid;
@@ -30,14 +30,6 @@ public class ReservationController {
      */
     @PostMapping("/api/v1/reserve")
     public void reserveV1(MemberDetails memberDetails, @RequestBody @Valid AddReservationRequest request) {
-        reservationService.addReservation(request.toNewReservation(memberDetails.getMemberId()));
-    }
-
-    /**
-     * v1 선점 - DB 로만 + scheduler
-     */
-    @PostMapping("/api/v2/hold")
-    public void reserveV2(MemberDetails memberDetails, @RequestBody @Valid AddReservationRequest request) {
         reservationService.addReservation(request.toNewReservation(memberDetails.getMemberId()));
     }
 

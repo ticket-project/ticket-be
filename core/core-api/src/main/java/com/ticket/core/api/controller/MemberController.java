@@ -1,6 +1,6 @@
-package com.ticket.core.api.controller.v1;
+package com.ticket.core.api.controller;
 
-import com.ticket.core.api.controller.v1.response.MemberResponse;
+import com.ticket.core.api.controller.response.MemberResponse;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberDetails;
 import com.ticket.core.domain.member.MemberService;

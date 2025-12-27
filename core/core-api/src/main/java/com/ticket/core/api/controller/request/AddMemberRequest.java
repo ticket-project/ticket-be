@@ -1,4 +1,4 @@
-package com.ticket.core.api.controller.v1.request;
+package com.ticket.core.api.controller.request;
 
 import com.ticket.core.domain.member.AddMember;
 import com.ticket.core.enums.Role;
