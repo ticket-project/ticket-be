@@ -50,10 +50,10 @@ class SeatHoldConcurrencyServiceV0Test {
 
     @AfterEach
     void tearDown() {
+        seatHoldRepository.deleteAllInBatch();
         performanceSeatRepository.deleteAllInBatch();
         performanceRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
-        seatHoldRepository.deleteAllInBatch();
     }
 
     @Test
