@@ -6,12 +6,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "SEAT_HOLD", uniqueConstraints = {
-        @UniqueConstraint(
-                name = "MEMBER_ID_PERFORMANCE_SEAT_ID",
-                columnNames = {"MEMBER_ID", "PERFORMANCE_SEAT_ID"}
-        )
-})
+@Table(name = "SEAT_HOLD")
 public class SeatHoldEntity extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
