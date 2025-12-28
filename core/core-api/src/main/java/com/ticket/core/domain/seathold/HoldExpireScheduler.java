@@ -38,7 +38,8 @@ public class HoldExpireScheduler {
         final List<Long> performanceSeatIds = expiredSeatHolds.stream()
                 .map(SeatHoldEntity::getPerformanceSeatId)
                 .toList();
-        performanceSeatRepository.changeHoldStateToAvailable(performanceSeatIds, PerformanceSeatState.HELD, PerformanceSeatState.AVAILABLE);
+        int changedCount = performanceSeatRepository.changeHoldStateToAvailable(performanceSeatIds, PerformanceSeatState.HELD, PerformanceSeatState.AVAILABLE);
+        log.info("changedCount {} performanceSeats size", changedCount);
         log.info("Expired {} seat holds", expiredSeatHolds.size());
     }
 }

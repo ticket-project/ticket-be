@@ -32,7 +32,7 @@ public interface PerformanceSeatRepository extends JpaRepository<PerformanceSeat
             WHERE ps.id IN :performanceSeatIds
             AND ps.state = :curState
             """)
-    void changeHoldStateToAvailable(List<Long> performanceSeatIds, PerformanceSeatState curState, PerformanceSeatState changeState);
+    int changeHoldStateToAvailable(List<Long> performanceSeatIds, PerformanceSeatState curState, PerformanceSeatState changeState);
 
     List<PerformanceSeatEntity> findAllByPerformanceIdAndSeatIdIn(Long performanceId, Collection<Long> seatIds);
 }
