@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 질문 및 토론
+    url: https://github.com/ticket-project/ticket-be/discussions
+    about: 일반적인 질문이나 토론은 Discussions를 이용해주세요.
