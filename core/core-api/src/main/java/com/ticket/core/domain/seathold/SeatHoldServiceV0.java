@@ -5,7 +5,6 @@ import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.domain.performanceseat.PerformanceSeatFinder;
 import com.ticket.core.enums.HoldState;
-import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.storage.db.core.PerformanceEntity;
@@ -48,11 +47,6 @@ public class SeatHoldServiceV0 implements SeatHoldService {
         }
         if (availablePerformanceSeats.size() != newSeatHold.getSeatIds().size()) {
             throw new CoreException(ErrorType.SEAT_COUNT_MISMATCH);
-        }
-        for (PerformanceSeatEntity availablePerformanceSeat : availablePerformanceSeats) {
-            if (availablePerformanceSeat.getState() != PerformanceSeatState.AVAILABLE) {
-                throw new CoreException(ErrorType.NOT_FOUND_DATA, "가능한 좌석이 없습니다.");
-            }
         }
         availablePerformanceSeats.forEach(PerformanceSeatEntity::hold);
 
