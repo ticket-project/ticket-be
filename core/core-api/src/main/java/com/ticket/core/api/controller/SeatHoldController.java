@@ -6,9 +6,11 @@ import com.ticket.core.domain.seathold.SeatHoldService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/api/seathold")
 public class SeatHoldController {
 
     private final SeatHoldService seatHoldService;
@@ -20,7 +22,7 @@ public class SeatHoldController {
     /**
      * v0 선점 - DB 로만 + scheduler
      */
-    @PostMapping("/api/v0/hold")
+    @PostMapping("/v0")
     public void hold(MemberDetails memberDetails, @RequestBody @Valid AddSeatHoldRequest request) {
         seatHoldService.hold(request.toNewSeatHold(memberDetails.getMemberId()));
     }
