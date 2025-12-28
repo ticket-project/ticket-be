@@ -20,5 +20,6 @@ include(
         'core:core-enum',
         'core:core-api',
         'storage:db-core',
+        'storage:redis-core',
         'support:logging'
 )
