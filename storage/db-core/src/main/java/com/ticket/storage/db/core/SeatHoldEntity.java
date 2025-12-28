@@ -55,7 +55,7 @@ public class SeatHoldEntity extends BaseEntity {
         return state;
     }
 
-    public void restoreState(final HoldState holdState) {
-        this.state = holdState;
+    public void restore() {
+        this.state = HoldState.RESTORED;
     }
 }

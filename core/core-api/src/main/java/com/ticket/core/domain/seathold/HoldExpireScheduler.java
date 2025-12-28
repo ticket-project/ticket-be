@@ -34,7 +34,7 @@ public class HoldExpireScheduler {
         if (expiredSeatHolds.isEmpty()) {
             return;
         }
-        expiredSeatHolds.forEach(expiredSeatHold -> expiredSeatHold.restoreState(HoldState.RESTORED));
+        expiredSeatHolds.forEach(SeatHoldEntity::restore);
         final List<Long> performanceSeatIds = expiredSeatHolds.stream()
                 .map(SeatHoldEntity::getPerformanceSeatId)
                 .toList();
