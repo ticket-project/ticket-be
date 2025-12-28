@@ -5,6 +5,7 @@ import jakarta.persistence.LockModeType;
 import jakarta.persistence.QueryHint;
 import org.springframework.data.jpa.repository.*;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface PerformanceSeatRepository extends JpaRepository<PerformanceSeatEntity, Long> {
@@ -31,4 +32,6 @@ public interface PerformanceSeatRepository extends JpaRepository<PerformanceSeat
             WHERE ps.id IN :performanceSeatIds
             """)
     void changeStateToAvailable(List<Long> performanceSeatIds, PerformanceSeatState changeState);
+
+    List<PerformanceSeatEntity> findAllByPerformanceIdAndSeatIdIn(Long performanceId, Collection<Long> seatIds);
 }

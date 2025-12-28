@@ -34,4 +34,9 @@ public class ReservationManager {
                         .toList()
         );
     }
+
+    public void addWithoutReserve(final Long memberId, final Long performanceId, final List<PerformanceSeatEntity> reservedSeats) {
+        final ReservationEntity savedReservation = saveReservation(memberId, performanceId);
+        saveReservationDetails(reservedSeats, savedReservation.getId());
+    }
 }

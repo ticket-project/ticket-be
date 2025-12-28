@@ -45,12 +45,8 @@ public class ReservationServiceV0 implements ReservationService {
         if (updateRows != newReservation.getSeatIds().size()) {
             throw new CoreException(ErrorType.SEAT_COUNT_MISMATCH);
         }
-
-        final List<PerformanceSeatEntity> performanceSeatEntities = newReservation.getSeatIds().stream()
-                .map(m -> new PerformanceSeatEntity(foundPerformance.getId(), m, PerformanceSeatState.RESERVED))
-                .toList();
-        reservationManager.add(foundMember.getId(), foundPerformance.getId(), performanceSeatEntities);
+        final List<PerformanceSeatEntity> reservedSeats = performanceSeatRepository.findAllByPerformanceIdAndSeatIdIn(foundPerformance.getId(), newReservation.getSeatIds());
+        reservationManager.addWithoutReserve(foundMember.getId(), foundPerformance.getId(), reservedSeats);
     }
-
 
 }
