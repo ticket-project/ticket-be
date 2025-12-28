@@ -46,7 +46,7 @@ public class SeatHoldServiceV0 implements SeatHoldService {
         availablePerformanceSeats.forEach(PerformanceSeatEntity::hold);
 
         final List<SeatHoldEntity> seatHoldEntities = availablePerformanceSeats.stream()
-                .map(m -> new SeatHoldEntity(foundMember.getId(), m.getId(), LocalDateTime.now().plusMinutes(1)))
+                .map(m -> new SeatHoldEntity(foundMember.getId(), m.getId(), LocalDateTime.now().plusMinutes(5)))
                 .toList();
         seatHoldRepository.saveAll(seatHoldEntities);
     }
