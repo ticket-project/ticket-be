@@ -21,7 +21,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         final MemberDetails memberDetails = (MemberDetails) session.getAttribute(SessionConst.LOGIN_MEMBER);
         final String uri = request.getRequestURI();
-        if (uri.startsWith("/api/v1/admin")) {
+        if (uri.startsWith("/api/admin")) {
             if (memberDetails.getRole() != Role.ADMIN) {
                 throw new AuthException(ErrorType.AUTHORIZATION_ERROR);
             }
