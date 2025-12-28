@@ -1,6 +1,7 @@
 package com.ticket.core.domain.seathold;
 
 import com.ticket.core.enums.HoldState;
+import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.storage.db.core.PerformanceSeatRepository;
 import com.ticket.storage.db.core.SeatHoldEntity;
 import com.ticket.storage.db.core.SeatHoldRepository;
@@ -34,6 +35,6 @@ public class HoldExpireScheduler {
         final List<Long> performanceSeatIds = expiredSeatHolds.stream()
                 .map(SeatHoldEntity::getPerformanceSeatId)
                 .toList();
-        performanceSeatRepository.changeStateToAvailable(performanceSeatIds);
+        performanceSeatRepository.changeStateToAvailable(performanceSeatIds, PerformanceSeatState.AVAILABLE);
     }
 }

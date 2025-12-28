@@ -44,6 +44,7 @@ public class ReservationServiceV0 implements ReservationService {
         int updateRows = performanceSeatRepository.updateState(
                 foundPerformance.getId(),
                 newReservation.getSeatIds(),
+                PerformanceSeatState.AVAILABLE,
                 PerformanceSeatState.RESERVED
         );
         if (updateRows != newReservation.getSeatIds().size()) {
