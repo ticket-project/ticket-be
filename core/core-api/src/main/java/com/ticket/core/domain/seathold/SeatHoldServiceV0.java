@@ -37,7 +37,7 @@ public class SeatHoldServiceV0 implements SeatHoldService {
 
     @Override
     @Transactional
-    public void hold(final NewSeatHold newSeatHold) {
+    public SeatHoldInfo hold(final NewSeatHold newSeatHold) {
         final Member foundMember = memberFinder.find(newSeatHold.getMemberId());
         final PerformanceEntity foundPerformance = findOpenPerformance(newSeatHold.getPerformanceId());
         final List<PerformanceSeatEntity> availablePerformanceSeats = findAvailablePerformanceSeats(newSeatHold.getSeatIds(), foundPerformance.getId());
@@ -58,6 +58,9 @@ public class SeatHoldServiceV0 implements SeatHoldService {
                 .map(m -> new SeatHoldEntity(foundMember.getId(), m.getId(), LocalDateTime.now().plusMinutes(5), HoldState.PENDING))
                 .toList();
         seatHoldRepository.saveAll(seatHoldEntities);
+        //응답값을 공연, 회차, 좌석정보, 선점 유효 시간(웹소켓으로?)
+        return new SeatHoldInfo(foundPerformance.getId(), availablePerformanceSeats.stream().map(PerformanceSeatEntity::getId).toList(), foundMember.getId(), HoldState.PENDING);
+        //할인 쿠폰이나 포인트 같은 가격은 결제 창에서.
     }
 
     private PerformanceEntity findOpenPerformance(final Long performanceId) {
