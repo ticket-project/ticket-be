@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/member")
+@RequestMapping("/api/member")
 public class MemberController {
 
     private static final Logger log = LoggerFactory.getLogger(MemberController.class);
@@ -22,7 +22,7 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    @GetMapping
+    @GetMapping("/v0")
     public ApiResponse<MemberResponse> findById(MemberDetails memberDetails) {
         log.info("loginMember={}", memberDetails);
         final Member findMember = memberService.findById(memberDetails.getMemberId());

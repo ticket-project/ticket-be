@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -27,12 +27,12 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping
+    @PostMapping("/v0")
     public ApiResponse<Long> register(@RequestBody @Valid AddMemberRequest request) {
         return ApiResponse.success(authService.register(request.toAddMember()));
     }
 
-    @PostMapping("/login")
+    @PostMapping("/v0/login")
     public ApiResponse<Long> login(@RequestBody @Valid LoginMemberRequest request, HttpServletRequest httpRequest) {
         final Member loginedMember = authService.login(Email.create(request.getEmail()), Password.create(request.getPassword()));
 
