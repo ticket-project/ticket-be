@@ -4,6 +4,8 @@ import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.enums.PerformanceSeatState;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import com.ticket.storage.db.core.PerformanceEntity;
 import com.ticket.storage.db.core.PerformanceSeatEntity;
 import com.ticket.storage.db.core.PerformanceSeatRepository;
@@ -41,7 +43,7 @@ public class ReservationServiceV0 implements ReservationService {
                 PerformanceSeatState.RESERVED
         );
         if (updateRows != newReservation.getSeatIds().size()) {
-            throw new RuntimeException("좌석 예매 실패");
+            throw new CoreException(ErrorType.SEAT_COUNT_MISMATCH);
         }
 
         final List<PerformanceSeatEntity> performanceSeatEntities = newReservation.getSeatIds().stream()
