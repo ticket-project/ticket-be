@@ -3,6 +3,7 @@ package com.ticket.core.domain.seathold;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.enums.EntityStatus;
+import com.ticket.core.enums.HoldState;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.enums.PerformanceState;
 import com.ticket.core.support.exception.CoreException;
@@ -49,11 +50,10 @@ public class SeatHoldServiceV0 implements SeatHoldService {
         availablePerformanceSeats.forEach(PerformanceSeatEntity::hold);
 
         final List<SeatHoldEntity> seatHoldEntities = availablePerformanceSeats.stream()
-                .map(m -> new SeatHoldEntity(foundMember.getId(), m.getId(), LocalDateTime.now().plusMinutes(5)))
+                .map(m -> new SeatHoldEntity(foundMember.getId(), m.getId(), LocalDateTime.now().plusMinutes(5), HoldState.PENDING))
                 .toList();
         seatHoldRepository.saveAll(seatHoldEntities);
     }
-
 
     private PerformanceEntity findOpenPerformance(final Long performanceId) {
         return performanceRepository.findByIdAndStateAndStatus(

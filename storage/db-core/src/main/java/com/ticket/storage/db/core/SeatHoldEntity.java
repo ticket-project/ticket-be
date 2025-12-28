@@ -1,5 +1,6 @@
 package com.ticket.storage.db.core;
 
+import com.ticket.core.enums.HoldState;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -17,12 +18,16 @@ public class SeatHoldEntity extends BaseEntity {
 
     private LocalDateTime expireAt;
 
+    @Enumerated(EnumType.STRING)
+    private HoldState state;
+
     protected SeatHoldEntity() {}
 
-    public SeatHoldEntity(final Long memberId, final Long performanceSeatId, final LocalDateTime expireAt) {
+    public SeatHoldEntity(final Long memberId, final Long performanceSeatId, final LocalDateTime expireAt, final HoldState state) {
         this.memberId = memberId;
         this.performanceSeatId = performanceSeatId;
         this.expireAt = expireAt;
+        this.state = state;
     }
 
     public Long getId() {
@@ -39,5 +44,13 @@ public class SeatHoldEntity extends BaseEntity {
 
     public LocalDateTime getExpireAt() {
         return expireAt;
+    }
+
+    public HoldState getState() {
+        return state;
+    }
+
+    public void restoreState(final HoldState holdState) {
+        this.state = holdState;
     }
 }

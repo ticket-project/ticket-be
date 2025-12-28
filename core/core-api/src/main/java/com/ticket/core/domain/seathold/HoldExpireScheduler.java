@@ -1,5 +1,6 @@
 package com.ticket.core.domain.seathold;
 
+import com.ticket.core.enums.HoldState;
 import com.ticket.storage.db.core.PerformanceSeatRepository;
 import com.ticket.storage.db.core.SeatHoldEntity;
 import com.ticket.storage.db.core.SeatHoldRepository;
@@ -25,10 +26,11 @@ public class HoldExpireScheduler {
     @Scheduled(fixedRate = 60000)
     public void expireSeatHolds() {
         final LocalDateTime now = LocalDateTime.now();
-        final List<SeatHoldEntity> expiredSeatHolds = seatHoldRepository.findAllByExpireAtBefore(now);
+        final List<SeatHoldEntity> expiredSeatHolds = seatHoldRepository.findAllByExpireAtBeforeAndStateEquals(now, HoldState.PENDING);
         if (expiredSeatHolds.isEmpty()) {
             return;
         }
+        expiredSeatHolds.forEach(expiredSeatHold -> expiredSeatHold.restoreState(HoldState.RESTORED));
         final List<Long> performanceSeatIds = expiredSeatHolds.stream()
                 .map(SeatHoldEntity::getPerformanceSeatId)
                 .toList();
