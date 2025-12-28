@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ReservationConcurrencyServiceV0Test {
 
     private static final Logger log = LoggerFactory.getLogger(ReservationConcurrencyServiceV0Test.class);
-    @Autowired private ReservationServiceV0 reservationService;
+    @Autowired private ReservationService reservationService;
     @Autowired private MemberRepository memberRepository;
     @Autowired private PerformanceRepository performanceRepository;
     @Autowired private PerformanceSeatRepository performanceSeatRepository;

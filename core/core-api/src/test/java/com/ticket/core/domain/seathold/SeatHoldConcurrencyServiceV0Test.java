@@ -25,14 +25,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SeatHoldConcurrencyServiceV0Test {
 
     private static final Logger log = LoggerFactory.getLogger(SeatHoldConcurrencyServiceV0Test.class);
-    @Autowired private SeatHoldServiceV0 seatHoldService;
+    @Autowired private SeatHoldService seatHoldService;
     @Autowired private MemberRepository memberRepository;
     @Autowired private PerformanceRepository performanceRepository;
     @Autowired private PerformanceSeatRepository performanceSeatRepository;
     @Autowired private SeatHoldRepository seatHoldRepository;
 
     private MemberEntity savedMember;
-    private List<MemberEntity> saveMembers;
+    private List<MemberEntity> savedMembers;
     private PerformanceEntity savedPerformance;
     private List<PerformanceSeatEntity> savedPerformanceSeats;
 
@@ -43,7 +43,7 @@ class SeatHoldConcurrencyServiceV0Test {
         savedPerformanceSeats = performanceSeatRepository.saveAll(
                 TestDataFactory.createAvailableSeats(savedPerformance.getId(), List.of(1L))
         );
-        saveMembers = IntStream.range(0, 100)
+        savedMembers = IntStream.range(0, 100)
                 .mapToObj(i -> memberRepository.save(TestDataFactory.createMember("user" + i + "@test.com", "pw", "name", Role.MEMBER)))
                 .toList();
     }
@@ -74,14 +74,14 @@ class SeatHoldConcurrencyServiceV0Test {
                     ready.countDown();
                     start.await();
                     final NewSeatHold request = new NewSeatHold(
-                            saveMembers.get(idx).getId(),
+                            savedMembers.get(idx).getId(),
                             savedPerformance.getId(),
                             List.of(1L)
                     );
                     seatHoldService.hold(request);
                     successCount.incrementAndGet();
                 } catch (Exception e) {
-                    log.error("예약 실패: {}", e.getMessage(), e);
+                    log.error("선점 실패: {}", e.getMessage(), e);
                     failCount.incrementAndGet();
                 } finally {
                     done.countDown();
