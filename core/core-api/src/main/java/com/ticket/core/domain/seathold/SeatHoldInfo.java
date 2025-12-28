@@ -14,7 +14,6 @@ public class SeatHoldInfo {
         this.performanceId = performanceId;
         this.performanceSeatIds = performanceSeatIds;
         this.memberId = memberId;
-//        this.expireAt = expireAt;
         this.state = state;
     }
 
