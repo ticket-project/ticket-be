@@ -2,15 +2,10 @@ package com.ticket.core.domain.reservation;
 
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
-import com.ticket.core.enums.EntityStatus;
-import com.ticket.core.enums.PerformanceSeatState;
-import com.ticket.core.enums.PerformanceState;
-import com.ticket.core.support.exception.ErrorType;
-import com.ticket.core.support.exception.NotFoundException;
+import com.ticket.core.domain.performance.PerformanceFinder;
+import com.ticket.core.domain.performanceseat.PerformanceSeatFinder;
 import com.ticket.storage.db.core.PerformanceEntity;
-import com.ticket.storage.db.core.PerformanceRepository;
 import com.ticket.storage.db.core.PerformanceSeatEntity;
-import com.ticket.storage.db.core.PerformanceSeatRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,20 +15,20 @@ import java.util.List;
 public class ReservationServiceV1 implements ReservationService {
 
     private final MemberFinder memberFinder;
-    private final PerformanceRepository performanceRepository;
-    private final PerformanceSeatRepository performanceSeatRepository;
+    private final PerformanceFinder performanceFinder;
+    private final PerformanceSeatFinder performanceSeatFinder;
     private final ReservationValidator reservationValidator;
     private final ReservationManager reservationManager;
 
     public ReservationServiceV1(final MemberFinder memberFinder,
-                                final PerformanceRepository performanceRepository,
-                                final PerformanceSeatRepository performanceSeatRepository,
+                                final PerformanceFinder performanceFinder,
+                                final PerformanceSeatFinder performanceSeatFinder,
                                 final ReservationValidator reservationValidator,
                                 final ReservationManager reservationManager
 ) {
         this.memberFinder = memberFinder;
-        this.performanceRepository = performanceRepository;
-        this.performanceSeatRepository = performanceSeatRepository;
+        this.performanceFinder = performanceFinder;
+        this.performanceSeatFinder = performanceSeatFinder;
         this.reservationValidator = reservationValidator;
         this.reservationManager = reservationManager;
     }
@@ -41,8 +36,8 @@ public class ReservationServiceV1 implements ReservationService {
     @Transactional
     public void addReservation(final NewReservation newReservation) {
         final Member foundMember = memberFinder.find(newReservation.getMemberId());
-        final PerformanceEntity foundPerformance = findOpenPerformance(newReservation.getPerformanceId());
-        final List<PerformanceSeatEntity> foundPerformanceSeats = findAvailablePerformanceSeats(
+        final PerformanceEntity foundPerformance = performanceFinder.findOpenPerformance(newReservation.getPerformanceId());
+        final List<PerformanceSeatEntity> foundPerformanceSeats = performanceSeatFinder.findAvailablePerformanceSeats(
                 newReservation.getSeatIds(),
                 foundPerformance.getId()
         );
@@ -54,23 +49,6 @@ public class ReservationServiceV1 implements ReservationService {
                 foundPerformanceSeats.size()
         );
         reservationManager.add(foundMember.getId(), foundPerformance.getId(), foundPerformanceSeats);
-    }
-
-    private PerformanceEntity findOpenPerformance(final Long performanceId) {
-        return performanceRepository.findByIdAndStateAndStatus(
-                        performanceId,
-                        PerformanceState.OPEN,
-                        EntityStatus.ACTIVE
-                )
-                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND_DATA));
-    }
-
-    private List<PerformanceSeatEntity> findAvailablePerformanceSeats(final List<Long> seatIds, final Long performanceId) {
-        return performanceSeatRepository.findByPerformanceIdAndSeatIdInAndState(
-                performanceId,
-                seatIds,
-                PerformanceSeatState.AVAILABLE
-        );
     }
 
 }
