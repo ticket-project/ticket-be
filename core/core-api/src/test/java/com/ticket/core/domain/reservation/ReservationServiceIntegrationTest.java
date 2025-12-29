@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @SuppressWarnings("NonAsciiCharacters")
-class ReservationServiceTest {
+class ReservationServiceIntegrationTest {
 
     @Autowired private ReservationService reservationService;
     @Autowired private MemberRepository memberRepository;

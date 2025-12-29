@@ -1,4 +1,4 @@
-package com.ticket.core.domain.reservation;
+package com.ticket.core.domain.seathold;
 
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.TestDataFactory;
@@ -22,44 +22,40 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @SuppressWarnings("NonAsciiCharacters")
-class ReservationConcurrencyServiceV0Test {
+class SeatHoldConcurrencyServiceV0IntegrationTest {
 
-    private static final Logger log = LoggerFactory.getLogger(ReservationConcurrencyServiceV0Test.class);
-    @Autowired private ReservationService reservationService;
+    private static final Logger log = LoggerFactory.getLogger(SeatHoldConcurrencyServiceV0IntegrationTest.class);
+    @Autowired private SeatHoldService seatHoldService;
     @Autowired private MemberRepository memberRepository;
     @Autowired private PerformanceRepository performanceRepository;
     @Autowired private PerformanceSeatRepository performanceSeatRepository;
-    @Autowired private ReservationRepository reservationRepository;
-    @Autowired private ReservationDetailRepository reservationDetailRepository;
+    @Autowired private SeatHoldRepository seatHoldRepository;
 
-    private MemberEntity savedMember;
-    private List<MemberEntity> saveMembers;
+    private List<MemberEntity> savedMembers;
     private PerformanceEntity savedPerformance;
-    private List<PerformanceSeatEntity> savedPerformanceSeats;
 
     @BeforeEach
     void setUp() {
-        savedMember = memberRepository.save(TestDataFactory.createMember());
+        memberRepository.save(TestDataFactory.createMember());
         savedPerformance = performanceRepository.save(TestDataFactory.createPerformance());
-        savedPerformanceSeats = performanceSeatRepository.saveAll(
+        performanceSeatRepository.saveAll(
                 TestDataFactory.createAvailableSeats(savedPerformance.getId(), List.of(1L))
         );
-        saveMembers = IntStream.range(0, 100)
+        savedMembers = IntStream.range(0, 100)
                 .mapToObj(i -> memberRepository.save(TestDataFactory.createMember("user" + i + "@test.com", "pw", "name", Role.MEMBER)))
                 .toList();
     }
 
     @AfterEach
     void tearDown() {
-        reservationDetailRepository.deleteAllInBatch();
-        reservationRepository.deleteAllInBatch();
+        seatHoldRepository.deleteAllInBatch();
         performanceSeatRepository.deleteAllInBatch();
         performanceRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
     }
 
     @Test
-    void 재고가_1개일때_여러_요청이_동시에_들어오면_db_update_잠금으로_인해_예매가_오버셀되지_않는다() throws InterruptedException {
+    void 재고가_1개일때_여러_요청이_동시에_들어오면_비관적_락에_의해_한_명만_선점한다() throws InterruptedException {
         // given
         final int threadCount = 100;
         try (final ExecutorService es = Executors.newVirtualThreadPerTaskExecutor()) {
@@ -75,15 +71,15 @@ class ReservationConcurrencyServiceV0Test {
                 try {
                     ready.countDown();
                     start.await();
-                    final NewReservation request = new NewReservation(
-                            saveMembers.get(idx).getId(),
+                    final NewSeatHold request = new NewSeatHold(
+                            savedMembers.get(idx).getId(),
                             savedPerformance.getId(),
                             List.of(1L)
                     );
-                    reservationService.addReservation(request);
+                    seatHoldService.hold(request);
                     successCount.incrementAndGet();
                 } catch (Exception e) {
-                    log.error("예약 실패: {}", e.getMessage(), e);
+                    log.error("선점 실패: {}", e.getMessage(), e);
                     failCount.incrementAndGet();
                 } finally {
                     done.countDown();
@@ -95,8 +91,9 @@ class ReservationConcurrencyServiceV0Test {
         done.await();
         assertThat(successCount.get()).isEqualTo(1);
         assertThat(failCount.get()).isEqualTo(99);
-        final long reservationCount = reservationRepository.count();
-        assertThat(reservationCount).isEqualTo(1);
+        final long holdCount = seatHoldRepository.count();
+        assertThat(holdCount).isEqualTo(1);
         }
     }
+
 }

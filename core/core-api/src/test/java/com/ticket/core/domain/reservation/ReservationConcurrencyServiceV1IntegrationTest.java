@@ -22,9 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @SuppressWarnings("NonAsciiCharacters")
-class ReservationConcurrencyServiceV1Test {
+class ReservationConcurrencyServiceV1IntegrationTest {
 
-    private static final Logger log = LoggerFactory.getLogger(ReservationConcurrencyServiceV1Test.class);
+    private static final Logger log = LoggerFactory.getLogger(ReservationConcurrencyServiceV1IntegrationTest.class);
     @Autowired private ReservationServiceV1 reservationService;
     @Autowired private MemberRepository memberRepository;
     @Autowired private PerformanceRepository performanceRepository;
@@ -32,16 +32,14 @@ class ReservationConcurrencyServiceV1Test {
     @Autowired private ReservationRepository reservationRepository;
     @Autowired private ReservationDetailRepository reservationDetailRepository;
 
-    private MemberEntity savedMember;
     private List<MemberEntity> saveMembers;
     private PerformanceEntity savedPerformance;
-    private List<PerformanceSeatEntity> savedPerformanceSeats;
 
     @BeforeEach
     void setUp() {
-        savedMember = memberRepository.save(TestDataFactory.createMember());
+        memberRepository.save(TestDataFactory.createMember());
         savedPerformance = performanceRepository.save(TestDataFactory.createPerformance());
-        savedPerformanceSeats = performanceSeatRepository.saveAll(
+        performanceSeatRepository.saveAll(
                 TestDataFactory.createAvailableSeats(savedPerformance.getId(), List.of(1L))
         );
         saveMembers = IntStream.range(0, 100)
