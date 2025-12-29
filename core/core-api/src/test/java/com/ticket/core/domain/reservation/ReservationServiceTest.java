@@ -3,6 +3,7 @@ package com.ticket.core.domain.reservation;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.support.TestDataFactory;
 import com.ticket.storage.db.core.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,15 @@ class ReservationServiceTest {
         savedPerformanceSeats = performanceSeatRepository.saveAll(
                 TestDataFactory.createAvailableSeats(savedPerformance.getId(), List.of(1L, 2L))
         );
+    }
+
+    @AfterEach
+    void tearDown() {
+        reservationDetailRepository.deleteAllInBatch();
+        reservationRepository.deleteAllInBatch();
+        performanceSeatRepository.deleteAllInBatch();
+        performanceRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
     }
 
     @Test
