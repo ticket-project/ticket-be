@@ -51,7 +51,7 @@ public class SeatHoldServiceV0 implements SeatHoldService {
         availablePerformanceSeats.forEach(PerformanceSeatEntity::hold);
 
         final List<SeatHoldEntity> seatHoldEntities = availablePerformanceSeats.stream()
-                .map(m -> new SeatHoldEntity(foundMember.getId(), m.getId(), LocalDateTime.now().plusMinutes(5), HoldState.PENDING))
+                .map(m -> new SeatHoldEntity(foundMember.getId(), m.getId(), LocalDateTime.now().plusSeconds(foundPerformance.getHoldTime()), HoldState.PENDING))
                 .toList();
         seatHoldRepository.saveAll(seatHoldEntities);
         //응답값을 공연, 회차, 좌석정보, 선점 유효 시간(웹소켓으로?)

@@ -1,13 +1,13 @@
 -- ==========================
 -- 기본 공연 생성
 -- ==========================
-INSERT INTO SHOWS (id, title, status)
-VALUES (1, '공연1', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (2, '공연2', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (3, '공연3', 'ACTIVE');
-
+-- INSERT INTO SHOWS (id, title, status)
+-- VALUES (1, '공연1', 'ACTIVE');
+-- INSERT INTO SHOWS (id, title, status)
+-- VALUES (2, '공연2', 'ACTIVE');
+-- INSERT INTO SHOWS (id, title, status)
+-- VALUES (3, '공연3', 'ACTIVE');
+--
 
 
 -- 기본 좌석(행/열) 생성
@@ -29,24 +29,6 @@ VALUES (6, 'B', '3');
 -- 공연 회차(Performance) 샘플 2개
 -- show_id 는 그냥 100 번으로 가정
 -- ==========================
-INSERT INTO PERFORMANCE (id,
-                         show_id,
-                         start_time,
-                         end_time,
-                         reserve_open_time,
-                         reserve_close_time,
-                         state,
-                         status,
-                         max_can_reserve_count)
-VALUES (1,
-        1,
-        '2025-12-24 19:00:00',
-        '2025-12-24 21:30:00',
-        '2025-12-01 10:00:00',
-        '2025-12-24 18:00:00',
-        'OPEN',
-        'ACTIVE',
-        4);
 
 INSERT INTO PERFORMANCE (id,
                          show_id,
@@ -56,7 +38,29 @@ INSERT INTO PERFORMANCE (id,
                          reserve_close_time,
                          state,
                          status,
-                         max_can_reserve_count)
+                         max_can_reserve_count,
+                         hold_time)
+VALUES (1,
+        1,
+        '2025-12-24 19:00:00',
+        '2025-12-24 21:30:00',
+        '2025-12-01 10:00:00',
+        '2025-12-24 18:00:00',
+        'OPEN',
+        'ACTIVE',
+        4,
+        300);
+
+INSERT INTO PERFORMANCE (id,
+                         show_id,
+                         start_time,
+                         end_time,
+                         reserve_open_time,
+                         reserve_close_time,
+                         state,
+                         status,
+                         max_can_reserve_count,
+                         hold_time)
 VALUES (2,
         1,
         '2025-12-25 14:00:00',
@@ -65,7 +69,8 @@ VALUES (2,
         '2025-12-25 13:00:00',
         'OPEN',
         'ACTIVE',
-        4);
+        4,
+        300);
 
 -- ==========================
 -- 회차 1번(performance_id = 1)의 좌석 상태
