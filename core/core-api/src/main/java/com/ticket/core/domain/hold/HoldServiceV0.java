@@ -1,44 +1,37 @@
-package com.ticket.core.domain.seathold;
+package com.ticket.core.domain.hold;
 
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.domain.performanceseat.PerformanceSeatFinder;
-import com.ticket.core.enums.HoldState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.storage.db.core.PerformanceEntity;
 import com.ticket.storage.db.core.PerformanceSeatEntity;
-import com.ticket.storage.db.core.SeatHoldEntity;
-import com.ticket.storage.db.core.SeatHoldRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class SeatHoldServiceV0 implements SeatHoldService {
+public class HoldServiceV0 implements HoldService {
 
     private final MemberFinder memberFinder;
     private final PerformanceFinder performanceFinder;
     private final PerformanceSeatFinder performanceSeatFinder;
-    private final SeatHoldRepository seatHoldRepository;
 
-    public SeatHoldServiceV0(final MemberFinder memberFinder,
-                             final PerformanceFinder performanceFinder,
-                             final PerformanceSeatFinder performanceSeatFinder,
-                             final SeatHoldRepository seatHoldRepository
+    public HoldServiceV0(final MemberFinder memberFinder,
+                         final PerformanceFinder performanceFinder,
+                         final PerformanceSeatFinder performanceSeatFinder
     ) {
         this.memberFinder = memberFinder;
         this.performanceFinder = performanceFinder;
         this.performanceSeatFinder = performanceSeatFinder;
-        this.seatHoldRepository = seatHoldRepository;
     }
 
     @Override
     @Transactional
-    public SeatHoldInfo hold(final NewSeatHold newSeatHold) {
+    public HoldToken hold(final NewSeatHold newSeatHold) {
         final Member foundMember = memberFinder.find(newSeatHold.getMemberId());
         final PerformanceEntity foundPerformance = performanceFinder.findOpenPerformance(newSeatHold.getPerformanceId());
         final List<PerformanceSeatEntity> availablePerformanceSeats = performanceSeatFinder.findAvailablePerformanceSeats(newSeatHold.getSeatIds(), foundPerformance.getId());
@@ -48,15 +41,9 @@ public class SeatHoldServiceV0 implements SeatHoldService {
         if (availablePerformanceSeats.size() != newSeatHold.getSeatIds().size()) {
             throw new CoreException(ErrorType.SEAT_COUNT_MISMATCH);
         }
-        availablePerformanceSeats.forEach(PerformanceSeatEntity::hold);
-
-        final List<SeatHoldEntity> seatHoldEntities = availablePerformanceSeats.stream()
-                .map(m -> new SeatHoldEntity(foundMember.getId(), m.getId(), LocalDateTime.now().plusSeconds(foundPerformance.getHoldTime()), HoldState.PENDING))
-                .toList();
-        seatHoldRepository.saveAll(seatHoldEntities);
-        //응답값을 공연, 회차, 좌석정보, 선점 유효 시간(웹소켓으로?)
-        return new SeatHoldInfo(foundPerformance.getId(), availablePerformanceSeats.stream().map(PerformanceSeatEntity::getId).toList(), foundMember.getId(), HoldState.PENDING);
-        //할인 쿠폰이나 포인트 같은 가격은 결제 창에서.
+        final HoldToken holdToken = new HoldToken(foundMember.getId());
+        availablePerformanceSeats.forEach(performanceSeatEntity -> performanceSeatEntity.hold(foundPerformance.getHoldTime(), holdToken.getToken()));
+        return holdToken;
     }
 
 }

@@ -1,4 +1,4 @@
-package com.ticket.core.domain.seathold;
+package com.ticket.core.domain.hold;
 
 import java.util.List;
 

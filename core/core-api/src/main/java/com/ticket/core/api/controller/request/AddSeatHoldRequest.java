@@ -1,6 +1,6 @@
 package com.ticket.core.api.controller.request;
 
-import com.ticket.core.domain.seathold.NewSeatHold;
+import com.ticket.core.domain.hold.NewSeatHold;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
