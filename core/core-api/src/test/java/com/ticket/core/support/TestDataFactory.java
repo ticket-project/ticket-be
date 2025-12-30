@@ -34,11 +34,13 @@ public class TestDataFactory {
     public static PerformanceEntity createPerformance(Long showId, PerformanceState state) {
         return new PerformanceEntity(
                 showId,
+                1L,
                 BASE_TIME.plusDays(7),
                 BASE_TIME.plusDays(7).plusHours(2),
                 BASE_TIME.minusDays(1),
                 BASE_TIME.plusDays(6),
                 4,
+                300,
                 state
         );
     }

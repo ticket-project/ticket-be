@@ -14,6 +14,8 @@ public class PerformanceEntity extends BaseEntity {
 
     private Long showId;
 
+    private Long roundNo;
+
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
@@ -24,18 +26,23 @@ public class PerformanceEntity extends BaseEntity {
 
     private int maxCanReserveCount;
 
+    @Column(nullable = false)
+    private Integer holdTime = 300;
+
     @Enumerated(value = EnumType.STRING)
     private PerformanceState state;
 
     protected PerformanceEntity() {}
 
-    public PerformanceEntity(final Long showId, final LocalDateTime startTime, final LocalDateTime endTime, final LocalDateTime reserveOpenTime, final LocalDateTime reserveCloseTime, final int maxCanReserveCount, final PerformanceState state) {
+    public PerformanceEntity(final Long showId, final Long roundNo, final LocalDateTime startTime, final LocalDateTime endTime, final LocalDateTime reserveOpenTime, final LocalDateTime reserveCloseTime, final int maxCanReserveCount, final Integer holdTime, final PerformanceState state) {
         this.showId = showId;
+        this.roundNo = roundNo;
         this.startTime = startTime;
         this.endTime = endTime;
         this.reserveOpenTime = reserveOpenTime;
         this.reserveCloseTime = reserveCloseTime;
         this.maxCanReserveCount = maxCanReserveCount;
+        this.holdTime = holdTime;
         this.state = state;
     }
 
@@ -69,6 +76,14 @@ public class PerformanceEntity extends BaseEntity {
 
     public int getMaxCanReserveCount() {
         return maxCanReserveCount;
+    }
+
+    public Long getRoundNo() {
+        return roundNo;
+    }
+
+    public Integer getHoldTime() {
+        return holdTime;
     }
 
     public boolean isOverCount(final long requestReserveCount) {
