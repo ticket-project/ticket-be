@@ -11,6 +11,7 @@ import com.ticket.core.support.exception.ErrorType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -42,7 +43,8 @@ public class HoldServiceV0 implements HoldService {
             throw new CoreException(ErrorType.SEAT_COUNT_MISMATCH);
         }
         final HoldToken holdToken = new HoldToken(foundMember.getId());
-        availablePerformanceSeats.forEach(performanceSeat -> performanceSeat.hold(foundMember.getId(), foundPerformance.getHoldTime(), holdToken.getToken()));
+        final LocalDateTime holdExpireAt = LocalDateTime.now().plusSeconds(foundPerformance.getHoldTime());
+        availablePerformanceSeats.forEach(performanceSeat -> performanceSeat.hold(foundMember.getId(), holdExpireAt, holdToken.getToken()));
         return holdToken;
     }
 
