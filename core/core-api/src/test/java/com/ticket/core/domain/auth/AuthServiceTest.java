@@ -40,7 +40,6 @@ class AuthServiceTest extends UnitBase {
         void 올바른_입력값이면_성공한다() {
             //given
             final AddMember addMember = new AddMember("test@test.com", "1234", "test", Role.MEMBER);
-            when(memberRepository.existsByEmail(any())).thenReturn(false);
             when(passwordService.encode(any())).thenReturn("encoded");
             final Member savedMember = new Member(
                     Email.create(addMember.getEmail()),
@@ -61,7 +60,6 @@ class AuthServiceTest extends UnitBase {
         void 중복된_이메일이면_실패한다() {
             //given
             final AddMember addMember = new AddMember("test@test.com", "1234", "test", Role.MEMBER);
-            when(memberRepository.existsByEmail(addMember.getEmail())).thenReturn(true);
             //then
             assertThatThrownBy(() -> authService.register(addMember))
                     .isInstanceOf(CoreException.class);
