@@ -47,7 +47,7 @@ class ReservationConcurrencyServiceV1IntegrationTest extends IntegrationBase {
                 TestDataFactory.createAvailableSeats(savedPerformance.getId(), List.of(1L), LocalDateTime.now().plusSeconds(savedPerformance.getHoldTime()), 1L, "testHoldTokenUUID")
         );
         saveMembers = IntStream.range(0, 100)
-                .mapToObj(i -> memberRepository.save(TestDataFactory.createMember("user" + i + "@test.com", "pw", "name", Role.MEMBER)))
+                .mapToObj(i -> memberRepository.save(TestDataFactory.createMember("user" + i + "@test.com", "password", "name", Role.MEMBER)))
                 .toList();
     }
 

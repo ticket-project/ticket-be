@@ -26,12 +26,12 @@ public class AuthService {
 
     @Transactional
     public Long register(final AddMember addMember) {
-        if (memberRepository.existsByEmail(addMember.getEmailValue())) {
+        if (memberRepository.existsByEmail(addMember.getEmail())) {
             throw new CoreException(ErrorType.MEMBER_DUPLICATE_EMAIL);
         }
         final Member member = new Member(
-                addMember.getEmailValue(),
-                passwordService.encode(addMember.getPassword()),
+                Email.create(addMember.getEmail()),
+                Password.create(passwordService.encode(addMember.getPassword())),
                 addMember.getName(),
                 addMember.getRole()
         );
@@ -43,11 +43,11 @@ public class AuthService {
         }
     }
 
-    public Member login(final Email email, final Password password) {
-        final Member foundMember = memberRepository.findByEmail(email.getValue())
+    public Member login(final String email, final String password) {
+        final Member foundMember = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA));
 
-        if (!passwordService.matches(password.getValue(), foundMember.getPassword())) {
+        if (!passwordService.matches(password, foundMember.getPassword().getPassword())) {
             throw new CoreException(ErrorType.MEMBER_NOT_MATCH_PASSWORD);
         }
         return foundMember;

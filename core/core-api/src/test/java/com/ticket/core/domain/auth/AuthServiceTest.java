@@ -43,8 +43,8 @@ class AuthServiceTest extends UnitBase {
             when(memberRepository.existsByEmail(any())).thenReturn(false);
             when(passwordService.encode(any())).thenReturn("encoded");
             final Member savedMember = new Member(
-                    addMember.getEmailValue(),
-                    addMember.getPassword().getValue(),
+                    Email.create(addMember.getEmail()),
+                    Password.create(addMember.getPassword()),
                     addMember.getName(),
                     addMember.getRole()
             );
@@ -61,7 +61,7 @@ class AuthServiceTest extends UnitBase {
         void 중복된_이메일이면_실패한다() {
             //given
             final AddMember addMember = new AddMember("test@test.com", "1234", "test", Role.MEMBER);
-            when(memberRepository.existsByEmail(addMember.getEmailValue())).thenReturn(true);
+            when(memberRepository.existsByEmail(addMember.getEmail())).thenReturn(true);
             //then
             assertThatThrownBy(() -> authService.register(addMember))
                     .isInstanceOf(CoreException.class);
@@ -79,17 +79,17 @@ class AuthServiceTest extends UnitBase {
             final Email email = Email.create("test@test.com");
             final Password password = Password.create("encoded(1234)");
             final Member member = new Member(
-                    email.getValue(),
-                    password.getValue(),
+                    email,
+                    password,
                     "test",
                     Role.MEMBER
             );
-            when(memberRepository.findByEmail(email.getValue())).thenReturn(Optional.of(member));
-            when(passwordService.matches(password.getValue(), member.getPassword())).thenReturn(true);
+            when(memberRepository.findByEmail(email.getEmail())).thenReturn(Optional.of(member));
+            when(passwordService.matches(password.getPassword(), member.getPassword().getPassword())).thenReturn(true);
             //when
-            final Member loggedInMember = authService.login(email, password);
+            final Member loggedInMember = authService.login(email.getEmail(), password.getPassword());
             //then
-            assertThat(loggedInMember.getEmail()).isEqualTo("test@test.com");
+            assertThat(loggedInMember.getEmail().getEmail()).isEqualTo("test@test.com");
             assertThat(loggedInMember.getName()).isEqualTo("test");
             assertThat(loggedInMember.getRole()).isEqualTo(Role.MEMBER);
         }
@@ -99,9 +99,9 @@ class AuthServiceTest extends UnitBase {
             //given
             final Email email = Email.create("test@test.com");
             final Password password = Password.create("encoded(1234)");
-            when(memberRepository.findByEmail(email.getValue())).thenReturn(Optional.empty());
+            when(memberRepository.findByEmail(email.getEmail())).thenReturn(Optional.empty());
             //then
-            assertThatThrownBy(() -> authService.login(email, password)).isInstanceOf(CoreException.class);
+            assertThatThrownBy(() -> authService.login(email.getEmail(), password.getPassword())).isInstanceOf(CoreException.class);
         }
 
         @Test
@@ -110,15 +110,15 @@ class AuthServiceTest extends UnitBase {
             final Email email = Email.create("test@test.com");
             final Password password = Password.create("encoded(1234)");
             final Member member = new Member(
-                    email.getValue(),
-                    password.getValue(),
+                    email,
+                    password,
                     "test",
                     Role.MEMBER
             );
-            when(memberRepository.findByEmail(email.getValue())).thenReturn(Optional.of(member));
-            when(passwordService.matches(password.getValue(), "encoded(1234)")).thenReturn(false);
+            when(memberRepository.findByEmail(email.getEmail())).thenReturn(Optional.of(member));
+            when(passwordService.matches(password.getPassword(), "encoded(1234)")).thenReturn(false);
             //then
-            assertThatThrownBy(() -> authService.login(email, password)).isInstanceOf(CoreException.class);
+            assertThatThrownBy(() -> authService.login(email.getEmail(), password.getPassword())).isInstanceOf(CoreException.class);
         }
     }
 

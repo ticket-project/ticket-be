@@ -1,6 +1,5 @@
 package com.ticket.core.domain.member;
 
-import com.ticket.core.domain.member.vo.Password;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -12,8 +11,8 @@ public class PasswordService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String encode(final Password password) {
-        return passwordEncoder.encode(password.getValue());
+    public String encode(final String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
     }
 
     public boolean matches(final String rawPassword, final String encodedPassword) {

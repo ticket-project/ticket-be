@@ -2,19 +2,25 @@ package com.ticket.core.domain.member.vo;
 
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+@Embeddable
 public class Email {
 
-    private final String value;
+    @Column(unique = true, nullable = false)
+    private String email;
 
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
-    private Email(final String value) {
-        this.value = validate(value);
+    protected Email() {}
+
+    private Email(final String email) {
+        this.email = validate(email);
     }
 
     private static String validate(final String email) {
@@ -35,19 +41,19 @@ public class Email {
         return new Email(value);
     }
 
-    public String getValue() {
-        return value;
+    public String getEmail() {
+        return email;
     }
 
     @Override
     public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         final Email email = (Email) o;
-        return Objects.equals(this.value, email.value);
+        return Objects.equals(this.email, email.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(value);
+        return Objects.hashCode(email);
     }
 }

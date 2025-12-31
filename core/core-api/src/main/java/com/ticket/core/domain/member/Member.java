@@ -1,6 +1,8 @@
 package com.ticket.core.domain.member;
 
 import com.ticket.core.domain.BaseEntity;
+import com.ticket.core.domain.member.vo.Email;
+import com.ticket.core.domain.member.vo.Password;
 import com.ticket.core.enums.Role;
 import jakarta.persistence.*;
 
@@ -12,16 +14,20 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String email;
-    private String password;
+    @Embedded
+    private Email email;
+
+    @Embedded
+    private Password password;
+
     private String name;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
     protected Member() {}
 
-    public Member(final String email, final String password, final String name, final Role role) {
+    public Member(final Email email, final Password password, final String name, final Role role) {
         this.email = email;
         this.password = password;
         this.name = name;
@@ -32,7 +38,7 @@ public class Member extends BaseEntity {
         return id;
     }
 
-    public String getEmail() {
+    public Email getEmail() {
         return email;
     }
 
@@ -40,7 +46,7 @@ public class Member extends BaseEntity {
         return name;
     }
 
-    public String getPassword() {
+    public Password getPassword() {
         return password;
     }
 

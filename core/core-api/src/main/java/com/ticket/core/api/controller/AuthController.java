@@ -6,8 +6,6 @@ import com.ticket.core.domain.auth.AuthService;
 import com.ticket.core.domain.auth.SessionConst;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberDetails;
-import com.ticket.core.domain.member.vo.Email;
-import com.ticket.core.domain.member.vo.Password;
 import com.ticket.core.support.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -34,7 +32,7 @@ public class AuthController {
 
     @PostMapping("/v0/login")
     public ApiResponse<Long> login(@RequestBody @Valid LoginMemberRequest request, HttpServletRequest httpRequest) {
-        final Member loginedMember = authService.login(Email.create(request.getEmail()), Password.create(request.getPassword()));
+        final Member loginedMember = authService.login(request.getEmail(), request.getPassword());
 
         final HttpSession oldSession = httpRequest.getSession(false);
         if (oldSession != null) {

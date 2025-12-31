@@ -2,16 +2,20 @@ package com.ticket.core.domain.member.vo;
 
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import jakarta.persistence.Embeddable;
 
 import java.util.Objects;
 
+@Embeddable
 public class Password {
     private static final int MINIMUM_PASSWORD_LENGTH = 4;
 
-    private final String value;
+    private String password;
 
-    private Password(final String value) {
-        this.value = validateAndNormalize(value);
+    protected Password() {}
+
+    private Password(final String password) {
+        this.password = validateAndNormalize(password);
     }
 
     public static Password create(final String value) {
@@ -32,19 +36,19 @@ public class Password {
         return trimmedValue;
     }
 
-    public String getValue() {
-        return value;
+    public String getPassword() {
+        return password;
     }
 
     @Override
     public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         final Password password = (Password) o;
-        return Objects.equals(value, password.value);
+        return Objects.equals(this.password, password.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(value);
+        return Objects.hashCode(password);
     }
 }
