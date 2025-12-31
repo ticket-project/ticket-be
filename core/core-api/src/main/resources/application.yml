@@ -1,8 +1,58 @@
 spring:
   config:
     import:
-      - db-core.yml
       - logging.yml
 
   profiles:
     active: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/ticket
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        show_sql: true
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/ticket
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        show_sql: true
+  sql:
+    init:
+      mode: never
+      encoding: UTF-8

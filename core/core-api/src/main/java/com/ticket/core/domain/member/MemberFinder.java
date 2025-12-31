@@ -2,8 +2,6 @@ package com.ticket.core.domain.member;
 
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.exception.NotFoundException;
-import com.ticket.storage.db.core.MemberEntity;
-import com.ticket.storage.db.core.MemberRepository;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,7 +14,7 @@ public class MemberFinder {
     }
 
     public Member find(final Long id) {
-        final MemberEntity memberEntity = memberRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND_DATA));
-        return new Member(memberEntity.getId(), memberEntity.getEmail(), memberEntity.getName(), memberEntity.getRole());
+        final Member member = memberRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND_DATA));
+        return new Member(member.getId(), member.getEmail(), member.getName(), member.getRole());
     }
 }

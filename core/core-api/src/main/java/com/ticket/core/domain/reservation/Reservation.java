@@ -1,10 +1,10 @@
-package com.ticket.storage.db.core;
+package com.ticket.core.domain.reservation;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "RESERVATION")
-public class ReservationEntity extends BaseEntity {
+public class Reservation {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -13,9 +13,9 @@ public class ReservationEntity extends BaseEntity {
 
     private Long performanceId;
 
-    protected ReservationEntity() {}
+    protected Reservation() {}
 
-    public ReservationEntity(final Long memberId, final Long performanceId) {
+    public Reservation(final Long memberId, final Long performanceId) {
         this.memberId = memberId;
         this.performanceId = performanceId;
     }

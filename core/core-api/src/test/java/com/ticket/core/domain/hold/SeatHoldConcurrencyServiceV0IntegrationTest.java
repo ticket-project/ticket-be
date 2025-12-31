@@ -1,4 +1,4 @@
-package com.ticket.core.domain.seathold;
+package com.ticket.core.domain.hold;
 
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.TestDataFactory;
@@ -25,11 +25,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SeatHoldConcurrencyServiceV0IntegrationTest {
 
     private static final Logger log = LoggerFactory.getLogger(SeatHoldConcurrencyServiceV0IntegrationTest.class);
-    @Autowired private SeatHoldService seatHoldService;
+    @Autowired private HoldService holdService;
     @Autowired private MemberRepository memberRepository;
     @Autowired private PerformanceRepository performanceRepository;
     @Autowired private PerformanceSeatRepository performanceSeatRepository;
-    @Autowired private SeatHoldRepository seatHoldRepository;
 
     private List<MemberEntity> savedMembers;
     private PerformanceEntity savedPerformance;
@@ -48,7 +47,6 @@ class SeatHoldConcurrencyServiceV0IntegrationTest {
 
     @AfterEach
     void tearDown() {
-        seatHoldRepository.deleteAllInBatch();
         performanceSeatRepository.deleteAllInBatch();
         performanceRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
@@ -76,7 +74,7 @@ class SeatHoldConcurrencyServiceV0IntegrationTest {
                             savedPerformance.getId(),
                             List.of(1L)
                     );
-                    seatHoldService.hold(request);
+                    holdService.hold(request);
                     successCount.incrementAndGet();
                 } catch (Exception e) {
                     log.error("선점 실패: {}", e.getMessage(), e);

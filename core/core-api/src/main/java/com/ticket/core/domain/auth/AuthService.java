@@ -2,13 +2,12 @@ package com.ticket.core.domain.auth;
 
 import com.ticket.core.domain.member.AddMember;
 import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberRepository;
 import com.ticket.core.domain.member.PasswordService;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.Password;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
-import com.ticket.storage.db.core.MemberEntity;
-import com.ticket.storage.db.core.MemberRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +29,7 @@ public class AuthService {
         if (memberRepository.existsByEmail(addMember.getEmailValue())) {
             throw new CoreException(ErrorType.MEMBER_DUPLICATE_EMAIL);
         }
-        final MemberEntity memberEntity = new MemberEntity(
+        final Member member = new Member(
                 addMember.getEmailValue(),
                 passwordService.encode(addMember.getPassword()),
                 addMember.getName(),
@@ -38,19 +37,19 @@ public class AuthService {
         );
 
         try {
-            return memberRepository.save(memberEntity).getId();
+            return memberRepository.save(member).getId();
         } catch (DataIntegrityViolationException e) {
             throw new CoreException(ErrorType.MEMBER_DUPLICATE_EMAIL);
         }
     }
 
     public Member login(final Email email, final Password password) {
-        final MemberEntity foundMemberEntity = memberRepository.findByEmail(email.getValue())
+        final Member foundMember = memberRepository.findByEmail(email.getValue())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA));
 
-        if (!passwordService.matches(password.getValue(), foundMemberEntity.getPassword())) {
+        if (!passwordService.matches(password.getValue(), foundMember.getPassword())) {
             throw new CoreException(ErrorType.MEMBER_NOT_MATCH_PASSWORD);
         }
-        return new Member(foundMemberEntity.getId(), foundMemberEntity.getEmail(), foundMemberEntity.getName(), foundMemberEntity.getRole());
+        return new Member(foundMember.getId(), foundMember.getEmail(), foundMember.getName(), foundMember.getRole());
     }
 }

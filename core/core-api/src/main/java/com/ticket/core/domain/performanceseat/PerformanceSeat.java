@@ -1,4 +1,4 @@
-package com.ticket.storage.db.core;
+package com.ticket.core.domain.performanceseat;
 
 import com.ticket.core.enums.PerformanceSeatState;
 import jakarta.persistence.*;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "PERFORMANCE_SEAT")
-public class PerformanceSeatEntity extends BaseEntity {
+public class PerformanceSeat {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,9 +25,9 @@ public class PerformanceSeatEntity extends BaseEntity {
 
     private String holdToken;
 
-    protected PerformanceSeatEntity() {}
+    protected PerformanceSeat() {}
 
-    public PerformanceSeatEntity(final Long performanceId, final Long seatId, final PerformanceSeatState state, final LocalDateTime holdExpireAt, final Long holdByMemberId, final String holdToken) {
+    public PerformanceSeat(final Long performanceId, final Long seatId, final PerformanceSeatState state, final LocalDateTime holdExpireAt, final Long holdByMemberId, final String holdToken) {
         this.performanceId = performanceId;
         this.seatId = seatId;
         this.state = state;

@@ -1,5 +1,6 @@
-package com.ticket.storage.db.core;
+package com.ticket.core.domain.performance;
 
+import com.ticket.core.domain.BaseEntity;
 import com.ticket.core.enums.PerformanceState;
 import jakarta.persistence.*;
 
@@ -7,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "PERFORMANCE")
-public class PerformanceEntity extends BaseEntity {
+public class Performance extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,9 +33,9 @@ public class PerformanceEntity extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private PerformanceState state;
 
-    protected PerformanceEntity() {}
+    protected Performance() {}
 
-    public PerformanceEntity(final Long showId, final Long roundNo, final LocalDateTime startTime, final LocalDateTime endTime, final LocalDateTime reserveOpenTime, final LocalDateTime reserveCloseTime, final int maxCanReserveCount, final Integer holdTime, final PerformanceState state) {
+    public Performance(final Long showId, final Long roundNo, final LocalDateTime startTime, final LocalDateTime endTime, final LocalDateTime reserveOpenTime, final LocalDateTime reserveCloseTime, final int maxCanReserveCount, final Integer holdTime, final PerformanceState state) {
         this.showId = showId;
         this.roundNo = roundNo;
         this.startTime = startTime;

@@ -1,14 +1,11 @@
 package com.ticket.core.domain.auth;
 
 import com.ticket.core.domain.member.AddMember;
-import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.PasswordService;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.Password;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.exception.CoreException;
-import com.ticket.storage.db.core.MemberEntity;
-import com.ticket.storage.db.core.MemberRepository;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

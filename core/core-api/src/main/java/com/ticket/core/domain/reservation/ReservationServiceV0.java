@@ -2,13 +2,13 @@ package com.ticket.core.domain.reservation;
 
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
+import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
+import com.ticket.core.domain.performanceseat.PerformanceSeat;
+import com.ticket.core.domain.performanceseat.PerformanceSeatRepository;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
-import com.ticket.storage.db.core.PerformanceEntity;
-import com.ticket.storage.db.core.PerformanceSeatEntity;
-import com.ticket.storage.db.core.PerformanceSeatRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class ReservationServiceV0 implements ReservationService {
     @Transactional
     public void addReservation(final NewReservation newReservation) {
         final Member foundMember = memberFinder.find(newReservation.getMemberId());
-        final PerformanceEntity foundPerformance = performanceFinder.findOpenPerformance(newReservation.getPerformanceId());
+        final Performance foundPerformance = performanceFinder.findOpenPerformance(newReservation.getPerformanceId());
         int updateRows = performanceSeatRepository.updateState(
                 foundPerformance.getId(),
                 newReservation.getSeatIds(),
@@ -45,7 +45,7 @@ public class ReservationServiceV0 implements ReservationService {
         if (updateRows != newReservation.getSeatIds().size()) {
             throw new CoreException(ErrorType.SEAT_COUNT_MISMATCH);
         }
-        final List<PerformanceSeatEntity> reservedSeats = performanceSeatRepository.findAllByPerformanceIdAndSeatIdIn(foundPerformance.getId(), newReservation.getSeatIds());
+        final List<PerformanceSeat> reservedSeats = performanceSeatRepository.findAllByPerformanceIdAndSeatIdIn(foundPerformance.getId(), newReservation.getSeatIds());
         reservationManager.addWithoutReserve(foundMember.getId(), foundPerformance.getId(), reservedSeats);
     }
 

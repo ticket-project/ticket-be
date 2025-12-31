@@ -8,12 +8,14 @@ tasks.named('jar') {
 
 dependencies {
     implementation project(':core:core-enum')
-    implementation project(':storage:db-core')
     implementation project(':storage:redis-core')
     implementation project(':support:logging')
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.security:spring-security-crypto:6.4.4'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.h2database:h2'
 
 }

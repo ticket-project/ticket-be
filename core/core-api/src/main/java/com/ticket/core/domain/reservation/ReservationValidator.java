@@ -1,9 +1,8 @@
 package com.ticket.core.domain.reservation;
 
+import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
-import com.ticket.storage.db.core.PerformanceEntity;
-import com.ticket.storage.db.core.ReservationDetailRepository;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,7 +16,7 @@ public class ReservationValidator {
 
     public void validateNew(final int reserveRequestSeatSize,
                             final Long memberId,
-                            final PerformanceEntity performance,
+                            final Performance performance,
                             final int canReservePerformanceSeatsSize) {
         final long reservedCount = reservationDetailRepository.countByMemberIdAndPerformanceId(memberId, performance.getId());
 

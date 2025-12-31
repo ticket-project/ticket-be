@@ -1,4 +1,4 @@
-package com.ticket.storage.db.core;
+package com.ticket.core.domain;
 
 import com.ticket.core.enums.EntityStatus;
 import jakarta.persistence.*;

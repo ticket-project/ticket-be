@@ -1,8 +1,8 @@
 package com.ticket.core.domain.hold;
 
+import com.ticket.core.domain.performanceseat.PerformanceSeat;
+import com.ticket.core.domain.performanceseat.PerformanceSeatRepository;
 import com.ticket.core.enums.PerformanceSeatState;
-import com.ticket.storage.db.core.PerformanceSeatEntity;
-import com.ticket.storage.db.core.PerformanceSeatRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +23,10 @@ public class HoldExpireScheduler {
     @Scheduled(fixedRate = 60000)
     public void expireSeatHolds() {
         final LocalDateTime now = LocalDateTime.now();
-        final List<PerformanceSeatEntity> expiredSeatHolds = performanceSeatRepository.findAllByHoldExpireAtBeforeAndStateEquals(now, PerformanceSeatState.HELD);
+        final List<PerformanceSeat> expiredSeatHolds = performanceSeatRepository.findAllByHoldExpireAtBeforeAndStateEquals(now, PerformanceSeatState.HELD);
         if (expiredSeatHolds.isEmpty()) {
             return;
         }
-        expiredSeatHolds.forEach(PerformanceSeatEntity::release);
+        expiredSeatHolds.forEach(PerformanceSeat::release);
     }
 }

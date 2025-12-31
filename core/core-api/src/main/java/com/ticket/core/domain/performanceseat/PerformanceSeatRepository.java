@@ -1,4 +1,4 @@
-package com.ticket.storage.db.core;
+package com.ticket.core.domain.performanceseat;
 
 import com.ticket.core.enums.PerformanceSeatState;
 import jakarta.persistence.LockModeType;
@@ -9,16 +9,16 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-public interface PerformanceSeatRepository extends JpaRepository<PerformanceSeatEntity, Long> {
+public interface PerformanceSeatRepository extends JpaRepository<PerformanceSeat, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @QueryHints({
             @QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")
     })
-    List<PerformanceSeatEntity> findByPerformanceIdAndSeatIdInAndState(Long performanceId, List<Long> seatIds, PerformanceSeatState State);
+    List<PerformanceSeat> findByPerformanceIdAndSeatIdInAndState(Long performanceId, List<Long> seatIds, PerformanceSeatState State);
 
     @Modifying
     @Query("""
-            UPDATE PerformanceSeatEntity ps
+            UPDATE PerformanceSeat ps
             SET ps.state = :changeState
             WHERE ps.state = :curState
             AND ps.performanceId = :performanceId
@@ -26,8 +26,9 @@ public interface PerformanceSeatRepository extends JpaRepository<PerformanceSeat
     """)
     int updateState(Long performanceId, List<Long> seatIds, PerformanceSeatState curState, PerformanceSeatState changeState);
 
-    List<PerformanceSeatEntity> findAllByPerformanceIdAndSeatIdIn(Long performanceId, Collection<Long> seatIds);
+    List<PerformanceSeat> findAllByPerformanceIdAndSeatIdIn(Long performanceId, Collection<Long> seatIds);
 
-    List<PerformanceSeatEntity> findAllByHoldExpireAtBeforeAndStateEquals(LocalDateTime expireAtBefore, PerformanceSeatState state);
+    List<PerformanceSeat> findAllByHoldExpireAtBeforeAndStateEquals(LocalDateTime expireAtBefore, PerformanceSeatState state);
 
+    List<PerformanceSeat> findAllByStateEquals(PerformanceSeatState state);
 }

@@ -1,11 +1,11 @@
-package com.ticket.storage.db.core;
+package com.ticket.core.domain.seat;
 
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "SEAT")
-public class SeatEntity extends BaseEntity {
+public class Seat {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,9 +16,9 @@ public class SeatEntity extends BaseEntity {
     //열
     private String y;
 
-    protected SeatEntity() {}
+    protected Seat() {}
 
-    public SeatEntity(final Long id, final String x, final String y) {
+    public Seat(final Long id, final String x, final String y) {
         this.id = id;
         this.x = x;
         this.y = y;

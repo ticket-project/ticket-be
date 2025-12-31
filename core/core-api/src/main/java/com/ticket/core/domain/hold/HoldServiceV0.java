@@ -2,12 +2,12 @@ package com.ticket.core.domain.hold;
 
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
+import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
+import com.ticket.core.domain.performanceseat.PerformanceSeat;
 import com.ticket.core.domain.performanceseat.PerformanceSeatFinder;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
-import com.ticket.storage.db.core.PerformanceEntity;
-import com.ticket.storage.db.core.PerformanceSeatEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +33,8 @@ public class HoldServiceV0 implements HoldService {
     @Transactional
     public HoldToken hold(final NewSeatHold newSeatHold) {
         final Member foundMember = memberFinder.find(newSeatHold.getMemberId());
-        final PerformanceEntity foundPerformance = performanceFinder.findOpenPerformance(newSeatHold.getPerformanceId());
-        final List<PerformanceSeatEntity> availablePerformanceSeats = performanceSeatFinder.findAvailablePerformanceSeats(newSeatHold.getSeatIds(), foundPerformance.getId());
+        final Performance foundPerformance = performanceFinder.findOpenPerformance(newSeatHold.getPerformanceId());
+        final List<PerformanceSeat> availablePerformanceSeats = performanceSeatFinder.findAvailablePerformanceSeats(newSeatHold.getSeatIds(), foundPerformance.getId());
         if (availablePerformanceSeats.isEmpty()) {
             throw new CoreException(ErrorType.NOT_FOUND_DATA, "가능한 좌석이 없습니다.");
         }
@@ -42,7 +42,7 @@ public class HoldServiceV0 implements HoldService {
             throw new CoreException(ErrorType.SEAT_COUNT_MISMATCH);
         }
         final HoldToken holdToken = new HoldToken(foundMember.getId());
-        availablePerformanceSeats.forEach(performanceSeatEntity -> performanceSeatEntity.hold(foundPerformance.getHoldTime(), holdToken.getToken()));
+        availablePerformanceSeats.forEach(performanceSeat -> performanceSeat.hold(foundPerformance.getHoldTime(), holdToken.getToken()));
         return holdToken;
     }
 

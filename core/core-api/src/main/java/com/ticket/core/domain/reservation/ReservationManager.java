@@ -1,6 +1,6 @@
 package com.ticket.core.domain.reservation;
 
-import com.ticket.storage.db.core.*;
+import com.ticket.core.domain.performanceseat.PerformanceSeat;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,27 +16,27 @@ public class ReservationManager {
         this.reservationDetailRepository = reservationDetailRepository;
     }
 
-    public void add(final Long memberId, final Long performanceId, final List<PerformanceSeatEntity> performanceSeats) {
-        performanceSeats.forEach(PerformanceSeatEntity::reserve);
+    public void add(final Long memberId, final Long performanceId, final List<PerformanceSeat> performanceSeats) {
+        performanceSeats.forEach(PerformanceSeat::reserve);
 
-        final ReservationEntity savedReservation = saveReservation(memberId, performanceId);
+        final Reservation savedReservation = saveReservation(memberId, performanceId);
         saveReservationDetails(performanceSeats, savedReservation.getId());
     }
 
-    private ReservationEntity saveReservation(final Long memberId, final Long performanceId) {
-        return reservationRepository.save(new ReservationEntity(memberId, performanceId));
+    private Reservation saveReservation(final Long memberId, final Long performanceId) {
+        return reservationRepository.save(new Reservation(memberId, performanceId));
     }
 
-    private void saveReservationDetails(final List<PerformanceSeatEntity> foundPerformanceSeats, final Long reservationId) {
+    private void saveReservationDetails(final List<PerformanceSeat> foundPerformanceSeats, final Long reservationId) {
         reservationDetailRepository.saveAll(
                 foundPerformanceSeats.stream()
-                        .map(p -> new ReservationDetailEntity(reservationId, p.getId()))
+                        .map(p -> new ReservationDetail(reservationId, p.getId()))
                         .toList()
         );
     }
 
-    public void addWithoutReserve(final Long memberId, final Long performanceId, final List<PerformanceSeatEntity> reservedSeats) {
-        final ReservationEntity savedReservation = saveReservation(memberId, performanceId);
+    public void addWithoutReserve(final Long memberId, final Long performanceId, final List<PerformanceSeat> reservedSeats) {
+        final Reservation savedReservation = saveReservation(memberId, performanceId);
         saveReservationDetails(reservedSeats, savedReservation.getId());
     }
 }

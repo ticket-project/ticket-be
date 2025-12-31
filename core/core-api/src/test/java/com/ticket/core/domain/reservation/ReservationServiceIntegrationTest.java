@@ -61,11 +61,11 @@ class ReservationServiceIntegrationTest {
         );
         // then
         assertThat(reservedSeats).allMatch(seat -> seat.getState() == PerformanceSeatState.RESERVED);
-        final List<ReservationEntity> reservations = reservationRepository.findAll();
+        final List<Reservation> reservations = reservationRepository.findAll();
         assertThat(reservations).hasSize(1);
         assertThat(reservations.getFirst().getMemberId()).isEqualTo(savedMember.getId());
 
-        final List<ReservationDetailEntity> details = reservationDetailRepository.findAll();
+        final List<ReservationDetail> details = reservationDetailRepository.findAll();
         assertThat(details).hasSize(2);
     }
 }

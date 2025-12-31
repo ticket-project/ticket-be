@@ -2,10 +2,10 @@ package com.ticket.core.domain.reservation;
 
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
+import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
+import com.ticket.core.domain.performanceseat.PerformanceSeat;
 import com.ticket.core.domain.performanceseat.PerformanceSeatFinder;
-import com.ticket.storage.db.core.PerformanceEntity;
-import com.ticket.storage.db.core.PerformanceSeatEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,8 +36,8 @@ public class ReservationServiceV1 implements ReservationService {
     @Transactional
     public void addReservation(final NewReservation newReservation) {
         final Member foundMember = memberFinder.find(newReservation.getMemberId());
-        final PerformanceEntity foundPerformance = performanceFinder.findOpenPerformance(newReservation.getPerformanceId());
-        final List<PerformanceSeatEntity> foundPerformanceSeats = performanceSeatFinder.findAvailablePerformanceSeats(
+        final Performance foundPerformance = performanceFinder.findOpenPerformance(newReservation.getPerformanceId());
+        final List<PerformanceSeat> foundPerformanceSeats = performanceSeatFinder.findAvailablePerformanceSeats(
                 newReservation.getSeatIds(),
                 foundPerformance.getId()
         );
