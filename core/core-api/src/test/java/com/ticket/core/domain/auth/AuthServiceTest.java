@@ -1,6 +1,8 @@
 package com.ticket.core.domain.auth;
 
 import com.ticket.core.domain.member.AddMember;
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberRepository;
 import com.ticket.core.domain.member.PasswordService;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.Password;
@@ -42,19 +44,19 @@ class AuthServiceTest {
             final AddMember addMember = new AddMember("test@test.com", "1234", "test", Role.MEMBER);
             when(memberRepository.existsByEmail(any())).thenReturn(false);
             when(passwordService.encode(any())).thenReturn("encoded");
-            final MemberEntity savedMemberEntity = new MemberEntity(
+            final Member savedMember = new Member(
                     addMember.getEmailValue(),
                     addMember.getPassword().getValue(),
                     addMember.getName(),
                     addMember.getRole()
             );
-            ReflectionTestUtils.setField(savedMemberEntity, "id", 1L);
-            when(memberRepository.save(any(MemberEntity.class))).thenReturn(savedMemberEntity);
+            ReflectionTestUtils.setField(savedMember, "id", 1L);
+            when(memberRepository.save(any(Member.class))).thenReturn(savedMember);
             //when
             final Long id = authService.register(addMember);
             //then
             assertThat(id).isEqualTo(1L);
-            verify(memberRepository).save(any(MemberEntity.class));
+            verify(memberRepository).save(any(Member.class));
         }
 
         @Test
@@ -78,14 +80,14 @@ class AuthServiceTest {
             //given
             final Email email = Email.create("test@test.com");
             final Password password = Password.create("encoded(1234)");
-            final MemberEntity memberEntity = new MemberEntity(
+            final Member member = new Member(
                     email.getValue(),
                     password.getValue(),
                     "test",
                     Role.MEMBER
             );
-            when(memberRepository.findByEmail(email.getValue())).thenReturn(Optional.of(memberEntity));
-            when(passwordService.matches(password.getValue(), memberEntity.getPassword())).thenReturn(true);
+            when(memberRepository.findByEmail(email.getValue())).thenReturn(Optional.of(member));
+            when(passwordService.matches(password.getValue(), member.getPassword())).thenReturn(true);
             //when
             final Member loggedInMember = authService.login(email, password);
             //then
@@ -109,13 +111,13 @@ class AuthServiceTest {
             //given
             final Email email = Email.create("test@test.com");
             final Password password = Password.create("encoded(1234)");
-            final MemberEntity memberEntity = new MemberEntity(
+            final Member member = new Member(
                     email.getValue(),
                     password.getValue(),
                     "test",
                     Role.MEMBER
             );
-            when(memberRepository.findByEmail(email.getValue())).thenReturn(Optional.of(memberEntity));
+            when(memberRepository.findByEmail(email.getValue())).thenReturn(Optional.of(member));
             when(passwordService.matches(password.getValue(), "encoded(1234)")).thenReturn(false);
             //then
             assertThatThrownBy(() -> authService.login(email, password)).isInstanceOf(CoreException.class);

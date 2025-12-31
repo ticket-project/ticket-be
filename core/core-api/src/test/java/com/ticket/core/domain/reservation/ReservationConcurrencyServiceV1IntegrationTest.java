@@ -1,8 +1,12 @@
 package com.ticket.core.domain.reservation;
 
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberRepository;
+import com.ticket.core.domain.performance.Performance;
+import com.ticket.core.domain.performance.PerformanceRepository;
+import com.ticket.core.domain.performanceseat.PerformanceSeatRepository;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.TestDataFactory;
-import com.ticket.storage.db.core.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -32,15 +37,15 @@ class ReservationConcurrencyServiceV1IntegrationTest {
     @Autowired private ReservationRepository reservationRepository;
     @Autowired private ReservationDetailRepository reservationDetailRepository;
 
-    private List<MemberEntity> saveMembers;
-    private PerformanceEntity savedPerformance;
+    private List<Member> saveMembers;
+    private Performance savedPerformance;
 
     @BeforeEach
     void setUp() {
         memberRepository.save(TestDataFactory.createMember());
         savedPerformance = performanceRepository.save(TestDataFactory.createPerformance());
         performanceSeatRepository.saveAll(
-                TestDataFactory.createAvailableSeats(savedPerformance.getId(), List.of(1L))
+                TestDataFactory.createAvailableSeats(savedPerformance.getId(), List.of(1L), LocalDateTime.now().plusSeconds(savedPerformance.getHoldTime()), 1L, "testHoldTokenUUID")
         );
         saveMembers = IntStream.range(0, 100)
                 .mapToObj(i -> memberRepository.save(TestDataFactory.createMember("user" + i + "@test.com", "pw", "name", Role.MEMBER)))

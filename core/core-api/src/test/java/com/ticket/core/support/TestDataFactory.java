@@ -1,9 +1,14 @@
 package com.ticket.core.support;
 
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.performance.Performance;
+import com.ticket.core.domain.performanceseat.PerformanceSeat;
+import com.ticket.core.domain.reservation.Reservation;
+import com.ticket.core.domain.reservation.ReservationDetail;
+import com.ticket.core.domain.seat.Seat;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.enums.PerformanceState;
 import com.ticket.core.enums.Role;
-import com.ticket.storage.db.core.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,25 +19,25 @@ public class TestDataFactory {
     public static final LocalDateTime BASE_TIME = LocalDateTime.of(2026, 1, 1, 0, 0);
 
     // ===== Member =====
-    public static MemberEntity createMember() {
+    public static Member createMember() {
         return createMember("test@example.com", "password123", "테스트유저", Role.MEMBER);
     }
 
-    public static MemberEntity createMember(String email, String password, String name, Role role) {
-        return new MemberEntity(email, password, name, role);
+    public static Member createMember(String email, String password, String name, Role role) {
+        return new Member(email, password, name, role);
     }
 
-    public static MemberEntity createAdminMember() {
+    public static Member createAdminMember() {
         return createMember("admin@example.com", "password123", "관리자", Role.ADMIN);
     }
 
     // ===== Performance (회차) =====
-    public static PerformanceEntity createPerformance() {
+    public static Performance createPerformance() {
         return createPerformance(1L, PerformanceState.OPEN);
     }
 
-    public static PerformanceEntity createPerformance(Long showId, PerformanceState state) {
-        return new PerformanceEntity(
+    public static Performance createPerformance(Long showId, PerformanceState state) {
+        return new Performance(
                 showId,
                 1L,
                 BASE_TIME.plusDays(7),
@@ -45,17 +50,17 @@ public class TestDataFactory {
         );
     }
 
-    public static PerformanceEntity createClosedPerformance(Long showId) {
+    public static Performance createClosedPerformance(Long showId) {
         return createPerformance(showId, PerformanceState.CLOSE);
     }
 
     // ===== Seat (좌석) =====
-    public static SeatEntity createSeat(Long id, String row, String col) {
-        return new SeatEntity(id, row, col);
+    public static Seat createSeat(Long id, String row, String col) {
+        return new Seat(id, row, col);
     }
 
-    public static List<SeatEntity> createSeats(int count) {
-        List<SeatEntity> seats = new ArrayList<>();
+    public static List<Seat> createSeats(int count) {
+        List<Seat> seats = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             seats.add(createSeat((long) i, "A", String.valueOf(i)));
         }
@@ -63,28 +68,28 @@ public class TestDataFactory {
     }
 
     // ===== PerformanceSeat (회차_좌석) =====
-    public static PerformanceSeatEntity createPerformanceSeat(Long performanceId, Long seatId, PerformanceSeatState state) {
-        return new PerformanceSeatEntity(performanceId, seatId, state);
+    public static PerformanceSeat createPerformanceSeat(Long performanceId, Long seatId, PerformanceSeatState state, LocalDateTime holdExpireAt, Long holdByMemberId, String holdToken) {
+        return new PerformanceSeat(performanceId, seatId, state, holdExpireAt, holdByMemberId, holdToken);
     }
 
-    public static PerformanceSeatEntity createAvailableSeat(Long performanceId, Long seatId) {
-        return createPerformanceSeat(performanceId, seatId, PerformanceSeatState.AVAILABLE);
+    public static PerformanceSeat createAvailableSeat(Long performanceId, Long seatId, LocalDateTime holdExpireAt, Long holdByMemberId, String holdToken) {
+        return createPerformanceSeat(performanceId, seatId, PerformanceSeatState.AVAILABLE, holdExpireAt, holdByMemberId, holdToken);
     }
 
-    public static List<PerformanceSeatEntity> createAvailableSeats(Long performanceId, List<Long> seatIds) {
+    public static List<PerformanceSeat> createAvailableSeats(Long performanceId, List<Long> seatIds, LocalDateTime holdExpireAt, Long holdByMemberId, String holdToken) {
         return seatIds.stream()
-                .map(seatId -> createAvailableSeat(performanceId, seatId))
+                .map(seatId -> createAvailableSeat(performanceId, seatId, holdExpireAt, holdByMemberId, holdToken))
                 .toList();
     }
 
     // ===== Reservation (예매) =====
-    public static ReservationEntity createReservation(Long memberId, Long performanceId) {
-        return new ReservationEntity(memberId, performanceId);
+    public static Reservation createReservation(Long memberId, Long performanceId) {
+        return new Reservation(memberId, performanceId);
     }
 
     // ===== ReservationDetail (예매 상세) =====
-    public static ReservationDetailEntity createReservationDetail(Long reservationId, Long performanceSeatId) {
-        return new ReservationDetailEntity(reservationId, performanceSeatId);
+    public static ReservationDetail createReservationDetail(Long reservationId, Long performanceSeatId) {
+        return new ReservationDetail(reservationId, performanceSeatId);
     }
 
 }

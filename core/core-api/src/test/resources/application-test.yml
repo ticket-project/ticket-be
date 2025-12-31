@@ -3,15 +3,6 @@ spring:
     import:
       - logging.yml
 
-  profiles:
-    active: local
-
----
-spring:
-  config:
-    activate:
-      on-profile: local
-
   datasource:
     url: jdbc:mysql://localhost:3307/ticket
     username: root
@@ -26,9 +17,7 @@ spring:
         format_sql: true
         use_sql_comments: true
         show_sql: true
-    defer-datasource-initialization: true
-
   sql:
     init:
-      mode: always
+      mode: never
       encoding: UTF-8
