@@ -1,5 +1,7 @@
 spring:
   config:
+    activate:
+      on-profile: test
     import:
       - logging.yml
 

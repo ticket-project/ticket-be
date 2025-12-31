@@ -6,6 +6,7 @@ import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceRepository;
 import com.ticket.core.domain.performanceseat.PerformanceSeatRepository;
 import com.ticket.core.enums.Role;
+import com.ticket.core.support.IntegrationBase;
 import com.ticket.core.support.TestDataFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,9 +25,8 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
 @SuppressWarnings("NonAsciiCharacters")
-class ReservationConcurrencyServiceV1IntegrationTest {
+class ReservationConcurrencyServiceV1IntegrationTest extends IntegrationBase {
 
     private static final Logger log = LoggerFactory.getLogger(ReservationConcurrencyServiceV1IntegrationTest.class);
     @Autowired private ReservationServiceV1 reservationService;
