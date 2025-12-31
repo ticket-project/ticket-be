@@ -74,13 +74,13 @@ public class TestDataFactory {
         return new PerformanceSeat(performanceId, seatId, state, holdExpireAt, holdByMemberId, holdToken);
     }
 
-    public static PerformanceSeat createAvailableSeat(Long performanceId, Long seatId, LocalDateTime holdExpireAt, Long holdByMemberId, String holdToken) {
-        return createPerformanceSeat(performanceId, seatId, PerformanceSeatState.AVAILABLE, holdExpireAt, holdByMemberId, holdToken);
+    public static PerformanceSeat createAvailableSeat(Long performanceId, Long seatId) {
+        return createPerformanceSeat(performanceId, seatId, PerformanceSeatState.AVAILABLE, null , null, null);
     }
 
     public static List<PerformanceSeat> createAvailableSeats(Long performanceId, List<Long> seatIds, LocalDateTime holdExpireAt, Long holdByMemberId, String holdToken) {
         return seatIds.stream()
-                .map(seatId -> createAvailableSeat(performanceId, seatId, holdExpireAt, holdByMemberId, holdToken))
+                .map(seatId -> createAvailableSeat(performanceId, seatId))
                 .toList();
     }
 
