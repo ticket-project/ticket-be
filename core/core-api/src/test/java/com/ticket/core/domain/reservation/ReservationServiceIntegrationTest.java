@@ -1,14 +1,20 @@
 package com.ticket.core.domain.reservation;
 
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberRepository;
+import com.ticket.core.domain.performance.Performance;
+import com.ticket.core.domain.performance.PerformanceRepository;
+import com.ticket.core.domain.performanceseat.PerformanceSeat;
+import com.ticket.core.domain.performanceseat.PerformanceSeatRepository;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.support.TestDataFactory;
-import com.ticket.storage.db.core.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,16 +30,16 @@ class ReservationServiceIntegrationTest {
     @Autowired private ReservationRepository reservationRepository;
     @Autowired private ReservationDetailRepository reservationDetailRepository;
 
-    private MemberEntity savedMember;
-    private PerformanceEntity savedPerformance;
-    private List<PerformanceSeatEntity> savedPerformanceSeats;
+    private Member savedMember;
+    private Performance savedPerformance;
+    private List<PerformanceSeat> savedPerformanceSeats;
 
     @BeforeEach
     void setUp() {
         savedMember = memberRepository.save(TestDataFactory.createMember());
         savedPerformance = performanceRepository.save(TestDataFactory.createPerformance());
         savedPerformanceSeats = performanceSeatRepository.saveAll(
-                TestDataFactory.createAvailableSeats(savedPerformance.getId(), List.of(1L, 2L))
+                TestDataFactory.createAvailableSeats(savedPerformance.getId(), List.of(1L), LocalDateTime.now().plusSeconds(savedPerformance.getHoldTime()), 1L, "testHoldTokenUUID")
         );
     }
 
@@ -52,12 +58,12 @@ class ReservationServiceIntegrationTest {
         final NewReservation newReservation = new NewReservation(
                 savedMember.getId(),
                 savedPerformance.getId(),
-                List.of(1L, 2L)
+                List.of(1L)
         );
         // when
         reservationService.addReservation(newReservation);
-        final List<PerformanceSeatEntity> reservedSeats = performanceSeatRepository.findAllById(
-                savedPerformanceSeats.stream().map(PerformanceSeatEntity::getId).toList()
+        final List<PerformanceSeat> reservedSeats = performanceSeatRepository.findAllById(
+                savedPerformanceSeats.stream().map(PerformanceSeat::getId).toList()
         );
         // then
         assertThat(reservedSeats).allMatch(seat -> seat.getState() == PerformanceSeatState.RESERVED);
@@ -66,6 +72,6 @@ class ReservationServiceIntegrationTest {
         assertThat(reservations.getFirst().getMemberId()).isEqualTo(savedMember.getId());
 
         final List<ReservationDetail> details = reservationDetailRepository.findAll();
-        assertThat(details).hasSize(2);
+        assertThat(details).hasSize(1);
     }
 }
