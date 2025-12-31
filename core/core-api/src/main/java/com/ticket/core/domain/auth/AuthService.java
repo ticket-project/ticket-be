@@ -50,6 +50,6 @@ public class AuthService {
         if (!passwordService.matches(password.getValue(), foundMember.getPassword())) {
             throw new CoreException(ErrorType.MEMBER_NOT_MATCH_PASSWORD);
         }
-        return new Member(foundMember.getId(), foundMember.getEmail(), foundMember.getName(), foundMember.getRole());
+        return foundMember;
     }
 }
