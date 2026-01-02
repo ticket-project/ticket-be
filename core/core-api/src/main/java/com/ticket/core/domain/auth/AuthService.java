@@ -46,7 +46,7 @@ public class AuthService {
     }
 
     public Member login(final String email, final String password) {
-        final Member foundMember = memberRepository.findByEmail(email)
+        final Member foundMember = memberRepository.findByEmail_Email(email)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA));
 
         if (!passwordService.matches(password, foundMember.getPassword().getPassword())) {
