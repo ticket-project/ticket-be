@@ -3,7 +3,6 @@ package com.ticket.core.support;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.EncodedPassword;
-import com.ticket.core.domain.member.vo.RawPassword;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performanceseat.PerformanceSeat;
 import com.ticket.core.domain.reservation.Reservation;
@@ -79,7 +78,7 @@ public class TestDataFactory {
         return createPerformanceSeat(performanceId, seatId, PerformanceSeatState.AVAILABLE, null , null, null);
     }
 
-    public static List<PerformanceSeat> createAvailableSeats(Long performanceId, List<Long> seatIds, LocalDateTime holdExpireAt, Long holdByMemberId, String holdToken) {
+    public static List<PerformanceSeat> createAvailableSeats(Long performanceId, List<Long> seatIds) {
         return seatIds.stream()
                 .map(seatId -> createAvailableSeat(performanceId, seatId))
                 .toList();
