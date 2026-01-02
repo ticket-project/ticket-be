@@ -38,7 +38,7 @@ class ReservationServiceIntegrationTest extends IntegrationBase {
         savedMember = memberRepository.save(TestDataFactory.createMember());
         savedPerformance = performanceRepository.save(TestDataFactory.createPerformance());
         savedPerformanceSeats = performanceSeatRepository.saveAll(
-                TestDataFactory.createAvailableSeats(savedPerformance.getId(), List.of(1L), LocalDateTime.now().plusSeconds(savedPerformance.getHoldTime()), 1L, "testHoldTokenUUID")
+                TestDataFactory.createAvailableSeats(savedPerformance.getId(), List.of(1L))
         );
     }
 
