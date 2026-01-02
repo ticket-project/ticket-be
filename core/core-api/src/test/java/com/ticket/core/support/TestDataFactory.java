@@ -2,7 +2,8 @@ package com.ticket.core.support;
 
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.vo.Email;
-import com.ticket.core.domain.member.vo.Password;
+import com.ticket.core.domain.member.vo.EncodedPassword;
+import com.ticket.core.domain.member.vo.RawPassword;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performanceseat.PerformanceSeat;
 import com.ticket.core.domain.reservation.Reservation;
@@ -26,7 +27,7 @@ public class TestDataFactory {
     }
 
     public static Member createMember(String email, String password, String name, Role role) {
-        return new Member(Email.create(email), Password.create(password), name, role);
+        return new Member(Email.create(email), EncodedPassword.create(password), name, role);
     }
 
     public static Member createAdminMember() {

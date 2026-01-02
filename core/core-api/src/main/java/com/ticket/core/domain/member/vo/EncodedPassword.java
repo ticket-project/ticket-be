@@ -1,0 +1,37 @@
+package com.ticket.core.domain.member.vo;
+
+import jakarta.persistence.Embeddable;
+
+import java.util.Objects;
+
+@Embeddable
+public class EncodedPassword {
+
+    private String password;
+
+    protected EncodedPassword() {}
+
+    private EncodedPassword(final String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
+    public static EncodedPassword create(final String value) {
+        return new EncodedPassword(value);
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        final EncodedPassword rawPassword = (EncodedPassword) o;
+        return Objects.equals(this.password, rawPassword.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(password);
+    }
+}

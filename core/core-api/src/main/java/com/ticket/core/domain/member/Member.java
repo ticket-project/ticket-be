@@ -2,7 +2,7 @@ package com.ticket.core.domain.member;
 
 import com.ticket.core.domain.BaseEntity;
 import com.ticket.core.domain.member.vo.Email;
-import com.ticket.core.domain.member.vo.Password;
+import com.ticket.core.domain.member.vo.EncodedPassword;
 import com.ticket.core.enums.Role;
 import jakarta.persistence.*;
 
@@ -18,7 +18,7 @@ public class Member extends BaseEntity {
     private Email email;
 
     @Embedded
-    private Password password;
+    private EncodedPassword encodedPassword;
 
     private String name;
 
@@ -27,9 +27,9 @@ public class Member extends BaseEntity {
 
     protected Member() {}
 
-    public Member(final Email email, final Password password, final String name, final Role role) {
+    public Member(final Email email, final EncodedPassword encodedPassword, final String name, final Role role) {
         this.email = email;
-        this.password = password;
+        this.encodedPassword = encodedPassword;
         this.name = name;
         this.role = role;
     }
@@ -46,8 +46,8 @@ public class Member extends BaseEntity {
         return name;
     }
 
-    public Password getPassword() {
-        return password;
+    public EncodedPassword getEncodedPassword() {
+        return encodedPassword;
     }
 
     public Role getRole() {
