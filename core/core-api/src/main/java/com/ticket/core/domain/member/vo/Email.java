@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 @Embeddable
 public class Email {
 
-    @Column(unique = true, nullable = false)
     private String email;
 
     private static final Pattern EMAIL_PATTERN =

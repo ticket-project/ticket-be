@@ -7,7 +7,9 @@ import com.ticket.core.enums.Role;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "MEMBER")
+@Table(name = "MEMBER", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"email"})
+})
 public class Member extends BaseEntity {
 
     @Id
