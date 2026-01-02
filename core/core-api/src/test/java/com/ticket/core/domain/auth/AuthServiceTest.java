@@ -7,12 +7,13 @@ import com.ticket.core.domain.member.PasswordService;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.Password;
 import com.ticket.core.enums.Role;
-import com.ticket.core.support.UnitBase;
 import com.ticket.core.support.exception.CoreException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
@@ -22,7 +23,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("NonAsciiCharacters")
-class AuthServiceTest extends UnitBase {
+@ExtendWith(MockitoExtension.class)
+class AuthServiceTest {
 
     @InjectMocks
     private AuthService authService;

@@ -1,6 +1,5 @@
 package com.ticket.core.domain.member.vo;
 
-import com.ticket.core.support.UnitBase;
 import com.ticket.core.support.exception.CoreException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,7 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 @SuppressWarnings("NonAsciiCharacters")
-class PasswordTest extends UnitBase {
+class PasswordTest {
 
     @ParameterizedTest
     @NullAndEmptySource

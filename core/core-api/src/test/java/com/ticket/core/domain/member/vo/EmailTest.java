@@ -1,6 +1,5 @@
 package com.ticket.core.domain.member.vo;
 
-import com.ticket.core.support.UnitBase;
 import com.ticket.core.support.exception.CoreException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -10,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings("NonAsciiCharacters")
-class EmailTest extends UnitBase {
+class EmailTest {
 
     @ParameterizedTest
     @NullAndEmptySource
