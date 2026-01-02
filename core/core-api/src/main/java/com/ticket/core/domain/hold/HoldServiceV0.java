@@ -42,7 +42,7 @@ public class HoldServiceV0 implements HoldService {
         if (availablePerformanceSeats.size() != newSeatHold.getSeatIds().size()) {
             throw new CoreException(ErrorType.SEAT_COUNT_MISMATCH);
         }
-        final HoldToken holdToken = new HoldToken(foundMember.getId());
+        final HoldToken holdToken = HoldToken.issue(foundMember.getId());
         final LocalDateTime holdExpireAt = LocalDateTime.now().plusSeconds(foundPerformance.getHoldTime());
         availablePerformanceSeats.forEach(performanceSeat -> performanceSeat.hold(foundMember.getId(), holdExpireAt, holdToken.getToken()));
         return holdToken;

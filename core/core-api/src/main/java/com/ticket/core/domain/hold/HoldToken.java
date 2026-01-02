@@ -6,9 +6,9 @@ public class HoldToken {
     private final Long memberId;
     private final String token;
 
-    public HoldToken(final Long memberId) {
+    public HoldToken(final Long memberId, final String token) {
         this.memberId = memberId;
-        this.token = UUID.randomUUID().toString();
+        this.token = token;
     }
 
     public Long getMemberId() {
@@ -17,5 +17,9 @@ public class HoldToken {
 
     public String getToken() {
         return token;
+    }
+
+    public static HoldToken issue(final Long memberId) {
+        return new HoldToken(memberId, UUID.randomUUID().toString());
     }
 }
