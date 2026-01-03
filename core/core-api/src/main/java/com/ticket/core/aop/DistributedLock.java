@@ -9,10 +9,22 @@ import java.util.concurrent.TimeUnit;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DistributedLock {
+
     /**
-     * 락의 이름
+     * 도메인 구분용 prefix
      */
-    String key();
+    String prefix() default "";
+
+    /**
+     * 락 키를 생성할 SpEL 표현식들.
+     *
+     * 결과가 Collection/배열이면 각 요소가 개별 락으로 처리됩니다.
+     *
+     * 예시:
+     * - 단일: "#memberId"
+     * - 멀티: {"#a", "#b"} 또는 "#request.getIds()"
+     */
+    String[] dynamicKey();
 
     /**
      * 락의 시간 단위
