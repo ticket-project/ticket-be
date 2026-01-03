@@ -2,6 +2,7 @@ spring:
   config:
     import:
       - logging.yml
+      - redis.yml
 
   profiles:
     active: local
