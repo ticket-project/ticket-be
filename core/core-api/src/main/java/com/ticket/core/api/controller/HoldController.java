@@ -23,10 +23,19 @@ public class HoldController {
     }
 
     /**
-     * v0 선점 - DB 로만 + scheduler
+     * v0 - DB 로만 + scheduler
      */
     @PostMapping("/v0")
-    public ApiResponse<HoldInfoResponse> hold(MemberDetails memberDetails, @RequestBody @Valid AddSeatHoldRequest request) {
+    public ApiResponse<HoldInfoResponse> holdV0(MemberDetails memberDetails, @RequestBody @Valid AddSeatHoldRequest request) {
+        final HoldToken holdToken = holdService.hold(request.toNewSeatHold(memberDetails.getMemberId()));
+        return ApiResponse.success(HoldInfoResponse.from(holdToken));
+    }
+
+    /**
+     * v1 - Redisson DistributedLock
+     */
+    @PostMapping("/v1")
+    public ApiResponse<HoldInfoResponse> holdV1(MemberDetails memberDetails, @RequestBody @Valid AddSeatHoldRequest request) {
         final HoldToken holdToken = holdService.hold(request.toNewSeatHold(memberDetails.getMemberId()));
         return ApiResponse.success(HoldInfoResponse.from(holdToken));
     }
