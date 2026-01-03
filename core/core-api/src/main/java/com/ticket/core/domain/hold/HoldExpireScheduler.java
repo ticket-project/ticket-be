@@ -4,13 +4,12 @@ import com.ticket.core.domain.performanceseat.PerformanceSeat;
 import com.ticket.core.domain.performanceseat.PerformanceSeatRepository;
 import com.ticket.core.enums.PerformanceSeatState;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Component
+//@Component
 public class HoldExpireScheduler {
 
     private final PerformanceSeatRepository performanceSeatRepository;
