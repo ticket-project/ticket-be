@@ -37,7 +37,8 @@ public abstract class ConcurrencyTestBase extends IntegrationBase {
     @BeforeAll
     void setUpBase() {
         savedPerformance = performanceRepository.save(TestDataFactory.createPerformance());
-        savedPerformanceSeats = performanceSeatRepository.saveAll(        TestDataFactory.createAvailableSeats(savedPerformance.getId(), getSeatIds())
+        savedPerformanceSeats = performanceSeatRepository.saveAll(
+                TestDataFactory.createAvailableSeats(savedPerformance.getId(), getSeatIds())
         );
         savedMembers = memberRepository.saveAll(TestDataFactory.createMembers(100));
     }
