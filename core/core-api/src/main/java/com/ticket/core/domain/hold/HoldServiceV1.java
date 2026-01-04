@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Redisson 분산락을 통한 좌석 선점 서비스 (동시성 문제 방지)
+ */
 @Service("holdServiceV1")
 public class HoldServiceV1 implements HoldService {
 

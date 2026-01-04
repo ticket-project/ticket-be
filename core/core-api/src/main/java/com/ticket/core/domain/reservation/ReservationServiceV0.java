@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * DB 행 락을 통한 예매 서비스 (동시성 문제 방지)
+ */
 @Service("reservationServiceV0")
 public class ReservationServiceV0 implements ReservationService {
 
