@@ -4,6 +4,7 @@ import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberRepository;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceRepository;
+import com.ticket.core.domain.performanceseat.PerformanceSeat;
 import com.ticket.core.domain.performanceseat.PerformanceSeatRepository;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.IntegrationBase;
@@ -37,12 +38,13 @@ class ReservationServiceV0ConcurrencyTest extends IntegrationBase {
 
     private List<Member> saveMembers;
     private Performance savedPerformance;
+    private List<PerformanceSeat> savedPerformanceSeats;
 
     @BeforeEach
     void setUp() {
         memberRepository.save(TestDataFactory.createMember());
         savedPerformance = performanceRepository.save(TestDataFactory.createPerformance());
-        performanceSeatRepository.saveAll(
+        savedPerformanceSeats = performanceSeatRepository.saveAll(
                 TestDataFactory.createAvailableSeats(savedPerformance.getId(), List.of(1L))
         );
         saveMembers = IntStream.range(0, 100)
@@ -65,7 +67,7 @@ class ReservationServiceV0ConcurrencyTest extends IntegrationBase {
         ConcurrentTestUtil.execute(100, idx -> reservationService.addReservation(new NewReservation(
                 saveMembers.get(idx).getId(),
                 savedPerformance.getId(),
-                List.of(1L)
+                savedPerformanceSeats.stream().map(PerformanceSeat::getSeatId).toList()
         )));
         final long reservationCount = reservationRepository.count();
         assertThat(reservationCount).isEqualTo(1);
