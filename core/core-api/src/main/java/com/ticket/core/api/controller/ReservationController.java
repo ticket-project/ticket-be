@@ -4,6 +4,7 @@ import com.ticket.core.api.controller.request.AddReservationRequest;
 import com.ticket.core.domain.member.MemberDetails;
 import com.ticket.core.domain.reservation.ReservationService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +16,7 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-    public ReservationController(final ReservationService reservationService) {
+    public ReservationController(@Qualifier("reservationServiceV1") final ReservationService reservationService) {
         this.reservationService = reservationService;
     }
 

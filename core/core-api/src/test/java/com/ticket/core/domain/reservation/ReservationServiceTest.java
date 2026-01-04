@@ -13,21 +13,28 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
-class ReservationServiceIntegrationTest extends IntegrationBase {
+class ReservationServiceTest extends IntegrationBase {
 
-    @Autowired private ReservationService reservationService;
-    @Autowired private MemberRepository memberRepository;
-    @Autowired private PerformanceRepository performanceRepository;
-    @Autowired private PerformanceSeatRepository performanceSeatRepository;
-    @Autowired private ReservationRepository reservationRepository;
-    @Autowired private ReservationDetailRepository reservationDetailRepository;
+    @Autowired
+    @Qualifier("reservationServiceV1")
+    private ReservationService reservationService;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private PerformanceRepository performanceRepository;
+    @Autowired
+    private PerformanceSeatRepository performanceSeatRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private ReservationDetailRepository reservationDetailRepository;
 
     private Member savedMember;
     private Performance savedPerformance;
