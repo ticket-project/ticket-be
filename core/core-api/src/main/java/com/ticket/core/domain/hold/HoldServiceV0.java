@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 비관적 락을 통한 좌석 선점 서비스 (동시성 문제 방지)
+ */
 @Service("holdServiceV0")
 public class HoldServiceV0 implements HoldService {
 
