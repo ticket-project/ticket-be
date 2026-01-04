@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
+@Service("reservationServiceV1")
 public class ReservationServiceV1 implements ReservationService {
 
     private final MemberFinder memberFinder;

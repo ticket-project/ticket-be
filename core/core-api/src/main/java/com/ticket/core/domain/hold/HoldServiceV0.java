@@ -8,12 +8,13 @@ import com.ticket.core.domain.performanceseat.PerformanceSeat;
 import com.ticket.core.domain.performanceseat.PerformanceSeatFinder;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-//@Service
+@Service("holdServiceV0")
 public class HoldServiceV0 implements HoldService {
 
     private final MemberFinder memberFinder;

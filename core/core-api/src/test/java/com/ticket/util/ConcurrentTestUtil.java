@@ -42,7 +42,7 @@ public class ConcurrentTestUtil {
             start.countDown();
             done.await();
             assertThat(successCount.get()).isEqualTo(1);
-            assertThat(failCount.get()).isEqualTo(99);
+            assertThat(failCount.get()).isEqualTo(threadCount - 1);
         }
     }
 }

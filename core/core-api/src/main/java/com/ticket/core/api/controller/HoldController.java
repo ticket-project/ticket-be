@@ -7,6 +7,7 @@ import com.ticket.core.domain.hold.HoldInfoResponse;
 import com.ticket.core.domain.hold.HoldService;
 import com.ticket.core.support.response.ApiResponse;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,7 @@ public class HoldController {
 
     private final HoldService holdService;
 
-    public HoldController(final HoldService holdService) {
+    public HoldController(@Qualifier("holdServiceV1") final HoldService holdService) {
         this.holdService = holdService;
     }
 

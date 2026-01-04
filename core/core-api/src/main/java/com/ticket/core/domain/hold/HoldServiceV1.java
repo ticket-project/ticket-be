@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Service
+@Service("holdServiceV1")
 public class HoldServiceV1 implements HoldService {
 
     private final MemberFinder memberFinder;

@@ -9,11 +9,12 @@ import com.ticket.core.domain.performanceseat.PerformanceSeatRepository;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-//@Service
+@Service("reservationServiceV0")
 public class ReservationServiceV0 implements ReservationService {
 
     private final MemberFinder memberFinder;
