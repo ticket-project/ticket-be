@@ -12,8 +12,6 @@ import com.ticket.util.ConcurrentTestUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -24,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("NonAsciiCharacters")
 class ReservationServiceV0ConcurrencyTest extends IntegrationBase {
 
-    private static final Logger log = LoggerFactory.getLogger(ReservationServiceV0ConcurrencyTest.class);
     @Autowired
     private ReservationService reservationService;
     @Autowired
