@@ -14,13 +14,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
-class ReservationServiceIntegrationTest extends IntegrationBase {
+class ReservationServiceTest extends IntegrationBase {
 
     @Autowired private ReservationService reservationService;
     @Autowired private MemberRepository memberRepository;

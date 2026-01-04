@@ -22,11 +22,11 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
-class ReservationConcurrencyServiceV0IntegrationTest extends IntegrationBase {
+class ReservationServiceV1ConcurrencyTest extends IntegrationBase {
 
-    private static final Logger log = LoggerFactory.getLogger(ReservationConcurrencyServiceV0IntegrationTest.class);
+    private static final Logger log = LoggerFactory.getLogger(ReservationServiceV1ConcurrencyTest.class);
     @Autowired
-    private ReservationService reservationService;
+    private ReservationServiceV1 reservationService;
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
@@ -63,7 +63,7 @@ class ReservationConcurrencyServiceV0IntegrationTest extends IntegrationBase {
     }
 
     @Test
-    void 재고가_1개일때_여러_요청이_동시에_들어오면_db_update_잠금으로_인해_예매가_오버셀되지_않는다() throws InterruptedException {
+    void 재고가_1개일때_여러_요청이_동시에_들어오면_비관적_락에_의해_예매가_오버셀되지_않는다() throws InterruptedException {
         // given & when & then
         ConcurrentTestUtil.execute(100, () -> reservationService.addReservation(new NewReservation(
                 saveMembers.getFirst().getId(),
@@ -73,4 +73,5 @@ class ReservationConcurrencyServiceV0IntegrationTest extends IntegrationBase {
         final long reservationCount = reservationRepository.count();
         assertThat(reservationCount).isEqualTo(1);
     }
+
 }

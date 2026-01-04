@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 @SuppressWarnings("NonAsciiCharacters")
-class SeatHoldConcurrencyServiceV0IntegrationTest extends IntegrationBase {
+class SeatHoldServiceV0ConcurrencyTest extends IntegrationBase {
 
-    private static final Logger log = LoggerFactory.getLogger(SeatHoldConcurrencyServiceV0IntegrationTest.class);
+    private static final Logger log = LoggerFactory.getLogger(SeatHoldServiceV0ConcurrencyTest.class);
     @Autowired private HoldService holdService;
     @Autowired private MemberRepository memberRepository;
     @Autowired private PerformanceRepository performanceRepository;
