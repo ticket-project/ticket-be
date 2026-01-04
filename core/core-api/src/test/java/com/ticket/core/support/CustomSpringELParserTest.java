@@ -64,4 +64,18 @@ class CustomSpringELParserTest {
                 .hasMessage("keys가 0개입니다.");
     }
 
+    @Test
+    void parameterNames와_args_길이가_다르면_context_세팅중_예외가_발생할_수_있다() {
+        // given
+        String prefix = "LOCK:";
+        String[] parameterNames = {"a", "b"};
+        Object[] args = {1}; // b에 해당하는 args[1]가 없음
+        String[] dynamicKey = {"#a"};
+
+        // when & then
+        assertThatThrownBy(() ->
+                CustomSpringELParser.getDynamicValue(prefix, parameterNames, args, dynamicKey)
+        ).isInstanceOf(ArrayIndexOutOfBoundsException.class);
+    }
+
 }
