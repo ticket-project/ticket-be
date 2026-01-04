@@ -62,10 +62,12 @@ public class TestDataFactory {
 
     /**
      * 여러 Member 생성 (동시성 테스트용)
+     * EMAIL_COUNTER를 사용하여 고유한 이메일 생성
      */
     public static List<Member> createMembers(int count) {
+        int startIdx = EMAIL_COUNTER.get(); // 현재 카운터 값
         return IntStream.range(0, count)
-                .mapToObj(i -> createMember("user" + i + "@test.com"))
+                .mapToObj(i -> createMember("user" + (startIdx + i) + "_" + System.nanoTime() + "@test.com"))
                 .toList();
     }
 
