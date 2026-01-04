@@ -10,7 +10,6 @@ import com.ticket.core.domain.performanceseat.PerformanceSeatFinder;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,7 +31,6 @@ public class HoldServiceV1 implements HoldService {
     }
 
     @Override
-    @Transactional
     @DistributedLock(prefix = "SEAT", dynamicKey = "#newSeatHold.getSeatIds()")
     public HoldToken hold(final NewSeatHold newSeatHold) {
         final Member foundMember = memberFinder.find(newSeatHold.getMemberId());
