@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -29,11 +31,15 @@ class ReservationServiceV1ConcurrencyTest extends ConcurrencyTestBase {
 
     @Test
     void 재고가_1개일때_여러_요청이_동시에_들어오면_비관적_락에_의해_예매가_오버셀되지_않는다() throws InterruptedException {
+        // given
+        final List<Long> seatIds = savedPerformanceSeats.stream()
+                .map(PerformanceSeat::getSeatId)
+                .toList();
         // given & when & then
         ConcurrentTestUtil.execute(100, idx -> reservationService.addReservation(new NewReservation(
                 savedMembers.get(idx).getId(),
                 savedPerformance.getId(),
-                savedPerformanceSeats.stream().map(PerformanceSeat::getSeatId).toList()
+                seatIds
         )));
         final long reservationCount = reservationRepository.count();
         assertThat(reservationCount).isEqualTo(1);
