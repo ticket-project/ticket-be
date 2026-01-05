@@ -60,7 +60,8 @@ public abstract class IntegrationBase {
                 .map(PerformanceSeat::getSeatId)
                 .toList();
         performanceSeatRepository.deleteAllInBatch();
-        savedPerformanceSeats = performanceSeatRepository.saveAll(        TestDataFactory.createAvailableSeats(savedPerformance.getId(), seatIds)
+        savedPerformanceSeats = performanceSeatRepository.saveAll(
+                TestDataFactory.createAvailableSeats(savedPerformance.getId(), seatIds)
         );
     }
 }

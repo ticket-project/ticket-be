@@ -38,8 +38,7 @@ class HoldServiceV1Test {
                 // given
                 final Member member = TestDataFactory.createMember();
                 final Performance performance = TestDataFactory.createPerformance();
-                final List<PerformanceSeat> availableSeats = TestDataFactory.createAvailableSeats(performance.getId(),
-                                List.of(1L, 2L));
+                final List<PerformanceSeat> availableSeats = TestDataFactory.createAvailableSeats(performance.getId(), List.of(1L, 2L));
                 NewSeatHold newSeatHold = new NewSeatHold(member.getId(), performance.getId(),
                                 availableSeats.stream().map(PerformanceSeat::getSeatId).toList());
                 when(memberFinder.find(member.getId())).thenReturn(member);

@@ -5,6 +5,8 @@ import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.support.IntegrationBase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -15,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("NonAsciiCharacters")
 class ReservationServiceV1Test extends IntegrationBase {
 
+    private static final Logger log = LoggerFactory.getLogger(ReservationServiceV1Test.class);
     @Autowired
     @Qualifier("reservationServiceV1")
     private ReservationService reservationService;
@@ -32,23 +35,26 @@ class ReservationServiceV1Test extends IntegrationBase {
     @Test
     void 예매를_성공한다() {
         // given
+        Long memberId = savedMembers.getFirst().getId();
+        Long performanceId = savedPerformance.getId();
+        List<Long> seatIds = savedPerformanceSeats.stream()
+                .map(PerformanceSeat::getSeatId)
+                .toList();
         final NewReservation newReservation = new NewReservation(
-                savedMembers.getFirst().getId(),
-                savedPerformance.getId(),
-                List.of(1L)
+                memberId,
+                performanceId,
+                seatIds
         );
         // when
         reservationService.addReservation(newReservation);
-        final List<PerformanceSeat> reservedSeats = performanceSeatRepository.findAllById(
-                savedPerformanceSeats.stream().map(PerformanceSeat::getId).toList()
-        );
         // then
+        final List<PerformanceSeat> reservedSeats = performanceSeatRepository.findAllByPerformanceIdAndSeatIdIn(performanceId, seatIds);
         assertThat(reservedSeats).allMatch(seat -> seat.getState() == PerformanceSeatState.RESERVED);
         final List<Reservation> reservations = reservationRepository.findAll();
         assertThat(reservations).hasSize(1);
         assertThat(reservations.getFirst().getMemberId()).isEqualTo(savedMembers.getFirst().getId());
 
         final List<ReservationDetail> details = reservationDetailRepository.findAll();
-        assertThat(details).hasSize(1);
+        assertThat(details).hasSize(3);
     }
 }

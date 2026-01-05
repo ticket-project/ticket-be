@@ -102,7 +102,7 @@ public class TestDataFactory {
     // ===== PerformanceSeat 생성 =====
 
     /**
-     * 사용 가능한 좌석 생성
+     * 사용 가능한 회차_좌석 생성
      */
     public static PerformanceSeat createAvailableSeat(Long performanceId, Long seatId) {
         return FIXTURE.giveMeBuilder(PerformanceSeat.class)
@@ -118,7 +118,7 @@ public class TestDataFactory {
     }
 
     /**
-     * 여러 사용 가능한 좌석 생성
+     * 여러 사용 가능한 회차_좌석 생성
      */
     public static List<PerformanceSeat> createAvailableSeats(Long performanceId, List<Long> seatIds) {
         return seatIds.stream()
