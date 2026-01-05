@@ -47,27 +47,12 @@ public class TestDataFactory {
     }
 
     /**
-     * 커스텀 이메일로 Member 생성
-     */
-    public static Member createMember(String email) {
-        return FIXTURE.giveMeBuilder(Member.class)
-                .setNull("id")
-                .set("status", EntityStatus.ACTIVE)
-                .set(javaGetter(Member::getEmail), Email.create(email))
-                .set(javaGetter(Member::getEncodedPassword), EncodedPassword.create("encoded_password"))
-                .set(javaGetter(Member::getName), "테스트유저")
-                .set(javaGetter(Member::getRole), Role.MEMBER)
-                .sample();
-    }
-
-    /**
      * 여러 Member 생성 (동시성 테스트용)
      * EMAIL_COUNTER를 사용하여 고유한 이메일 생성
      */
     public static List<Member> createMembers(int count) {
-        int startIdx = EMAIL_COUNTER.get(); // 현재 카운터 값
         return IntStream.range(0, count)
-                .mapToObj(i -> createMember("user" + (startIdx + i) + "_" + System.nanoTime() + "@test.com"))
+                .mapToObj(_ -> createMember())
                 .toList();
     }
 
