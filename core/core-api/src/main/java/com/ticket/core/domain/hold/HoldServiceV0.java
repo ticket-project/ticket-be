@@ -17,9 +17,8 @@ import java.util.List;
 /**
  * 비관적 락을 통한 좌석 선점 서비스 (동시성 문제 방지)
  */
-@Service("holdServiceV0")
-public class HoldServiceV0 implements HoldService {
-
+@Service
+public class HoldServiceV0 {
     private final MemberFinder memberFinder;
     private final PerformanceFinder performanceFinder;
     private final PerformanceSeatFinder performanceSeatFinder;
@@ -33,7 +32,6 @@ public class HoldServiceV0 implements HoldService {
         this.performanceSeatFinder = performanceSeatFinder;
     }
 
-    @Override
     @Transactional
     public void hold(final NewSeatHold newSeatHold) {
         final Member foundMember = memberFinder.find(newSeatHold.getMemberId());

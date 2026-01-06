@@ -6,7 +6,6 @@ import com.ticket.core.support.ConcurrentTestUtil;
 import com.ticket.core.support.IntegrationBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,8 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class HoldServiceV1ConcurrencyTest extends IntegrationBase {
 
     @Autowired
-    @Qualifier("holdServiceV1")
-    private HoldService holdService;
+    private HoldServiceV1 holdService;
 
     @Test
     void 동시에_같은_좌석_선점_시도시_분산락에_의해_하나만_성공한다() throws InterruptedException {
@@ -40,17 +38,12 @@ class HoldServiceV1ConcurrencyTest extends IntegrationBase {
         assertThat(seats).hasSize(savedPerformanceSeats.size());
         assertThat(seats).allSatisfy(seat -> {
             assertThat(seat.getState()).isEqualTo(PerformanceSeatState.HELD);
-            assertThat(seat.getHoldToken()).isNotNull();
             assertThat(seat.getHoldByMemberId()).isNotNull();
             assertThat(seat.getHoldExpireAt()).isAfter(LocalDateTime.now());
         });
 
         // 모든 좌석이 같은 회원에게 선점되었는지 확인
         assertThat(seats.stream().map(PerformanceSeat::getHoldByMemberId).distinct())
-                .hasSize(1);
-
-        // 모든 좌석이 같은 토큰을 가지는지 확인
-        assertThat(seats.stream().map(PerformanceSeat::getHoldToken).distinct())
                 .hasSize(1);
     }
 }

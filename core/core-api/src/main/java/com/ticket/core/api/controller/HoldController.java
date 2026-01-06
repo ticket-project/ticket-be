@@ -1,11 +1,13 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.request.AddSeatHoldRequest;
-import com.ticket.core.domain.hold.HoldService;
+import com.ticket.core.api.controller.response.HoldInfoResponse;
+import com.ticket.core.domain.hold.HoldInfo;
+import com.ticket.core.domain.hold.HoldServiceV0;
+import com.ticket.core.domain.hold.HoldServiceV1;
 import com.ticket.core.domain.member.MemberDetails;
 import com.ticket.core.support.response.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,10 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/hold")
 public class HoldController {
 
-    private final HoldService holdService;
+    private final HoldServiceV0 holdServiceV0;
+    private final HoldServiceV1 holdServiceV1;
 
-    public HoldController(@Qualifier("holdServiceV1") final HoldService holdService) {
-        this.holdService = holdService;
+    public HoldController(final HoldServiceV0 holdServiceV0, final HoldServiceV1 holdServiceV1) {
+        this.holdServiceV0 = holdServiceV0;
+        this.holdServiceV1 = holdServiceV1;
     }
 
     /**
@@ -26,7 +30,7 @@ public class HoldController {
      */
     @PostMapping("/v0")
     public ApiResponse<Void> holdV0(MemberDetails memberDetails, @RequestBody @Valid AddSeatHoldRequest request) {
-        holdService.hold(request.toNewSeatHold(memberDetails.getMemberId()));
+        holdServiceV0.hold(request.toNewSeatHold(memberDetails.getMemberId()));
         return ApiResponse.success();
     }
 
@@ -34,9 +38,9 @@ public class HoldController {
      * v1 - Redisson DistributedLock
      */
     @PostMapping("/v1")
-    public ApiResponse<Void> holdV1(MemberDetails memberDetails, @RequestBody @Valid AddSeatHoldRequest request) {
-        holdService.hold(request.toNewSeatHold(memberDetails.getMemberId()));
-        return ApiResponse.success();
+    public ApiResponse<HoldInfoResponse> holdV1(MemberDetails memberDetails, @RequestBody @Valid AddSeatHoldRequest request) {
+        final HoldInfo holdInfo = holdServiceV1.hold(request.toNewSeatHold(memberDetails.getMemberId()));
+        return ApiResponse.success(HoldInfoResponse.from(holdInfo));
     }
 
 }

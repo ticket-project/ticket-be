@@ -5,7 +5,6 @@ import com.ticket.core.support.ConcurrentTestUtil;
 import com.ticket.core.support.IntegrationBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
 
@@ -13,8 +12,7 @@ import java.util.List;
 class HoldServiceV0ConcurrencyTest extends IntegrationBase {
 
     @Autowired
-    @Qualifier("holdServiceV0")
-    private HoldService holdService;
+    private HoldServiceV0 holdService;
 
     @Test
     void 재고가_1개일때_여러_요청이_동시에_들어오면_비관적_락에_의해_한_명만_선점한다() throws InterruptedException {

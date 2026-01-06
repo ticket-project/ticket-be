@@ -17,9 +17,8 @@ import java.util.List;
 /**
  * Redisson 분산락을 통한 좌석 선점 서비스 (동시성 문제 방지)
  */
-@Service("holdServiceV1")
-public class HoldServiceV1 implements HoldService {
-
+@Service
+public class HoldServiceV1 {
     private final MemberFinder memberFinder;
     private final PerformanceFinder performanceFinder;
     private final PerformanceSeatFinder performanceSeatFinder;
@@ -33,9 +32,8 @@ public class HoldServiceV1 implements HoldService {
         this.performanceSeatFinder = performanceSeatFinder;
     }
 
-    @Override
     @DistributedLock(prefix = "SEAT", dynamicKey = "#newSeatHold.getSeatIds()")
-    public void hold(final NewSeatHold newSeatHold) {
+    public HoldInfo hold(final NewSeatHold newSeatHold) {
         final Member foundMember = memberFinder.find(newSeatHold.getMemberId());
         final Performance foundPerformance = performanceFinder.findOpenPerformance(newSeatHold.getPerformanceId());
         final List<PerformanceSeat> availablePerformanceSeats = performanceSeatFinder.findAvailablePerformanceSeats(newSeatHold.getSeatIds(), foundPerformance.getId());
@@ -47,6 +45,11 @@ public class HoldServiceV1 implements HoldService {
         }
         final LocalDateTime holdExpireAt = LocalDateTime.now().plusSeconds(foundPerformance.getHoldTime());
         availablePerformanceSeats.forEach(performanceSeat -> performanceSeat.hold(foundMember.getId(), holdExpireAt));
+        return new HoldInfo(foundMember.getId(),
+                foundPerformance.getId(),
+                availablePerformanceSeats.stream().map(PerformanceSeat::getSeatId).toList(),
+                holdExpireAt
+        );
     }
 
 }
