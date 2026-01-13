@@ -1,6 +1,7 @@
 package com.ticket.core.domain.performance;
 
 import com.ticket.core.domain.BaseEntity;
+import com.ticket.core.domain.show.Show;
 import com.ticket.core.enums.PerformanceState;
 import jakarta.persistence.*;
 
@@ -13,7 +14,8 @@ public class Performance extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long showId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Show show;
 
     private Long roundNo;
 
@@ -35,8 +37,8 @@ public class Performance extends BaseEntity {
 
     protected Performance() {}
 
-    public Performance(final Long showId, final Long roundNo, final LocalDateTime startTime, final LocalDateTime endTime, final LocalDateTime reserveOpenTime, final LocalDateTime reserveCloseTime, final int maxCanReserveCount, final Integer holdTime, final PerformanceState state) {
-        this.showId = showId;
+    public Performance(final Show show, final Long roundNo, final LocalDateTime startTime, final LocalDateTime endTime, final LocalDateTime reserveOpenTime, final LocalDateTime reserveCloseTime, final int maxCanReserveCount, final Integer holdTime, final PerformanceState state) {
+        this.show = show;
         this.roundNo = roundNo;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -51,8 +53,8 @@ public class Performance extends BaseEntity {
         return id;
     }
 
-    public Long getShowId() {
-        return showId;
+    public Show getShow() {
+        return show;
     }
 
     public LocalDateTime getStartTime() {

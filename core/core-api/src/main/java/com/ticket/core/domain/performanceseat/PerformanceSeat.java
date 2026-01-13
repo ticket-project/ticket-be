@@ -1,70 +1,66 @@
 package com.ticket.core.domain.performanceseat;
 
+import com.ticket.core.domain.BaseEntity;
+import com.ticket.core.domain.performance.Performance;
+import com.ticket.core.domain.seat.Seat;
 import com.ticket.core.enums.PerformanceSeatState;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "PERFORMANCE_SEAT")
-public class PerformanceSeat {
+public class PerformanceSeat extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long performanceId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Performance performance;
 
-    private Long seatId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Seat seat;
 
     @Enumerated(EnumType.STRING)
     private PerformanceSeatState state;
 
-    private LocalDateTime holdExpireAt;
-
-    private Long holdByMemberId;
+    private BigDecimal price;
 
     protected PerformanceSeat() {}
 
-    public PerformanceSeat(final Long performanceId, final Long seatId, final PerformanceSeatState state, final LocalDateTime holdExpireAt, final Long holdByMemberId) {
-        this.performanceId = performanceId;
-        this.seatId = seatId;
+    public PerformanceSeat(final Performance performance, final Seat seat, final PerformanceSeatState state, final BigDecimal price) {
+        this.performance = performance;
+        this.seat = seat;
         this.state = state;
-        this.holdExpireAt = holdExpireAt;
-        this.holdByMemberId = holdByMemberId;
+        this.price = price;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Long getPerformanceId() {
-        return performanceId;
+    public Performance getPerformance() {
+        return performance;
     }
 
-    public Long getSeatId() {
-        return seatId;
+    public Seat getSeat() {
+        return seat;
     }
 
     public PerformanceSeatState getState() {
         return state;
     }
 
-    public LocalDateTime getHoldExpireAt() {
-        return holdExpireAt;
-    }
-
-    public Long getHoldByMemberId() {
-        return holdByMemberId;
+    public BigDecimal getPrice() {
+        return price;
     }
 
     public void reserve() {
-        this.state = PerformanceSeatState.RESERVED;
+        this.state = PerformanceSeatState.HELD;
     }
 
-    public void hold(final Long memberId, final LocalDateTime holdExpireAt) {
+    public void hold() {
         this.state = PerformanceSeatState.HELD;
-        this.holdExpireAt = holdExpireAt;
-        this.holdByMemberId = memberId;
     }
 
     public void release() {

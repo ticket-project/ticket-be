@@ -1,11 +1,12 @@
 package com.ticket.core.domain.seat;
 
 
+import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "SEAT")
-public class Seat {
+public class Seat extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
