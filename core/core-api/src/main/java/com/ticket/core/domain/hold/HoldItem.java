@@ -15,6 +15,7 @@ public class HoldItem extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hold_id", nullable = false)
     private Hold hold;
 
     @ManyToOne(fetch = FetchType.LAZY)

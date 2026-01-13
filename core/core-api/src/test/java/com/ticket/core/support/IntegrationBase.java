@@ -64,13 +64,13 @@ public abstract class IntegrationBase {
 
     @AfterEach
     void tearDownBase() {
-        resetSeatsToAvailable();
+        clearHoldData();
     }
 
     /**
      * 선점 상태만 리셋 (전체 삭제 없이)
      */
-    protected void resetSeatsToAvailable() {
+    protected void clearHoldData() {
         holdItemRepository.deleteAllInBatch();
         holdRepository.deleteAllInBatch();
     }

@@ -24,10 +24,10 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
-class HoldServiceV1Test {
+class HoldServiceTest {
 
     @InjectMocks
-    private HoldServiceV1 holdService;
+    private HoldService holdService;
     @Mock
     private MemberFinder memberFinder;
     @Mock

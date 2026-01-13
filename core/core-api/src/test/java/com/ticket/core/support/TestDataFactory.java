@@ -112,24 +112,13 @@ public class TestDataFactory {
                 .toList();
     }
 
-    /**
-     * 선점된 좌석 생성
-     */
-    public static PerformanceSeat createHeldSeat(Long performanceId, Long seatId, Long memberId) {
-        return FIXTURE.giveMeBuilder(PerformanceSeat.class)
-                .setNull("id")
-                .set(javaGetter(PerformanceSeat::getPerformance), performanceId)
-                .set(javaGetter(PerformanceSeat::getSeat), seatId)
-                .set(javaGetter(PerformanceSeat::getState), PerformanceSeatState.HELD)
-                .sample();
-    }
 
     public static Seat createSeat() {
         return FIXTURE.giveMeBuilder(Seat.class)
                 .setNull("id")
                 .set("status", EntityStatus.ACTIVE)
-                .set(javaGetter(Seat::getX), "x")
-                .set(javaGetter(Seat::getY), "y")
+                .set(javaGetter(Seat::getRow), "row")
+                .set(javaGetter(Seat::getColumn), "col")
                 .sample();
     }
 

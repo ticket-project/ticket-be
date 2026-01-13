@@ -12,17 +12,17 @@ VALUES (3, '공연3', 'ACTIVE');
 
 -- 기본 좌석(행/열) 생성
 -- ==========================
-INSERT INTO SEAT (id, x, y)
+INSERT INTO SEAT (id, row, column)
 VALUES (1, 'A', '1');
-INSERT INTO SEAT (id, x, y)
+INSERT INTO SEAT (id, row, column)
 VALUES (2, 'A', '2');
-INSERT INTO SEAT (id, x, y)
+INSERT INTO SEAT (id, row, column)
 VALUES (3, 'A', '3');
-INSERT INTO SEAT (id, x, y)
+INSERT INTO SEAT (id, row, column)
 VALUES (4, 'B', '1');
-INSERT INTO SEAT (id, x, y)
+INSERT INTO SEAT (id, row, column)
 VALUES (5, 'B', '2');
-INSERT INTO SEAT (id, x, y)
+INSERT INTO SEAT (id, row, column)
 VALUES (6, 'B', '3');
 
 -- ==========================

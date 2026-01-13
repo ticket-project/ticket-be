@@ -23,7 +23,7 @@ public class MemberController {
     }
 
     @GetMapping("/v1")
-    public ApiResponse<MemberResponse> findById(MemberDetails memberDetails) {
+    public ApiResponse<MemberResponse> getCurrentMember(MemberDetails memberDetails) {
         log.info("loginMember={}", memberDetails);
         final Member findMember = memberService.findById(memberDetails.getMemberId());
         return ApiResponse.success(new MemberResponse(findMember.getId(), findMember.getEmail().getEmail(), findMember.getName(), findMember.getRole().name()));

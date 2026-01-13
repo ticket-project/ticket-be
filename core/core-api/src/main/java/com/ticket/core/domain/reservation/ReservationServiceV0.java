@@ -6,6 +6,8 @@ import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.domain.performanceseat.PerformanceSeat;
 import com.ticket.core.domain.performanceseat.PerformanceSeatRepository;
+import com.ticket.core.domain.seat.Seat;
+import com.ticket.core.domain.seat.SeatRepository;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
@@ -24,25 +26,28 @@ public class ReservationServiceV0 implements ReservationService {
     private final PerformanceFinder performanceFinder;
     private final PerformanceSeatRepository performanceSeatRepository;
     private final ReservationManager reservationManager;
+    private final SeatRepository seatRepository;
 
     public ReservationServiceV0(final MemberFinder memberFinder,
                                 final PerformanceFinder performanceFinder,
                                 final PerformanceSeatRepository performanceSeatRepository,
-                                final ReservationManager reservationManager
-) {
+                                final ReservationManager reservationManager,
+                                final SeatRepository seatRepository) {
         this.memberFinder = memberFinder;
         this.performanceFinder = performanceFinder;
         this.performanceSeatRepository = performanceSeatRepository;
         this.reservationManager = reservationManager;
+        this.seatRepository = seatRepository;
     }
 
     @Transactional
     public void addReservation(final NewReservation newReservation) {
         final Member foundMember = memberFinder.find(newReservation.getMemberId());
         final Performance foundPerformance = performanceFinder.findOpenPerformance(newReservation.getPerformanceId());
+        final List<Seat> foundSeats = seatRepository.findByIdIn(newReservation.getSeatIds());
         int updateRows = performanceSeatRepository.updateState(
-                foundPerformance.getId(),
-                newReservation.getSeatIds(),
+                foundPerformance,
+                foundSeats,
                 PerformanceSeatState.AVAILABLE,
                 PerformanceSeatState.HELD
         );

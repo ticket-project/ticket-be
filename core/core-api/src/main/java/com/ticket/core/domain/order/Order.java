@@ -16,11 +16,37 @@ public class Order extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @OneToOne(fetch = LAZY)
+    @JoinColumn(unique = true)
     private Hold hold;
 
     @Enumerated(EnumType.STRING)
     private OrderState state;
+
+    protected Order() {}
+
+    public Order(final Member member, final Hold hold, final OrderState state) {
+        this.member = member;
+        this.hold = hold;
+        this.state = state;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Member getMember() {
+        return member;
+    }
+
+    public Hold getHold() {
+        return hold;
+    }
+
+    public OrderState getState() {
+        return state;
+    }
 }
