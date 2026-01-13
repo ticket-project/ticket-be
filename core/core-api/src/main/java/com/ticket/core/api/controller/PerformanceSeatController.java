@@ -20,7 +20,7 @@ public class PerformanceSeatController {
     /**
      * 대기열을 타고 들어와서 이 api 호출해서 현재 예약 가능한 좌석 목록을 조회할 수 있어야 한다.
      */
-    @GetMapping("/list")
+    @GetMapping
     public void getPerformanceSeatList() {
         List<PerformanceSeat> availableSeats = performanceSeatService.getAllAvailableSeats();
     }

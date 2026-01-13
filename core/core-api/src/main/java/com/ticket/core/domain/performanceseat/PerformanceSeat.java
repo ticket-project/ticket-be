@@ -16,9 +16,11 @@ public class PerformanceSeat extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "performance_id", nullable = false)
     private Performance performance;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seat_id", nullable = false)
     private Seat seat;
 
     @Enumerated(EnumType.STRING)
