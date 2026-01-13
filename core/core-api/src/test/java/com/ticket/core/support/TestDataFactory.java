@@ -8,11 +8,14 @@ import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.EncodedPassword;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performanceseat.PerformanceSeat;
+import com.ticket.core.domain.seat.Seat;
+import com.ticket.core.domain.show.Show;
 import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.enums.PerformanceState;
 import com.ticket.core.enums.Role;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -61,18 +64,18 @@ public class TestDataFactory {
     /**
      * 기본 Performance 생성 (OPEN 상태)
      */
-    public static Performance createPerformance() {
-        return createPerformance(PerformanceState.OPEN);
+    public static Performance createPerformance(Show show) {
+        return createPerformance(show, PerformanceState.OPEN);
     }
 
     /**
      * 특정 상태의 Performance 생성
      */
-    public static Performance createPerformance(PerformanceState state) {
+    public static Performance createPerformance(Show show, PerformanceState state) {
         return FIXTURE.giveMeBuilder(Performance.class)
                 .setNull("id")
                 .set("status", EntityStatus.ACTIVE)
-                .set(javaGetter(Performance::getShowId), 1L)
+                .set(javaGetter(Performance::getShow), show)
                 .set(javaGetter(Performance::getRoundNo), 1L)
                 .set(javaGetter(Performance::getStartTime), BASE_TIME.plusDays(7))
                 .set(javaGetter(Performance::getEndTime), BASE_TIME.plusDays(7).plusHours(2))
@@ -89,25 +92,23 @@ public class TestDataFactory {
     /**
      * 사용 가능한 회차_좌석 생성
      */
-    public static PerformanceSeat createAvailableSeat(Long performanceId, Long seatId) {
+    public static PerformanceSeat createAvailableSeat(Performance performance, Seat seat) {
         return FIXTURE.giveMeBuilder(PerformanceSeat.class)
                 .setNull("id")
                 .set("status", EntityStatus.ACTIVE)
-                .set(javaGetter(PerformanceSeat::getPerformanceId), performanceId)
-                .set(javaGetter(PerformanceSeat::getSeatId), seatId)
+                .set(javaGetter(PerformanceSeat::getPerformance), performance)
+                .set(javaGetter(PerformanceSeat::getSeat), seat)
                 .set(javaGetter(PerformanceSeat::getState), PerformanceSeatState.AVAILABLE)
-                .setNull(javaGetter(PerformanceSeat::getHoldExpireAt))
-                .setNull(javaGetter(PerformanceSeat::getHoldByMemberId))
-                .setNull(javaGetter(PerformanceSeat::getHoldToken))
+                .set(javaGetter(PerformanceSeat::getPrice), BigDecimal.valueOf(50000))
                 .sample();
     }
 
     /**
      * 여러 사용 가능한 회차_좌석 생성
      */
-    public static List<PerformanceSeat> createAvailableSeats(Long performanceId, List<Long> seatIds) {
-        return seatIds.stream()
-                .map(seatId -> createAvailableSeat(performanceId, seatId))
+    public static List<PerformanceSeat> createAvailableSeats(Performance performance, List<Seat> seats) {
+        return seats.stream()
+                .map(seat -> createAvailableSeat(performance, seat))
                 .toList();
     }
 
@@ -117,12 +118,33 @@ public class TestDataFactory {
     public static PerformanceSeat createHeldSeat(Long performanceId, Long seatId, Long memberId) {
         return FIXTURE.giveMeBuilder(PerformanceSeat.class)
                 .setNull("id")
-                .set(javaGetter(PerformanceSeat::getPerformanceId), performanceId)
-                .set(javaGetter(PerformanceSeat::getSeatId), seatId)
+                .set(javaGetter(PerformanceSeat::getPerformance), performanceId)
+                .set(javaGetter(PerformanceSeat::getSeat), seatId)
                 .set(javaGetter(PerformanceSeat::getState), PerformanceSeatState.HELD)
-                .set(javaGetter(PerformanceSeat::getHoldExpireAt), LocalDateTime.now().plusMinutes(5))
-                .set(javaGetter(PerformanceSeat::getHoldByMemberId), memberId)
-                .set(javaGetter(PerformanceSeat::getHoldToken), "test-token")
+                .sample();
+    }
+
+    public static Seat createSeat() {
+        return FIXTURE.giveMeBuilder(Seat.class)
+                .setNull("id")
+                .set("status", EntityStatus.ACTIVE)
+                .set(javaGetter(Seat::getX), "x")
+                .set(javaGetter(Seat::getY), "y")
+                .sample();
+    }
+
+    public static List<Seat> createSeats(int count) {
+        return IntStream.range(0, count)
+                .mapToObj(_ -> createSeat())
+                .toList();
+    }
+
+    public static Show createShow() {
+        return FIXTURE.giveMeBuilder(Show.class)
+                .setNull("id")
+                .set("status", EntityStatus.ACTIVE)
+                .set(javaGetter(Show::getPlace), "서울")
+                .set(javaGetter(Show::getTitle), "만약에 우리")
                 .sample();
     }
 }

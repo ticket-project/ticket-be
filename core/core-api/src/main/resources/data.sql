@@ -1,13 +1,13 @@
 -- ==========================
 -- 기본 공연 생성
 -- ==========================
--- INSERT INTO SHOWS (id, title, status)
--- VALUES (1, '공연1', 'ACTIVE');
--- INSERT INTO SHOWS (id, title, status)
--- VALUES (2, '공연2', 'ACTIVE');
--- INSERT INTO SHOWS (id, title, status)
--- VALUES (3, '공연3', 'ACTIVE');
---
+INSERT INTO SHOWS (id, title, status)
+VALUES (1, '공연1', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status)
+VALUES (2, '공연2', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status)
+VALUES (3, '공연3', 'ACTIVE');
+
 
 
 -- 기본 좌석(행/열) 생성
@@ -87,7 +87,7 @@ INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state)
 VALUES (2, 1, 2, 'AVAILABLE'); -- A2
 
 INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state)
-VALUES (3, 1, 3, 'RESERVED');
+VALUES (3, 1, 3, 'AVAILABLE');
 -- A3 (이미 예매됨)
 
 -- 회차 2번(performance_id = 2)도 몇 개 넣어보자

@@ -4,18 +4,12 @@ import java.util.List;
 
 public class NewSeatHold {
 
-    private final Long memberId;
     private final Long performanceId;
     private final List<Long> seatIds;
 
-    public NewSeatHold(final Long memberId, final Long performanceId, final List<Long> seatIds) {
-        this.memberId = memberId;
+    public NewSeatHold(final Long performanceId, final List<Long> seatIds) {
         this.performanceId = performanceId;
         this.seatIds = List.copyOf(seatIds);
-    }
-
-    public Long getMemberId() {
-        return memberId;
     }
 
     public Long getPerformanceId() {

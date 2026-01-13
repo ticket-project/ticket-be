@@ -1,5 +1,7 @@
 package com.ticket.core.domain.performanceseat;
 
+import com.ticket.core.domain.performance.Performance;
+import com.ticket.core.domain.seat.Seat;
 import com.ticket.core.enums.PerformanceSeatState;
 import org.springframework.stereotype.Component;
 
@@ -20,5 +22,9 @@ public class PerformanceSeatFinder {
                 seatIds,
                 PerformanceSeatState.AVAILABLE
         );
+    }
+
+    public List<PerformanceSeat> findAllByPerformanceAndSeatIn(final Performance performance, final List<Seat> seats) {
+        return performanceSeatRepository.findAllByPerformanceAndSeatIn(performance, seats);
     }
 }

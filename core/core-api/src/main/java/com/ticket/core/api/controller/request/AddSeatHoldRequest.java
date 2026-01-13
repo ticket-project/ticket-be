@@ -16,8 +16,6 @@ public class AddSeatHoldRequest {
     @NotEmpty
     private List<@Positive @NotNull Long> seatIds;
 
-    public AddSeatHoldRequest() {}
-
     public Long getPerformanceId() {
         return performanceId;
     }
@@ -26,7 +24,7 @@ public class AddSeatHoldRequest {
         return seatIds;
     }
 
-    public NewSeatHold toNewSeatHold(final Long memberId) {
-        return new NewSeatHold(memberId, performanceId, seatIds);
+    public NewSeatHold toNewSeatHold() {
+        return new NewSeatHold(performanceId, seatIds);
     }
 }

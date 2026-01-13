@@ -44,7 +44,7 @@ public class ReservationServiceV0 implements ReservationService {
                 foundPerformance.getId(),
                 newReservation.getSeatIds(),
                 PerformanceSeatState.AVAILABLE,
-                PerformanceSeatState.RESERVED
+                PerformanceSeatState.HELD
         );
         if (updateRows != newReservation.getSeatIds().size()) {
             throw new CoreException(ErrorType.SEAT_COUNT_MISMATCH);

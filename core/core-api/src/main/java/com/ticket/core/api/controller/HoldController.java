@@ -2,7 +2,7 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.request.AddSeatHoldRequest;
 import com.ticket.core.api.controller.response.HoldInfoResponse;
-import com.ticket.core.domain.hold.HoldInfo;
+import com.ticket.core.domain.hold.Hold;
 import com.ticket.core.domain.hold.HoldServiceV0;
 import com.ticket.core.domain.hold.HoldServiceV1;
 import com.ticket.core.domain.member.MemberDetails;
@@ -30,7 +30,7 @@ public class HoldController {
      */
     @PostMapping("/v0")
     public ApiResponse<Void> holdV0(MemberDetails memberDetails, @RequestBody @Valid AddSeatHoldRequest request) {
-        holdServiceV0.hold(request.toNewSeatHold(memberDetails.getMemberId()));
+        holdServiceV0.hold(memberDetails.getMemberId(), request.toNewSeatHold());
         return ApiResponse.success();
     }
 
@@ -39,8 +39,8 @@ public class HoldController {
      */
     @PostMapping("/v1")
     public ApiResponse<HoldInfoResponse> holdV1(MemberDetails memberDetails, @RequestBody @Valid AddSeatHoldRequest request) {
-        final HoldInfo holdInfo = holdServiceV1.hold(request.toNewSeatHold(memberDetails.getMemberId()));
-        return ApiResponse.success(HoldInfoResponse.from(holdInfo));
+        final Hold hold = holdServiceV1.hold(memberDetails.getMemberId(), request.toNewSeatHold());
+        return ApiResponse.success(HoldInfoResponse.from(hold));
     }
 
 }
