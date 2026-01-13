@@ -13,10 +13,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
-class HoldServiceV1ConcurrencyTest extends IntegrationBase {
+class HoldServiceConcurrencyTest extends IntegrationBase {
 
     @Autowired
-    private HoldServiceV1 holdService;
+    private HoldService holdService;
 
     @Test
     void 동시에_같은_좌석_선점_시도시_분산락에_의해_하나만_성공한다() throws InterruptedException {

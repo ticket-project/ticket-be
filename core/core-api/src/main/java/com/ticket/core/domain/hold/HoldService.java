@@ -21,7 +21,7 @@ import java.util.List;
  * Redisson 분산락을 통한 좌석 선점 서비스 (동시성 문제 방지)
  */
 @Service
-public class HoldServiceV1 {
+public class HoldService {
     private final MemberFinder memberFinder;
     private final PerformanceFinder performanceFinder;
     private final PerformanceSeatFinder performanceSeatFinder;
@@ -29,12 +29,12 @@ public class HoldServiceV1 {
     private final HoldItemRepository holdItemRepository;
     private final SeatRepository seatRepository;
 
-    public HoldServiceV1(final MemberFinder memberFinder,
-                         final PerformanceFinder performanceFinder,
-                         final PerformanceSeatFinder performanceSeatFinder,
-                         final HoldRepository holdRepository,
-                         final HoldItemRepository holdItemRepository,
-                         final SeatRepository seatRepository) {
+    public HoldService(final MemberFinder memberFinder,
+                       final PerformanceFinder performanceFinder,
+                       final PerformanceSeatFinder performanceSeatFinder,
+                       final HoldRepository holdRepository,
+                       final HoldItemRepository holdItemRepository,
+                       final SeatRepository seatRepository) {
         this.memberFinder = memberFinder;
         this.performanceFinder = performanceFinder;
         this.performanceSeatFinder = performanceSeatFinder;

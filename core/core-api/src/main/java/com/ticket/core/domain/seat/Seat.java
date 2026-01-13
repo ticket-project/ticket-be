@@ -12,29 +12,28 @@ public class Seat extends BaseEntity {
     private Long id;
 
     //행
-    private String x;
+    private String row;
 
     //열
-    private String y;
+    private String column;
 
     protected Seat() {}
 
-    public Seat(final Long id, final String x, final String y) {
-        this.id = id;
-        this.x = x;
-        this.y = y;
+    public Seat(final String row, final String column) {
+        this.row = row;
+        this.column = column;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getX() {
-        return x;
+    public String getRow() {
+        return row;
     }
 
-    public String getY() {
-        return y;
+    public String getColumn() {
+        return column;
     }
 
 }
