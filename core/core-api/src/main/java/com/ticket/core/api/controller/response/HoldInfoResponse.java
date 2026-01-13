@@ -1,40 +1,33 @@
 package com.ticket.core.api.controller.response;
 
-import com.ticket.core.domain.hold.HoldInfo;
+import com.ticket.core.domain.hold.Hold;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class HoldInfoResponse {
+    private final Long holdId;
     private final Long memberId;
-    private final Long performanceId;
-    private final List<Long> seatIds;
-    private final LocalDateTime expiredAt;
+    private final LocalDateTime expireAt;
 
-    public HoldInfoResponse(final Long memberId, final Long performanceId, final List<Long> seatIds, final LocalDateTime expiredAt) {
+    public HoldInfoResponse(final Long holdId, final Long memberId, final LocalDateTime expireAt) {
+        this.holdId = holdId;
         this.memberId = memberId;
-        this.performanceId = performanceId;
-        this.seatIds = seatIds;
-        this.expiredAt = expiredAt;
+        this.expireAt = expireAt;
     }
 
-    public static HoldInfoResponse from(final HoldInfo holdInfo) {
-        return new HoldInfoResponse(holdInfo.getMemberId(), holdInfo.getPerformanceId(), holdInfo.getSeatIds(), holdInfo.getExpiredAt());
+    public static HoldInfoResponse from(final Hold hold) {
+        return new HoldInfoResponse(hold.getId(), hold.getMember().getId(), hold.getExpireAt());
+    }
+
+    public Long getHoldId() {
+        return holdId;
     }
 
     public Long getMemberId() {
         return memberId;
     }
 
-    public Long getPerformanceId() {
-        return performanceId;
-    }
-
-    public List<Long> getSeatIds() {
-        return seatIds;
-    }
-
-    public LocalDateTime getExpiredAt() {
-        return expiredAt;
+    public LocalDateTime getExpireAt() {
+        return expireAt;
     }
 }

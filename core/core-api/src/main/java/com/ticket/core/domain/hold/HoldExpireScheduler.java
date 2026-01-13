@@ -6,7 +6,6 @@ import com.ticket.core.enums.PerformanceSeatState;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 //@Component
@@ -21,8 +20,7 @@ public class HoldExpireScheduler {
     @Transactional
     @Scheduled(fixedRate = 60000)
     public void expireSeatHolds() {
-        final LocalDateTime now = LocalDateTime.now();
-        final List<PerformanceSeat> expiredSeatHolds = performanceSeatRepository.findAllByHoldExpireAtBeforeAndStateEquals(now, PerformanceSeatState.HELD);
+        final List<PerformanceSeat> expiredSeatHolds = performanceSeatRepository.findAllByStateEquals(PerformanceSeatState.HELD);
         if (expiredSeatHolds.isEmpty()) {
             return;
         }

@@ -54,7 +54,7 @@ class CustomSpringELParserTest {
     void SPEL에서_객체의_프로퍼티_접근이_가능하다() {
         // given
         String prefix = "LOCK:";
-        NewSeatHold newSeatHold = new NewSeatHold(1L, 2L, List.of(1L, 2L));
+        NewSeatHold newSeatHold = new NewSeatHold( 2L, List.of(1L, 2L));
 
         String[] parameterNames = {"newSeatHold"};
         Object[] args = {newSeatHold};
