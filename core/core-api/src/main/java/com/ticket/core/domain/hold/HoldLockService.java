@@ -12,16 +12,15 @@ import com.ticket.core.domain.seat.SeatRepository;
 import com.ticket.core.enums.HoldState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Redisson 분산락을 통한 좌석 선점 서비스 (동시성 문제 방지)
+ * v1: Redisson 분산락을 통한 좌석 선점 서비스 (동시성 문제 방지)
  */
-@Service
-public class HoldService {
+//@Service
+public class HoldLockService implements HoldService {
     private final MemberFinder memberFinder;
     private final PerformanceFinder performanceFinder;
     private final PerformanceSeatFinder performanceSeatFinder;
@@ -29,12 +28,12 @@ public class HoldService {
     private final HoldItemRepository holdItemRepository;
     private final SeatRepository seatRepository;
 
-    public HoldService(final MemberFinder memberFinder,
-                       final PerformanceFinder performanceFinder,
-                       final PerformanceSeatFinder performanceSeatFinder,
-                       final HoldRepository holdRepository,
-                       final HoldItemRepository holdItemRepository,
-                       final SeatRepository seatRepository) {
+    public HoldLockService(final MemberFinder memberFinder,
+                           final PerformanceFinder performanceFinder,
+                           final PerformanceSeatFinder performanceSeatFinder,
+                           final HoldRepository holdRepository,
+                           final HoldItemRepository holdItemRepository,
+                           final SeatRepository seatRepository) {
         this.memberFinder = memberFinder;
         this.performanceFinder = performanceFinder;
         this.performanceSeatFinder = performanceSeatFinder;
@@ -43,8 +42,8 @@ public class HoldService {
         this.seatRepository = seatRepository;
     }
 
-    @DistributedLock(prefix = "SEAT", dynamicKey = "#newSeatHold.getSeatIds()")
-    public Hold hold(final Long memberId, final NewSeatHold newSeatHold) {
+    @DistributedLock(prefix = "SEAT", dynamicKey = "#newHold.getSeatIds()")
+    public Long hold(final Long memberId, final NewSeatHold newSeatHold) {
         final Member foundMember = memberFinder.find(memberId);
         final Performance foundPerformance = performanceFinder.findOpenPerformance(newSeatHold.getPerformanceId());
         final List<Seat> foundSeats = seatRepository.findByIdIn(newSeatHold.getSeatIds());
@@ -54,7 +53,7 @@ public class HoldService {
 
         final Hold savedHold = saveHold(foundMember, foundPerformance);
         saveHoldItems(availablePerformanceSeats, savedHold);
-        return savedHold;
+        return savedHold.getId();
     }
 
     private void validatePerformanceSeats(final NewSeatHold newSeatHold, final List<PerformanceSeat> availablePerformanceSeats) {
