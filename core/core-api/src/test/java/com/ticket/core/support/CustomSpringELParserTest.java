@@ -1,6 +1,6 @@
 package com.ticket.core.support;
 
-import com.ticket.core.domain.hold.NewSeatHold;
+import com.ticket.core.domain.hold.NewHold;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -54,10 +54,10 @@ class CustomSpringELParserTest {
     void SPEL에서_객체의_프로퍼티_접근이_가능하다() {
         // given
         String prefix = "LOCK:";
-        NewSeatHold newSeatHold = new NewSeatHold( 2L, List.of(1L, 2L));
+        NewHold newHold = new NewHold( 2L, List.of(1L, 2L));
 
         String[] parameterNames = {"newSeatHold"};
-        Object[] args = {newSeatHold};
+        Object[] args = {newHold};
         String[] dynamicKey = {"#newSeatHold.getSeatIds()"};
 
         // when

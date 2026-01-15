@@ -43,12 +43,12 @@ public class HoldLockService implements HoldService {
     }
 
     @DistributedLock(prefix = "SEAT", dynamicKey = "#newHold.getSeatIds()")
-    public Long hold(final Long memberId, final NewSeatHold newSeatHold) {
+    public Long hold(final Long memberId, final NewHold newHold) {
         final Member foundMember = memberFinder.find(memberId);
-        final Performance foundPerformance = performanceFinder.findOpenPerformance(newSeatHold.getPerformanceId());
-        final List<Seat> foundSeats = seatRepository.findByIdIn(newSeatHold.getSeatIds());
+        final Performance foundPerformance = performanceFinder.findOpenPerformance(newHold.getPerformanceId());
+        final List<Seat> foundSeats = seatRepository.findByIdIn(newHold.getSeatIds());
         final List<PerformanceSeat> availablePerformanceSeats = performanceSeatFinder.findAllByPerformanceAndSeatIn(foundPerformance, foundSeats);
-        validatePerformanceSeats(newSeatHold, availablePerformanceSeats);
+        validatePerformanceSeats(newHold, availablePerformanceSeats);
         availablePerformanceSeats.forEach(PerformanceSeat::hold);
 
         final Hold savedHold = saveHold(foundMember, foundPerformance);
@@ -56,11 +56,11 @@ public class HoldLockService implements HoldService {
         return savedHold.getId();
     }
 
-    private void validatePerformanceSeats(final NewSeatHold newSeatHold, final List<PerformanceSeat> availablePerformanceSeats) {
+    private void validatePerformanceSeats(final NewHold newHold, final List<PerformanceSeat> availablePerformanceSeats) {
         if (availablePerformanceSeats.isEmpty()) {
             throw new CoreException(ErrorType.NOT_FOUND_DATA, "가능한 좌석이 없습니다.");
         }
-        if (availablePerformanceSeats.size() != newSeatHold.getSeatIds().size()) {
+        if (availablePerformanceSeats.size() != newHold.getSeatIds().size()) {
             throw new CoreException(ErrorType.SEAT_COUNT_MISMATCH);
         }
     }

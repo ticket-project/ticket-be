@@ -50,9 +50,9 @@ class HoldLockServiceTest {
         when(seatRepository.findByIdIn(seatIds)).thenReturn(seats);
         when(performanceFinder.findOpenPerformance(performance.getId())).thenReturn(performance);
         when(performanceSeatFinder.findAllByPerformanceAndSeatIn(performance, seats)).thenReturn(Collections.emptyList());
-        NewSeatHold newSeatHold = new NewSeatHold(performance.getId(), seatIds);
+        NewHold newHold = new NewHold(performance.getId(), seatIds);
         // when & then
-        assertThatThrownBy(() -> holdLockService.hold(member.getId(), newSeatHold))
+        assertThatThrownBy(() -> holdLockService.hold(member.getId(), newHold))
                 .isInstanceOf(CoreException.class);
     }
 }
