@@ -12,17 +12,17 @@ VALUES (3, '공연3', 'ACTIVE');
 
 -- 기본 좌석(행/열) 생성
 -- ==========================
-INSERT INTO SEAT (id, row, column)
+INSERT INTO SEAT (id, seat_row, seat_col)
 VALUES (1, 'A', '1');
-INSERT INTO SEAT (id, row, column)
+INSERT INTO SEAT (id, seat_row, seat_col)
 VALUES (2, 'A', '2');
-INSERT INTO SEAT (id, row, column)
+INSERT INTO SEAT (id, seat_row, seat_col)
 VALUES (3, 'A', '3');
-INSERT INTO SEAT (id, row, column)
+INSERT INTO SEAT (id, seat_row, seat_col)
 VALUES (4, 'B', '1');
-INSERT INTO SEAT (id, row, column)
+INSERT INTO SEAT (id, seat_row, seat_col)
 VALUES (5, 'B', '2');
-INSERT INTO SEAT (id, row, column)
+INSERT INTO SEAT (id, seat_row, seat_col)
 VALUES (6, 'B', '3');
 
 -- ==========================
@@ -35,11 +35,11 @@ INSERT INTO PERFORMANCE (id,
                          round_no,
                          start_time,
                          end_time,
-                         reserve_open_time,
-                         reserve_close_time,
+                         order_open_time,
+                         order_close_time,
                          state,
                          status,
-                         max_can_reserve_count,
+                         max_can_hold_count,
                          hold_time)
 VALUES (1,
         1,
@@ -58,11 +58,11 @@ INSERT INTO PERFORMANCE (id,
                          round_no,
                          start_time,
                          end_time,
-                         reserve_open_time,
-                         reserve_close_time,
+                         order_open_time,
+                         order_close_time,
                          state,
                          status,
-                         max_can_reserve_count,
+                         max_can_hold_count,
                          hold_time)
 VALUES (2,
         1,
