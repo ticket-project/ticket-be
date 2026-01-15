@@ -79,9 +79,9 @@ public class TestDataFactory {
                 .set(javaGetter(Performance::getRoundNo), 1L)
                 .set(javaGetter(Performance::getStartTime), BASE_TIME.plusDays(7))
                 .set(javaGetter(Performance::getEndTime), BASE_TIME.plusDays(7).plusHours(2))
-                .set(javaGetter(Performance::getReserveOpenTime), BASE_TIME.minusDays(1))
-                .set(javaGetter(Performance::getReserveCloseTime), BASE_TIME.plusDays(6))
-                .set(javaGetter(Performance::getMaxCanReserveCount), 4)
+                .set(javaGetter(Performance::getOrderOpenTime), BASE_TIME.minusDays(1))
+                .set(javaGetter(Performance::getOrderCloseTime), BASE_TIME.plusDays(6))
+                .set(javaGetter(Performance::getMaxCanHoldCount), 4)
                 .set(javaGetter(Performance::getHoldTime), 300)
                 .set(javaGetter(Performance::getState), state)
                 .sample();
@@ -117,8 +117,8 @@ public class TestDataFactory {
         return FIXTURE.giveMeBuilder(Seat.class)
                 .setNull("id")
                 .set("status", EntityStatus.ACTIVE)
-                .set(javaGetter(Seat::getRow), "row")
-                .set(javaGetter(Seat::getColumn), "col")
+                .set(javaGetter(Seat::getSeatRow), "row")
+                .set(javaGetter(Seat::getSeatCol), "col")
                 .sample();
     }
 

@@ -25,4 +25,7 @@ public enum ErrorCode {
     //예매
     E5000,
     E5001,
+
+    //선점
+    E6000,
 }
