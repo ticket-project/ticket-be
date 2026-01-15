@@ -23,13 +23,13 @@ public class Performance extends BaseEntity {
 
     private LocalDateTime endTime;
 
-    private LocalDateTime reserveOpenTime;
+    private LocalDateTime orderOpenTime;
 
-    private LocalDateTime reserveCloseTime;
+    private LocalDateTime orderCloseTime;
 
-    private int maxCanReserveCount;
+    private int maxCanHoldCount;
 
-    @Column(nullable = false)
+    @Column
     private Integer holdTime = 300;
 
     @Enumerated(value = EnumType.STRING)
@@ -37,14 +37,14 @@ public class Performance extends BaseEntity {
 
     protected Performance() {}
 
-    public Performance(final Show show, final Long roundNo, final LocalDateTime startTime, final LocalDateTime endTime, final LocalDateTime reserveOpenTime, final LocalDateTime reserveCloseTime, final int maxCanReserveCount, final Integer holdTime, final PerformanceState state) {
+    public Performance(final Show show, final Long roundNo, final LocalDateTime startTime, final LocalDateTime endTime, final LocalDateTime orderOpenTime, final LocalDateTime orderCloseTime, final int maxCanHoldCount, final Integer holdTime, final PerformanceState state) {
         this.show = show;
         this.roundNo = roundNo;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.reserveOpenTime = reserveOpenTime;
-        this.reserveCloseTime = reserveCloseTime;
-        this.maxCanReserveCount = maxCanReserveCount;
+        this.orderOpenTime = orderOpenTime;
+        this.orderCloseTime = orderCloseTime;
+        this.maxCanHoldCount = maxCanHoldCount;
         this.holdTime = holdTime;
         this.state = state;
     }
@@ -65,20 +65,20 @@ public class Performance extends BaseEntity {
         return endTime;
     }
 
-    public LocalDateTime getReserveOpenTime() {
-        return reserveOpenTime;
+    public LocalDateTime getOrderOpenTime() {
+        return orderOpenTime;
     }
 
-    public LocalDateTime getReserveCloseTime() {
-        return reserveCloseTime;
+    public LocalDateTime getOrderCloseTime() {
+        return orderCloseTime;
     }
 
     public PerformanceState getState() {
         return state;
     }
 
-    public int getMaxCanReserveCount() {
-        return maxCanReserveCount;
+    public int getMaxCanHoldCount() {
+        return maxCanHoldCount;
     }
 
     public Long getRoundNo() {
@@ -90,6 +90,6 @@ public class Performance extends BaseEntity {
     }
 
     public boolean isOverCount(final long requestReserveCount) {
-        return requestReserveCount > maxCanReserveCount;
+        return requestReserveCount > maxCanHoldCount;
     }
 }
