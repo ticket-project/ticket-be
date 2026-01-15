@@ -1,13 +1,13 @@
 package com.ticket.core.api.controller.request;
 
-import com.ticket.core.domain.hold.NewSeatHold;
+import com.ticket.core.domain.hold.NewHold;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.util.List;
 
-public class AddSeatHoldRequest {
+public class AddHoldRequest {
 
     @Positive
     @NotNull
@@ -24,7 +24,7 @@ public class AddSeatHoldRequest {
         return seatIds;
     }
 
-    public NewSeatHold toNewSeatHold() {
-        return new NewSeatHold(performanceId, seatIds);
+    public NewHold toNewHold() {
+        return new NewHold(performanceId, seatIds);
     }
 }

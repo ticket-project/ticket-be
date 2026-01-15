@@ -33,8 +33,8 @@ public class HoldRedisService implements HoldService {
     private final MemberFinder memberFinder;
     private final PerformanceFinder performanceFinder;
     private final SeatRepository seatRepository;
-    private final HoldRepository holdRepository;
     private final PerformanceSeatFinder performanceSeatFinder;
+    private final HoldRepository holdRepository;
     private final HoldItemRepository holdItemRepository;
 
     public HoldRedisService(final RedissonClient redissonClient, final MemberFinder memberFinder, final PerformanceFinder performanceFinder, final SeatRepository seatRepository, final HoldRepository holdRepository, final PerformanceSeatFinder performanceSeatFinder, final HoldItemRepository holdItemRepository) {
@@ -91,11 +91,11 @@ public class HoldRedisService implements HoldService {
         """;
 
     @Transactional
-    public Long hold(final Long memberId, final NewSeatHold newSeatHold) {
+    public Long hold(final Long memberId, final NewHold newHold) {
         //여기 밑에 select 하는 것들이 뭔가 성능상 나빠보이는데, 이 방법 밖에 없나?
         final Member foundMember = memberFinder.find(memberId);
-        final Performance foundPerformance = performanceFinder.findOpenPerformance(newSeatHold.getPerformanceId());
-        final List<Seat> foundSeats = seatRepository.findByIdIn(newSeatHold.getSeatIds());
+        final Performance foundPerformance = performanceFinder.findOpenPerformance(newHold.getPerformanceId());
+        final List<Seat> foundSeats = seatRepository.findByIdIn(newHold.getSeatIds());
         final List<PerformanceSeat> foundPerformanceSeats = performanceSeatFinder.findAllByPerformanceAndSeatIn(foundPerformance, foundSeats);
 
         final RScript script = redissonClient.getScript(StringCodec.INSTANCE);
@@ -130,7 +130,8 @@ public class HoldRedisService implements HoldService {
                 .map(ps -> new HoldItem(savedHold, ps, ps.getPrice()))
                 .toList();
         holdItemRepository.saveAll(holdItems);
-
+        //todo 이력용으로 hold에 저장하긴 했는데, hold의 state도 관리를 해야하나? 해줘야겠지. 성공했는지 실패했는지 알 수가 없으니.
+        //선점이 결제까지 완료 되었는지, 아니면 결제에서 실패했는지 시간초과인지 등
         return hold.getId();
     }
 

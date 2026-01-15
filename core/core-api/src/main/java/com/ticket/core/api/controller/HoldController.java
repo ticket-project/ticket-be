@@ -1,6 +1,6 @@
 package com.ticket.core.api.controller;
 
-import com.ticket.core.api.controller.request.AddSeatHoldRequest;
+import com.ticket.core.api.controller.request.AddHoldRequest;
 import com.ticket.core.domain.hold.HoldService;
 import com.ticket.core.domain.member.MemberDetails;
 import com.ticket.core.support.response.ApiResponse;
@@ -20,8 +20,8 @@ public class HoldController {
     }
 
     @PostMapping("/v1")
-    public ApiResponse<Long> holdRedis(MemberDetails memberDetails, @RequestBody @Valid AddSeatHoldRequest request) {
-        final Long holdId = holdService.hold(memberDetails.getMemberId(), request.toNewSeatHold());
+    public ApiResponse<Long> holdRedis(MemberDetails memberDetails, @RequestBody @Valid AddHoldRequest request) {
+        final Long holdId = holdService.hold(memberDetails.getMemberId(), request.toNewHold());
         return ApiResponse.success(holdId);
     }
 
