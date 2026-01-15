@@ -24,10 +24,10 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
-class HoldServiceTest {
+class HoldLockServiceTest {
 
     @InjectMocks
-    private HoldService holdService;
+    private HoldLockService holdLockService;
     @Mock
     private MemberFinder memberFinder;
     @Mock
@@ -52,7 +52,7 @@ class HoldServiceTest {
         when(performanceSeatFinder.findAllByPerformanceAndSeatIn(performance, seats)).thenReturn(Collections.emptyList());
         NewSeatHold newSeatHold = new NewSeatHold(performance.getId(), seatIds);
         // when & then
-        assertThatThrownBy(() -> holdService.hold(member.getId(), newSeatHold))
+        assertThatThrownBy(() -> holdLockService.hold(member.getId(), newSeatHold))
                 .isInstanceOf(CoreException.class);
     }
 }
