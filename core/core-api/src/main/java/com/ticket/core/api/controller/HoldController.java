@@ -20,7 +20,7 @@ public class HoldController {
     }
 
     @PostMapping("/v1")
-    public ApiResponse<Long> holdRedis(MemberDetails memberDetails, @RequestBody @Valid AddHoldRequest request) {
+    public ApiResponse<Long> hold(MemberDetails memberDetails, @RequestBody @Valid AddHoldRequest request) {
         final Long holdId = holdService.hold(memberDetails.getMemberId(), request.toNewHold());
         return ApiResponse.success(holdId);
     }
