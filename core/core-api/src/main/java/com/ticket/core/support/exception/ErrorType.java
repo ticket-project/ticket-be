@@ -29,7 +29,7 @@ public enum ErrorType {
     SEAT_COUNT_MISMATCH(HttpStatus.CONFLICT, ErrorCode.E5001, "요청한 좌석 중 일부가 예약 불가능합니다."),
 
     //선점
-    SEAT_ALREADY_HOLD(HttpStatus.BAD_REQUEST, ErrorCode.E6000, "좌석이 이미 선점되었습니다.");
+    SEAT_ALREADY_HOLD(HttpStatus.CONFLICT, ErrorCode.E6000, "좌석이 이미 선점되었습니다.");
 
     private final HttpStatus status;
     private final ErrorCode errorCode;
