@@ -97,7 +97,9 @@ public class HoldRedisService implements HoldService {
         final Performance foundPerformance = performanceFinder.findOpenPerformance(newHold.getPerformanceId());
         final List<Seat> foundSeats = seatRepository.findByIdIn(newHold.getSeatIds());
         final List<PerformanceSeat> foundPerformanceSeats = performanceSeatFinder.findAllByPerformanceAndSeatIn(foundPerformance, foundSeats);
-
+        if (foundPerformanceSeats.isEmpty()) {
+            throw new CoreException(ErrorType.NOT_FOUND_DATA);
+        }
         final RScript script = redissonClient.getScript(StringCodec.INSTANCE);
 
         final List<Long> seatIds = foundSeats.stream().map(Seat::getId).toList();
