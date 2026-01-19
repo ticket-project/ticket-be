@@ -14,10 +14,10 @@ spring:
       on-profile: local
 
   datasource:
-    url: jdbc:mysql://localhost:3307/ticket
-    username: root
-    password: 1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ENC(HEKDdGjc3XXx3IJAqBmKs4Ggv3T3U/1P1H7WIVvgf9/zCdEEdWdq1wHJFqmVSguUyt1UEfwNTKpHpkgphI7cxd3th0rFkEVbn3l/UklezUgT0SwIVexEkqHJr1ftbQZe)
+    username: ENC(W6YKIZmg7DUMiFlQc82hnA==)
+    password: ENC(aM0E/7b9o91RxbWsWLyR254D19dX1Seh)
+    driver-class-name: oracle.jdbc.OracleDriver
 
   jpa:
     hibernate:
@@ -33,3 +33,8 @@ spring:
     init:
       mode: always
       encoding: UTF-8
+
+jasypt:
+  encryptor:
+    bean: jasyptEncryptor
+    password: ${ENCRYPT_KEY}
