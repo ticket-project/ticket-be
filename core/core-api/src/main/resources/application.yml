@@ -14,9 +14,9 @@ spring:
       on-profile: local
 
   datasource:
-    url: ENC(HEKDdGjc3XXx3IJAqBmKs4Ggv3T3U/1P1H7WIVvgf9/zCdEEdWdq1wHJFqmVSguUyt1UEfwNTKpHpkgphI7cxd3th0rFkEVbn3l/UklezUgT0SwIVexEkqHJr1ftbQZe)
-    username: ENC(W6YKIZmg7DUMiFlQc82hnA==)
-    password: ENC(aM0E/7b9o91RxbWsWLyR254D19dX1Seh)
+    url: ENC(Py4JmirUnT/3AsB4zNg8klLnnDE3uq65NfpkjQuFDfySvmIaKwV87vq3F/tveoXHCXn+Vea6KUu/v9p3SoYJCAiRRA7Xk+35p5HkLWEbJtFnp3c4NW1LhBqHGKSw+aocXsZa41KRNkXT9gq3B3Fthg==)
+    username: ENC(AKqZK5wXFgy4k1yf538xbL6EJzOwfeMMQFCN6wEFuHhxYc5OBJT51HzlBLwP+1Nu)
+    password: ENC(tK56UTDRanNdn7lq+Dv+zoTRGzEUSbiYQVTIT5JvNJVj4UPKcB4bvR0Jqv345bLB)
     driver-class-name: oracle.jdbc.OracleDriver
 
   jpa:
