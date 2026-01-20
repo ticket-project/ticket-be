@@ -4,37 +4,22 @@ spring:
       - logging.yml
       - redis.yml
 
-  profiles:
-    active: local
-
----
-spring:
-  config:
-    activate:
-      on-profile: local
-
-  datasource:
-    url: ENC(Py4JmirUnT/3AsB4zNg8klLnnDE3uq65NfpkjQuFDfySvmIaKwV87vq3F/tveoXHCXn+Vea6KUu/v9p3SoYJCAiRRA7Xk+35p5HkLWEbJtFnp3c4NW1LhBqHGKSw+aocXsZa41KRNkXT9gq3B3Fthg==)
-    username: ENC(AKqZK5wXFgy4k1yf538xbL6EJzOwfeMMQFCN6wEFuHhxYc5OBJT51HzlBLwP+1Nu)
-    password: ENC(tK56UTDRanNdn7lq+Dv+zoTRGzEUSbiYQVTIT5JvNJVj4UPKcB4bvR0Jqv345bLB)
-    driver-class-name: oracle.jdbc.OracleDriver
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-        show_sql: true
-    defer-datasource-initialization: true
-
-  sql:
-    init:
-      mode: always
-      encoding: UTF-8
-
 jasypt:
   encryptor:
     bean: jasyptEncryptor
     password: ${ENCRYPT_KEY}
+
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    display-request-duration: true
+    operations-sorter: alpha
+    persist-authorization: true
+    filter: true
+    url: /api-docs
