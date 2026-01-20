@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 비관적 락을 통한 예매 서비스 (동시성 문제 방지)
  */
-@Service("reservationServiceV1")
+@Service
 public class ReservationServiceV1 implements ReservationService {
 
     private final MemberFinder memberFinder;
