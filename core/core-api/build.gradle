@@ -35,9 +35,11 @@ dependencies {
     implementation 'com.oracle.database.security:oraclepki:21.3.0.0'
     implementation 'com.oracle.database.security:osdt_core:21.3.0.0'
 
-    runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'com.h2database:h2'
     testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.1.15")
+
+    //swagger
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.15"
 
     // REST Docs
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
