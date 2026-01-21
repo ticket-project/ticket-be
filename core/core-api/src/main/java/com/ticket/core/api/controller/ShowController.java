@@ -1,8 +1,10 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.request.ShowSearchParam;
+import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.domain.show.usecase.SearchShowsUseCase;
 import com.ticket.core.support.response.ApiResponse;
+import com.ticket.core.support.response.SliceResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,10 +20,10 @@ public class ShowController {
     }
 
     @GetMapping("/search")
-    public ApiResponse<Void> searchShows(ShowSearchParam param, Pageable pageable) {
-        SearchShowsUseCase.Input input = new SearchShowsUseCase.Input(param, pageable);
-        searchShowsUseCase.execute(input);
-        return null;
+    public ApiResponse<SliceResponse<ShowResponse>> searchShows(final ShowSearchParam param, final Pageable pageable) {
+        final SearchShowsUseCase.Input input = new SearchShowsUseCase.Input(param, pageable);
+        final SearchShowsUseCase.Output output = searchShowsUseCase.execute(input);
+        return ApiResponse.success(SliceResponse.from(output.shows()));
     }
 
 }

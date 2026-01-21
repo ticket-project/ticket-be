@@ -15,16 +15,15 @@ public class SearchShowsUseCase {
         this.showQuerydslRepository = showQuerydslRepository;
     }
 
-    public record Input(ShowSearchParam param,
-                        Pageable pageable) {
+    public record Input(ShowSearchParam param, Pageable pageable) {
     }
 
-    public record Output(ShowSearchParam param) {
+    public record Output(Slice<ShowResponse> shows) {
     }
 
-    public Output execute(Input input) {
+    public Output execute(final Input input) {
         Slice<ShowResponse> responses = showQuerydslRepository.findAllBySearch(input.param, input.pageable);
-        return null;
+        return new Output(responses);
     }
 
 }

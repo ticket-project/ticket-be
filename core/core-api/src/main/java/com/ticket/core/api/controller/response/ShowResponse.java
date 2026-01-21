@@ -1,4 +1,12 @@
 package com.ticket.core.api.controller.response;
 
-public class ShowResponse {
+import java.time.LocalDate;
+
+public record ShowResponse(
+        Long id,
+        String title,
+        String subTitle,
+        LocalDate startDate,
+        LocalDate endDate,
+        String place) {
 }
