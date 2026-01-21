@@ -4,6 +4,8 @@ package com.ticket.core.domain.show;
 import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "SHOWS")
 public class Show extends BaseEntity {
@@ -13,13 +15,25 @@ public class Show extends BaseEntity {
 
     private String title;
 
-    //장소
+    private String subTitle;
+
+    private String info;
+
+    private LocalDate startDate;
+
+    private LocalDate endDate;
+
+    //장소 todo 향후 물리적 공연장 테이블 나와서 연관관계?
     private String place;
 
     protected Show() {}
 
-    public Show(final String title, final String place) {
+    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final String place) {
         this.title = title;
+        this.subTitle = subTitle;
+        this.info = info;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.place = place;
     }
 
@@ -29,6 +43,22 @@ public class Show extends BaseEntity {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getSubTitle() {
+        return subTitle;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
     public String getPlace() {
