@@ -28,8 +28,7 @@ public class Show extends BaseEntity {
 
     protected Show() {}
 
-    public Show(final Long id, final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final String place) {
-        this.id = id;
+    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final String place) {
         this.title = title;
         this.subTitle = subTitle;
         this.info = info;
