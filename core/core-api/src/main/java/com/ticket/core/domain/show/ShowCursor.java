@@ -1,7 +1,7 @@
 package com.ticket.core.domain.show;
 
 public record ShowCursor(
-        String sort,
+        ShowSortKey sort,
         String dir,
         String lastValue,
         Long lastId
