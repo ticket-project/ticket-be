@@ -4,9 +4,12 @@ public class ShowSearchParam {
     private String category;
     private String place;
 
-    public ShowSearchParam(final String category, final String place) {
+    private String cursor;
+
+    public ShowSearchParam(final String category, final String place, final String cursor) {
         this.category = category;
         this.place = place;
+        this.cursor = cursor;
     }
 
     public String getCategory() {
@@ -15,5 +18,9 @@ public class ShowSearchParam {
 
     public String getPlace() {
         return place;
+    }
+
+    public String getCursor() {
+        return cursor;
     }
 }
