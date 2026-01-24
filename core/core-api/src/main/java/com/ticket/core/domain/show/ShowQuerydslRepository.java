@@ -9,7 +9,7 @@ import com.ticket.core.api.controller.request.ShowSearchParam;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.support.cursor.CursorCodec;
 import com.ticket.core.support.cursor.CursorSlice;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
@@ -17,13 +17,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
-import java.util.Iterator;
 import java.util.List;
 
 import static com.ticket.core.domain.show.QCategory.category;
 import static com.ticket.core.domain.show.QShow.show;
 import static com.ticket.core.domain.show.QShowCategory.showCategory;
-import static com.ticket.core.domain.show.ShowSortKey.POPULAR;
 
 @Repository
 public class ShowQuerydslRepository {
@@ -35,14 +33,12 @@ public class ShowQuerydslRepository {
         this.cursorCodec = cursorCodec;
     }
 
-    public CursorSlice<ShowResponse> findAllBySearch(ShowSearchParam param, Pageable pageable) {
-        int size = pageable.getPageSize();
-
+    public CursorSlice<ShowResponse> findAllBySearch(ShowSearchParam param, int size, String sort) {
         BooleanBuilder where = new BooleanBuilder();
         where.and(categoryNameEq(param.getCategory()));
         where.and(placeContains(param.getPlace()));
 
-        SortOrder sortOrder = resolveSortOrder(pageable);
+        SortOrder sortOrder = resolveSortOrder(sort);
 
         OrderSpecifier<?> primaryOrder = primaryOrderSpecifier(sortOrder);
         OrderSpecifier<Long> tieBreakerOrder = (sortOrder.direction.isAscending() ? show.id.asc() : show.id.desc());
@@ -73,7 +69,7 @@ public class ShowQuerydslRepository {
         boolean hasNext = results.size() > size;
         if (hasNext) results = results.subList(0, size);
 
-        Slice<ShowResponse> slice = new SliceImpl<>(results, pageable, hasNext);
+        Slice<ShowResponse> slice = new SliceImpl<>(results, PageRequest.of(0, size), hasNext);
 
         String nextCursor = null;
         if (hasNext && !results.isEmpty()) {
@@ -151,14 +147,14 @@ public class ShowQuerydslRepository {
         };
     }
 
-    private SortOrder resolveSortOrder(Pageable pageable) {
-        if (pageable.getSort().isUnsorted()) {
-            return new SortOrder(POPULAR, Sort.Direction.ASC);
-        }
-
-        Iterator<Sort.Order> it = pageable.getSort().iterator();
-        Sort.Order first = it.next();
-        return new SortOrder(ShowSortKey.fromApiValue(first.getProperty()), first.getDirection());
+    private SortOrder resolveSortOrder(String sort) {
+        ShowSortKey sortKey = ShowSortKey.fromApiValue(sort);
+        // 인기순(POPULAR)은 DESC, 최신순(LATEST)은 DESC, 마감임박순(ENDING_SOON)은 ASC
+        Sort.Direction direction = switch (sortKey) {
+            case POPULAR, LATEST -> Sort.Direction.DESC;
+            case ENDING_SOON -> Sort.Direction.ASC;
+        };
+        return new SortOrder(sortKey, direction);
     }
 
     private BooleanExpression categoryNameEq(String categoryName) {
