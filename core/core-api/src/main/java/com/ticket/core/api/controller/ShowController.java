@@ -11,11 +11,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.domain.Pageable;
-
-import org.springframework.data.web.PageableDefault;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "공연(Show)", description = "공연 정보 조회 API")
@@ -95,23 +94,19 @@ public class ShowController {
     })
     @GetMapping("/search")
     public ApiResponse<SliceResponse<ShowResponse>> searchShows(
-            @Parameter(description = "검색 조건", required = false)
+            @ParameterObject
             final ShowSearchParam param,
 
-            @Parameter(
-                    description = """
-                            페이지네이션 설정
-                            - `size`: 한 번에 조회할 개수 (기본값: 5, 최대: 100)
-                            - `sort`: 정렬 기준 (popular, latest, endingSoon)
-                            """,
-                    example = "size=10&sort=popular"
-            )
-            @PageableDefault(size = 5)
-            final Pageable pageable
+            @Parameter(description = "한 번에 조회할 개수 (기본값: 5, 최대: 100)", example = "5")
+            @RequestParam(defaultValue = "5") final int size,
+
+            @Parameter(description = "정렬 기준 [popular(인기순), latest(최신순), endingSoon(마감임박순)]", example = "popular")
+            @RequestParam(defaultValue = "popular") final String sort
     ) {
-        final SearchShowsUseCase.Input input = new SearchShowsUseCase.Input(param, pageable);
+        final SearchShowsUseCase.Input input = new SearchShowsUseCase.Input(param, size, sort);
         final SearchShowsUseCase.Output output = searchShowsUseCase.execute(input);
         return ApiResponse.success(SliceResponse.from(output.shows(), output.nextCursor()));
     }
 
 }
+
