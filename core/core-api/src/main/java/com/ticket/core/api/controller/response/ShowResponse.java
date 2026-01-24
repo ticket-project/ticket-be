@@ -8,5 +8,6 @@ public record ShowResponse(
         String subTitle,
         LocalDate startDate,
         LocalDate endDate,
+        Long viewCount,
         String place) {
 }

@@ -23,6 +23,7 @@ import java.util.List;
 import static com.ticket.core.domain.show.QCategory.category;
 import static com.ticket.core.domain.show.QShow.show;
 import static com.ticket.core.domain.show.QShowCategory.showCategory;
+import static com.ticket.core.domain.show.ShowSortKey.POPULAR;
 
 @Repository
 public class ShowQuerydslRepository {
@@ -59,6 +60,7 @@ public class ShowQuerydslRepository {
                         show.subTitle,
                         show.startDate,
                         show.endDate,
+                        show.viewCount,
                         show.place))
                 .from(show)
                 .leftJoin(showCategory).on(showCategory.show.eq(show))
@@ -73,7 +75,6 @@ public class ShowQuerydslRepository {
 
         Slice<ShowResponse> slice = new SliceImpl<>(results, pageable, hasNext);
 
-        // 5) nextCursor 생성(다음이 있을 때만)
         String nextCursor = null;
         if (hasNext && !results.isEmpty()) {
             ShowResponse last = results.getLast();
@@ -85,16 +86,15 @@ public class ShowQuerydslRepository {
     }
 
     private ShowCursor buildNextCursor(ShowResponse last, SortOrder sortOrder) {
-        String lastValue = switch (sortOrder.property) {
-            case "startDate" -> last.startDate().toString();
-            case "endDate"   -> last.endDate().toString();
-            case "title"     -> last.title();
-            case "id"        -> String.valueOf(last.id());
-            default -> throw new IllegalArgumentException("지원하지 않는 정렬 키: " + sortOrder.property);
+        String lastValue = switch (sortOrder.key) {
+            case POPULAR -> last.viewCount().toString();
+            case LATEST -> last.startDate().toString();
+            //todo 마감임박순은 무슨 조건으로 정렬?
+            case ENDING_SOON -> last.title();
         };
 
         return new ShowCursor(
-                sortOrder.property,
+                sortOrder.key,
                 sortOrder.direction.name(),
                 lastValue,
                 last.id()
@@ -102,35 +102,32 @@ public class ShowQuerydslRepository {
     }
 
     private BooleanExpression cursorCondition(ShowCursor cursor, SortOrder sortOrder) {
-        boolean desc = sortOrder.direction.isDescending();
+        boolean desc = sortOrder.direction().isDescending();
         Long lastId = cursor.lastId();
 
-        return switch (sortOrder.property) {
-            case "startDate" -> {
-                LocalDate last = LocalDate.parse(cursor.lastValue());
+        return switch (sortOrder.key()) {
+
+            case POPULAR -> {
+                long last = Long.parseLong(cursor.lastValue());
+                yield  show.viewCount.lt(last).or(show.viewCount.eq(last).and(show.id.lt(lastId)));
+            }
+            case LATEST -> {
+                var last = LocalDate.parse(cursor.lastValue());
                 yield desc
                         ? show.startDate.lt(last).or(show.startDate.eq(last).and(show.id.lt(lastId)))
                         : show.startDate.gt(last).or(show.startDate.eq(last).and(show.id.gt(lastId)));
             }
-            case "endDate" -> {
+            case ENDING_SOON -> {
                 LocalDate last = LocalDate.parse(cursor.lastValue());
                 yield desc
                         ? show.endDate.lt(last).or(show.endDate.eq(last).and(show.id.lt(lastId)))
                         : show.endDate.gt(last).or(show.endDate.eq(last).and(show.id.gt(lastId)));
             }
-            case "title" -> {
-                String last = cursor.lastValue();
-                yield desc
-                        ? show.title.lt(last).or(show.title.eq(last).and(show.id.lt(lastId)))
-                        : show.title.gt(last).or(show.title.eq(last).and(show.id.gt(lastId)));
-            }
-            case "id" -> desc ? show.id.lt(lastId) : show.id.gt(lastId);
-            default -> throw new IllegalArgumentException("지원하지 않는 정렬 키: " + sortOrder.property);
         };
     }
 
     private void validateCursorMatchesRequest(ShowCursor cursor, SortOrder sortOrder) {
-        if (!sortOrder.property.equals(cursor.sort())) {
+        if (!sortOrder.key.equals(cursor.sort())) {
             throw new IllegalArgumentException("cursor.sort와 요청 sort가 일치하지 않습니다.");
         }
         if (!sortOrder.direction.name().equalsIgnoreCase(cursor.dir())) {
@@ -140,33 +137,28 @@ public class ShowQuerydslRepository {
             throw new IllegalArgumentException("cursor.lastId가 없습니다.");
         }
 
-        // id 정렬이 아닌 경우 lastValue 필수
-        if (!"id".equals(sortOrder.property) && !StringUtils.hasText(cursor.lastValue())) {
+        // lastValue 필수
+        if (!StringUtils.hasText(cursor.lastValue())) {
             throw new IllegalArgumentException("cursor.lastValue가 없습니다.");
         }
     }
 
     private OrderSpecifier<?> primaryOrderSpecifier(SortOrder sortOrder) {
-        boolean asc = sortOrder.direction.isAscending();
-
-        return switch (sortOrder.property) {
-            case "startDate" -> asc ? show.startDate.asc() : show.startDate.desc();
-            case "endDate"   -> asc ? show.endDate.asc() : show.endDate.desc();
-            case "title"     -> asc ? show.title.asc() : show.title.desc();
-            case "id"        -> asc ? show.id.asc() : show.id.desc();
-            default -> asc ? show.id.asc() : show.id.desc();
+        return switch (sortOrder.key()) {
+            case POPULAR -> show.viewCount.desc();
+            case LATEST -> show.createdAt.desc();
+            case ENDING_SOON -> show.endDate.asc();
         };
     }
 
     private SortOrder resolveSortOrder(Pageable pageable) {
         if (pageable.getSort().isUnsorted()) {
-            // 기본 정렬
-            return new SortOrder("startDate", Sort.Direction.ASC);
+            return new SortOrder(POPULAR, Sort.Direction.ASC);
         }
 
         Iterator<Sort.Order> it = pageable.getSort().iterator();
         Sort.Order first = it.next();
-        return new SortOrder(first.getProperty(), first.getDirection());
+        return new SortOrder(ShowSortKey.fromApiValue(first.getProperty()), first.getDirection());
     }
 
     private BooleanExpression categoryNameEq(String categoryName) {
@@ -181,6 +173,7 @@ public class ShowQuerydslRepository {
                 : null;
     }
 
-    private record SortOrder(String property, Sort.Direction direction) {}
+    private record SortOrder(ShowSortKey key, Sort.Direction direction) {
+    }
 
 }

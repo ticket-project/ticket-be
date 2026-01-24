@@ -28,4 +28,7 @@ public enum ErrorCode {
 
     //선점
     E6000,
+
+    //공연
+    E7000,
 }
