@@ -3,6 +3,7 @@ package com.ticket.core.domain.show.usecase;
 import com.ticket.core.api.controller.request.ShowSearchParam;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.domain.show.ShowQuerydslRepository;
+import com.ticket.core.support.cursor.CursorSlice;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -18,12 +19,12 @@ public class SearchShowsUseCase {
     public record Input(ShowSearchParam param, Pageable pageable) {
     }
 
-    public record Output(Slice<ShowResponse> shows) {
+    public record Output(Slice<ShowResponse> shows, String nextCursor) {
     }
 
     public Output execute(final Input input) {
-        Slice<ShowResponse> responses = showQuerydslRepository.findAllBySearch(input.param, input.pageable);
-        return new Output(responses);
+        CursorSlice<ShowResponse> result = showQuerydslRepository.findAllBySearch(input.param, input.pageable);
+        return new Output(result.slice(), result.nextCursor());
     }
 
 }
