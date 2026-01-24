@@ -5,32 +5,32 @@ VALUES (1, null, '콘서트', 1);
 -- ==========================
 -- 기본 공연 생성
 -- ==========================
-INSERT INTO SHOWS (id, title, status)
-VALUES (1, '공연1', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (2, '공연2', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (3, '공연3', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (4, '공연4', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (5, '공연5', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (6, '공연6', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (7, '공연7', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (8, '공연8', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (9, '공연9', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (10, '공연10', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (11, '공연11', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (12, '공연12', 'ACTIVE');
-INSERT INTO SHOWS (id, title, status)
-VALUES (13, '공연13', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status, view_count)
+VALUES (1, '공연1', 'ACTIVE', 1);
+INSERT INTO SHOWS (id, title, status, view_count, start_date)
+VALUES (2, '공연2', 'ACTIVE', 2, '2026-03-02');
+INSERT INTO SHOWS (id, title, status, view_count, start_date)
+VALUES (3, '공연3', 'ACTIVE', 3, '2026-03-03');
+INSERT INTO SHOWS (id, title, status, view_count, start_date)
+VALUES (4, '공연4', 'ACTIVE', 4, '2026-03-04');
+INSERT INTO SHOWS (id, title, status, view_count, start_date)
+VALUES (5, '공연5', 'ACTIVE', 5, '2026-03-05');
+INSERT INTO SHOWS (id, title, status, view_count, start_date)
+VALUES (6, '공연6', 'ACTIVE', 6, '2026-03-06');
+INSERT INTO SHOWS (id, title, status, view_count, start_date)
+VALUES (7, '공연7', 'ACTIVE', 7, '2026-03-07');
+INSERT INTO SHOWS (id, title, status, view_count, start_date)
+VALUES (8, '공연8', 'ACTIVE', 8, '2026-03-08');
+INSERT INTO SHOWS (id, title, status, view_count, start_date)
+VALUES (9, '공연9', 'ACTIVE', 9, '2026-03-09');
+INSERT INTO SHOWS (id, title, status, view_count, start_date)
+VALUES (10, '공연10', 'ACTIVE', 10, '2026-03-10');
+INSERT INTO SHOWS (id, title, status, view_count, start_date)
+VALUES (11, '공연11', 'ACTIVE', 11, '2026-03-11');
+INSERT INTO SHOWS (id, title, status, view_count, start_date)
+VALUES (12, '공연12', 'ACTIVE', 12, '2026-03-12');
+INSERT INTO SHOWS (id, title, status, view_count, start_date)
+VALUES (13, '공연13', 'ACTIVE', 13, '2026-03-13');
 
 
 INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
