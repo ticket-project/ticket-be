@@ -40,7 +40,7 @@ public class ShowQuerydslRepository {
 
         BooleanBuilder where = new BooleanBuilder();
         where.and(categoryNameEq(param.getCategory()));
-        where.and(placeEq(param.getPlace()));
+        where.and(placeContains(param.getPlace()));
 
         SortOrder sortOrder = resolveSortOrder(pageable);
 
@@ -167,9 +167,9 @@ public class ShowQuerydslRepository {
                 : null;
     }
 
-    private BooleanExpression placeEq(String place) {
+    private BooleanExpression placeContains(String place) {
         return StringUtils.hasText(place)
-                ? show.place.eq(place)
+                ? show.place.containsIgnoreCase(place)
                 : null;
     }
 
