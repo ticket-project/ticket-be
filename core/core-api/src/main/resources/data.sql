@@ -1,3 +1,7 @@
+
+INSERT INTO CATEGORYS (id, parent_id, name, depth)
+VALUES (1, null, '콘서트', 1);
+
 -- ==========================
 -- 기본 공연 생성
 -- ==========================
@@ -7,7 +11,52 @@ INSERT INTO SHOWS (id, title, status)
 VALUES (2, '공연2', 'ACTIVE');
 INSERT INTO SHOWS (id, title, status)
 VALUES (3, '공연3', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status)
+VALUES (4, '공연4', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status)
+VALUES (5, '공연5', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status)
+VALUES (6, '공연6', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status)
+VALUES (7, '공연7', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status)
+VALUES (8, '공연8', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status)
+VALUES (9, '공연9', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status)
+VALUES (10, '공연10', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status)
+VALUES (11, '공연11', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status)
+VALUES (12, '공연12', 'ACTIVE');
+INSERT INTO SHOWS (id, title, status)
+VALUES (13, '공연13', 'ACTIVE');
 
+
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
+VALUES (1, 1, 1);
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
+VALUES (2, 2, 1);
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
+VALUES (3, 3, 1);
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
+VALUES (4, 4, 1);
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
+VALUES (5, 5, 1);
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
+VALUES (6, 6, 1);
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
+VALUES (7, 7, 1);
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
+VALUES (8, 8, 1);
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
+VALUES (9, 9, 1);
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
+VALUES (10, 10, 1);
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
+VALUES (11, 11, 1);
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id)
+VALUES (12, 12, 1);
 
 
 -- 기본 좌석(행/열) 생성
