@@ -92,7 +92,7 @@ public class ShowController {
                     )
             )
     })
-    @GetMapping("/search")
+    @GetMapping
     public ApiResponse<SliceResponse<ShowResponse>> searchShows(
             @ParameterObject
             final ShowSearchParam param,
