@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.ticket.core.domain.show.QCategory.category;
@@ -36,9 +37,13 @@ public class ShowQuerydslRepository {
     public CursorSlice<ShowResponse> findAllBySearch(ShowSearchParam param, int size, String sort) {
         BooleanBuilder where = new BooleanBuilder();
         where.and(categoryNameEq(param.getCategory()));
-        where.and(placeContains(param.getPlace()));
+        where.and(regionContains(param.getPlace()));
 
         SortOrder sortOrder = resolveSortOrder(sort);
+
+        if (ShowSortKey.SHOW_APPROACHING.equals(sortOrder.key)) {
+            where.and(show.startDate.goe(LocalDate.now()));
+        }
 
         OrderSpecifier<?> primaryOrder = primaryOrderSpecifier(sortOrder);
         OrderSpecifier<Long> tieBreakerOrder = (sortOrder.direction.isAscending() ? show.id.asc() : show.id.desc());
@@ -54,10 +59,16 @@ public class ShowQuerydslRepository {
                         show.id,
                         show.title,
                         show.subTitle,
+                        category.name,
                         show.startDate,
                         show.endDate,
                         show.viewCount,
-                        show.place))
+                        show.saleType,
+                        show.saleStartDate,
+                        show.saleEndDate,
+                        show.createdAt,
+                        show.region,
+                        show.venue))
                 .from(show)
                 .leftJoin(showCategory).on(showCategory.show.eq(show))
                 .leftJoin(category).on(showCategory.category.eq(category))
@@ -84,9 +95,8 @@ public class ShowQuerydslRepository {
     private ShowCursor buildNextCursor(ShowResponse last, SortOrder sortOrder) {
         String lastValue = switch (sortOrder.key) {
             case POPULAR -> last.viewCount().toString();
-            case LATEST -> last.startDate().toString();
-            //todo 마감임박순은 무슨 조건으로 정렬?
-            case ENDING_SOON -> last.title();
+            case LATEST -> last.createdAt().toString();
+            case SHOW_APPROACHING -> last.startDate().toString();
         };
 
         return new ShowCursor(
@@ -98,26 +108,21 @@ public class ShowQuerydslRepository {
     }
 
     private BooleanExpression cursorCondition(ShowCursor cursor, SortOrder sortOrder) {
-        boolean desc = sortOrder.direction().isDescending();
         Long lastId = cursor.lastId();
 
         return switch (sortOrder.key()) {
 
             case POPULAR -> {
-                long last = Long.parseLong(cursor.lastValue());
-                yield  show.viewCount.lt(last).or(show.viewCount.eq(last).and(show.id.lt(lastId)));
+                var last = Long.parseLong(cursor.lastValue());
+                yield show.viewCount.lt(last).or(show.viewCount.eq(last).and(show.id.lt(lastId)));
             }
             case LATEST -> {
-                var last = LocalDate.parse(cursor.lastValue());
-                yield desc
-                        ? show.startDate.lt(last).or(show.startDate.eq(last).and(show.id.lt(lastId)))
-                        : show.startDate.gt(last).or(show.startDate.eq(last).and(show.id.gt(lastId)));
+                var last = LocalDateTime.parse(cursor.lastValue());
+                yield show.createdAt.lt(last).or(show.createdAt.eq(last).and(show.id.lt(lastId)));
             }
-            case ENDING_SOON -> {
-                LocalDate last = LocalDate.parse(cursor.lastValue());
-                yield desc
-                        ? show.endDate.lt(last).or(show.endDate.eq(last).and(show.id.lt(lastId)))
-                        : show.endDate.gt(last).or(show.endDate.eq(last).and(show.id.gt(lastId)));
+            case SHOW_APPROACHING -> {
+                var last = LocalDate.parse(cursor.lastValue());
+                yield show.startDate.gt(last).or(show.startDate.eq(last).and(show.id.gt(lastId)));
             }
         };
     }
@@ -143,16 +148,16 @@ public class ShowQuerydslRepository {
         return switch (sortOrder.key()) {
             case POPULAR -> show.viewCount.desc();
             case LATEST -> show.createdAt.desc();
-            case ENDING_SOON -> show.endDate.asc();
+            case SHOW_APPROACHING -> show.startDate.asc();
         };
     }
 
     private SortOrder resolveSortOrder(String sort) {
         ShowSortKey sortKey = ShowSortKey.fromApiValue(sort);
-        // 인기순(POPULAR)은 DESC, 최신순(LATEST)은 DESC, 마감임박순(ENDING_SOON)은 ASC
+        // 인기순(POPULAR)은 DESC, 최신순(LATEST)은 DESC, 공연임박순(SHOW_APPROACHING)은 ASC
         Sort.Direction direction = switch (sortKey) {
             case POPULAR, LATEST -> Sort.Direction.DESC;
-            case ENDING_SOON -> Sort.Direction.ASC;
+            case SHOW_APPROACHING -> Sort.Direction.ASC;
         };
         return new SortOrder(sortKey, direction);
     }
@@ -163,9 +168,9 @@ public class ShowQuerydslRepository {
                 : null;
     }
 
-    private BooleanExpression placeContains(String place) {
-        return StringUtils.hasText(place)
-                ? show.place.containsIgnoreCase(place)
+    private BooleanExpression regionContains(String region) {
+        return StringUtils.hasText(region)
+                ? show.region.containsIgnoreCase(region)
                 : null;
     }
 
