@@ -57,17 +57,20 @@ public class ShowQuerydslRepository {
             where.and(cursorCondition(cursor, sortOrder));
         }
 
-        //ID 조회 (Paging & Filtering)
-        List<Long> ids = queryFactory
-                .select(show.id)
+        List<Tuple> rows = queryFactory
+                .select(show.id, show.startDate, show.createdAt, show.viewCount)
+                .distinct()
                 .from(show)
                 .leftJoin(showCategory).on(showCategory.show.eq(show))
                 .leftJoin(category).on(showCategory.category.eq(category))
                 .where(where)
-                .groupBy(show.id)
-                .orderBy(primaryOrder, tieBreakerOrder)
+                .orderBy(show.startDate.asc(), show.id.asc())
                 .limit(size + 1L)
                 .fetch();
+
+        List<Long> ids = rows.stream()
+                .map(t -> t.get(show.id))
+                .toList();
 
         if (ids.isEmpty()) {
             return new CursorSlice<>(new SliceImpl<>(List.of(), PageRequest.of(0, size), false), null);
