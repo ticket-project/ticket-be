@@ -39,13 +39,13 @@ public class ShowController {
                     
                     ## 정렬 옵션 (sort 파라미터)
                     - `popular` (기본값) - 인기순 (조회수 높은 순)
-                    - `latest` - 최신순 (공연 시작일 최신순)
-                    - `endingSoon` - 마감 임박순 (공연 종료일 가까운 순)
+                    - `latest` - 최신순 (생성일 최신순)
+                    - `approaching` - 공연 임박순 (공연 시작일 가까운 순)
                     
                     ## 정렬 예시
                     - `?sort=popular` - 인기순 (기본)
                     - `?sort=latest` - 최신순
-                    - `?sort=endingSoon` - 마감 임박순
+                    - `?sort=approaching` - 공연 임박순
                     """
     )
     @ApiResponses(value = {
@@ -65,19 +65,31 @@ public class ShowController {
                                                     "id": 20,
                                                     "title": "뮤지컬 위키드",
                                                     "subTitle": "10주년 기념 공연",
+                                                    "categoryName": "뮤지컬",
                                                     "startDate": "2026-03-01",
                                                     "endDate": "2026-05-31",
                                                     "viewCount": 15000,
-                                                    "place": "블루스퀘어 신한카드홀"
+                                                    "saleType": "GENERAL",
+                                                    "saleStartDate": "2026-01-01",
+                                                    "saleEndDate": "2026-02-28",
+                                                    "createdAt": "2026-01-01T10:00:00",
+                                                    "region": "서울",
+                                                    "venue": "블루스퀘어 신한카드홀"
                                                   },
                                                   {
                                                     "id": 19,
                                                     "title": "콘서트 BTS",
                                                     "subTitle": "월드투어",
+                                                    "categoryName": "콘서트",
                                                     "startDate": "2026-02-28",
                                                     "endDate": "2026-03-02",
                                                     "viewCount": 50000,
-                                                    "place": "잠실올림픽주경기장"
+                                                    "saleType": "EXCLUSIVE",
+                                                    "saleStartDate": "2026-01-15",
+                                                    "saleEndDate": "2026-02-15",
+                                                    "createdAt": "2026-01-01T12:00:00",
+                                                    "region": "서울",
+                                                    "venue": "잠실올림픽주경기장"
                                                   }
                                                 ],
                                                 "hasNext": true,
@@ -100,7 +112,7 @@ public class ShowController {
             @Parameter(description = "한 번에 조회할 개수 (기본값: 5, 최대: 100)", example = "5")
             @RequestParam(defaultValue = "5") final int size,
 
-            @Parameter(description = "정렬 기준 [popular(인기순), latest(최신순), endingSoon(마감임박순)]", example = "popular")
+            @Parameter(description = "정렬 기준 [popular(인기순), latest(최신순), approaching(공연임박순)]", example = "popular")
             @RequestParam(defaultValue = "popular") final String sort
     ) {
         final SearchShowsUseCase.Input input = new SearchShowsUseCase.Input(param, size, sort);

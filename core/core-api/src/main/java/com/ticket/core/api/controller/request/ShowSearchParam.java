@@ -16,8 +16,8 @@ public class ShowSearchParam {
     private String category;
 
     @Schema(
-            description = "공연 장소 검색 (부분 일치)",
-            example = "블루스퀘어",
+            description = "지역 검색 (부분 일치)",
+            example = "서울",
             requiredMode = NOT_REQUIRED
     )
     private String place;
