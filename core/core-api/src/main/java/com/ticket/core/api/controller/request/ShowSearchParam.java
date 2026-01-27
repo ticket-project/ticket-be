@@ -20,7 +20,7 @@ public class ShowSearchParam {
             example = "서울",
             requiredMode = NOT_REQUIRED
     )
-    private String place;
+    private String region;
 
     @Schema(
             description = """
@@ -33,9 +33,9 @@ public class ShowSearchParam {
     )
     private String cursor;
 
-    public ShowSearchParam(final String category, final String place, final String cursor) {
+    public ShowSearchParam(final String category, final String region, final String cursor) {
         this.category = category;
-        this.place = place;
+        this.region = region;
         this.cursor = cursor;
     }
 
@@ -43,8 +43,8 @@ public class ShowSearchParam {
         return category;
     }
 
-    public String getPlace() {
-        return place;
+    public String getRegion() {
+        return region;
     }
 
     public String getCursor() {
