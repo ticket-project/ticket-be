@@ -40,7 +40,7 @@ public class ShowQuerydslRepository {
     public CursorSlice<ShowResponse> findAllBySearch(ShowSearchParam param, int size, String sort) {
         BooleanBuilder where = new BooleanBuilder();
         where.and(categoryNameEq(param.getCategory()));
-        where.and(regionContains(param.getPlace()));
+        where.and(regionContains(param.getRegion()));
 
         SortOrder sortOrder = resolveSortOrder(sort);
 
