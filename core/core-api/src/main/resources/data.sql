@@ -2,6 +2,7 @@
 -- 카테고리 생성
 -- ==========================
 INSERT INTO CATEGORYS (id, parent_id, name, depth) VALUES (1, null, '콘서트', 1);
+INSERT INTO CATEGORYS (id, parent_id, name, depth) VALUES (2, null, '연극', 1);
 
 -- ==========================
 -- 콘서트 공연 생성 (40개)
@@ -139,6 +140,7 @@ INSERT INTO SHOW_CATEGORYS (id, show_id, category_id) VALUES (37, 37, 1);
 INSERT INTO SHOW_CATEGORYS (id, show_id, category_id) VALUES (38, 38, 1);
 INSERT INTO SHOW_CATEGORYS (id, show_id, category_id) VALUES (39, 39, 1);
 INSERT INTO SHOW_CATEGORYS (id, show_id, category_id) VALUES (40, 40, 1);
+INSERT INTO SHOW_CATEGORYS (id, show_id, category_id) VALUES (41, 3, 2);
 
 
 -- 기본 좌석(행/열) 생성
