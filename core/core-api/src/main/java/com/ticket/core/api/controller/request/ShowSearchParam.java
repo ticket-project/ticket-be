@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 
-@Schema(description = "공연 검색 요청 파라미터")
+@Schema(description = "공연 조회 요청 파라미터")
 public class ShowSearchParam {
 
     @Schema(

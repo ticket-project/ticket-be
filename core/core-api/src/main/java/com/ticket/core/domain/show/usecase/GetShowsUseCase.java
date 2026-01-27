@@ -10,10 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class SearchShowsUseCase {
+public class GetShowsUseCase {
     private final ShowQuerydslRepository showQuerydslRepository;
 
-    public SearchShowsUseCase(final ShowQuerydslRepository showQuerydslRepository) {
+    public GetShowsUseCase(final ShowQuerydslRepository showQuerydslRepository) {
         this.showQuerydslRepository = showQuerydslRepository;
     }
 
@@ -30,4 +30,3 @@ public class SearchShowsUseCase {
     }
 
 }
-
