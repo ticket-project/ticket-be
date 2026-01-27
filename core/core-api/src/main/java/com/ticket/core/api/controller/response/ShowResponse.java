@@ -1,10 +1,11 @@
 package com.ticket.core.api.controller.response;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import com.ticket.core.domain.show.SaleType;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "공연 정보 응답")
 public record ShowResponse(
@@ -18,8 +19,8 @@ public record ShowResponse(
         @Schema(description = "공연 부제목", example = "10주년 기념 공연")
         String subTitle,
 
-        @Schema(description = "카테고리 이름", example = "콘서트")
-        String categoryName,
+        @Schema(description = "카테고리 이름 목록", example = "[\"콘서트\", \"K-POP\"]")
+        List<String> categoryNames,
 
         @Schema(description = "공연 시작일", example = "2026-03-01")
         LocalDate startDate,
