@@ -2,7 +2,8 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.request.ShowSearchParam;
 import com.ticket.core.api.controller.response.ShowResponse;
-import com.ticket.core.domain.show.usecase.SearchShowsUseCase;
+import com.ticket.core.domain.show.usecase.GetLatestShowsUseCase;
+import com.ticket.core.domain.show.usecase.GetShowsUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,23 +13,22 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "공연(Show)", description = "공연 정보 조회 API")
 @RestController
 @RequestMapping("/api/v1/shows")
 public class ShowController {
-    private final SearchShowsUseCase searchShowsUseCase;
+    private final GetShowsUseCase getShowsUseCase;
+    private final GetLatestShowsUseCase getLatestShowsUseCase;
 
-    public ShowController(final SearchShowsUseCase searchShowsUseCase) {
-        this.searchShowsUseCase = searchShowsUseCase;
+    public ShowController(final GetShowsUseCase getShowsUseCase, final GetLatestShowsUseCase getLatestShowsUseCase) {
+        this.getShowsUseCase = getShowsUseCase;
+        this.getLatestShowsUseCase = getLatestShowsUseCase;
     }
 
     @Operation(
-            summary = "공연 검색 (무한스크롤)",
+            summary = "공연 조회 (무한스크롤)",
             description = """
                     공연 목록을 커서 기반 무한스크롤 방식으로 조회합니다.
                     
@@ -105,7 +105,7 @@ public class ShowController {
             )
     })
     @GetMapping
-    public ApiResponse<SliceResponse<ShowResponse>> searchShows(
+    public ApiResponse<SliceResponse<ShowResponse>> getShowsPage(
             @ParameterObject
             final ShowSearchParam param,
 
@@ -115,10 +115,59 @@ public class ShowController {
             @Parameter(description = "정렬 기준 [popular(인기순), latest(최신순), approaching(공연임박순)]", example = "popular")
             @RequestParam(defaultValue = "popular") final String sort
     ) {
-        final SearchShowsUseCase.Input input = new SearchShowsUseCase.Input(param, size, sort);
-        final SearchShowsUseCase.Output output = searchShowsUseCase.execute(input);
+        final GetShowsUseCase.Input input = new GetShowsUseCase.Input(param, size, sort);
+        final GetShowsUseCase.Output output = getShowsUseCase.execute(input);
         return ApiResponse.success(SliceResponse.from(output.shows(), output.nextCursor()));
     }
 
-}
+    @Operation(
+            summary = "메인 홈 최신 공연 목록 조회",
+            description = "특정 카테고리의 최신 등록된 공연 10개를 조회합니다."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    value = """
+                                            {
+                                              "status": "SUCCESS",
+                                              "data": {
+                                                "shows": [
+                                                  {
+                                                    "id": 20,
+                                                    "title": "뮤지컬 위키드",
+                                                    "image": "http://example.com/image.jpg",
+                                                    "startDate": "2026-03-01",
+                                                    "venue": "블루스퀘어 신한카드홀",
+                                                    "createdAt": "2026-01-01T10:00:00"
+                                                  },
+                                                  {
+                                                    "id": 19,
+                                                    "title": "콘서트 BTS",
+                                                    "image": "http://example.com/image2.jpg",
+                                                    "startDate": "2026-02-28",
+                                                    "venue": "잠실올림픽주경기장",
+                                                    "createdAt": "2026-01-01T09:00:00"
+                                                  }
+                                                ]
+                                              },
+                                              "message": null
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/latest")
+    public ApiResponse<GetLatestShowsUseCase.Output> getLatestShows(
+            @Parameter(description = "카테고리 이름", example = "CONCERT", required = true)
+            @RequestParam(defaultValue = "CONCERT") String category) {
+        GetLatestShowsUseCase.Input input = new GetLatestShowsUseCase.Input(category);
+        return ApiResponse.success(getLatestShowsUseCase.execute(input));
+    }
 
+}
