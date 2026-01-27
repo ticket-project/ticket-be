@@ -6,11 +6,13 @@ import com.ticket.core.support.exception.ErrorType;
 public enum ShowSortKey {
     POPULAR("popular"),          // 기본: 인기순
     LATEST("latest"),            // 최신순
-    ENDING_SOON("endingSoon");   // 마감 임박순
+    SHOW_APPROACHING("approaching");   // 공연 임박순
 
     private final String apiValue;
 
-    ShowSortKey(String apiValue) { this.apiValue = apiValue; }
+    ShowSortKey(String apiValue) {
+        this.apiValue = apiValue;
+    }
 
     public String getApiValue() {
         return apiValue;

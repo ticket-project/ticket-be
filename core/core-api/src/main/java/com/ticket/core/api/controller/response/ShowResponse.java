@@ -1,8 +1,10 @@
 package com.ticket.core.api.controller.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import com.ticket.core.domain.show.SaleType;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Schema(description = "공연 정보 응답")
 public record ShowResponse(
@@ -16,6 +18,9 @@ public record ShowResponse(
         @Schema(description = "공연 부제목", example = "10주년 기념 공연")
         String subTitle,
 
+        @Schema(description = "카테고리 이름", example = "콘서트")
+        String categoryName,
+
         @Schema(description = "공연 시작일", example = "2026-03-01")
         LocalDate startDate,
 
@@ -25,7 +30,22 @@ public record ShowResponse(
         @Schema(description = "조회수", example = "15000")
         Long viewCount,
 
-        @Schema(description = "공연 장소", example = "블루스퀘어 신한카드홀")
-        String place
+        @Schema(description = "판매 타입", example = "GENERAL")
+        SaleType saleType,
+
+        @Schema(description = "판매 시작일", example = "2026-01-01")
+        LocalDate saleStartDate,
+
+        @Schema(description = "판매 종료일", example = "2026-02-28")
+        LocalDate saleEndDate,
+
+        @Schema(description = "생성일", example = "2026-02-28T14:00:00")
+        LocalDateTime createdAt,
+
+        @Schema(description = "지역", example = "서울")
+        String region,
+
+        @Schema(description = "장소", example = "예술의전당")
+        String venue
 ) {
 }
