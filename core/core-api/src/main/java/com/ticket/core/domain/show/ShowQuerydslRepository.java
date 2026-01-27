@@ -101,7 +101,10 @@ public class ShowQuerydslRepository {
                     s.getCreatedAt(),
                     s.getRegion(),
                     s.getVenue()
-            )).categoryNames().add(catName);
+            ));
+            if (catName != null) {
+                resultMap.get(s.getId()).categoryNames().add(catName);
+            }
         }
 
         List<ShowResponse> results = new ArrayList<>(resultMap.values());
