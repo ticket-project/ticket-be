@@ -1,8 +1,8 @@
 package com.ticket.core.domain.show;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.request.ShowSearchParam;
@@ -18,7 +18,10 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.ticket.core.domain.show.QCategory.category;
 import static com.ticket.core.domain.show.QShow.show;
@@ -54,28 +57,54 @@ public class ShowQuerydslRepository {
             where.and(cursorCondition(cursor, sortOrder));
         }
 
-        List<ShowResponse> results = queryFactory
-                .select(Projections.constructor(ShowResponse.class,
-                        show.id,
-                        show.title,
-                        show.subTitle,
-                        category.name,
-                        show.startDate,
-                        show.endDate,
-                        show.viewCount,
-                        show.saleType,
-                        show.saleStartDate,
-                        show.saleEndDate,
-                        show.createdAt,
-                        show.region,
-                        show.venue))
+        //ID 조회 (Paging & Filtering)
+        List<Long> ids = queryFactory
+                .select(show.id)
                 .from(show)
                 .leftJoin(showCategory).on(showCategory.show.eq(show))
                 .leftJoin(category).on(showCategory.category.eq(category))
                 .where(where)
+                .groupBy(show.id)
+                .orderBy(primaryOrder, tieBreakerOrder)
                 .limit(size + 1L)
+                .fetch();
+
+        if (ids.isEmpty()) {
+            return new CursorSlice<>(new SliceImpl<>(List.of(), PageRequest.of(0, size), false), null);
+        }
+
+        List<Tuple> tuples = queryFactory
+                .select(show, category.name)
+                .from(show)
+                .leftJoin(showCategory).on(showCategory.show.eq(show))
+                .leftJoin(category).on(showCategory.category.eq(category))
+                .where(show.id.in(ids))
                 .orderBy(primaryOrder, tieBreakerOrder)
                 .fetch();
+
+        Map<Long, ShowResponse> resultMap = new LinkedHashMap<>();
+        for (Tuple tuple : tuples) {
+            Show s = tuple.get(show);
+            String catName = tuple.get(category.name);
+
+            resultMap.computeIfAbsent(s.getId(), id -> new ShowResponse(
+                    s.getId(),
+                    s.getTitle(),
+                    s.getSubTitle(),
+                    new ArrayList<>(),
+                    s.getStartDate(),
+                    s.getEndDate(),
+                    s.getViewCount(),
+                    s.getSaleType(),
+                    s.getSaleStartDate(),
+                    s.getSaleEndDate(),
+                    s.getCreatedAt(),
+                    s.getRegion(),
+                    s.getVenue()
+            )).categoryNames().add(catName);
+        }
+
+        List<ShowResponse> results = new ArrayList<>(resultMap.values());
 
         boolean hasNext = results.size() > size;
         if (hasNext) results = results.subList(0, size);
