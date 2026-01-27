@@ -25,19 +25,34 @@ public class Show extends BaseEntity {
 
     private Long viewCount;
 
-    //장소 todo 향후 물리적 공연장 테이블 나와서 연관관계?
-    private String place;
+    @Enumerated(EnumType.STRING)
+    private SaleType saleType;
+
+    private LocalDate saleStartDate;
+
+    private LocalDate saleEndDate;
+
+    private String image;
+
+    private String region;
+
+    private String venue;
 
     protected Show() {}
 
-    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final String place, final Long viewCount) {
+    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final Long viewCount, final SaleType saleType, final LocalDate saleStartDate, final LocalDate saleEndDate, final String image, final String region, final String venue) {
         this.title = title;
         this.subTitle = subTitle;
         this.info = info;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.place = place;
         this.viewCount = viewCount;
+        this.saleType = saleType;
+        this.saleStartDate = saleStartDate;
+        this.saleEndDate = saleEndDate;
+        this.image = image;
+        this.region = region;
+        this.venue = venue;
     }
 
     public Long getId() {
@@ -64,11 +79,31 @@ public class Show extends BaseEntity {
         return endDate;
     }
 
-    public String getPlace() {
-        return place;
-    }
-
     public Long getViewCount() {
         return viewCount;
+    }
+
+    public SaleType getSaleType() {
+        return saleType;
+    }
+
+    public LocalDate getSaleStartDate() {
+        return saleStartDate;
+    }
+
+    public LocalDate getSaleEndDate() {
+        return saleEndDate;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public String getVenue() {
+        return venue;
     }
 }
