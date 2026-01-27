@@ -7,6 +7,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.request.ShowSearchParam;
 import com.ticket.core.api.controller.response.ShowResponse;
+import com.ticket.core.api.controller.response.ShowSummaryResponse;
+import com.querydsl.core.types.Projections;
 import com.ticket.core.support.cursor.CursorCodec;
 import com.ticket.core.support.cursor.CursorSlice;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +37,25 @@ public class ShowQuerydslRepository {
     public ShowQuerydslRepository(final JPAQueryFactory queryFactory, final CursorCodec cursorCodec) {
         this.queryFactory = queryFactory;
         this.cursorCodec = cursorCodec;
+    }
+
+    public List<ShowSummaryResponse> findLatestShows(final String categoryName, int limit) {
+        return queryFactory
+                .select(Projections.constructor(ShowSummaryResponse.class,
+                        show.id,
+                        show.title,
+                        show.image,
+                        show.startDate,
+                        show.venue,
+                        show.createdAt))
+                .distinct()
+                .from(show)
+                .join(showCategory).on(showCategory.show.eq(show))
+                .join(category).on(category.eq(showCategory.category))
+                .where(category.name.eq(categoryName))
+                .orderBy(show.createdAt.desc())
+                .limit(limit)
+                .fetch();
     }
 
     public CursorSlice<ShowResponse> findAllBySearch(ShowSearchParam param, int size, String sort) {

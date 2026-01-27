@@ -22,4 +22,15 @@ public class BaseEntity {
     @Enumerated(EnumType.STRING)
     private EntityStatus status = EntityStatus.ACTIVE;
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public EntityStatus getStatus() {
+        return status;
+    }
 }
