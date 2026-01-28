@@ -13,7 +13,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "공연(Show)", description = "공연 정보 조회 API")
 @RestController
 @RequestMapping("/api/v1/shows")
+@Validated
 public class ShowController {
     private final GetShowsUseCase getShowsUseCase;
     private final GetLatestShowsUseCase getLatestShowsUseCase;
@@ -220,8 +223,9 @@ public class ShowController {
     public ApiResponse<GetShowsOpeningSoonUseCase.Output> getShowsOpeningSoon(
             @Parameter(description = "카테고리", example = "CONCERT", required = true)
             @RequestParam(defaultValue = "CONCERT") String category,
-            @RequestParam int size) {
+            @RequestParam(defaultValue = "5") @Max(value = 20) int size) {
         GetShowsOpeningSoonUseCase.Input input = new GetShowsOpeningSoonUseCase.Input(category, size);
         return ApiResponse.success(getShowsOpeningSoonUseCase.execute(input));
     }
 }
+
