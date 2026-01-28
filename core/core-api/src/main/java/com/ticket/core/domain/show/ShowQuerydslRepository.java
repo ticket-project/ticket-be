@@ -53,7 +53,7 @@ public class ShowQuerydslRepository {
                 .from(show)
                 .join(showCategory).on(showCategory.show.eq(show))
                 .join(category).on(category.eq(showCategory.category))
-                .where(category.code.eq(categoryCode))
+                .where(categoryCodeEq(categoryCode))
                 .orderBy(show.createdAt.desc())
                 .limit(limit)
                 .fetch();
