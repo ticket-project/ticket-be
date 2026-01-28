@@ -19,7 +19,7 @@ public record ShowOpeningSoonResponse(
         @Schema(description = "장소", example = "예술의전당")
         String venue,
 
-        @Schema(description = "판매 시작일", example = "2026-03-01")
-        LocalDate saleStartDate
+        @Schema(description = "공연 시작일", example = "2026-03-01")
+        LocalDate startDate
 ) {
 }
