@@ -3,6 +3,7 @@ package com.ticket.core.api.controller;
 import com.ticket.core.api.controller.request.ShowSearchParam;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.domain.show.usecase.GetLatestShowsUseCase;
+import com.ticket.core.domain.show.usecase.GetShowsOpeningSoonUseCase;
 import com.ticket.core.domain.show.usecase.GetShowsUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
@@ -13,7 +14,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "공연(Show)", description = "공연 정보 조회 API")
 @RestController
@@ -21,10 +25,12 @@ import org.springframework.web.bind.annotation.*;
 public class ShowController {
     private final GetShowsUseCase getShowsUseCase;
     private final GetLatestShowsUseCase getLatestShowsUseCase;
+    private final GetShowsOpeningSoonUseCase getShowsOpeningSoonUseCase;
 
-    public ShowController(final GetShowsUseCase getShowsUseCase, final GetLatestShowsUseCase getLatestShowsUseCase) {
+    public ShowController(final GetShowsUseCase getShowsUseCase, final GetLatestShowsUseCase getLatestShowsUseCase, final GetShowsOpeningSoonUseCase getShowsOpeningSoonUseCase) {
         this.getShowsUseCase = getShowsUseCase;
         this.getLatestShowsUseCase = getLatestShowsUseCase;
+        this.getShowsOpeningSoonUseCase = getShowsOpeningSoonUseCase;
     }
 
     @Operation(
@@ -58,7 +64,7 @@ public class ShowController {
                                     name = "성공 응답 예시",
                                     value = """
                                             {
-                                              "status": "SUCCESS",
+                                              "result": "SUCCESS",
                                               "data": {
                                                 "items": [
                                                   {
@@ -73,7 +79,7 @@ public class ShowController {
                                                     "saleStartDate": "2026-01-01",
                                                     "saleEndDate": "2026-02-28",
                                                     "createdAt": "2026-01-01T10:00:00",
-                                                    "region": "서울",
+                                                    "region": "SEOUL",
                                                     "venue": "블루스퀘어 신한카드홀"
                                                   },
                                                   {
@@ -88,7 +94,7 @@ public class ShowController {
                                                     "saleStartDate": "2026-01-15",
                                                     "saleEndDate": "2026-02-15",
                                                     "createdAt": "2026-01-01T12:00:00",
-                                                    "region": "서울",
+                                                    "region": "SEOUL",
                                                     "venue": "잠실올림픽주경기장"
                                                   }
                                                 ],
@@ -97,7 +103,7 @@ public class ShowController {
                                                 "numberOfElements": 2,
                                                 "nextCursor": "eyJpZCI6MTksInN0YXJ0RGF0ZSI6IjIwMjYtMDItMjgifQ=="
                                               },
-                                              "message": null
+                                              "error": null
                                             }
                                             """
                             )
@@ -134,7 +140,7 @@ public class ShowController {
                                     name = "성공 응답 예시",
                                     value = """
                                             {
-                                              "status": "SUCCESS",
+                                              "result": "SUCCESS",
                                               "data": {
                                                 "shows": [
                                                   {
@@ -155,7 +161,7 @@ public class ShowController {
                                                   }
                                                 ]
                                               },
-                                              "message": null
+                                              "error": null
                                             }
                                             """
                             )
@@ -164,10 +170,58 @@ public class ShowController {
     })
     @GetMapping("/latest")
     public ApiResponse<GetLatestShowsUseCase.Output> getLatestShows(
-            @Parameter(description = "카테고리 이름", example = "CONCERT", required = true)
+            @Parameter(description = "카테고리", example = "CONCERT", required = true)
             @RequestParam(defaultValue = "CONCERT") String category) {
         GetLatestShowsUseCase.Input input = new GetLatestShowsUseCase.Input(category);
         return ApiResponse.success(getLatestShowsUseCase.execute(input));
     }
 
+    @Operation(
+            summary = "메인 홈 오픈예정 공연 목록 조회",
+            description = "특정 카테고리의 예매오픈마감 임박 순 공연 5개를 조회합니다."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    value = """
+                                            {
+                                              "result": "SUCCESS",
+                                              "data": {
+                                                "shows": [
+                                                  {
+                                                    "id": 21,
+                                                    "title": "뮤지컬 시카고",
+                                                    "image": "http://example.com/chicago.jpg",
+                                                    "venue": "디큐브 링크아트센터",
+                                                    "saleStartDate": "2026-04-01"
+                                                  },
+                                                  {
+                                                    "id": 22,
+                                                    "title": "콘서트 싸이흠뻑쇼",
+                                                    "image": "http://example.com/psy.jpg",
+                                                    "venue": "잠실주경기장",
+                                                    "saleStartDate": "2026-04-05"
+                                                  }
+                                                ]
+                                              },
+                                              "error": null
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/opening-soon")
+    public ApiResponse<GetShowsOpeningSoonUseCase.Output> getShowsOpeningSoon(
+            @Parameter(description = "카테고리", example = "CONCERT", required = true)
+            @RequestParam(defaultValue = "CONCERT") String category,
+            @RequestParam int size) {
+        GetShowsOpeningSoonUseCase.Input input = new GetShowsOpeningSoonUseCase.Input(category, size);
+        return ApiResponse.success(getShowsOpeningSoonUseCase.execute(input));
+    }
 }
