@@ -1,6 +1,7 @@
 package com.ticket.core.api.controller.response;
 
 import com.ticket.core.domain.show.SaleType;
+import com.ticket.core.domain.show.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
@@ -43,8 +44,8 @@ public record ShowResponse(
         @Schema(description = "생성일", example = "2026-02-28T14:00:00")
         LocalDateTime createdAt,
 
-        @Schema(description = "지역", example = "서울")
-        String region,
+        @Schema(description = "지역", example = "SEOUL")
+        Region region,
 
         @Schema(description = "장소", example = "예술의전당")
         String venue
