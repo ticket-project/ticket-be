@@ -9,10 +9,12 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
+    private String code;
+
     private Long parentId;
 
-    private int depth;
-
+    @Column(nullable = false)
     private String name;
 
     protected Category() {}
