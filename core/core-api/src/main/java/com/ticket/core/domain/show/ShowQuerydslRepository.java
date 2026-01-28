@@ -3,12 +3,13 @@ package com.ticket.core.domain.show;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.request.ShowSearchParam;
+import com.ticket.core.api.controller.response.ShowOpeningSoonResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.api.controller.response.ShowSummaryResponse;
-import com.querydsl.core.types.Projections;
 import com.ticket.core.support.cursor.CursorCodec;
 import com.ticket.core.support.cursor.CursorSlice;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +40,7 @@ public class ShowQuerydslRepository {
         this.cursorCodec = cursorCodec;
     }
 
-    public List<ShowSummaryResponse> findLatestShows(final String categoryName, int limit) {
+    public List<ShowSummaryResponse> findLatestShows(final String categoryCode, int limit) {
         return queryFactory
                 .select(Projections.constructor(ShowSummaryResponse.class,
                         show.id,
@@ -52,16 +53,35 @@ public class ShowQuerydslRepository {
                 .from(show)
                 .join(showCategory).on(showCategory.show.eq(show))
                 .join(category).on(category.eq(showCategory.category))
-                .where(category.name.eq(categoryName))
+                .where(category.code.eq(categoryCode))
                 .orderBy(show.createdAt.desc())
+                .limit(limit)
+                .fetch();
+    }
+
+    public List<ShowOpeningSoonResponse> findShowsOpeningSoon(final String categoryCode, int limit) {
+        return queryFactory
+                .select(Projections.constructor(ShowOpeningSoonResponse.class,
+                        show.id,
+                        show.title,
+                        show.image,
+                        show.venue,
+                        show.startDate))
+                .distinct()
+                .from(show)
+                .join(showCategory).on(showCategory.show.eq(show))
+                .join(category).on(category.eq(showCategory.category))
+                .where(category.code.eq(categoryCode)
+                        .and(show.startDate.goe(LocalDate.now())))
+                .orderBy(show.startDate.asc())
                 .limit(limit)
                 .fetch();
     }
 
     public CursorSlice<ShowResponse> findAllBySearch(ShowSearchParam param, int size, String sort) {
         BooleanBuilder where = new BooleanBuilder();
-        where.and(categoryNameEq(param.getCategory()));
-        where.and(regionContains(param.getRegion()));
+        where.and(categoryCodeEq(param.getCategory()));
+        where.and(regionEq(param.getRegion()));
 
         SortOrder sortOrder = resolveSortOrder(sort);
 
@@ -218,16 +238,14 @@ public class ShowQuerydslRepository {
         return new SortOrder(sortKey, direction);
     }
 
-    private BooleanExpression categoryNameEq(String categoryName) {
-        return StringUtils.hasText(categoryName)
-                ? category.name.eq(categoryName)
+    private BooleanExpression categoryCodeEq(String categoryCode) {
+        return StringUtils.hasText(categoryCode)
+                ? category.code.eq(categoryCode)
                 : null;
     }
 
-    private BooleanExpression regionContains(String region) {
-        return StringUtils.hasText(region)
-                ? show.region.containsIgnoreCase(region)
-                : null;
+    private BooleanExpression regionEq(Region region) {
+        return region != null ? show.region.eq(region) : null;
     }
 
     private record SortOrder(ShowSortKey key, Sort.Direction direction) {
