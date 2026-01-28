@@ -1,5 +1,6 @@
 package com.ticket.core.api.controller.request;
 
+import com.ticket.core.domain.show.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
@@ -9,18 +10,18 @@ public class ShowSearchParam {
 
     @Schema(
             description = "카테고리 필터",
-            example = "콘서트",
-            allowableValues = {"뮤지컬", "콘서트", "연극", "오페라", "클래식"},
+            example = "CONCERT",
+            allowableValues = {"CONCERT", "THEATER"},
             requiredMode = NOT_REQUIRED
     )
     private String category;
 
     @Schema(
-            description = "지역 검색 (부분 일치)",
-            example = "서울",
+            description = "지역 검색",
+            example = "SEOUL",
             requiredMode = NOT_REQUIRED
     )
-    private String region;
+    private Region region;
 
     @Schema(
             description = """
@@ -33,7 +34,7 @@ public class ShowSearchParam {
     )
     private String cursor;
 
-    public ShowSearchParam(final String category, final String region, final String cursor) {
+    public ShowSearchParam(final String category, final Region region, final String cursor) {
         this.category = category;
         this.region = region;
         this.cursor = cursor;
@@ -43,7 +44,7 @@ public class ShowSearchParam {
         return category;
     }
 
-    public String getRegion() {
+    public Region getRegion() {
         return region;
     }
 

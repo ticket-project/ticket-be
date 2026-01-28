@@ -14,6 +14,7 @@ import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.enums.PerformanceState;
 import com.ticket.core.enums.Role;
+import com.ticket.core.domain.show.Region;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -132,7 +133,7 @@ public class TestDataFactory {
         return FIXTURE.giveMeBuilder(Show.class)
                 .setNull("id")
                 .set("status", EntityStatus.ACTIVE)
-                .set(javaGetter(Show::getRegion), "서울")
+                .set(javaGetter(Show::getRegion), Region.SEOUL)
                 .set(javaGetter(Show::getTitle), "만약에 우리")
                 .sample();
     }

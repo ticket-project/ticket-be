@@ -34,13 +34,14 @@ public class Show extends BaseEntity {
 
     private String image;
 
-    private String region;
+    @Enumerated(EnumType.STRING)
+    private Region region;
 
     private String venue;
 
     protected Show() {}
 
-    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final Long viewCount, final SaleType saleType, final LocalDate saleStartDate, final LocalDate saleEndDate, final String image, final String region, final String venue) {
+    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final Long viewCount, final SaleType saleType, final LocalDate saleStartDate, final LocalDate saleEndDate, final String image, final Region region, final String venue) {
         this.title = title;
         this.subTitle = subTitle;
         this.info = info;
@@ -99,7 +100,7 @@ public class Show extends BaseEntity {
         return image;
     }
 
-    public String getRegion() {
+    public Region getRegion() {
         return region;
     }
 
