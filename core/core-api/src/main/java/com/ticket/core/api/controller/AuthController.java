@@ -64,4 +64,17 @@ public class AuthController {
 
         return ApiResponse.success(response);
     }
+
+    @Operation(summary = "로그아웃", description = "현재 세션을 무효화하여 로그아웃합니다")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "로그아웃 성공")
+    })
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(HttpServletRequest httpRequest) {
+        final HttpSession session = httpRequest.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return ApiResponse.success();
+    }
 }
