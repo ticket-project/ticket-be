@@ -27,7 +27,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.12.1'
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:2.0.0'
 
     /*DB 오라클 접속에 필요한 라이브러리*/
     runtimeOnly 'com.oracle.database.jdbc:ojdbc8'
@@ -38,8 +38,8 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.1.15")
 
-    //swagger
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.15"
+    //swagger - Spring Boot 4.0 호환 버전 (최신 버전 사용)
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0"
 
     // REST Docs
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'

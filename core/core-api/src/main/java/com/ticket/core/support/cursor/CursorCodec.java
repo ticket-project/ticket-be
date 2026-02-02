@@ -1,8 +1,8 @@
 package com.ticket.core.support.cursor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticket.core.domain.show.ShowCursor;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
