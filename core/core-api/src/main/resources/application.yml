@@ -3,6 +3,32 @@ spring:
     import:
       - logging.yml
       - redis.yml
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id:
+            client-secret:
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - profile
+              - email
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
+
+# JWT 설정
+jwt:
+  secret: your-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm-please-change-this-in-production
+  expiration: 3600000  # 1시간 (밀리초)
+
+# OAuth2 설정
+oauth2:
+  redirect-url: http://localhost:8081/oauth2/callback  # 테스트용: 프론트엔드가 없을 때는 백엔드 URL 사용
 
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
