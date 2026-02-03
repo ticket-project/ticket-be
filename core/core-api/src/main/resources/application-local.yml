@@ -19,3 +19,14 @@ spring:
     init:
       mode: always   # schema.sql/data.sql 쓰면 always로 변경
       encoding: UTF-8
+server:
+  port: 8081
+
+jwt:
+  secret: dev-secret-dev-secret-dev-secret-dev-secret
+  issuer: ticket-api
+  expiration: 3600000
+  refresh-expiration: 1209600000
+
+oauth2:
+  redirect-url: http://localhost:8081/oauth2/callback
