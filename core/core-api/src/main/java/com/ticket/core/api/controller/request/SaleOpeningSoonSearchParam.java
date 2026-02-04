@@ -66,8 +66,6 @@ public class SaleOpeningSoonSearchParam {
     )
     private String cursor;
 
-    public SaleOpeningSoonSearchParam() {}
-
     public SaleOpeningSoonSearchParam(
             String category,
             String title,

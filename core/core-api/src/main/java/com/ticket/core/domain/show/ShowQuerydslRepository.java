@@ -49,7 +49,7 @@ public class ShowQuerydslRepository {
 
         SortOrder sortOrder = resolveSortOrder(sort);
 
-        if (ShowSortKey.SHOW_APPROACHING.equals(sortOrder.key)) {
+        if (ShowSortKey.SHOW_START_APPROACHING.equals(sortOrder.key)) {
             where.and(show.startDate.goe(LocalDate.now()));
         }
 
@@ -136,8 +136,8 @@ public class ShowQuerydslRepository {
         String lastValue = switch (sortOrder.key) {
             case POPULAR -> last.viewCount().toString();
             case LATEST -> last.createdAt().toString();
-            case SHOW_APPROACHING -> last.startDate().toString();
-            case SALE_OPENING -> throw new UnsupportedOperationException("SALE_OPENING은 이 메서드에서 사용 불가");
+            case SHOW_START_APPROACHING -> last.startDate().toString();
+            case SALE_START_APPROACHING -> last.saleStartDate().toString();
         };
 
         return new ShowCursor(
@@ -161,11 +161,14 @@ public class ShowQuerydslRepository {
                 var last = LocalDateTime.parse(cursor.lastValue());
                 yield show.createdAt.lt(last).or(show.createdAt.eq(last).and(show.id.lt(lastId)));
             }
-            case SHOW_APPROACHING -> {
+            case SHOW_START_APPROACHING -> {
                 var last = LocalDate.parse(cursor.lastValue());
                 yield show.startDate.gt(last).or(show.startDate.eq(last).and(show.id.gt(lastId)));
             }
-            case SALE_OPENING -> throw new UnsupportedOperationException("SALE_OPENING은 이 메서드에서 사용 불가");
+            case SALE_START_APPROACHING -> {
+                var last = LocalDate.parse(cursor.lastValue());
+                yield show.saleStartDate.gt(last).or(show.saleStartDate.eq(last).and(show.id.gt(lastId)));
+            }
         };
     }
 
@@ -190,8 +193,8 @@ public class ShowQuerydslRepository {
         return switch (sortOrder.key()) {
             case POPULAR -> show.viewCount.desc();
             case LATEST -> show.createdAt.desc();
-            case SHOW_APPROACHING -> show.startDate.asc();
-            case SALE_OPENING -> show.saleStartDate.asc();
+            case SHOW_START_APPROACHING -> show.startDate.asc();
+            case SALE_START_APPROACHING -> show.saleStartDate.asc();
         };
     }
 
@@ -200,7 +203,7 @@ public class ShowQuerydslRepository {
         // 인기순(POPULAR)은 DESC, 최신순(LATEST)은 DESC, 공연임박순(SHOW_APPROACHING)은 ASC
         Sort.Direction direction = switch (sortKey) {
             case POPULAR, LATEST -> Sort.Direction.DESC;
-            case SHOW_APPROACHING, SALE_OPENING -> Sort.Direction.ASC;
+            case SHOW_START_APPROACHING, SALE_START_APPROACHING -> Sort.Direction.ASC;
         };
         return new SortOrder(sortKey, direction);
     }
@@ -213,6 +216,28 @@ public class ShowQuerydslRepository {
 
     private BooleanExpression regionEq(Region region) {
         return region != null ? show.region.eq(region) : null;
+    }
+
+    private BooleanExpression titleContains(String title) {
+        return StringUtils.hasText(title)
+                ? show.title.containsIgnoreCase(title)
+                : null;
+    }
+
+    private BooleanExpression saleStartDateGoe(LocalDate from) {
+        return from != null ? show.saleStartDate.goe(from) : null;
+    }
+
+    private BooleanExpression saleStartDateLoe(LocalDate to) {
+        return to != null ? show.saleStartDate.loe(to) : null;
+    }
+
+    private BooleanExpression saleEndDateGoe(LocalDate from) {
+        return from != null ? show.saleEndDate.goe(from) : null;
+    }
+
+    private BooleanExpression saleEndDateLoe(LocalDate to) {
+        return to != null ? show.saleEndDate.loe(to) : null;
     }
 
     private record SortOrder(ShowSortKey key, Sort.Direction direction) {
@@ -260,7 +285,7 @@ public class ShowQuerydslRepository {
     /**
      * 판매 오픈 예정 공연 무한스크롤 조회
      * - 검색: 제목, 판매시작일, 판매종료일
-     * - 정렬: popular(인기순), saleStartDate(판매시작일순)
+     * - 정렬: popular(인기순), saleStartApproaching(판매시작일순)
      */
     public CursorSlice<ShowOpeningSoonDetailResponse> findSaleOpeningSoonPage(
             SaleOpeningSoonSearchParam param,
@@ -271,42 +296,23 @@ public class ShowQuerydslRepository {
         
         // 판매 시작일이 오늘 이후인 것만 (오픈 예정)
         where.and(show.saleStartDate.goe(LocalDate.now()));
+        where.and(categoryCodeEq(param.getCategory()));
+        where.and(titleContains(param.getTitle()));
+        where.and(saleStartDateGoe(param.getSaleStartDateFrom()));
+        where.and(saleStartDateLoe(param.getSaleStartDateTo()));
+        where.and(saleEndDateGoe(param.getSaleEndDateFrom()));
+        where.and(saleEndDateLoe(param.getSaleEndDateTo()));
         
-        // 카테고리 필터
-        if (StringUtils.hasText(param.getCategory())) {
-            where.and(category.code.eq(param.getCategory()));
-        }
-        
-        // 제목 검색 (부분 일치)
-        if (StringUtils.hasText(param.getTitle())) {
-            where.and(show.title.containsIgnoreCase(param.getTitle()));
-        }
-        
-        // 판매 시작일 범위 필터
-        if (param.getSaleStartDateFrom() != null) {
-            where.and(show.saleStartDate.goe(param.getSaleStartDateFrom()));
-        }
-        if (param.getSaleStartDateTo() != null) {
-            where.and(show.saleStartDate.loe(param.getSaleStartDateTo()));
-        }
-        
-        // 판매 종료일 범위 필터
-        if (param.getSaleEndDateFrom() != null) {
-            where.and(show.saleEndDate.goe(param.getSaleEndDateFrom()));
-        }
-        if (param.getSaleEndDateTo() != null) {
-            where.and(show.saleEndDate.loe(param.getSaleEndDateTo()));
-        }
-        
-        // 정렬 결정 (popular: 인기순, saleStartDate: 판매시작일순 - 기본값)
-        boolean isPopularSort = "popular".equalsIgnoreCase(sort);
-        OrderSpecifier<?> primaryOrder = isPopularSort ? show.viewCount.desc() : show.saleStartDate.asc();
-        OrderSpecifier<Long> tieBreakerOrder = isPopularSort ? show.id.desc() : show.id.asc();
+        // 정렬 결정
+        SortOrder sortOrder = resolveSortOrder(sort);
+        OrderSpecifier<?> primaryOrder = primaryOrderSpecifier(sortOrder);
+        OrderSpecifier<Long> tieBreakerOrder = sortOrder.direction.isAscending() ? show.id.asc() : show.id.desc();
         
         // 커서 처리
         if (StringUtils.hasText(param.getCursor())) {
             ShowCursor cursor = cursorCodec.decode(param.getCursor());
-            where.and(saleOpeningSoonCursorCondition(cursor, isPopularSort));
+            validateCursorMatchesRequest(cursor, sortOrder);
+            where.and(cursorCondition(cursor, sortOrder));
         }
         
         // 1차 쿼리: ID 목록 조회
@@ -359,12 +365,12 @@ public class ShowQuerydslRepository {
         String nextCursor = null;
         if (hasNext && !results.isEmpty()) {
             ShowOpeningSoonDetailResponse last = results.getLast();
-            String lastValue = isPopularSort 
+            String lastValue = sortOrder.key() == ShowSortKey.POPULAR
                     ? String.valueOf(last.viewCount())
                     : last.saleStartDate().toString();
             ShowCursor next = new ShowCursor(
-                    isPopularSort ? ShowSortKey.POPULAR : ShowSortKey.SALE_OPENING,
-                    isPopularSort ? "DESC" : "ASC",
+                    sortOrder.key(),
+                    sortOrder.direction().name(),
                     lastValue,
                     last.id()
             );
@@ -372,20 +378,6 @@ public class ShowQuerydslRepository {
         }
         
         return new CursorSlice<>(slice, nextCursor);
-    }
-    
-    private BooleanExpression saleOpeningSoonCursorCondition(ShowCursor cursor, boolean isPopularSort) {
-        Long lastId = cursor.lastId();
-        
-        if (isPopularSort) {
-            var lastViewCount = Long.parseLong(cursor.lastValue());
-            return show.viewCount.lt(lastViewCount)
-                    .or(show.viewCount.eq(lastViewCount).and(show.id.lt(lastId)));
-        } else {
-            var lastSaleStartDate = LocalDate.parse(cursor.lastValue());
-            return show.saleStartDate.gt(lastSaleStartDate)
-                    .or(show.saleStartDate.eq(lastSaleStartDate).and(show.id.gt(lastId)));
-        }
     }
 
 }
