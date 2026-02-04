@@ -6,8 +6,8 @@ import com.ticket.core.support.exception.ErrorType;
 public enum ShowSortKey {
     POPULAR("popular"),          // 기본: 인기순
     LATEST("latest"),            // 최신순
-    SHOW_APPROACHING("approaching"),   // 공연 임박순
-    SALE_OPENING("saleStartDate");    // 판매 오픈 예정순 (판매시작일 오름차순)
+    SHOW_START_APPROACHING("showStartApproaching"),   // 공연 임박순
+    SALE_START_APPROACHING("saleStartApproaching");    // 판매 오픈 예정순 (판매시작일 오름차순)
 
     private final String apiValue;
 

@@ -58,12 +58,12 @@ public class ShowController {
                     ## 정렬 옵션 (sort 파라미터)
                     - `popular` (기본값) - 인기순 (조회수 높은 순)
                     - `latest` - 최신순 (생성일 최신순)
-                    - `approaching` - 공연 임박순 (공연 시작일 가까운 순)
+                    - `showStartApproaching` - 공연 임박순 (공연 시작일 가까운 순)
                     
                     ## 정렬 예시
                     - `?sort=popular` - 인기순 (기본)
                     - `?sort=latest` - 최신순
-                    - `?sort=approaching` - 공연 임박순
+                    - `?sort=showStartApproaching` - 공연 임박순
                     """
     )
     @ApiResponses(value = {
@@ -130,7 +130,7 @@ public class ShowController {
             @Parameter(description = "한 번에 조회할 개수 (기본값: 5, 최대: 100)", example = "5")
             @RequestParam(defaultValue = "5") final int size,
 
-            @Parameter(description = "정렬 기준 [popular(인기순), latest(최신순), approaching(공연임박순)]", example = "popular")
+            @Parameter(description = "정렬 기준 [popular(인기순), latest(최신순), showStartApproaching(공연임박순)]", example = "popular")
             @RequestParam(defaultValue = "popular") final String sort
     ) {
         final GetShowsUseCase.Input input = new GetShowsUseCase.Input(param, size, sort);
@@ -249,7 +249,7 @@ public class ShowController {
                     - **category**: 카테고리 필터
                     
                     ## 정렬 옵션
-                    - `saleStartDate` (기본값) - 판매 시작일 오름차순
+                    - `saleStartApproaching` (기본값) - 판매 시작일 오름차순
                     - `popular` - 인기순 (조회수 높은 순)
                     
                     ## 페이지네이션
@@ -301,8 +301,8 @@ public class ShowController {
             @Parameter(description = "한 번에 조회할 개수 (기본값: 16)", example = "16")
             @RequestParam(defaultValue = "16") final int size,
 
-            @Parameter(description = "정렬 기준 [saleStartDate(판매시작일순), popular(인기순)]", example = "saleStartDate")
-            @RequestParam(defaultValue = "saleStartDate") final String sort
+            @Parameter(description = "정렬 기준 [saleStartApproaching(판매시작일순), popular(인기순)]", example = "saleStartApproaching")
+            @RequestParam(defaultValue = "saleStartApproaching") final String sort
     ) {
         final var input = new GetShowsSaleOpeningSoonPageUseCase.Input(param, size, sort);
         final var output = getShowsSaleOpeningSoonPageUseCase.execute(input);
