@@ -1,10 +1,11 @@
 package com.ticket.core.domain.show;
 
+import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "SHOW_CATEGORYS")
-public class ShowCategory {
+public class ShowCategory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
