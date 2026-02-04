@@ -11,7 +11,7 @@ import com.ticket.core.domain.performanceseat.PerformanceSeatRepository;
 import com.ticket.core.domain.seat.Seat;
 import com.ticket.core.domain.seat.SeatRepository;
 import com.ticket.core.domain.show.Show;
-import com.ticket.core.domain.show.ShowRepository;
+import com.ticket.core.domain.show.ShowJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
@@ -31,7 +31,7 @@ public abstract class IntegrationBase {
     @Autowired
     protected PerformanceRepository performanceRepository;
     @Autowired
-    protected ShowRepository showRepository;
+    protected ShowJpaRepository showJpaRepository;
     @Autowired
     protected SeatRepository seatRepository;
     @Autowired
@@ -53,7 +53,7 @@ public abstract class IntegrationBase {
 
     @BeforeAll
     void setUpBase() {
-        savedShow = showRepository.save(TestDataFactory.createShow());
+        savedShow = showJpaRepository.save(TestDataFactory.createShow());
         savedPerformance = performanceRepository.save(TestDataFactory.createPerformance(savedShow));
         savedSeats = seatRepository.saveAll(TestDataFactory.createSeats(5));
         savedPerformanceSeats = performanceSeatRepository.saveAll(

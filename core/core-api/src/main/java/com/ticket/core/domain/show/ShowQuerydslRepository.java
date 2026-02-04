@@ -40,44 +40,6 @@ public class ShowQuerydslRepository {
         this.cursorCodec = cursorCodec;
     }
 
-    public List<ShowSummaryResponse> findLatestShows(final String categoryCode, int limit) {
-        return queryFactory
-                .select(Projections.constructor(ShowSummaryResponse.class,
-                        show.id,
-                        show.title,
-                        show.image,
-                        show.startDate,
-                        show.venue,
-                        show.createdAt))
-                .distinct()
-                .from(show)
-                .join(showCategory).on(showCategory.show.eq(show))
-                .join(category).on(category.eq(showCategory.category))
-                .where(categoryCodeEq(categoryCode))
-                .orderBy(show.createdAt.desc())
-                .limit(limit)
-                .fetch();
-    }
-
-    public List<ShowOpeningSoonResponse> findShowsOpeningSoon(final String categoryCode, int limit) {
-        return queryFactory
-                .select(Projections.constructor(ShowOpeningSoonResponse.class,
-                        show.id,
-                        show.title,
-                        show.image,
-                        show.venue,
-                        show.startDate))
-                .distinct()
-                .from(show)
-                .join(showCategory).on(showCategory.show.eq(show))
-                .join(category).on(category.eq(showCategory.category))
-                .where(category.code.eq(categoryCode)
-                        .and(show.startDate.goe(LocalDate.now())))
-                .orderBy(show.startDate.asc())
-                .limit(limit)
-                .fetch();
-    }
-
     public CursorSlice<ShowResponse> findAllBySearch(ShowSearchParam param, int size, String sort) {
         BooleanBuilder where = new BooleanBuilder();
         where.and(categoryCodeEq(param.getCategory()));
@@ -249,6 +211,48 @@ public class ShowQuerydslRepository {
     }
 
     private record SortOrder(ShowSortKey key, Sort.Direction direction) {
+    }
+
+    public List<ShowSummaryResponse> findLatestShows(final String categoryCode, int limit) {
+        return queryFactory
+                .select(Projections.constructor(ShowSummaryResponse.class,
+                        show.id,
+                        show.title,
+                        show.image,
+                        show.startDate,
+                        show.venue,
+                        show.createdAt))
+                .distinct()
+                .from(show)
+                .join(showCategory).on(showCategory.show.eq(show))
+                .join(category).on(category.eq(showCategory.category))
+                .where(categoryCodeEq(categoryCode))
+                .orderBy(show.createdAt.desc())
+                .limit(limit)
+                .fetch();
+    }
+
+    public List<ShowOpeningSoonResponse> findShowsSaleOpeningSoon(final String categoryCode, int limit) {
+        return queryFactory
+                .select(Projections.constructor(ShowOpeningSoonResponse.class,
+                        show.id,
+                        show.title,
+                        show.image,
+                        show.venue,
+                        show.startDate,
+                        show.endDate,
+                        show.saleStartDate,
+                        show.saleEndDate
+                ))
+                .distinct()
+                .from(show)
+                .join(showCategory).on(showCategory.show.eq(show))
+                .join(category).on(category.eq(showCategory.category))
+                .where(category.code.eq(categoryCode)
+                        .and(show.saleStartDate.goe(LocalDate.now())))
+                .orderBy(show.saleStartDate.asc())
+                .limit(limit)
+                .fetch();
     }
 
 }
