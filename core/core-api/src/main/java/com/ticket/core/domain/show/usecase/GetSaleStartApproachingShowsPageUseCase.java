@@ -13,11 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
-public class GetShowsSaleOpeningSoonPageUseCase {
+public class GetSaleStartApproachingShowsPageUseCase {
     
     private final ShowQuerydslRepository showQuerydslRepository;
 
-    public GetShowsSaleOpeningSoonPageUseCase(ShowQuerydslRepository showQuerydslRepository) {
+    public GetSaleStartApproachingShowsPageUseCase(ShowQuerydslRepository showQuerydslRepository) {
         this.showQuerydslRepository = showQuerydslRepository;
     }
 
