@@ -5,8 +5,8 @@ import com.ticket.core.api.controller.request.ShowSearchParam;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.domain.show.usecase.GetLatestShowsUseCase;
-import com.ticket.core.domain.show.usecase.GetShowsOpeningSoonUseCase;
-import com.ticket.core.domain.show.usecase.GetShowsSaleOpeningSoonPageUseCase;
+import com.ticket.core.domain.show.usecase.GetSaleStartApproachingShowsUseCase;
+import com.ticket.core.domain.show.usecase.GetSaleStartApproachingShowsPageUseCase;
 import com.ticket.core.domain.show.usecase.GetShowsUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
@@ -30,19 +30,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class ShowController {
     private final GetShowsUseCase getShowsUseCase;
     private final GetLatestShowsUseCase getLatestShowsUseCase;
-    private final GetShowsOpeningSoonUseCase getShowsOpeningSoonUseCase;
-    private final GetShowsSaleOpeningSoonPageUseCase getShowsSaleOpeningSoonPageUseCase;
+    private final GetSaleStartApproachingShowsUseCase getSaleStartApproachingShowsUseCase;
+    private final GetSaleStartApproachingShowsPageUseCase getSaleStartApproachingShowsPageUseCase;
 
     public ShowController(
             final GetShowsUseCase getShowsUseCase,
             final GetLatestShowsUseCase getLatestShowsUseCase,
-            final GetShowsOpeningSoonUseCase getShowsOpeningSoonUseCase,
-            final GetShowsSaleOpeningSoonPageUseCase getShowsSaleOpeningSoonPageUseCase
+            final GetSaleStartApproachingShowsUseCase getSaleStartApproachingShowsUseCase,
+            final GetSaleStartApproachingShowsPageUseCase getSaleStartApproachingShowsPageUseCase
     ) {
         this.getShowsUseCase = getShowsUseCase;
         this.getLatestShowsUseCase = getLatestShowsUseCase;
-        this.getShowsOpeningSoonUseCase = getShowsOpeningSoonUseCase;
-        this.getShowsSaleOpeningSoonPageUseCase = getShowsSaleOpeningSoonPageUseCase;
+        this.getSaleStartApproachingShowsUseCase = getSaleStartApproachingShowsUseCase;
+        this.getSaleStartApproachingShowsPageUseCase = getSaleStartApproachingShowsPageUseCase;
     }
 
     @Operation(
@@ -229,12 +229,12 @@ public class ShowController {
             )
     })
     @GetMapping("/sale-opening-soon")
-    public ApiResponse<GetShowsOpeningSoonUseCase.Output> getShowsSaleOpeningSoon(
+    public ApiResponse<GetSaleStartApproachingShowsUseCase.Output> getShowsSaleOpeningSoon(
             @Parameter(description = "카테고리", example = "CONCERT", required = true)
             @RequestParam(defaultValue = "CONCERT") String category,
             @RequestParam(defaultValue = "5") int size) {
-        GetShowsOpeningSoonUseCase.Input input = new GetShowsOpeningSoonUseCase.Input(category, size);
-        return ApiResponse.success(getShowsOpeningSoonUseCase.execute(input));
+        GetSaleStartApproachingShowsUseCase.Input input = new GetSaleStartApproachingShowsUseCase.Input(category, size);
+        return ApiResponse.success(getSaleStartApproachingShowsUseCase.execute(input));
     }
 
     @Operation(
@@ -304,8 +304,8 @@ public class ShowController {
             @Parameter(description = "정렬 기준 [saleStartApproaching(판매시작일순), popular(인기순)]", example = "saleStartApproaching")
             @RequestParam(defaultValue = "saleStartApproaching") final String sort
     ) {
-        final var input = new GetShowsSaleOpeningSoonPageUseCase.Input(param, size, sort);
-        final var output = getShowsSaleOpeningSoonPageUseCase.execute(input);
+        final GetSaleStartApproachingShowsPageUseCase.Input input = new GetSaleStartApproachingShowsPageUseCase.Input(param, size, sort);
+        final GetSaleStartApproachingShowsPageUseCase.Output output = getSaleStartApproachingShowsPageUseCase.execute(input);
         return ApiResponse.success(SliceResponse.from(output.shows(), output.nextCursor()));
     }
 }

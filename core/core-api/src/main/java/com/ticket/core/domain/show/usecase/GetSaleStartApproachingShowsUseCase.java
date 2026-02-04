@@ -9,10 +9,10 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
-public class GetShowsOpeningSoonUseCase {
+public class GetSaleStartApproachingShowsUseCase {
     private final ShowQuerydslRepository showQuerydslRepository;
 
-    public GetShowsOpeningSoonUseCase(final ShowQuerydslRepository showQuerydslRepository) {
+    public GetSaleStartApproachingShowsUseCase(final ShowQuerydslRepository showQuerydslRepository) {
         this.showQuerydslRepository = showQuerydslRepository;
     }
 
