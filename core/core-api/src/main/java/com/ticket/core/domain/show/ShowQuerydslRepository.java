@@ -105,7 +105,7 @@ public class ShowQuerydslRepository {
                 .leftJoin(showCategory).on(showCategory.show.eq(show))
                 .leftJoin(category).on(showCategory.category.eq(category))
                 .where(where)
-                .orderBy(show.startDate.asc(), show.id.asc())
+                .orderBy(primaryOrder, tieBreakerOrder)
                 .limit(size + 1L)
                 .fetch();
 
