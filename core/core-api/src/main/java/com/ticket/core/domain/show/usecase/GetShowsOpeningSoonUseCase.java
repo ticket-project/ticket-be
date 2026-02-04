@@ -23,6 +23,6 @@ public class GetShowsOpeningSoonUseCase {
     }
 
     public Output execute(final Input input) {
-        return new Output(showQuerydslRepository.findShowsOpeningSoon(input.category, input.size));
+        return new Output(showQuerydslRepository.findShowsSaleOpeningSoon(input.category, input.size));
     }
 }

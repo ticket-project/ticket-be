@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 
-@Schema(description = "오픈 예정 공연 정보 응답")
+@Schema(description = "판매 오픈 예정 공연 정보 응답")
 public record ShowOpeningSoonResponse(
 
         @Schema(description = "공연 ID", example = "20")
@@ -20,6 +20,15 @@ public record ShowOpeningSoonResponse(
         String venue,
 
         @Schema(description = "공연 시작일", example = "2026-03-01")
-        LocalDate startDate
+        LocalDate startDate,
+
+        @Schema(description = "공연 종료일", example = "2026-08-01")
+        LocalDate endDate,
+
+        @Schema(description = "티켓 판매 시작일", example = "2026-02-01")
+        LocalDate saleStartDate,
+
+        @Schema(description = "티켓 판매 종료일", example = "2026-07-21")
+        LocalDate saleEndDate
 ) {
 }
