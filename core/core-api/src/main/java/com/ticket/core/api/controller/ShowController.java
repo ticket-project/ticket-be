@@ -1,9 +1,12 @@
 package com.ticket.core.api.controller;
 
+import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
 import com.ticket.core.api.controller.request.ShowSearchParam;
+import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.domain.show.usecase.GetLatestShowsUseCase;
 import com.ticket.core.domain.show.usecase.GetShowsOpeningSoonUseCase;
+import com.ticket.core.domain.show.usecase.GetShowsSaleOpeningSoonPageUseCase;
 import com.ticket.core.domain.show.usecase.GetShowsUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
@@ -28,11 +31,18 @@ public class ShowController {
     private final GetShowsUseCase getShowsUseCase;
     private final GetLatestShowsUseCase getLatestShowsUseCase;
     private final GetShowsOpeningSoonUseCase getShowsOpeningSoonUseCase;
+    private final GetShowsSaleOpeningSoonPageUseCase getShowsSaleOpeningSoonPageUseCase;
 
-    public ShowController(final GetShowsUseCase getShowsUseCase, final GetLatestShowsUseCase getLatestShowsUseCase, final GetShowsOpeningSoonUseCase getShowsOpeningSoonUseCase) {
+    public ShowController(
+            final GetShowsUseCase getShowsUseCase,
+            final GetLatestShowsUseCase getLatestShowsUseCase,
+            final GetShowsOpeningSoonUseCase getShowsOpeningSoonUseCase,
+            final GetShowsSaleOpeningSoonPageUseCase getShowsSaleOpeningSoonPageUseCase
+    ) {
         this.getShowsUseCase = getShowsUseCase;
         this.getLatestShowsUseCase = getLatestShowsUseCase;
         this.getShowsOpeningSoonUseCase = getShowsOpeningSoonUseCase;
+        this.getShowsSaleOpeningSoonPageUseCase = getShowsSaleOpeningSoonPageUseCase;
     }
 
     @Operation(
@@ -225,5 +235,77 @@ public class ShowController {
             @RequestParam(defaultValue = "5") int size) {
         GetShowsOpeningSoonUseCase.Input input = new GetShowsOpeningSoonUseCase.Input(category, size);
         return ApiResponse.success(getShowsOpeningSoonUseCase.execute(input));
+    }
+
+    @Operation(
+            summary = "판매 오픈 예정 공연 목록 조회 (무한스크롤)",
+            description = """
+                    판매 오픈 예정 공연 목록을 커서 기반 무한스크롤로 조회합니다.
+                    
+                    ## 검색 조건
+                    - **title**: 공연 제목 (부분 일치 검색)
+                    - **saleStartDateFrom/To**: 판매 시작일 범위
+                    - **saleEndDateFrom/To**: 판매 종료일 범위
+                    - **category**: 카테고리 필터
+                    
+                    ## 정렬 옵션
+                    - `saleStartDate` (기본값) - 판매 시작일 오름차순
+                    - `popular` - 인기순 (조회수 높은 순)
+                    
+                    ## 페이지네이션
+                    - 한 페이지당 16개 조회 (기본값)
+                    - `cursor` 파라미터로 다음 페이지 조회
+                    """
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    value = """
+                                            {
+                                              "result": "SUCCESS",
+                                              "data": {
+                                                "items": [
+                                                  {
+                                                    "id": 21,
+                                                    "title": "뮤지컬 시카고",
+                                                    "image": "http://example.com/chicago.jpg",
+                                                    "venue": "디큐브 링크아트센터",
+                                                    "startDate": "2026-05-01",
+                                                    "endDate": "2026-07-31",
+                                                    "saleStartDate": "2026-04-01",
+                                                    "saleEndDate": "2026-06-30"
+                                                  }
+                                                ],
+                                                "hasNext": true,
+                                                "size": 16,
+                                                "numberOfElements": 16,
+                                                "nextCursor": "eyJpZCI6MzYsInNhbGVTdGFydERhdGUiOiIyMDI2LTA0LTE1In0="
+                                              },
+                                              "error": null
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/sale-opening-soon/page")
+    public ApiResponse<SliceResponse<ShowOpeningSoonDetailResponse>> getShowsSaleOpeningSoonPage(
+            @ParameterObject
+            final SaleOpeningSoonSearchParam param,
+
+            @Parameter(description = "한 번에 조회할 개수 (기본값: 16)", example = "16")
+            @RequestParam(defaultValue = "16") final int size,
+
+            @Parameter(description = "정렬 기준 [saleStartDate(판매시작일순), popular(인기순)]", example = "saleStartDate")
+            @RequestParam(defaultValue = "saleStartDate") final String sort
+    ) {
+        final var input = new GetShowsSaleOpeningSoonPageUseCase.Input(param, size, sort);
+        final var output = getShowsSaleOpeningSoonPageUseCase.execute(input);
+        return ApiResponse.success(SliceResponse.from(output.shows(), output.nextCursor()));
     }
 }

@@ -1,6 +1,6 @@
 package com.ticket.core.domain.show.usecase;
 
-import com.ticket.core.api.controller.response.ShowOpeningSoonResponse;
+import com.ticket.core.api.controller.response.ShowOpeningSoonSummaryResponse;
 import com.ticket.core.domain.show.ShowQuerydslRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +19,7 @@ public class GetShowsOpeningSoonUseCase {
     public record Input(String category, int size) {
     }
 
-    public record Output(List<ShowOpeningSoonResponse> shows) {
+    public record Output(List<ShowOpeningSoonSummaryResponse> shows) {
     }
 
     public Output execute(final Input input) {
