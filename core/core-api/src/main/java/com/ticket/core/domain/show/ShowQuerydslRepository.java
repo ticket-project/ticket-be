@@ -6,8 +6,10 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
 import com.ticket.core.api.controller.request.ShowSearchParam;
-import com.ticket.core.api.controller.response.ShowOpeningSoonResponse;
+import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
+import com.ticket.core.api.controller.response.ShowOpeningSoonSummaryResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.api.controller.response.ShowSummaryResponse;
 import com.ticket.core.support.cursor.CursorCodec;
@@ -135,6 +137,7 @@ public class ShowQuerydslRepository {
             case POPULAR -> last.viewCount().toString();
             case LATEST -> last.createdAt().toString();
             case SHOW_APPROACHING -> last.startDate().toString();
+            case SALE_OPENING -> throw new UnsupportedOperationException("SALE_OPENING은 이 메서드에서 사용 불가");
         };
 
         return new ShowCursor(
@@ -162,6 +165,7 @@ public class ShowQuerydslRepository {
                 var last = LocalDate.parse(cursor.lastValue());
                 yield show.startDate.gt(last).or(show.startDate.eq(last).and(show.id.gt(lastId)));
             }
+            case SALE_OPENING -> throw new UnsupportedOperationException("SALE_OPENING은 이 메서드에서 사용 불가");
         };
     }
 
@@ -187,6 +191,7 @@ public class ShowQuerydslRepository {
             case POPULAR -> show.viewCount.desc();
             case LATEST -> show.createdAt.desc();
             case SHOW_APPROACHING -> show.startDate.asc();
+            case SALE_OPENING -> show.saleStartDate.asc();
         };
     }
 
@@ -195,7 +200,7 @@ public class ShowQuerydslRepository {
         // 인기순(POPULAR)은 DESC, 최신순(LATEST)은 DESC, 공연임박순(SHOW_APPROACHING)은 ASC
         Sort.Direction direction = switch (sortKey) {
             case POPULAR, LATEST -> Sort.Direction.DESC;
-            case SHOW_APPROACHING -> Sort.Direction.ASC;
+            case SHOW_APPROACHING, SALE_OPENING -> Sort.Direction.ASC;
         };
         return new SortOrder(sortKey, direction);
     }
@@ -232,17 +237,14 @@ public class ShowQuerydslRepository {
                 .fetch();
     }
 
-    public List<ShowOpeningSoonResponse> findShowsSaleOpeningSoon(final String categoryCode, int limit) {
+    public List<ShowOpeningSoonSummaryResponse> findShowsSaleOpeningSoon(final String categoryCode, int limit) {
         return queryFactory
-                .select(Projections.constructor(ShowOpeningSoonResponse.class,
+                .select(Projections.constructor(ShowOpeningSoonSummaryResponse.class,
                         show.id,
                         show.title,
                         show.image,
                         show.venue,
-                        show.startDate,
-                        show.endDate,
-                        show.saleStartDate,
-                        show.saleEndDate
+                        show.saleStartDate
                 ))
                 .distinct()
                 .from(show)
@@ -253,6 +255,137 @@ public class ShowQuerydslRepository {
                 .orderBy(show.saleStartDate.asc())
                 .limit(limit)
                 .fetch();
+    }
+
+    /**
+     * 판매 오픈 예정 공연 무한스크롤 조회
+     * - 검색: 제목, 판매시작일, 판매종료일
+     * - 정렬: popular(인기순), saleStartDate(판매시작일순)
+     */
+    public CursorSlice<ShowOpeningSoonDetailResponse> findSaleOpeningSoonPage(
+            SaleOpeningSoonSearchParam param,
+            int size,
+            String sort
+    ) {
+        BooleanBuilder where = new BooleanBuilder();
+        
+        // 판매 시작일이 오늘 이후인 것만 (오픈 예정)
+        where.and(show.saleStartDate.goe(LocalDate.now()));
+        
+        // 카테고리 필터
+        if (StringUtils.hasText(param.getCategory())) {
+            where.and(category.code.eq(param.getCategory()));
+        }
+        
+        // 제목 검색 (부분 일치)
+        if (StringUtils.hasText(param.getTitle())) {
+            where.and(show.title.containsIgnoreCase(param.getTitle()));
+        }
+        
+        // 판매 시작일 범위 필터
+        if (param.getSaleStartDateFrom() != null) {
+            where.and(show.saleStartDate.goe(param.getSaleStartDateFrom()));
+        }
+        if (param.getSaleStartDateTo() != null) {
+            where.and(show.saleStartDate.loe(param.getSaleStartDateTo()));
+        }
+        
+        // 판매 종료일 범위 필터
+        if (param.getSaleEndDateFrom() != null) {
+            where.and(show.saleEndDate.goe(param.getSaleEndDateFrom()));
+        }
+        if (param.getSaleEndDateTo() != null) {
+            where.and(show.saleEndDate.loe(param.getSaleEndDateTo()));
+        }
+        
+        // 정렬 결정 (popular: 인기순, saleStartDate: 판매시작일순 - 기본값)
+        boolean isPopularSort = "popular".equalsIgnoreCase(sort);
+        OrderSpecifier<?> primaryOrder = isPopularSort ? show.viewCount.desc() : show.saleStartDate.asc();
+        OrderSpecifier<Long> tieBreakerOrder = isPopularSort ? show.id.desc() : show.id.asc();
+        
+        // 커서 처리
+        if (StringUtils.hasText(param.getCursor())) {
+            ShowCursor cursor = cursorCodec.decode(param.getCursor());
+            where.and(saleOpeningSoonCursorCondition(cursor, isPopularSort));
+        }
+        
+        // 1차 쿼리: ID 목록 조회
+        List<Tuple> rows = queryFactory
+                .select(show.id, show.saleStartDate, show.viewCount)
+                .distinct()
+                .from(show)
+                .leftJoin(showCategory).on(showCategory.show.eq(show))
+                .leftJoin(category).on(showCategory.category.eq(category))
+                .where(where)
+                .orderBy(primaryOrder, tieBreakerOrder)
+                .limit(size + 1L)
+                .fetch();
+        
+        List<Long> ids = rows.stream()
+                .map(t -> t.get(show.id))
+                .toList();
+        
+        if (ids.isEmpty()) {
+            return new CursorSlice<>(new SliceImpl<>(List.of(), PageRequest.of(0, size), false), null);
+        }
+        
+        // 2차 쿼리: 상세 정보 조회
+        List<ShowOpeningSoonDetailResponse> results = queryFactory
+                .select(Projections.constructor(ShowOpeningSoonDetailResponse.class,
+                        show.id,
+                        show.title,
+                        show.subTitle,
+                        show.image,
+                        show.venue,
+                        show.region.stringValue(),
+                        show.startDate,
+                        show.endDate,
+                        show.saleStartDate,
+                        show.saleEndDate,
+                        show.viewCount
+                ))
+                .from(show)
+                .where(show.id.in(ids))
+                .orderBy(primaryOrder, tieBreakerOrder)
+                .fetch();
+        
+        boolean hasNext = results.size() > size;
+        if (hasNext) {
+            results = results.subList(0, size);
+        }
+        
+        Slice<ShowOpeningSoonDetailResponse> slice = new SliceImpl<>(results, PageRequest.of(0, size), hasNext);
+        
+        String nextCursor = null;
+        if (hasNext && !results.isEmpty()) {
+            ShowOpeningSoonDetailResponse last = results.getLast();
+            String lastValue = isPopularSort 
+                    ? String.valueOf(last.viewCount())
+                    : last.saleStartDate().toString();
+            ShowCursor next = new ShowCursor(
+                    isPopularSort ? ShowSortKey.POPULAR : ShowSortKey.SALE_OPENING,
+                    isPopularSort ? "DESC" : "ASC",
+                    lastValue,
+                    last.id()
+            );
+            nextCursor = cursorCodec.encode(next);
+        }
+        
+        return new CursorSlice<>(slice, nextCursor);
+    }
+    
+    private BooleanExpression saleOpeningSoonCursorCondition(ShowCursor cursor, boolean isPopularSort) {
+        Long lastId = cursor.lastId();
+        
+        if (isPopularSort) {
+            var lastViewCount = Long.parseLong(cursor.lastValue());
+            return show.viewCount.lt(lastViewCount)
+                    .or(show.viewCount.eq(lastViewCount).and(show.id.lt(lastId)));
+        } else {
+            var lastSaleStartDate = LocalDate.parse(cursor.lastValue());
+            return show.saleStartDate.gt(lastSaleStartDate)
+                    .or(show.saleStartDate.eq(lastSaleStartDate).and(show.id.gt(lastId)));
+        }
     }
 
 }
