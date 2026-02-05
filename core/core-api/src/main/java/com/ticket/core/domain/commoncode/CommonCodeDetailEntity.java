@@ -26,4 +26,6 @@ public class CommonCodeDetailEntity extends BaseEntity {
 
     @Column(name = "use_yn", length = 1, nullable = false)
     private boolean useYn;
+
+    protected CommonCodeDetailEntity() {}
 }

@@ -23,4 +23,6 @@ public class CommonCodeGroupEntity extends BaseEntity {
     @Column(name = "use_yn", length = 1)
     private boolean useYn;
 
+    protected CommonCodeGroupEntity() {}
+
 }
