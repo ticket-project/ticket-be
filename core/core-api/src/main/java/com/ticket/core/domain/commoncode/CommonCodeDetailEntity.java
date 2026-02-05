@@ -25,5 +25,5 @@ public class CommonCodeDetailEntity extends BaseEntity {
     private String description;
 
     @Column(name = "use_yn", length = 1, nullable = false)
-    private String useYn;
+    private boolean useYn;
 }
