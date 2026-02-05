@@ -1,6 +1,6 @@
 package com.ticket.core.domain.show.usecase;
 
-import com.ticket.core.api.controller.request.ShowSearchParam;
+import com.ticket.core.api.controller.request.ShowParam;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.domain.show.ShowQuerydslRepository;
 import com.ticket.core.support.cursor.CursorSlice;
@@ -17,7 +17,7 @@ public class GetShowsUseCase {
         this.showQuerydslRepository = showQuerydslRepository;
     }
 
-    public record Input(ShowSearchParam param, int size, String sort) {
+    public record Input(ShowParam param, int size, String sort) {
     }
 
     public record Output(Slice<ShowResponse> shows, String nextCursor) {

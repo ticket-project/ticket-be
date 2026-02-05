@@ -7,7 +7,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
-import com.ticket.core.api.controller.request.ShowSearchParam;
+import com.ticket.core.api.controller.request.ShowParam;
 import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowOpeningSoonSummaryResponse;
@@ -44,7 +44,7 @@ public class ShowQuerydslRepository {
         this.cursorCodec = cursorCodec;
     }
 
-    public CursorSlice<ShowResponse> findAllBySearch(ShowSearchParam param, int size, String sort) {
+    public CursorSlice<ShowResponse> findAllBySearch(ShowParam param, int size, String sort) {
         BooleanBuilder where = new BooleanBuilder();
         where.and(categoryCodeEq(param.getCategory()));
         where.and(regionEq(param.getRegion()));

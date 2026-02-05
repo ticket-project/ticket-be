@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 
 @Schema(description = "공연 조회 요청 파라미터")
-public class ShowSearchParam {
+public class ShowParam {
 
     @Schema(
             description = "카테고리 필터",
@@ -34,7 +34,7 @@ public class ShowSearchParam {
     )
     private String cursor;
 
-    public ShowSearchParam(final String category, final Region region, final String cursor) {
+    public ShowParam(final String category, final Region region, final String cursor) {
         this.category = category;
         this.region = region;
         this.cursor = cursor;

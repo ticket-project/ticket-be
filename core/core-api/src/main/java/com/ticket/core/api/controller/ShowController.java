@@ -2,7 +2,7 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.ShowControllerDocs;
 import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
-import com.ticket.core.api.controller.request.ShowSearchParam;
+import com.ticket.core.api.controller.request.ShowParam;
 import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
@@ -49,7 +49,7 @@ public class ShowController implements ShowControllerDocs {
     @Override
     @GetMapping
     public ApiResponse<SliceResponse<ShowResponse>> getShowsPage(
-            @ParameterObject final ShowSearchParam param,
+            @ParameterObject final ShowParam param,
             @RequestParam(defaultValue = "5") final int size,
             @RequestParam(defaultValue = "popular") final String sort
     ) {

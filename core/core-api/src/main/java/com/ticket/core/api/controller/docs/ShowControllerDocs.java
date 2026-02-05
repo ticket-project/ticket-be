@@ -1,7 +1,7 @@
 package com.ticket.core.api.controller.docs;
 
 import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
-import com.ticket.core.api.controller.request.ShowSearchParam;
+import com.ticket.core.api.controller.request.ShowParam;
 import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
@@ -86,7 +86,7 @@ public interface ShowControllerDocs {
             )
     })
     ApiResponse<SliceResponse<ShowResponse>> getShowsPage(
-            @ParameterObject ShowSearchParam param,
+            @ParameterObject ShowParam param,
             @Parameter(description = "한 번에 조회할 개수 (기본값: 5, 최대: 100)", example = "5") int size,
             @Parameter(description = "정렬 기준 [popular(인기순), latest(최신순), showStartApproaching(공연임박순)]", example = "popular") String sort
     );
