@@ -4,7 +4,6 @@ import com.ticket.core.domain.show.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 
 /**
  * 더보기 페이지용 판매 오픈 예정 공연 상세 응답 (무한스크롤)
@@ -28,7 +27,7 @@ public record ShowOpeningSoonDetailResponse(
         String venue,
 
         @Schema(description = "지역", example = "서울")
-        String region,
+        Region region,
 
         @Schema(description = "공연 시작일", example = "2026-03-01")
         LocalDate startDate,
@@ -45,38 +44,4 @@ public record ShowOpeningSoonDetailResponse(
         @Schema(description = "조회수 (인기순 정렬 기준)", example = "15000")
         Long viewCount
 ) {
-    /**
-     * Region enum 코드를 한글 이름으로 변환
-     */
-    private static String toKoreanRegion(String regionCode) {
-        if (regionCode == null) return null;
-        return Arrays.stream(Region.values())
-                .filter(r -> r.name().equals(regionCode))
-                .findFirst()
-                .map(Region::getDescription)
-                .orElse(regionCode);
-    }
-    
-    /**
-     * 정적 팩토리 메서드 - region 코드를 한글로 변환
-     */
-    public static ShowOpeningSoonDetailResponse of(
-            Long id,
-            String title,
-            String subTitle,
-            String image,
-            String venue,
-            String regionCode,
-            LocalDate startDate,
-            LocalDate endDate,
-            LocalDate saleStartDate,
-            LocalDate saleEndDate,
-            Long viewCount
-    ) {
-        return new ShowOpeningSoonDetailResponse(
-                id, title, subTitle, image, venue,
-                toKoreanRegion(regionCode),
-                startDate, endDate, saleStartDate, saleEndDate, viewCount
-        );
-    }
 }
