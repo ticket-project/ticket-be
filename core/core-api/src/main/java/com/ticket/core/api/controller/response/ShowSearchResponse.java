@@ -7,7 +7,6 @@ import java.time.LocalDate;
 
 /**
  * 공연 검색 결과 응답 DTO
- * 요구사항: 이름, 썸네일이미지, 장소, 날짜, 지역
  */
 @Schema(description = "공연 검색 결과")
 public record ShowSearchResponse(
@@ -30,10 +29,10 @@ public record ShowSearchResponse(
         @Schema(description = "공연 종료일", example = "2026-05-31")
         LocalDate endDate,
 
-        @Schema(description = "지역 (한글명)", example = "서울")
+        @Schema(description = "지역")
         Region region,
 
-        @Schema(description = "조회수 (정렬 기준)", example = "15000")
+        @Schema(description = "조회수", example = "15000")
         Long viewCount
 ) {
 }

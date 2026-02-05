@@ -26,7 +26,7 @@ public record ShowOpeningSoonDetailResponse(
         @Schema(description = "장소", example = "예술의전당")
         String venue,
 
-        @Schema(description = "지역", example = "서울")
+        @Schema(description = "지역")
         Region region,
 
         @Schema(description = "공연 시작일", example = "2026-03-01")
