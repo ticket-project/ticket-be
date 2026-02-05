@@ -21,6 +21,6 @@ public class CommonCodeGroupEntity extends BaseEntity {
     private String description;
 
     @Column(name = "use_yn", length = 1)
-    private String useYn;
+    private boolean useYn;
 
 }
