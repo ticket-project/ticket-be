@@ -1,5 +1,7 @@
 package com.ticket.core.domain.show;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum Region {
     SEOUL("서울"),
     GYEONGGI("경기"),
@@ -16,6 +18,7 @@ public enum Region {
         this.description = description;
     }
 
+    @JsonValue
     public String getDescription() {
         return description;
     }
