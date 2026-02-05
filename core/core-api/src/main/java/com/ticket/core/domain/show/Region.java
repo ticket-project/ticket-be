@@ -1,7 +1,13 @@
 package com.ticket.core.domain.show;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * 지역 Enum
+ * - JSON 직렬화 시 { "code": "SEOUL", "name": "서울" } 형태로 출력
+ */
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Region {
     SEOUL("서울"),
     GYEONGGI("경기"),
@@ -18,9 +24,13 @@ public enum Region {
         this.description = description;
     }
 
-    @JsonValue
+    @JsonProperty("code")
+    public String getCode() {
+        return name();
+    }
+
+    @JsonProperty("name")
     public String getDescription() {
         return description;
     }
-
 }
