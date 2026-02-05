@@ -23,10 +23,10 @@ public class BaseEntity {
 
     @CreatedBy
     @Column(updatable = false, nullable = false)
-    protected String createdBy;
+    private String createdBy;
 
     @LastModifiedBy
-    protected String updatedBy;
+    private String updatedBy;
 
     @Enumerated(EnumType.STRING)
     private EntityStatus status = EntityStatus.ACTIVE;
