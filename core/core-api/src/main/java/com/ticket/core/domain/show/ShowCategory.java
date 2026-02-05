@@ -12,9 +12,11 @@ public class ShowCategory extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "show_id", nullable = false)
     private Show show;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     protected ShowCategory() {}
