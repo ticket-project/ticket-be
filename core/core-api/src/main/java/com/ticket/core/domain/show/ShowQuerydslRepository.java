@@ -8,9 +8,11 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
 import com.ticket.core.api.controller.request.ShowSearchParam;
+import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowOpeningSoonSummaryResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
+import com.ticket.core.api.controller.response.ShowSearchResponse;
 import com.ticket.core.api.controller.response.ShowSummaryResponse;
 import com.ticket.core.support.cursor.CursorCodec;
 import com.ticket.core.support.cursor.CursorSlice;
@@ -275,8 +277,10 @@ public class ShowQuerydslRepository {
                 .from(show)
                 .join(showCategory).on(showCategory.show.eq(show))
                 .join(category).on(category.eq(showCategory.category))
-                .where(category.code.eq(categoryCode)
-                        .and(show.saleStartDate.goe(LocalDate.now())))
+                .where(
+                        categoryCodeEq(categoryCode),
+                        saleStartDateGoe(LocalDate.now())
+                )
                 .orderBy(show.saleStartDate.asc())
                 .limit(limit)
                 .fetch();
@@ -293,7 +297,7 @@ public class ShowQuerydslRepository {
             String sort
     ) {
         BooleanBuilder where = new BooleanBuilder();
-        
+
         // 판매 시작일이 오늘 이후인 것만 (오픈 예정)
         where.and(show.saleStartDate.goe(LocalDate.now()));
         where.and(categoryCodeEq(param.getCategory()));
@@ -302,19 +306,19 @@ public class ShowQuerydslRepository {
         where.and(saleStartDateLoe(param.getSaleStartDateTo()));
         where.and(saleEndDateGoe(param.getSaleEndDateFrom()));
         where.and(saleEndDateLoe(param.getSaleEndDateTo()));
-        
+
         // 정렬 결정
         SortOrder sortOrder = resolveSortOrder(sort);
         OrderSpecifier<?> primaryOrder = primaryOrderSpecifier(sortOrder);
         OrderSpecifier<Long> tieBreakerOrder = sortOrder.direction.isAscending() ? show.id.asc() : show.id.desc();
-        
+
         // 커서 처리
         if (StringUtils.hasText(param.getCursor())) {
             ShowCursor cursor = cursorCodec.decode(param.getCursor());
             validateCursorMatchesRequest(cursor, sortOrder);
             where.and(cursorCondition(cursor, sortOrder));
         }
-        
+
         // 1차 쿼리: ID 목록 조회
         List<Tuple> rows = queryFactory
                 .select(show.id, show.saleStartDate, show.viewCount)
@@ -326,15 +330,15 @@ public class ShowQuerydslRepository {
                 .orderBy(primaryOrder, tieBreakerOrder)
                 .limit(size + 1L)
                 .fetch();
-        
+
         List<Long> ids = rows.stream()
                 .map(t -> t.get(show.id))
                 .toList();
-        
+
         if (ids.isEmpty()) {
             return new CursorSlice<>(new SliceImpl<>(List.of(), PageRequest.of(0, size), false), null);
         }
-        
+
         // 2차 쿼리: 상세 정보 조회
         List<ShowOpeningSoonDetailResponse> results = queryFactory
                 .select(Projections.constructor(ShowOpeningSoonDetailResponse.class,
@@ -343,7 +347,7 @@ public class ShowQuerydslRepository {
                         show.subTitle,
                         show.image,
                         show.venue,
-                        show.region.stringValue(),
+                        show.region,
                         show.startDate,
                         show.endDate,
                         show.saleStartDate,
@@ -354,14 +358,14 @@ public class ShowQuerydslRepository {
                 .where(show.id.in(ids))
                 .orderBy(primaryOrder, tieBreakerOrder)
                 .fetch();
-        
+
         boolean hasNext = results.size() > size;
         if (hasNext) {
             results = results.subList(0, size);
         }
-        
+
         Slice<ShowOpeningSoonDetailResponse> slice = new SliceImpl<>(results, PageRequest.of(0, size), hasNext);
-        
+
         String nextCursor = null;
         if (hasNext && !results.isEmpty()) {
             ShowOpeningSoonDetailResponse last = results.getLast();
@@ -376,8 +380,182 @@ public class ShowQuerydslRepository {
             );
             nextCursor = cursorCodec.encode(next);
         }
-        
+
         return new CursorSlice<>(slice, nextCursor);
+    }
+
+    // ========== 검색 API 메서드 ==========
+
+    /**
+     * 공연 검색 (커서 기반 페이지네이션)
+     * - 검색: 키워드(공연명)
+     * - 필터: 카테고리, 판매상태, 날짜범위, 지역
+     * - 정렬: popular(조회순, 기본), showStartApproaching(공연임박순)
+     */
+    public CursorSlice<ShowSearchResponse> searchShows(
+            ShowSearchRequest request,
+            int size,
+            String sort
+    ) {
+        BooleanBuilder where = buildSearchCondition(request);
+
+        SortOrder sortOrder = resolveSortOrder(sort);
+        OrderSpecifier<?> primaryOrder = primaryOrderSpecifier(sortOrder);
+        OrderSpecifier<Long> tieBreakerOrder = sortOrder.direction.isAscending() ? show.id.asc() : show.id.desc();
+
+        // 공연임박순은 오늘 이후 공연만 조회
+        if (ShowSortKey.SHOW_START_APPROACHING.equals(sortOrder.key)) {
+            where.and(show.startDate.goe(LocalDate.now()));
+        }
+
+        // 커서 처리
+        if (StringUtils.hasText(request.getCursor())) {
+            ShowCursor cursor = cursorCodec.decode(request.getCursor());
+            validateCursorMatchesRequest(cursor, sortOrder);
+            where.and(cursorCondition(cursor, sortOrder));
+        }
+
+        // 1차 쿼리: ID 목록 조회
+        List<Tuple> rows = queryFactory
+                .select(show.id, show.startDate, show.viewCount)
+                .distinct()
+                .from(show)
+                .leftJoin(showCategory).on(showCategory.show.eq(show))
+                .leftJoin(category).on(showCategory.category.eq(category))
+                .where(where)
+                .orderBy(primaryOrder, tieBreakerOrder)
+                .limit(size + 1L)
+                .fetch();
+
+        List<Long> ids = rows.stream()
+                .map(t -> t.get(show.id))
+                .toList();
+
+        if (ids.isEmpty()) {
+            return new CursorSlice<>(new SliceImpl<>(List.of(), PageRequest.of(0, size), false), null);
+        }
+
+        // 2차 쿼리: 상세 정보 조회
+        List<ShowSearchResponse> results = queryFactory
+                .select(Projections.constructor(ShowSearchResponse.class,
+                        show.id,
+                        show.title,
+                        show.image,
+                        show.venue,
+                        show.startDate,
+                        show.endDate,
+                        show.region,
+                        show.viewCount
+                ))
+                .from(show)
+                .where(show.id.in(ids))
+                .orderBy(primaryOrder, tieBreakerOrder)
+                .fetch();
+
+        boolean hasNext = results.size() > size;
+        if (hasNext) {
+            results = results.subList(0, size);
+        }
+
+        Slice<ShowSearchResponse> slice = new SliceImpl<>(results, PageRequest.of(0, size), hasNext);
+
+        String nextCursor = null;
+        if (hasNext && !results.isEmpty()) {
+            ShowSearchResponse last = results.getLast();
+            String lastValue = sortOrder.key() == ShowSortKey.POPULAR
+                    ? String.valueOf(last.viewCount())
+                    : last.startDate().toString();
+            ShowCursor next = new ShowCursor(
+                    sortOrder.key(),
+                    sortOrder.direction().name(),
+                    lastValue,
+                    last.id()
+            );
+            nextCursor = cursorCodec.encode(next);
+        }
+
+        return new CursorSlice<>(slice, nextCursor);
+    }
+
+    /**
+     * 공연 검색 결과 개수 조회 (필터 선택 시 사용)
+     */
+    public long countSearchShows(ShowSearchRequest request) {
+        BooleanBuilder where = buildSearchCondition(request);
+
+        Long count = queryFactory
+                .select(show.id.countDistinct())
+                .from(show)
+                .leftJoin(showCategory).on(showCategory.show.eq(show))
+                .leftJoin(category).on(showCategory.category.eq(category))
+                .where(where)
+                .fetchOne();
+
+        return count != null ? count : 0L;
+    }
+
+    /**
+     * 검색 조건 빌더 (공통)
+     */
+    private BooleanBuilder buildSearchCondition(ShowSearchRequest request) {
+        BooleanBuilder where = new BooleanBuilder();
+
+        // 키워드 검색 (공연명)
+        where.and(keywordContains(request.getKeyword()));
+        // 카테고리 필터
+        where.and(categoryCodeEq(request.getCategory()));
+        // 지역 필터
+        where.and(regionEq(request.getRegion()));
+        // 공연 시작일 범위
+        where.and(startDateGoe(request.getStartDateFrom()));
+        where.and(startDateLoe(request.getStartDateTo()));
+        // 판매 상태 필터
+        where.and(saleStatusCondition(request.getSaleStatus()));
+
+        return where;
+    }
+
+    /**
+     * 키워드 검색 조건 (공연명)
+     */
+    private BooleanExpression keywordContains(String keyword) {
+        return StringUtils.hasText(keyword)
+                ? show.title.containsIgnoreCase(keyword)
+                : null;
+    }
+
+    /**
+     * 공연 시작일 이후 조건
+     */
+    private BooleanExpression startDateGoe(LocalDate from) {
+        return from != null ? show.startDate.goe(from) : null;
+    }
+
+    /**
+     * 공연 시작일 이전 조건
+     */
+    private BooleanExpression startDateLoe(LocalDate to) {
+        return to != null ? show.startDate.loe(to) : null;
+    }
+
+    /**
+     * 판매 상태에 따른 조건 생성
+     * - UPCOMING: saleStartDate > today
+     * - ON_SALE: saleStartDate <= today <= saleEndDate
+     * - CLOSED: saleEndDate < today
+     */
+    private BooleanExpression saleStatusCondition(SaleStatus saleStatus) {
+        if (saleStatus == null) {
+            return null;
+        }
+
+        LocalDate today = LocalDate.now();
+
+        return switch (saleStatus) {
+            case UPCOMING -> show.saleStartDate.gt(today);
+            case ON_SALE -> show.saleStartDate.loe(today).and(show.saleEndDate.goe(today));
+            case CLOSED -> show.saleEndDate.lt(today);
+        };
     }
 
 }

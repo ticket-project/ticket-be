@@ -2,12 +2,17 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
 import com.ticket.core.api.controller.request.ShowSearchParam;
+import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
+import com.ticket.core.api.controller.response.ShowSearchCountResponse;
+import com.ticket.core.api.controller.response.ShowSearchResponse;
+import com.ticket.core.domain.show.usecase.CountSearchShowsUseCase;
 import com.ticket.core.domain.show.usecase.GetLatestShowsUseCase;
 import com.ticket.core.domain.show.usecase.GetSaleStartApproachingShowsUseCase;
 import com.ticket.core.domain.show.usecase.GetSaleStartApproachingShowsPageUseCase;
 import com.ticket.core.domain.show.usecase.GetShowsUseCase;
+import com.ticket.core.domain.show.usecase.SearchShowsUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,17 +37,23 @@ public class ShowController {
     private final GetLatestShowsUseCase getLatestShowsUseCase;
     private final GetSaleStartApproachingShowsUseCase getSaleStartApproachingShowsUseCase;
     private final GetSaleStartApproachingShowsPageUseCase getSaleStartApproachingShowsPageUseCase;
+    private final SearchShowsUseCase searchShowsUseCase;
+    private final CountSearchShowsUseCase countSearchShowsUseCase;
 
     public ShowController(
             final GetShowsUseCase getShowsUseCase,
             final GetLatestShowsUseCase getLatestShowsUseCase,
             final GetSaleStartApproachingShowsUseCase getSaleStartApproachingShowsUseCase,
-            final GetSaleStartApproachingShowsPageUseCase getSaleStartApproachingShowsPageUseCase
+            final GetSaleStartApproachingShowsPageUseCase getSaleStartApproachingShowsPageUseCase,
+            final SearchShowsUseCase searchShowsUseCase,
+            final CountSearchShowsUseCase countSearchShowsUseCase
     ) {
         this.getShowsUseCase = getShowsUseCase;
         this.getLatestShowsUseCase = getLatestShowsUseCase;
         this.getSaleStartApproachingShowsUseCase = getSaleStartApproachingShowsUseCase;
         this.getSaleStartApproachingShowsPageUseCase = getSaleStartApproachingShowsPageUseCase;
+        this.searchShowsUseCase = searchShowsUseCase;
+        this.countSearchShowsUseCase = countSearchShowsUseCase;
     }
 
     @Operation(
@@ -307,5 +318,118 @@ public class ShowController {
         final GetSaleStartApproachingShowsPageUseCase.Input input = new GetSaleStartApproachingShowsPageUseCase.Input(param, size, sort);
         final GetSaleStartApproachingShowsPageUseCase.Output output = getSaleStartApproachingShowsPageUseCase.execute(input);
         return ApiResponse.success(SliceResponse.from(output.shows(), output.nextCursor()));
+    }
+
+    // ========== 검색 API ==========
+
+    @Operation(
+            summary = "공연 검색 (무한스크롤)",
+            description = """
+                    공연을 다양한 조건으로 검색합니다.
+                    
+                    ## 검색 조건
+                    - **keyword**: 공연명 검색 (부분 일치)
+                    - **category**: 카테고리 필터 (CONCERT, THEATER 등)
+                    - **saleStatus**: 판매 상태 필터 (UPCOMING, ON_SALE, CLOSED)
+                    - **startDateFrom/To**: 공연 시작일 범위
+                    - **region**: 지역 필터
+                    
+                    ## 정렬 옵션
+                    - `popular` (기본값) - 조회순 (조회수 높은 순)
+                    - `showStartApproaching` - 공연 임박순 (공연 시작일 가까운 순)
+                    
+                    ## 페이지네이션
+                    - 첫 요청: `cursor` 파라미터 없이 호출
+                    - 다음 페이지: 응답의 `nextCursor` 값을 `cursor` 파라미터로 전달
+                    """
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "검색 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    value = """
+                                            {
+                                              "result": "SUCCESS",
+                                              "data": {
+                                                "items": [
+                                                  {
+                                                    "id": 20,
+                                                    "title": "뮤지컬 위키드",
+                                                    "image": "http://example.com/image.jpg",
+                                                    "venue": "블루스퀘어 신한카드홀",
+                                                    "startDate": "2026-03-01",
+                                                    "endDate": "2026-05-31",
+                                                    "region": "서울",
+                                                    "viewCount": 15000
+                                                  }
+                                                ],
+                                                "hasNext": true,
+                                                "size": 16,
+                                                "numberOfElements": 16,
+                                                "nextCursor": "eyJpZCI6MTksInZpZXdDb3VudCI6MTUwMDB9"
+                                              },
+                                              "error": null
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/search")
+    public ApiResponse<SliceResponse<ShowSearchResponse>> searchShows(
+            @ParameterObject
+            final ShowSearchRequest request,
+
+            @Parameter(description = "한 번에 조회할 개수 (기본값: 16)", example = "16")
+            @RequestParam(defaultValue = "16") final int size,
+
+            @Parameter(description = "정렬 기준 [popular(조회순), showStartApproaching(공연임박순)]", example = "popular")
+            @RequestParam(defaultValue = "popular") final String sort
+    ) {
+        final SearchShowsUseCase.Input input = new SearchShowsUseCase.Input(request, size, sort);
+        final SearchShowsUseCase.Output output = searchShowsUseCase.execute(input);
+        return ApiResponse.success(SliceResponse.from(output.shows(), output.nextCursor()));
+    }
+
+    @Operation(
+            summary = "공연 검색 결과 개수 조회",
+            description = """
+                    필터 조건에 맞는 공연 개수만 조회합니다.
+                    필터 변경 시 실제 데이터 없이 개수만 빠르게 확인할 때 사용합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    value = """
+                                            {
+                                              "result": "SUCCESS",
+                                              "data": {
+                                                "count": 42
+                                              },
+                                              "error": null
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/search/count")
+    public ApiResponse<ShowSearchCountResponse> countSearchShows(
+            @ParameterObject
+            final ShowSearchRequest request
+    ) {
+        final CountSearchShowsUseCase.Input input = new CountSearchShowsUseCase.Input(request);
+        final CountSearchShowsUseCase.Output output = countSearchShowsUseCase.execute(input);
+        return ApiResponse.success(output.response());
     }
 }
