@@ -1,8 +1,24 @@
 -- ==========================
 -- 카테고리 생성
 -- ==========================
-INSERT INTO CATEGORYS (id, parent_id, name, code, created_at, created_by) VALUES (1, null, '콘서트', 'CONCERT', '2026-01-01 10:00:00', 'seed');
-INSERT INTO CATEGORYS (id, parent_id, name, code, created_at, created_by) VALUES (2, null, '연극', 'THEATER', '2026-01-01 10:00:00', 'seed');
+INSERT INTO CATEGORYS (id, name, code, created_at, created_by) VALUES (1, '콘서트', 'CONCERT', '2026-01-01 10:00:00', 'seed');
+INSERT INTO CATEGORYS (id, name, code, created_at, created_by) VALUES (2, '연극', 'THEATER', '2026-01-01 10:00:00', 'seed');
+
+-- ==========================
+-- 장르 생성 (카테고리별)
+-- ==========================
+-- 콘서트 장르
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (1, 1, 'K-POP', 'KPOP', '2026-01-01 10:00:00', 'seed');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (2, 1, '힙합', 'HIPHOP', '2026-01-01 10:00:00', 'seed');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (3, 1, 'R&B', 'RNB', '2026-01-01 10:00:00', 'seed');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (4, 1, '팝', 'POP', '2026-01-01 10:00:00', 'seed');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (5, 1, '록/메탈', 'ROCK', '2026-01-01 10:00:00', 'seed');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (6, 1, '발라드', 'BALLAD', '2026-01-01 10:00:00', 'seed');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (7, 1, '인디/밴드', 'INDIE', '2026-01-01 10:00:00', 'seed');
+-- 연극 장르
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (8, 2, '드라마', 'DRAMA', '2026-01-01 10:00:00', 'seed');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (9, 2, '코미디', 'COMEDY', '2026-01-01 10:00:00', 'seed');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (10, 2, '뮤지컬', 'MUSICAL', '2026-01-01 10:00:00', 'seed');
 
 -- ==========================
 -- 콘서트 공연 생성 (40개)
@@ -98,49 +114,58 @@ VALUES (40, 'pH-1 & 그루비룸', 'H1GHR MUSIC SHOW', '하이어뮤직 콘서�
 
 
 -- ==========================
--- 공연-카테고리 매핑 (모두 콘서트)
+-- 공연-장르 매핑
 -- ==========================
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (1, 1, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (2, 2, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (3, 3, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (4, 4, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (5, 5, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (6, 6, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (7, 7, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (8, 8, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (9, 9, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (10, 10, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (11, 11, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (12, 12, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (13, 13, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (14, 14, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (15, 15, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (16, 16, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (17, 17, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (18, 18, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (19, 19, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (20, 20, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (21, 21, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (22, 22, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (23, 23, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (24, 24, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (25, 25, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (26, 26, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (27, 27, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (28, 28, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (29, 29, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (30, 30, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (31, 31, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (32, 32, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (33, 33, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (34, 34, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (35, 35, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (36, 36, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (37, 37, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (38, 38, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (39, 39, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (40, 40, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_CATEGORYS (id, show_id, category_id, created_at, created_by) VALUES (41, 3, 2, '2026-01-01 10:00:00', 'seed');
+-- K-POP 그룹 (1~15) -> K-POP 장르
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (1, 1, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (2, 2, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (3, 3, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (4, 4, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (5, 5, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (6, 6, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (7, 7, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (8, 8, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (9, 9, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (10, 10, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (11, 11, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (12, 12, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (13, 13, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (14, 14, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (15, 15, 1, '2026-01-01 10:00:00', 'seed');
+-- K-POP 솔로 (16~25) -> K-POP + 일부 R&B
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (16, 16, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (17, 17, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (18, 18, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (19, 19, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (20, 19, 3, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (21, 20, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (22, 20, 3, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (23, 21, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (24, 22, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (25, 23, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (26, 24, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (27, 25, 1, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (28, 25, 3, '2026-01-01 10:00:00', 'seed');
+-- 해외 아티스트 (26~35) -> 팝
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (29, 26, 4, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (30, 27, 4, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (31, 28, 4, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (32, 29, 4, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (33, 29, 3, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (34, 30, 4, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (35, 31, 3, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (36, 32, 2, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (37, 33, 4, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (38, 34, 2, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (39, 34, 4, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (40, 35, 4, '2026-01-01 10:00:00', 'seed');
+-- 국내 밴드/힙합 (36~40) -> 인디/밴드, 힙합
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (41, 36, 7, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (42, 37, 7, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (43, 38, 7, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (44, 38, 6, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (45, 39, 2, '2026-01-01 10:00:00', 'seed');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (46, 40, 2, '2026-01-01 10:00:00', 'seed');
 
 
 -- 기본 좌석(행/열) 생성
@@ -157,86 +182,86 @@ INSERT INTO SEAT (id, seat_row, seat_col, created_at, created_by)
 VALUES (5, 'B', '2', '2026-01-01 10:00:00', 'seed');
 INSERT INTO SEAT (id, seat_row, seat_col, created_at, created_by)
 VALUES (6, 'B', '3', '2026-01-01 10:00:00', 'seed');
-
--- ==========================
--- 공연 회차(Performance) 샘플 2개
--- show_id 는 그냥 100 번으로 가정
--- ==========================
-
-INSERT INTO PERFORMANCE (id,
-                         show_id,
-                         round_no,
-                         start_time,
-                         end_time,
-                         order_open_time,
-                         order_close_time,
-                         state,
-                         status,
-                         max_can_hold_count,
-                         hold_time,
-                         created_at,
-                         created_by)
-VALUES (1,
-        1,
-        1,
-        '2025-12-24 19:00:00',
-        '2025-12-24 21:30:00',
-        '2025-12-01 10:00:00',
-        '2025-12-24 18:00:00',
-        'OPEN',
-        'ACTIVE',
-        4,
-        300,
-        '2026-01-01 10:00:00',
-        'seed');
-
-INSERT INTO PERFORMANCE (id,
-                         show_id,
-                         round_no,
-                         start_time,
-                         end_time,
-                         order_open_time,
-                         order_close_time,
-                         state,
-                         status,
-                         max_can_hold_count,
-                         hold_time,
-                         created_at,
-                         created_by)
-VALUES (2,
-        1,
-        1,
-        '2025-12-25 14:00:00',
-        '2025-12-25 16:30:00',
-        '2025-12-01 10:00:00',
-        '2025-12-25 13:00:00',
-        'OPEN',
-        'ACTIVE',
-        4,
-        300,
-        '2026-01-01 10:00:00',
-        'seed');
-
--- ==========================
--- 회차 1번(performance_id = 1)의 좌석 상태
--- A1, A2는 예매 가능 / A3는 이미 예매된 상태로 가정
--- ==========================
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
-VALUES (1, 1, 1, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A1
-
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
-VALUES (2, 1, 2, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A2
-
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
-VALUES (3, 1, 3, 'AVAILABLE', '2026-01-01 10:00:00', 'seed');
--- A3 (이미 예매됨)
-
--- 회차 2번(performance_id = 2)도 몇 개 넣어보자
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
-VALUES (4, 2, 1, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A1
-
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
-VALUES (5, 2, 2, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A2
-
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
-VALUES (6, 2, 3, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A3  여기에 모든 행에 created_at, created_by 넣어줘
+--
+-- -- ==========================
+-- -- 공연 회차(Performance) 샘플 2개
+-- -- show_id 는 그냥 100 번으로 가정
+-- -- ==========================
+--
+-- INSERT INTO PERFORMANCE (id,
+--                          show_id,
+--                          round_no,
+--                          start_time,
+--                          end_time,
+--                          order_open_time,
+--                          order_close_time,
+--                          state,
+--                          status,
+--                          max_can_hold_count,
+--                          hold_time,
+--                          created_at,
+--                          created_by)
+-- VALUES (1,
+--         1,
+--         1,
+--         '2025-12-24 19:00:00',
+--         '2025-12-24 21:30:00',
+--         '2025-12-01 10:00:00',
+--         '2025-12-24 18:00:00',
+--         'OPEN',
+--         'ACTIVE',
+--         4,
+--         300,
+--         '2026-01-01 10:00:00',
+--         'seed');
+--
+-- INSERT INTO PERFORMANCE (id,
+--                          show_id,
+--                          round_no,
+--                          start_time,
+--                          end_time,
+--                          order_open_time,
+--                          order_close_time,
+--                          state,
+--                          status,
+--                          max_can_hold_count,
+--                          hold_time,
+--                          created_at,
+--                          created_by)
+-- VALUES (2,
+--         1,
+--         1,
+--         '2025-12-25 14:00:00',
+--         '2025-12-25 16:30:00',
+--         '2025-12-01 10:00:00',
+--         '2025-12-25 13:00:00',
+--         'OPEN',
+--         'ACTIVE',
+--         4,
+--         300,
+--         '2026-01-01 10:00:00',
+--         'seed');
+--
+-- -- ==========================
+-- -- 회차 1번(performance_id = 1)의 좌석 상태
+-- -- A1, A2는 예매 가능 / A3는 이미 예매된 상태로 가정
+-- -- ==========================
+-- INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
+-- VALUES (1, 1, 1, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A1
+--
+-- INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
+-- VALUES (2, 1, 2, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A2
+--
+-- INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
+-- VALUES (3, 1, 3, 'AVAILABLE', '2026-01-01 10:00:00', 'seed');
+-- -- A3 (이미 예매됨)
+--
+-- -- 회차 2번(performance_id = 2)도 몇 개 넣어보자
+-- INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
+-- VALUES (4, 2, 1, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A1
+--
+-- INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
+-- VALUES (5, 2, 2, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A2
+--
+-- INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
+-- VALUES (6, 2, 3, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A3  여기에 모든 행에 created_at, created_by 넣어줘
