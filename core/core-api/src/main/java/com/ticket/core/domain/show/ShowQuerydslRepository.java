@@ -31,8 +31,9 @@ import java.util.List;
 import java.util.Map;
 
 import static com.ticket.core.domain.show.QCategory.category;
+import static com.ticket.core.domain.show.QGenre.genre;
 import static com.ticket.core.domain.show.QShow.show;
-import static com.ticket.core.domain.show.QShowCategory.showCategory;
+import static com.ticket.core.domain.show.QShowGenre.showGenre;
 
 @Repository
 public class ShowQuerydslRepository {
@@ -48,6 +49,7 @@ public class ShowQuerydslRepository {
         BooleanBuilder where = new BooleanBuilder();
         where.and(categoryCodeEq(param.getCategory()));
         where.and(regionEq(param.getRegion()));
+        where.and(genreEq(param.getGenre()));
 
         SortOrder sortOrder = resolveSortOrder(sort);
 
@@ -68,8 +70,9 @@ public class ShowQuerydslRepository {
                 .select(show.id, show.startDate, show.createdAt, show.viewCount)
                 .distinct()
                 .from(show)
-                .leftJoin(showCategory).on(showCategory.show.eq(show))
-                .leftJoin(category).on(showCategory.category.eq(category))
+                .join(showGenre).on(showGenre.show.eq(show))
+                .join(genre).on(showGenre.genre.eq(genre))
+                .join(category).on(genre.category.eq(category))
                 .where(where)
                 .orderBy(primaryOrder, tieBreakerOrder)
                 .limit(size + 1L)
@@ -83,41 +86,51 @@ public class ShowQuerydslRepository {
             return new CursorSlice<>(new SliceImpl<>(List.of(), PageRequest.of(0, size), false), null);
         }
 
-        List<Tuple> tuples = queryFactory
-                .select(show, category.name)
+        // 장르 조회
+        List<Tuple> genreTuples = queryFactory
+                .select(show.id, genre.name)
                 .from(show)
-                .leftJoin(showCategory).on(showCategory.show.eq(show))
-                .leftJoin(category).on(showCategory.category.eq(category))
+                .join(showGenre).on(showGenre.show.eq(show))
+                .join(genre).on(showGenre.genre.eq(genre))
+                .where(show.id.in(ids))
+                .fetch();
+
+        // showId -> genreNames 매핑
+        Map<Long, List<String>> genreMap = new LinkedHashMap<>();
+        for (Tuple tuple : genreTuples) {
+            Long showId = tuple.get(show.id);
+            String genreName = tuple.get(genre.name);
+            if (genreName != null) {
+                genreMap.computeIfAbsent(showId, k -> new ArrayList<>()).add(genreName);
+            }
+        }
+
+        // Show 정보 조회
+        List<Show> shows = queryFactory
+                .selectFrom(show)
                 .where(show.id.in(ids))
                 .orderBy(primaryOrder, tieBreakerOrder)
                 .fetch();
 
-        Map<Long, ShowResponse> resultMap = new LinkedHashMap<>();
-        for (Tuple tuple : tuples) {
-            Show s = tuple.get(show);
-            String catName = tuple.get(category.name);
+        List<ShowResponse> results = shows.stream()
+                .map(s -> new ShowResponse(
+                        s.getId(),
+                        s.getTitle(),
+                        s.getSubTitle(),
+                        genreMap.getOrDefault(s.getId(), new ArrayList<>()),
+                        s.getStartDate(),
+                        s.getEndDate(),
+                        s.getViewCount(),
+                        s.getSaleType(),
+                        s.getSaleStartDate(),
+                        s.getSaleEndDate(),
+                        s.getCreatedAt(),
+                        s.getRegion(),
+                        s.getVenue()
+                ))
+                .toList();
 
-            resultMap.computeIfAbsent(s.getId(), id -> new ShowResponse(
-                    s.getId(),
-                    s.getTitle(),
-                    s.getSubTitle(),
-                    new ArrayList<>(),
-                    s.getStartDate(),
-                    s.getEndDate(),
-                    s.getViewCount(),
-                    s.getSaleType(),
-                    s.getSaleStartDate(),
-                    s.getSaleEndDate(),
-                    s.getCreatedAt(),
-                    s.getRegion(),
-                    s.getVenue()
-            ));
-            if (catName != null) {
-                resultMap.get(s.getId()).categoryNames().add(catName);
-            }
-        }
-
-        List<ShowResponse> results = new ArrayList<>(resultMap.values());
+        results = new ArrayList<>(results);
 
         boolean hasNext = results.size() > size;
         if (hasNext) results = results.subList(0, size);
@@ -216,6 +229,12 @@ public class ShowQuerydslRepository {
                 : null;
     }
 
+    private BooleanExpression genreEq(String genreCode) {
+        return StringUtils.hasText(genreCode)
+                ? genre.code.eq(genreCode)
+                : null;
+    }
+
     private BooleanExpression regionEq(Region region) {
         return region != null ? show.region.eq(region) : null;
     }
@@ -252,12 +271,14 @@ public class ShowQuerydslRepository {
                         show.title,
                         show.image,
                         show.startDate,
+                        show.endDate,
                         show.venue,
                         show.createdAt))
                 .distinct()
                 .from(show)
-                .join(showCategory).on(showCategory.show.eq(show))
-                .join(category).on(category.eq(showCategory.category))
+                .join(showGenre).on(showGenre.show.eq(show))
+                .join(genre).on(showGenre.genre.eq(genre))
+                .join(category).on(genre.category.eq(category))
                 .where(categoryCodeEq(categoryCode))
                 .orderBy(show.createdAt.desc())
                 .limit(limit)
@@ -275,8 +296,9 @@ public class ShowQuerydslRepository {
                 ))
                 .distinct()
                 .from(show)
-                .join(showCategory).on(showCategory.show.eq(show))
-                .join(category).on(category.eq(showCategory.category))
+                .join(showGenre).on(showGenre.show.eq(show))
+                .join(genre).on(showGenre.genre.eq(genre))
+                .join(category).on(genre.category.eq(category))
                 .where(
                         categoryCodeEq(categoryCode),
                         saleStartDateGoe(LocalDate.now())
@@ -324,8 +346,9 @@ public class ShowQuerydslRepository {
                 .select(show.id, show.saleStartDate, show.viewCount)
                 .distinct()
                 .from(show)
-                .leftJoin(showCategory).on(showCategory.show.eq(show))
-                .leftJoin(category).on(showCategory.category.eq(category))
+                .join(showGenre).on(showGenre.show.eq(show))
+                .join(genre).on(showGenre.genre.eq(genre))
+                .join(category).on(genre.category.eq(category))
                 .where(where)
                 .orderBy(primaryOrder, tieBreakerOrder)
                 .limit(size + 1L)
@@ -420,8 +443,9 @@ public class ShowQuerydslRepository {
                 .select(show.id, show.startDate, show.viewCount)
                 .distinct()
                 .from(show)
-                .leftJoin(showCategory).on(showCategory.show.eq(show))
-                .leftJoin(category).on(showCategory.category.eq(category))
+                .join(showGenre).on(showGenre.show.eq(show))
+                .join(genre).on(showGenre.genre.eq(genre))
+                .join(category).on(genre.category.eq(category))
                 .where(where)
                 .orderBy(primaryOrder, tieBreakerOrder)
                 .limit(size + 1L)
@@ -486,8 +510,9 @@ public class ShowQuerydslRepository {
         Long count = queryFactory
                 .select(show.id.countDistinct())
                 .from(show)
-                .leftJoin(showCategory).on(showCategory.show.eq(show))
-                .leftJoin(category).on(showCategory.category.eq(category))
+                .join(showGenre).on(showGenre.show.eq(show))
+                .join(genre).on(showGenre.genre.eq(genre))
+                .join(category).on(genre.category.eq(category))
                 .where(where)
                 .fetchOne();
 

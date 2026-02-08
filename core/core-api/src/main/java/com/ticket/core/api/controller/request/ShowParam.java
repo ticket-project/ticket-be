@@ -17,6 +17,14 @@ public class ShowParam {
     private String category;
 
     @Schema(
+            description = "장르 필터",
+            example = "KPOP",
+            allowableValues = {"KPOP", "POP", "HIPHOP", "RNB", "ROCK", "BALLAD", "INDIE", "DRAMA"},
+            requiredMode = NOT_REQUIRED
+    )
+    private String genre;
+
+    @Schema(
             description = "지역 검색",
             example = "SEOUL",
             requiredMode = NOT_REQUIRED
@@ -34,14 +42,19 @@ public class ShowParam {
     )
     private String cursor;
 
-    public ShowParam(final String category, final Region region, final String cursor) {
+    public ShowParam(final String category, final String genre, final Region region, final String cursor) {
         this.category = category;
+        this.genre = genre;
         this.region = region;
         this.cursor = cursor;
     }
 
     public String getCategory() {
         return category;
+    }
+
+    public String getGenre() {
+        return genre;
     }
 
     public Region getRegion() {
