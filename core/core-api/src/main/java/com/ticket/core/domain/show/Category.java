@@ -13,8 +13,6 @@ public class Category extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String code;
 
-    private Long parentId;
-
     @Column(nullable = false)
     private String name;
 
