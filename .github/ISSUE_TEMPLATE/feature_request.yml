@@ -31,7 +31,7 @@ body:
         - 카드 결제: 10분
         - 계좌이체: 15분
     validations:
-      required: true
+      required: false
 
   - type: dropdown
     id: component
@@ -41,7 +41,7 @@ body:
       multiple: true
       options:
         - 인증/회원 (Auth/Member)
-        - 공연 관리 (Performance)
+        - 공연 관리 (Show)
         - 좌석 관리 (Seat)
         - 예매 (Reservation)
         - 선점 (Hold)
@@ -52,6 +52,7 @@ body:
         - 스케줄러
         - 성능 최적화
         - 모니터링/로깅
+        - 인프라
         - 기타
     validations:
       required: true
