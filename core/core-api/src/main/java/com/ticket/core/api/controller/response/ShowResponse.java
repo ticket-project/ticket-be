@@ -20,8 +20,8 @@ public record ShowResponse(
         @Schema(description = "공연 부제목", example = "10주년 기념 공연")
         String subTitle,
 
-        @Schema(description = "카테고리 이름 목록", example = "[\"콘서트\", \"K-POP\"]")
-        List<String> categoryNames,
+        @Schema(description = "장르 이름 목록", example = "[\"힙합\", \"R&B\"]")
+        List<String> genreNames,
 
         @Schema(description = "공연 시작일", example = "2026-03-01")
         LocalDate startDate,
