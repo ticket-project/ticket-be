@@ -20,6 +20,9 @@ public record ShowSummaryResponse(
         @Schema(description = "공연 시작일", example = "2026-03-01")
         LocalDate startDate,
 
+        @Schema(description = "공연 종료일", example = "2028-03-01")
+        LocalDate endDate,
+
         @Schema(description = "장소", example = "예술의전당")
         String venue,
 
