@@ -222,7 +222,7 @@ public interface ShowControllerDocs {
     ApiResponse<SliceResponse<ShowOpeningSoonDetailResponse>> getShowsSaleOpeningSoonPage(
             @ParameterObject SaleOpeningSoonSearchParam param,
             @Parameter(description = "한 번에 조회할 개수 (기본값: 16)", example = "16") int size,
-            @Parameter(description = "정렬 기준 [saleStartApproaching(판매시작일순), popular(인기순)]", example = "saleStartApproaching") String sort
+            @Parameter(description = "정렬 기준 [saleStartApproaching(판매시작일순), popular(인기순), latest(최신순)]", example = "saleStartApproaching") String sort
     );
 
     // ========== 검색 API ==========

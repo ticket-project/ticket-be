@@ -344,7 +344,7 @@ public class ShowQuerydslRepository {
 
         // 1차 쿼리: ID 목록 조회
         List<Tuple> rows = queryFactory
-                .select(show.id, show.saleStartDate, show.viewCount)
+                .select(show.id, show.saleStartDate, show.viewCount, show.createdAt)
                 .distinct()
                 .from(show)
                 .join(showGenre).on(showGenre.show.eq(show))
