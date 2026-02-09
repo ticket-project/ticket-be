@@ -323,6 +323,7 @@ public class ShowQuerydslRepository {
         // 판매 시작일이 오늘 이후인 것만 (오픈 예정)
         where.and(show.saleStartDate.goe(LocalDate.now()));
         where.and(categoryCodeEq(param.getCategory()));
+        where.and(regionEq(param.getRegion()));
         where.and(titleContains(param.getTitle()));
         where.and(saleStartDateGoe(param.getSaleStartDateFrom()));
         where.and(saleStartDateLoe(param.getSaleStartDateTo()));
