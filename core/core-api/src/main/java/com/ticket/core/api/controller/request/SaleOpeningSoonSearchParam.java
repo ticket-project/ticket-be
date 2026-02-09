@@ -1,5 +1,6 @@
 package com.ticket.core.api.controller.request;
 
+import com.ticket.core.domain.show.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
@@ -26,6 +27,13 @@ public class SaleOpeningSoonSearchParam {
             requiredMode = NOT_REQUIRED
     )
     private String title;
+
+    @Schema(
+            description = "지역 검색",
+            example = "SEOUL",
+            requiredMode = NOT_REQUIRED
+    )
+    private Region region;
 
     @Schema(
             description = "판매 시작일 필터 (이 날짜 이후)",
@@ -69,6 +77,7 @@ public class SaleOpeningSoonSearchParam {
     public SaleOpeningSoonSearchParam(
             String category,
             String title,
+            Region region,
             LocalDate saleStartDateFrom,
             LocalDate saleStartDateTo,
             LocalDate saleEndDateFrom,
@@ -77,6 +86,7 @@ public class SaleOpeningSoonSearchParam {
     ) {
         this.category = category;
         this.title = title;
+        this.region = region;
         this.saleStartDateFrom = saleStartDateFrom;
         this.saleStartDateTo = saleStartDateTo;
         this.saleEndDateFrom = saleEndDateFrom;
@@ -90,6 +100,10 @@ public class SaleOpeningSoonSearchParam {
 
     public String getTitle() {
         return title;
+    }
+
+    public Region getRegion() {
+        return region;
     }
 
     public LocalDate getSaleStartDateFrom() {
