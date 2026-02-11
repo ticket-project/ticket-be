@@ -1,24 +1,24 @@
 package com.ticket.core.domain.show;
 
-import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "CATEGORYS")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Category extends BaseEntity {
+@Entity
+@Table(name = "PERFORMERS")
+public class Performer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String code;
-
-    @Column(nullable = false)
     private String name;
+
+    private String profileImageUrl;
+
+    private boolean isActive;
 
 }

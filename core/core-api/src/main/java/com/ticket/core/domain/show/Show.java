@@ -3,11 +3,16 @@ package com.ticket.core.domain.show;
 
 import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+@Getter
 @Entity
 @Table(name = "SHOWS")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Show extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,9 +44,10 @@ public class Show extends BaseEntity {
 
     private String venue;
 
-    protected Show() {}
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Performer performer;
 
-    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final Long viewCount, final SaleType saleType, final LocalDate saleStartDate, final LocalDate saleEndDate, final String image, final Region region, final String venue) {
+    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final Long viewCount, final SaleType saleType, final LocalDate saleStartDate, final LocalDate saleEndDate, final String image, final Region region, final String venue, final Performer performer) {
         this.title = title;
         this.subTitle = subTitle;
         this.info = info;
@@ -54,57 +60,7 @@ public class Show extends BaseEntity {
         this.image = image;
         this.region = region;
         this.venue = venue;
+        this.performer = performer;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getSubTitle() {
-        return subTitle;
-    }
-
-    public String getInfo() {
-        return info;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public Long getViewCount() {
-        return viewCount;
-    }
-
-    public SaleType getSaleType() {
-        return saleType;
-    }
-
-    public LocalDate getSaleStartDate() {
-        return saleStartDate;
-    }
-
-    public LocalDate getSaleEndDate() {
-        return saleEndDate;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public Region getRegion() {
-        return region;
-    }
-
-    public String getVenue() {
-        return venue;
-    }
 }

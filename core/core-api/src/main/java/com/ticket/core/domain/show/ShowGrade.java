@@ -1,24 +1,31 @@
 package com.ticket.core.domain.show;
 
-import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "CATEGORYS")
+import java.math.BigDecimal;
+
 @Getter
+@Entity
+@Table(name = "SHOW_GRADES")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Category extends BaseEntity {
+public class ShowGrade {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String code;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Show show;
 
-    @Column(nullable = false)
-    private String name;
+    private String gradeCode;
+
+    private String gradeName;
+
+    private BigDecimal price;
+
+    private Integer sortOrder;
 
 }

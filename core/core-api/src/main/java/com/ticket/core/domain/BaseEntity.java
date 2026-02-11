@@ -2,6 +2,7 @@ package com.ticket.core.domain;
 
 import com.ticket.core.enums.EntityStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
+@Getter
 public class BaseEntity {
 
     @CreatedDate
@@ -28,26 +30,10 @@ public class BaseEntity {
     @LastModifiedBy
     private String updatedBy;
 
+    @Getter
     @Enumerated(EnumType.STRING)
     private EntityStatus status = EntityStatus.ACTIVE;
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    private LocalDateTime deletedAt;
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public EntityStatus getStatus() {
-        return status;
-    }
 }

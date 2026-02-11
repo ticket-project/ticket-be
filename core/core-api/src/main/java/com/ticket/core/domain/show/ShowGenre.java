@@ -2,13 +2,18 @@ package com.ticket.core.domain.show;
 
 import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * 공연-장르 연결 엔티티
  * - 공연은 0개 이상의 장르를 가질 수 있음
  */
+@Getter
 @Entity
 @Table(name = "SHOW_GENRES")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ShowGenre extends BaseEntity {
 
     @Id
@@ -23,22 +28,9 @@ public class ShowGenre extends BaseEntity {
     @JoinColumn(name = "genre_id", nullable = false)
     private Genre genre;
 
-    protected ShowGenre() {}
-
     public ShowGenre(Show show, Genre genre) {
         this.show = show;
         this.genre = genre;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Show getShow() {
-        return show;
-    }
-
-    public Genre getGenre() {
-        return genre;
-    }
 }
