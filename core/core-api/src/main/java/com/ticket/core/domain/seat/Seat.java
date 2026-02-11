@@ -3,37 +3,32 @@ package com.ticket.core.domain.seat;
 
 import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @Table(name = "SEAT")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Seat extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //행
-    private String seatRow;
+    private String section;
 
-    //열
-    private String seatCol;
+    private String row_no;
 
-    protected Seat() {}
+    private String seat_no;
 
-    public Seat(final String seatRow, final String seatCol) {
-        this.seatRow = seatRow;
-        this.seatCol = seatCol;
-    }
+    private boolean isActive;
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getSeatRow() {
-        return seatRow;
-    }
-
-    public String getSeatCol() {
-        return seatCol;
+    public Seat(final String section, final String row_no, final String seat_no, final boolean isActive) {
+        this.section = section;
+        this.row_no = row_no;
+        this.seat_no = seat_no;
+        this.isActive = isActive;
     }
 
 }

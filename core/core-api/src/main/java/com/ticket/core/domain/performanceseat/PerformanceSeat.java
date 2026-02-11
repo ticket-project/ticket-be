@@ -5,11 +5,16 @@ import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.seat.Seat;
 import com.ticket.core.enums.PerformanceSeatState;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+@Getter
 @Entity
 @Table(name = "PERFORMANCE_SEAT")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PerformanceSeat extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,33 +33,11 @@ public class PerformanceSeat extends BaseEntity {
 
     private BigDecimal price;
 
-    protected PerformanceSeat() {}
-
     public PerformanceSeat(final Performance performance, final Seat seat, final PerformanceSeatState state, final BigDecimal price) {
         this.performance = performance;
         this.seat = seat;
         this.state = state;
         this.price = price;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Performance getPerformance() {
-        return performance;
-    }
-
-    public Seat getSeat() {
-        return seat;
-    }
-
-    public PerformanceSeatState getState() {
-        return state;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
     }
 
     public void reserve() {
