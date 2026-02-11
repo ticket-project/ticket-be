@@ -3,6 +3,8 @@ package com.ticket.core.api.controller.request;
 import com.ticket.core.domain.show.Region;
 import com.ticket.core.domain.show.SaleStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.time.LocalDate;
 
@@ -11,6 +13,8 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIR
 /**
  * 공연 검색 API 요청 파라미터
  */
+@Getter
+@AllArgsConstructor
 @Schema(description = "공연 검색 요청 파라미터")
 public class ShowSearchRequest {
 
@@ -69,49 +73,4 @@ public class ShowSearchRequest {
     )
     private String cursor;
 
-    public ShowSearchRequest(
-            String keyword,
-            String category,
-            SaleStatus saleStatus,
-            LocalDate startDateFrom,
-            LocalDate startDateTo,
-            Region region,
-            String cursor
-    ) {
-        this.keyword = keyword;
-        this.category = category;
-        this.saleStatus = saleStatus;
-        this.startDateFrom = startDateFrom;
-        this.startDateTo = startDateTo;
-        this.region = region;
-        this.cursor = cursor;
-    }
-
-    public String getKeyword() {
-        return keyword;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public SaleStatus getSaleStatus() {
-        return saleStatus;
-    }
-
-    public LocalDate getStartDateFrom() {
-        return startDateFrom;
-    }
-
-    public LocalDate getStartDateTo() {
-        return startDateTo;
-    }
-
-    public Region getRegion() {
-        return region;
-    }
-
-    public String getCursor() {
-        return cursor;
-    }
 }
