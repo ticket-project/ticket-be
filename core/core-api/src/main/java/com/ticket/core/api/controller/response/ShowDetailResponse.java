@@ -1,0 +1,94 @@
+package com.ticket.core.api.controller.response;
+
+import com.ticket.core.domain.show.Region;
+import com.ticket.core.domain.show.SaleType;
+import com.ticket.core.enums.PerformanceState;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Schema(description = "공연 상세 정보 응답")
+public record ShowDetailResponse(
+
+        @Schema(description = "공연 ID")
+        Long id,
+
+        @Schema(description = "공연 제목")
+        String title,
+
+        @Schema(description = "공연 부제목")
+        String subTitle,
+
+        @Schema(description = "공연 상세 정보")
+        String info,
+
+        @Schema(description = "공연 시작일")
+        LocalDate startDate,
+
+        @Schema(description = "공연 종료일")
+        LocalDate endDate,
+
+        @Schema(description = "조회수")
+        Long viewCount,
+
+        @Schema(description = "판매 타입")
+        SaleType saleType,
+
+        @Schema(description = "판매 시작일")
+        LocalDate saleStartDate,
+
+        @Schema(description = "판매 종료일")
+        LocalDate saleEndDate,
+
+        @Schema(description = "포스터 이미지 URL")
+        String image,
+
+        @Schema(description = "지역")
+        Region region,
+
+        @Schema(description = "공연 장소")
+        String venue,
+
+        @Schema(description = "출연자 정보")
+        PerformerInfo performer,
+
+        @Schema(description = "장르 목록")
+        List<String> genreNames,
+
+        @Schema(description = "좌석 등급 및 가격 목록")
+        List<GradeInfo> grades,
+
+        @Schema(description = "공연 회차 목록")
+        List<PerformanceInfo> performances
+) {
+
+    @Schema(description = "출연자 정보")
+    public record PerformerInfo(
+            @Schema(description = "출연자 ID") Long id,
+            @Schema(description = "출연자 이름") String name,
+            @Schema(description = "프로필 이미지 URL") String profileImageUrl
+    ) {}
+
+    @Schema(description = "좌석 등급 및 가격 정보")
+    public record GradeInfo(
+            @Schema(description = "등급 ID") Long id,
+            @Schema(description = "등급 코드") String gradeCode,
+            @Schema(description = "등급 이름") String gradeName,
+            @Schema(description = "가격") BigDecimal price,
+            @Schema(description = "정렬 순서") Integer sortOrder
+    ) {}
+
+    @Schema(description = "공연 회차 정보")
+    public record PerformanceInfo(
+            @Schema(description = "회차 ID") Long id,
+            @Schema(description = "회차 번호") Long roundNo,
+            @Schema(description = "공연 시작 시간") LocalDateTime startTime,
+            @Schema(description = "공연 종료 시간") LocalDateTime endTime,
+            @Schema(description = "예매 오픈 시간") LocalDateTime orderOpenTime,
+            @Schema(description = "예매 마감 시간") LocalDateTime orderCloseTime,
+            @Schema(description = "회차 상태") PerformanceState state
+    ) {}
+}

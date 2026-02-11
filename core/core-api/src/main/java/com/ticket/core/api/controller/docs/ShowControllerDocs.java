@@ -3,6 +3,7 @@ package com.ticket.core.api.controller.docs;
 import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
 import com.ticket.core.api.controller.request.ShowParam;
 import com.ticket.core.api.controller.request.ShowSearchRequest;
+import com.ticket.core.api.controller.response.ShowDetailResponse;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.api.controller.response.ShowSearchCountResponse;
@@ -25,6 +26,25 @@ import org.springdoc.core.annotations.ParameterObject;
  */
 @Tag(name = "공연(Show)", description = "공연 정보 조회 API")
 public interface ShowControllerDocs {
+
+    // ========== 상세 조회 API ==========
+
+    @Operation(
+            summary = "공연 상세 조회",
+            description = """
+                    공연 ID로 상세 정보를 조회합니다.
+                    출연자, 장르, 좌석 등급/가격, 공연 회차 등 모든 정보를 포함합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공"
+            )
+    })
+    ApiResponse<ShowDetailResponse> getShowDetail(
+            @Parameter(description = "공연 ID", example = "1", required = true) Long id
+    );
 
     // ========== 메인 페이지 API ==========
 
