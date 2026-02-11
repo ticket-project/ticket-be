@@ -2,7 +2,7 @@ package com.ticket.core.domain.show.usecase;
 
 import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.api.controller.response.ShowSearchResponse;
-import com.ticket.core.domain.show.ShowQuerydslRepository;
+import com.ticket.core.domain.show.ShowListQueryRepository;
 import com.ticket.core.support.cursor.CursorSlice;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -15,10 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class SearchShowsUseCase {
-    private final ShowQuerydslRepository showQuerydslRepository;
+    private final ShowListQueryRepository showListQueryRepository;
 
-    public SearchShowsUseCase(final ShowQuerydslRepository showQuerydslRepository) {
-        this.showQuerydslRepository = showQuerydslRepository;
+    public SearchShowsUseCase(final ShowListQueryRepository showListQueryRepository) {
+        this.showListQueryRepository = showListQueryRepository;
     }
 
     public record Input(ShowSearchRequest request, int size, String sort) {
@@ -28,7 +28,7 @@ public class SearchShowsUseCase {
     }
 
     public Output execute(final Input input) {
-        CursorSlice<ShowSearchResponse> result = showQuerydslRepository.searchShows(
+        CursorSlice<ShowSearchResponse> result = showListQueryRepository.searchShows(
                 input.request, input.size, input.sort);
         return new Output(result.slice(), result.nextCursor());
     }

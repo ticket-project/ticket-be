@@ -2,7 +2,7 @@ package com.ticket.core.domain.show.usecase;
 
 import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.api.controller.response.ShowSearchCountResponse;
-import com.ticket.core.domain.show.ShowQuerydslRepository;
+import com.ticket.core.domain.show.ShowListQueryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class CountSearchShowsUseCase {
-    private final ShowQuerydslRepository showQuerydslRepository;
+    private final ShowListQueryRepository showListQueryRepository;
 
-    public CountSearchShowsUseCase(final ShowQuerydslRepository showQuerydslRepository) {
-        this.showQuerydslRepository = showQuerydslRepository;
+    public CountSearchShowsUseCase(final ShowListQueryRepository showListQueryRepository) {
+        this.showListQueryRepository = showListQueryRepository;
     }
 
     public record Input(ShowSearchRequest request) {
@@ -26,7 +26,7 @@ public class CountSearchShowsUseCase {
     }
 
     public Output execute(final Input input) {
-        long count = showQuerydslRepository.countSearchShows(input.request);
+        long count = showListQueryRepository.countSearchShows(input.request);
         return new Output(new ShowSearchCountResponse(count));
     }
 }
