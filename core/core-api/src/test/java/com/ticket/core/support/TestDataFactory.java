@@ -118,8 +118,8 @@ public class TestDataFactory {
         return FIXTURE.giveMeBuilder(Seat.class)
                 .setNull("id")
                 .set("status", EntityStatus.ACTIVE)
-                .set(javaGetter(Seat::getSeatRow), "row")
-                .set(javaGetter(Seat::getSeatCol), "col")
+                .set(javaGetter(Seat::getRow_no), "row")
+                .set(javaGetter(Seat::getSeat_no), "col")
                 .sample();
     }
 

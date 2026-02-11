@@ -5,11 +5,16 @@ import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.EncodedPassword;
 import com.ticket.core.enums.Role;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @Table(name = "MEMBERS", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"email"})
 })
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
 
     @Id
@@ -27,8 +32,6 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    protected Member() {}
-
     public Member(final Email email, final EncodedPassword encodedPassword, final String name, final Role role) {
         this.email = email;
         this.encodedPassword = encodedPassword;
@@ -36,23 +39,4 @@ public class Member extends BaseEntity {
         this.role = role;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public EncodedPassword getEncodedPassword() {
-        return encodedPassword;
-    }
-
-    public Role getRole() {
-        return role;
-    }
 }
