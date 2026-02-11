@@ -4,6 +4,7 @@ import com.ticket.core.api.controller.docs.ShowControllerDocs;
 import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
 import com.ticket.core.api.controller.request.ShowParam;
 import com.ticket.core.api.controller.request.ShowSearchRequest;
+import com.ticket.core.api.controller.response.ShowDetailResponse;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.api.controller.response.ShowSearchCountResponse;
@@ -13,10 +14,7 @@ import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/shows")
@@ -29,6 +27,7 @@ public class ShowController implements ShowControllerDocs {
     private final GetSaleStartApproachingShowsPageUseCase getSaleStartApproachingShowsPageUseCase;
     private final SearchShowsUseCase searchShowsUseCase;
     private final CountSearchShowsUseCase countSearchShowsUseCase;
+    private final GetShowDetailUseCase getShowDetailUseCase;
 
     public ShowController(
             final GetShowsUseCase getShowsUseCase,
@@ -36,7 +35,8 @@ public class ShowController implements ShowControllerDocs {
             final GetSaleStartApproachingShowsUseCase getSaleStartApproachingShowsUseCase,
             final GetSaleStartApproachingShowsPageUseCase getSaleStartApproachingShowsPageUseCase,
             final SearchShowsUseCase searchShowsUseCase,
-            final CountSearchShowsUseCase countSearchShowsUseCase
+            final CountSearchShowsUseCase countSearchShowsUseCase,
+            final GetShowDetailUseCase getShowDetailUseCase
     ) {
         this.getShowsUseCase = getShowsUseCase;
         this.getLatestShowsUseCase = getLatestShowsUseCase;
@@ -44,6 +44,15 @@ public class ShowController implements ShowControllerDocs {
         this.getSaleStartApproachingShowsPageUseCase = getSaleStartApproachingShowsPageUseCase;
         this.searchShowsUseCase = searchShowsUseCase;
         this.countSearchShowsUseCase = countSearchShowsUseCase;
+        this.getShowDetailUseCase = getShowDetailUseCase;
+    }
+
+    @Override
+    @GetMapping("/{id}")
+    public ApiResponse<ShowDetailResponse> getShowDetail(@PathVariable final Long id) {
+        final GetShowDetailUseCase.Input input = new GetShowDetailUseCase.Input(id);
+        final GetShowDetailUseCase.Output output = getShowDetailUseCase.execute(input);
+        return ApiResponse.success(output.show());
     }
 
     @Override
