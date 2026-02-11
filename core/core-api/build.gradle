@@ -38,6 +38,11 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.1.15")
 
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
     //swagger
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.15"
 
