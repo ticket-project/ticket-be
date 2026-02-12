@@ -1,267 +1,322 @@
 -- ==========================
 -- 카테고리 생성
 -- ==========================
-INSERT INTO CATEGORYS (id, name, code, created_at, created_by) VALUES (1, '콘서트', 'CONCERT', '2026-01-01 10:00:00', 'seed');
-INSERT INTO CATEGORYS (id, name, code, created_at, created_by) VALUES (2, '연극', 'THEATER', '2026-01-01 10:00:00', 'seed');
+INSERT INTO CATEGORYS (id, name, code, created_at, created_by, status) VALUES (1, '콘서트', 'CONCERT', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO CATEGORYS (id, name, code, created_at, created_by, status) VALUES (2, '연극', 'THEATER', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- ==========================
 -- 장르 생성 (카테고리별)
 -- ==========================
--- 콘서트 장르
-INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (1, 1, 'K-POP', 'KPOP', '2026-01-01 10:00:00', 'seed');
-INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (2, 1, '힙합', 'HIPHOP', '2026-01-01 10:00:00', 'seed');
-INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (3, 1, 'R&B', 'RNB', '2026-01-01 10:00:00', 'seed');
-INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (4, 1, '팝', 'POP', '2026-01-01 10:00:00', 'seed');
-INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (5, 1, '록/메탈', 'ROCK', '2026-01-01 10:00:00', 'seed');
-INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (6, 1, '발라드', 'BALLAD', '2026-01-01 10:00:00', 'seed');
-INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (7, 1, '인디/밴드', 'INDIE', '2026-01-01 10:00:00', 'seed');
--- 연극 장르
-INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (8, 2, '드라마', 'DRAMA', '2026-01-01 10:00:00', 'seed');
-INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (9, 2, '코미디', 'COMEDY', '2026-01-01 10:00:00', 'seed');
-INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES (10, 2, '뮤지컬', 'MUSICAL', '2026-01-01 10:00:00', 'seed');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by, status) VALUES (1, 1, 'K-POP', 'KPOP', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by, status) VALUES (2, 1, '힙합', 'HIPHOP', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by, status) VALUES (3, 1, 'R&B', 'RNB', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by, status) VALUES (4, 1, '팝', 'POP', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by, status) VALUES (5, 1, '록/메탈', 'ROCK', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by, status) VALUES (6, 1, '발라드', 'BALLAD', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by, status) VALUES (7, 1, '인디/밴드', 'INDIE', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by, status) VALUES (8, 2, '드라마', 'DRAMA', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by, status) VALUES (9, 2, '코미디', 'COMEDY', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO GENRES (id, category_id, name, code, created_at, created_by, status) VALUES (10, 2, '뮤지컬', 'MUSICAL', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- ==========================
--- 콘서트 공연 생성 (40개)
+-- 아티스트(Performer) 생성
 -- ==========================
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (1, 'BTS', 'https://example.com/performers/bts.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (2, 'BLACKPINK', 'https://example.com/performers/bp.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (3, 'SEVENTEEN', 'https://example.com/performers/svt.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (4, 'aespa', 'https://example.com/performers/aespa.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (5, 'Stray Kids', 'https://example.com/performers/skz.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (6, 'TWICE', 'https://example.com/performers/twice.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (7, 'NCT 127', 'https://example.com/performers/nct127.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (8, 'NewJeans', 'https://example.com/performers/nj.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (9, 'IU', 'https://example.com/performers/iu.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (10, '태연', 'https://example.com/performers/taeyeon.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (11, 'Coldplay', 'https://example.com/performers/coldplay.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (12, 'Ed Sheeran', 'https://example.com/performers/ed.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (13, 'Taylor Swift', 'https://example.com/performers/taylor.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (14, 'Bruno Mars', 'https://example.com/performers/bruno.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (15, '잔나비', 'https://example.com/performers/jannabi.jpg', 1);
 
--- K-POP 그룹 (1~15)
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (1, 'BTS 월드투어', 'Yet To Come in Seoul', 'BTS 데뷔 10주년 기념 콘서트', '2026-03-01', '2026-03-03', 150000, 'ACTIVE', 'EXCLUSIVE', '2026-02-01', '2026-03-01', 'https://example.com/bts.jpg', 'SEOUL', '잠실올림픽주경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (2, 'BLACKPINK 콘서트', 'Born Pink World Tour', '블랙핑크 월드투어 서울 공연', '2026-04-15', '2026-04-17', 120000, 'ACTIVE', 'GENERAL', '2026-03-15', '2026-04-15', 'https://example.com/bp.jpg', 'SEOUL', '고척스카이돔', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (3, 'SEVENTEEN 콘서트', 'Follow Again', '세븐틴 앙코르 콘서트', '2026-01-28', '2026-01-30', 95000, 'ACTIVE', 'GENERAL', '2025-12-28', '2026-01-28', 'https://example.com/svt.jpg', 'INCHEON', '인천 인스파이어 아레나', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (4, 'aespa 콘서트', 'SYNK: Parallel Line', '에스파 첫 단독 콘서트', '2026-06-01', '2026-06-02', 78000, 'ACTIVE', 'GENERAL', '2026-05-01', '2026-06-01', 'https://example.com/aespa.jpg', 'SEOUL', '올림픽공원 체조경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (5, 'Stray Kids 콘서트', 'MANIAC', '스트레이 키즈 월드투어', '2026-02-20', '2026-02-22', 92000, 'ACTIVE', 'EXCLUSIVE', '2026-01-20', '2026-02-20', 'https://example.com/skz.jpg', 'SEOUL', '고척스카이돔', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (6, 'TWICE 콘서트', 'Ready To Be', '트와이스 앙코르', '2026-05-15', '2026-05-17', 88000, 'ACTIVE', 'GENERAL', '2026-04-15', '2026-05-15', 'https://example.com/twice.jpg', 'SEOUL', '잠실올림픽주경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (7, 'NCT 127 콘서트', 'NEO CITY', 'NCT 127 단독 콘서트', '2026-03-10', '2026-03-12', 75000, 'ACTIVE', 'GENERAL', '2026-02-10', '2026-03-10', 'https://example.com/nct127.jpg', 'SEOUL', '올림픽공원 체조경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (8, 'NewJeans 팬미팅', 'Bunnies Day', '뉴진스 첫 팬미팅', '2026-05-10', '2026-05-11', 45000, 'ACTIVE', 'EXCLUSIVE', '2026-04-10', '2026-05-10', 'https://example.com/nj.jpg', 'SEOUL', '블루스퀘어 신한카드홀', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (9, 'ITZY 콘서트', 'CHECKMATE', '있지 단독 콘서트', '2026-04-05', '2026-04-06', 52000, 'ACTIVE', 'GENERAL', '2026-03-05', '2026-04-05', 'https://example.com/itzy.jpg', 'SEOUL', '올림픽공원 체조경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (10, 'LE SSERAFIM 콘서트', 'FLAME RISES', '르세라핌 첫 단독 콘서트', '2026-07-20', '2026-07-21', 48000, 'ACTIVE', 'GENERAL', '2026-06-20', '2026-07-20', 'https://example.com/lsrf.jpg', 'SEOUL', '블루스퀘어 신한카드홀', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (11, 'EXO 콘서트', 'EXO PLANET', '엑소 완전체 콘서트', '2026-08-01', '2026-08-03', 115000, 'ACTIVE', 'EXCLUSIVE', '2026-07-01', '2026-08-01', 'https://example.com/exo.jpg', 'SEOUL', '잠실올림픽주경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (12, 'SHINee 콘서트', 'SHINee World', '샤이니 데뷔 18주년', '2026-05-25', '2026-05-27', 82000, 'ACTIVE', 'GENERAL', '2026-04-25', '2026-05-25', 'https://example.com/shinee.jpg', 'SEOUL', '고척스카이돔', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (13, 'Red Velvet 콘서트', 'R to V', '레드벨벳 단독 콘서트', '2026-06-15', '2026-06-16', 58000, 'ACTIVE', 'GENERAL', '2026-05-15', '2026-06-15', 'https://example.com/rv.jpg', 'SEOUL', '올림픽공원 체조경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (14, 'TXT 콘서트', 'ACT: PROMISE', '투모로우바이투게더 월드투어', '2026-03-25', '2026-03-27', 67000, 'ACTIVE', 'GENERAL', '2026-02-25', '2026-03-25', 'https://example.com/txt.jpg', 'INCHEON', '인천 인스파이어 아레나', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (15, 'ENHYPEN 콘서트', 'FATE', '엔하이픈 단독 콘서트', '2026-04-20', '2026-04-21', 55000, 'ACTIVE', 'GENERAL', '2026-03-20', '2026-04-20', 'https://example.com/enhypen.jpg', 'SEOUL', '올림픽공원 체조경기장', '2026-01-01 10:00:00', 'seed');
-
--- K-POP 솔로 (16~25)
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (16, 'IU 콘서트', 'The Golden Hour', '아이유 단독 콘서트', '2026-02-14', '2026-02-16', 85000, 'ACTIVE', 'EXCLUSIVE', '2026-01-14', '2026-02-14', 'https://example.com/iu.jpg', 'SEOUL', '올림픽공원 체조경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (17, '태연 콘서트', 'The ODDNESS', '태연 솔로 콘서트', '2026-01-25', '2026-01-26', 42000, 'ACTIVE', 'GENERAL', '2025-12-25', '2026-01-25', 'https://example.com/taeyeon.jpg', 'SEOUL', '블루스퀘어 신한카드홀', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (18, '정국 솔로 콘서트', 'GOLDEN', '정국 첫 솔로 월드투어', '2026-07-01', '2026-07-03', 135000, 'ACTIVE', 'EXCLUSIVE', '2026-06-01', '2026-07-01', 'https://example.com/jk.jpg', 'SEOUL', '잠실올림픽주경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (19, '지민 솔로 콘서트', 'FACE', '지민 솔로 앙코르', '2026-06-20', '2026-06-22', 98000, 'ACTIVE', 'GENERAL', '2026-05-20', '2026-06-20', 'https://example.com/jimin.jpg', 'SEOUL', '고척스카이돔', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (20, '백현 콘서트', 'DOOR', '백현 솔로 콘서트', '2026-05-01', '2026-05-02', 63000, 'ACTIVE', 'GENERAL', '2026-04-01', '2026-05-01', 'https://example.com/baekhyun.jpg', 'SEOUL', '올림픽공원 체조경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (21, '카이 콘서트', 'Rover', '카이 첫 솔로 콘서트', '2026-04-10', '2026-04-11', 38000, 'ACTIVE', 'GENERAL', '2026-03-10', '2026-04-10', 'https://example.com/kai.jpg', 'SEOUL', '블루스퀘어 신한카드홀', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (22, '수지 팬미팅', 'With', '수지 데뷔 15주년', '2026-03-15', '2026-03-15', 15000, 'ACTIVE', 'EXCLUSIVE', '2026-02-15', '2026-03-15', 'https://example.com/suzy.jpg', 'SEOUL', 'YES24 라이브홀', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (23, '청하 콘서트', 'Querencia', '청하 솔로 콘서트', '2026-02-01', '2026-02-02', 28000, 'ACTIVE', 'GENERAL', '2026-01-01', '2026-02-01', 'https://example.com/chungha.jpg', 'SEOUL', '올림픽공원 체조경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (24, '선미 콘서트', 'LALALAY', '선미 단독 콘서트', '2026-08-10', '2026-08-11', 32000, 'ACTIVE', 'GENERAL', '2026-07-10', '2026-08-10', 'https://example.com/sunmi.jpg', 'SEOUL', '블루스퀘어 신한카드홀', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (25, '화사 콘서트', 'Maria', '화사 솔로 콘서트', '2026-06-05', '2026-06-06', 25000, 'ACTIVE', 'GENERAL', '2026-05-05', '2026-06-05', 'https://example.com/hwasa.jpg', 'SEOUL', 'YES24 라이브홀', '2026-01-01 10:00:00', 'seed');
-
--- 해외 아티스트 (26~35)
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (26, 'Coldplay 내한공연', 'Music of the Spheres', '콜드플레이 첫 내한', '2026-04-25', '2026-04-26', 110000, 'ACTIVE', 'EXCLUSIVE', '2026-03-25', '2026-04-25', 'https://example.com/coldplay.jpg', 'SEOUL', '잠실올림픽주경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (27, 'Ed Sheeran 내한공연', 'Mathematics Tour', '에드 시런 아시아 투어', '2026-03-20', '2026-03-21', 88000, 'ACTIVE', 'GENERAL', '2026-02-20', '2026-03-20', 'https://example.com/ed.jpg', 'SEOUL', '고척스카이돔', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (28, 'Taylor Swift 내한공연', 'Eras Tour', '테일러 스위프트 첫 내한', '2026-09-10', '2026-09-12', 180000, 'ACTIVE', 'EXCLUSIVE', '2026-08-10', '2026-09-10', 'https://example.com/taylor.jpg', 'SEOUL', '잠실올림픽주경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (29, 'Bruno Mars 내한공연', '24K Magic', '브루노 마스 콘서트', '2026-05-30', '2026-05-31', 95000, 'ACTIVE', 'GENERAL', '2026-04-30', '2026-05-30', 'https://example.com/bruno.jpg', 'SEOUL', '고척스카이돔', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (30, 'Billie Eilish 내한공연', 'Happier Than Ever', '빌리 아일리시 첫 내한', '2026-07-15', '2026-07-16', 72000, 'ACTIVE', 'GENERAL', '2026-06-15', '2026-07-15', 'https://example.com/billie.jpg', 'SEOUL', '올림픽공원 체조경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (31, 'The Weeknd 내한공연', 'After Hours', '더 위켄드 아시아 투어', '2026-08-20', '2026-08-21', 85000, 'ACTIVE', 'GENERAL', '2026-07-20', '2026-08-20', 'https://example.com/weeknd.jpg', 'SEOUL', '잠실올림픽주경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (32, 'Post Malone 내한공연', 'Twelve Carat', '포스트 말론 콘서트', '2026-06-25', '2026-06-26', 68000, 'ACTIVE', 'EXCLUSIVE', '2026-05-25', '2026-06-25', 'https://example.com/post.jpg', 'SEOUL', '고척스카이돔', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (33, 'Harry Styles 내한공연', 'Love On Tour', '해리 스타일스 첫 내한', '2026-04-01', '2026-04-02', 78000, 'ACTIVE', 'GENERAL', '2026-03-01', '2026-04-01', 'https://example.com/harry.jpg', 'SEOUL', '올림픽공원 체조경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (34, 'Doja Cat 내한공연', 'Scarlet Tour', '도자 캣 아시아 투어', '2026-09-05', '2026-09-06', 42000, 'ACTIVE', 'GENERAL', '2026-08-05', '2026-09-05', 'https://example.com/doja.jpg', 'SEOUL', '블루스퀘어 신한카드홀', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (35, 'Maroon 5 내한공연', 'Jordi World Tour', '마룬5 내한 콘서트', '2026-10-01', '2026-10-02', 75000, 'ACTIVE', 'EXCLUSIVE', '2026-09-01', '2026-10-01', 'https://example.com/maroon5.jpg', 'SEOUL', '고척스카이돔', '2026-01-01 10:00:00', 'seed');
-
--- 국내 밴드/힙합 (36~40)
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (36, '잔나비 콘서트', 'PANORAMA', '잔나비 전국투어 서울', '2026-02-28', '2026-03-01', 45000, 'ACTIVE', 'GENERAL', '2026-01-28', '2026-02-28', 'https://example.com/jannabi.jpg', 'SEOUL', '올림픽공원 체조경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (37, 'HYUKOH 콘서트', '연결의 밤', '혁오 단독 콘서트', '2026-03-08', '2026-03-09', 35000, 'ACTIVE', 'GENERAL', '2026-02-08', '2026-03-08', 'https://example.com/hyukoh.jpg', 'SEOUL', '블루스퀘어 신한카드홀', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (38, '넬 콘서트', 'Healing', '넬 데뷔 25주년', '2026-04-12', '2026-04-13', 22000, 'ACTIVE', 'GENERAL', '2026-03-12', '2026-04-12', 'https://example.com/nell.jpg', 'SEOUL', 'YES24 라이브홀', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (39, '박재범 콘서트', 'AOMG TOUR', '박재범 솔로 콘서트', '2026-05-20', '2026-05-21', 38000, 'ACTIVE', 'EXCLUSIVE', '2026-04-20', '2026-05-20', 'https://example.com/jaypark.jpg', 'SEOUL', '올림픽공원 체조경기장', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
-VALUES (40, 'pH-1 & 그루비룸', 'H1GHR MUSIC SHOW', '하이어뮤직 콘서트', '2026-06-10', '2026-06-11', 18000, 'ACTIVE', 'GENERAL', '2026-05-10', '2026-06-10', 'https://example.com/ph1.jpg', 'SEOUL', 'YES24 라이브홀', '2026-01-01 10:00:00', 'seed');
-
+-- 추가 아티스트
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (16, 'AKMU', 'https://example.com/performers/akmu.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (17, 'DAY6', 'https://example.com/performers/day6.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (18, '10CM', 'https://example.com/performers/10cm.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (19, '검정치마', 'https://example.com/performers/blackskirt.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (20, 'HYUKOH', 'https://example.com/performers/hyukoh.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (21, '이무진', 'https://example.com/performers/leemujin.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (22, '박효신', 'https://example.com/performers/parkhyoshin.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (23, '성시경', 'https://example.com/performers/sungsikyung.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (24, '폴킴', 'https://example.com/performers/paulkim.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (25, '볼빨간사춘기', 'https://example.com/performers/bol4.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (26, 'YB', 'https://example.com/performers/yb.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (27, '자우림', 'https://example.com/performers/jaurim.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (28, '국카스텐', 'https://example.com/performers/guckkasten.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (29, '장범준', 'https://example.com/performers/jangbumjune.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (30, '백예린', 'https://example.com/performers/baekyerin.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (31, 'Charlie Puth', 'https://example.com/performers/charlieputh.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (32, 'Dua Lipa', 'https://example.com/performers/dualipa.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (33, 'Maroon 5', 'https://example.com/performers/maroon5.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (34, 'Imagine Dragons', 'https://example.com/performers/imaginedragons.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (35, 'Sam Smith', 'https://example.com/performers/samsmith.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (36, '국립극단', 'https://example.com/performers/nationaltheater.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (37, '서울시뮤지컬단', 'https://example.com/performers/seoulmusical.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (38, '극단청춘', 'https://example.com/performers/youththeater.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (39, '뮤지컬컴퍼니R', 'https://example.com/performers/musicalr.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (40, '연우무대', 'https://example.com/performers/yeonwoostage.jpg', 1);
 
 -- ==========================
--- 공연-장르 매핑
+-- 공연장(Venue) 생성
 -- ==========================
--- K-POP 그룹 (1~15) -> K-POP 장르
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (1, 1, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (2, 2, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (3, 3, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (4, 4, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (5, 5, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (6, 6, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (7, 7, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (8, 8, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (9, 9, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (10, 10, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (11, 11, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (12, 12, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (13, 13, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (14, 14, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (15, 15, 1, '2026-01-01 10:00:00', 'seed');
--- K-POP 솔로 (16~25) -> K-POP + 일부 R&B
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (16, 16, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (17, 17, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (18, 18, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (19, 19, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (20, 19, 3, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (21, 20, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (22, 20, 3, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (23, 21, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (24, 22, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (25, 23, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (26, 24, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (27, 25, 1, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (28, 25, 3, '2026-01-01 10:00:00', 'seed');
--- 해외 아티스트 (26~35) -> 팝
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (29, 26, 4, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (30, 27, 4, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (31, 28, 4, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (32, 29, 4, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (33, 29, 3, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (34, 30, 4, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (35, 31, 3, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (36, 32, 2, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (37, 33, 4, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (38, 34, 2, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (39, 34, 4, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (40, 35, 4, '2026-01-01 10:00:00', 'seed');
--- 국내 밴드/힙합 (36~40) -> 인디/밴드, 힙합
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (41, 36, 7, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (42, 37, 7, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (43, 38, 7, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (44, 38, 6, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (45, 39, 2, '2026-01-01 10:00:00', 'seed');
-INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by) VALUES (46, 40, 2, '2026-01-01 10:00:00', 'seed');
+INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (1, '잠실올림픽주경기장', '서울특별시 송파구 올림픽로 25', 'SEOUL', 37.51536200, 127.07332200, '02-2240-8800', 'https://example.com/venues/jamsil.jpg');
+INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (2, '고척스카이돔', '서울특별시 구로구 경인로 430', 'SEOUL', 37.49818700, 126.86715800, '02-2128-2300', 'https://example.com/venues/gocheok.jpg');
+INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (3, '인천 인스파이어 아레나', '인천광역시 중구 공항문화로 127', 'INCHEON', 37.46011200, 126.43805900, '032-729-2000', 'https://example.com/venues/inspire.jpg');
+INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (4, '올림픽공원 체조경기장', '서울특별시 송파구 올림픽로 424', 'SEOUL', 37.52125600, 127.12596100, '02-410-1114', 'https://example.com/venues/kspo.jpg');
+INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (5, '블루스퀘어 신한카드홀', '서울특별시 용산구 이태원로 294', 'SEOUL', 37.54131500, 126.99724500, '02-1588-5212', 'https://example.com/venues/bluesquare.jpg');
 
+-- 추가 공연장
+INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (6, '부산아시아드주경기장', '부산광역시 연제구 월드컵대로 344', 'GYEONGSANG', 35.19029500, 129.05923100, '051-500-2114', 'https://example.com/venues/busan_asiad.jpg');
+INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (7, '대구 EXCO 오디토리움', '대구광역시 북구 엑스코로 10', 'GYEONGSANG', 35.90611900, 128.61363700, '053-601-5000', 'https://example.com/venues/daegu_exco.jpg');
+INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (8, '광주 유니버시아드체육관', '광주광역시 서구 금화로 278', 'JEOLLA', 35.13487400, 126.87522100, '062-613-8240', 'https://example.com/venues/gwangju_uni.jpg');
+INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (9, '대전컨벤션센터 제2전시장', '대전광역시 유성구 엑스포로 107', 'CHUNGCHEONG', 36.37317000, 127.38027000, '042-250-1100', 'https://example.com/venues/dcc2.jpg');
+INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (10, '제주국제컨벤션센터', '제주특별자치도 서귀포시 중문관광로 224', 'JEJU', 33.24709200, 126.40887000, '064-735-1000', 'https://example.com/venues/icc_jeju.jpg');
 
--- 기본 좌석(행/열) 생성
 -- ==========================
-INSERT INTO SEAT (id, seat_row, seat_col, created_at, created_by)
-VALUES (1, 'A', '1', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SEAT (id, seat_row, seat_col, created_at, created_by)
-VALUES (2, 'A', '2', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SEAT (id, seat_row, seat_col, created_at, created_by)
-VALUES (3, 'A', '3', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SEAT (id, seat_row, seat_col, created_at, created_by)
-VALUES (4, 'B', '1', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SEAT (id, seat_row, seat_col, created_at, created_by)
-VALUES (5, 'B', '2', '2026-01-01 10:00:00', 'seed');
-INSERT INTO SEAT (id, seat_row, seat_col, created_at, created_by)
-VALUES (6, 'B', '3', '2026-01-01 10:00:00', 'seed');
---
--- -- ==========================
--- -- 공연 회차(Performance) 샘플 2개
--- -- show_id 는 그냥 100 번으로 가정
--- -- ==========================
---
--- INSERT INTO PERFORMANCE (id,
---                          show_id,
---                          round_no,
---                          start_time,
---                          end_time,
---                          order_open_time,
---                          order_close_time,
---                          state,
---                          status,
---                          max_can_hold_count,
---                          hold_time,
---                          created_at,
---                          created_by)
--- VALUES (1,
---         1,
---         1,
---         '2025-12-24 19:00:00',
---         '2025-12-24 21:30:00',
---         '2025-12-01 10:00:00',
---         '2025-12-24 18:00:00',
---         'OPEN',
---         'ACTIVE',
---         4,
---         300,
---         '2026-01-01 10:00:00',
---         'seed');
---
--- INSERT INTO PERFORMANCE (id,
---                          show_id,
---                          round_no,
---                          start_time,
---                          end_time,
---                          order_open_time,
---                          order_close_time,
---                          state,
---                          status,
---                          max_can_hold_count,
---                          hold_time,
---                          created_at,
---                          created_by)
--- VALUES (2,
---         1,
---         1,
---         '2025-12-25 14:00:00',
---         '2025-12-25 16:30:00',
---         '2025-12-01 10:00:00',
---         '2025-12-25 13:00:00',
---         'OPEN',
---         'ACTIVE',
---         4,
---         300,
---         '2026-01-01 10:00:00',
---         'seed');
---
--- -- ==========================
--- -- 회차 1번(performance_id = 1)의 좌석 상태
--- -- A1, A2는 예매 가능 / A3는 이미 예매된 상태로 가정
--- -- ==========================
--- INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
--- VALUES (1, 1, 1, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A1
---
--- INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
--- VALUES (2, 1, 2, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A2
---
--- INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
--- VALUES (3, 1, 3, 'AVAILABLE', '2026-01-01 10:00:00', 'seed');
--- -- A3 (이미 예매됨)
---
--- -- 회차 2번(performance_id = 2)도 몇 개 넣어보자
--- INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
--- VALUES (4, 2, 1, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A1
---
--- INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
--- VALUES (5, 2, 2, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A2
---
--- INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, created_at, created_by)
--- VALUES (6, 2, 3, 'AVAILABLE', '2026-01-01 10:00:00', 'seed'); -- A3  여기에 모든 행에 created_at, created_by 넣어줘
+-- 공연 생성 (1~60)
+-- ==========================
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (1, 'BTS 월드투어', 'Yet To Come in Seoul', 'BTS 데뷔 10주년 기념 콘서트', '2026-03-01', '2026-03-03', 150000, 'EXCLUSIVE', '2026-02-01', '2026-03-01', 'https://example.com/bts.jpg', 1, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (2, 'BLACKPINK 콘서트', 'Born Pink World Tour', '블랙핑크 월드투어 서울 공연', '2026-04-15', '2026-04-17', 120000, 'GENERAL', '2026-03-15', '2026-04-15', 'https://example.com/bp.jpg', 2, 2, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (3, 'SEVENTEEN 콘서트', 'Follow Again', '세븐틴 앙코르 콘서트', '2026-01-28', '2026-01-30', 95000, 'GENERAL', '2025-12-28', '2026-01-28', 'https://example.com/svt.jpg', 3, 3, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (4, 'aespa 콘서트', 'SYNK: Parallel Line', '에스파 첫 단독 콘서트', '2026-06-01', '2026-06-02', 78000, 'GENERAL', '2026-05-01', '2026-06-01', 'https://example.com/aespa.jpg', 4, 4, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (5, 'Stray Kids 콘서트', 'MANIAC', '스트레이 키즈 월드투어', '2026-02-20', '2026-02-22', 92000, 'EXCLUSIVE', '2026-01-20', '2026-02-20', 'https://example.com/skz.jpg', 2, 5, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (6, 'TWICE 콘서트', 'Ready To Be', '트와이스 앙코르', '2026-05-15', '2026-05-17', 88000, 'GENERAL', '2026-04-15', '2026-05-15', 'https://example.com/twice.jpg', 1, 6, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (7, 'NCT 127 콘서트', 'NEO CITY', 'NCT 127 단독 콘서트', '2026-03-10', '2026-03-12', 75000, 'GENERAL', '2026-02-10', '2026-03-10', 'https://example.com/nct127.jpg', 4, 7, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (8, 'NewJeans 팬미팅', 'Bunnies Day', '뉴진스 첫 팬미팅', '2026-05-10', '2026-05-11', 45000, 'EXCLUSIVE', '2026-04-10', '2026-05-10', 'https://example.com/nj.jpg', 5, 8, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (9, 'IU 콘서트', 'The Golden Hour', '아이유 단독 콘서트', '2026-02-14', '2026-02-16', 85000, 'EXCLUSIVE', '2026-01-14', '2026-02-14', 'https://example.com/iu.jpg', 4, 9, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (10, '태연 콘서트', 'The ODDNESS', '태연 솔로 콘서트', '2026-01-25', '2026-01-26', 42000, 'GENERAL', '2025-12-25', '2026-01-25', 'https://example.com/taeyeon.jpg', 5, 10, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (11, 'Coldplay 내한공연', 'Music of the Spheres', '콜드플레이 첫 내한', '2026-04-25', '2026-04-26', 110000, 'EXCLUSIVE', '2026-03-25', '2026-04-25', 'https://example.com/coldplay.jpg', 1, 11, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (12, 'Ed Sheeran 내한공연', 'Mathematics Tour', '에드 시런 아시아 투어', '2026-03-20', '2026-03-21', 88000, 'GENERAL', '2026-02-20', '2026-03-20', 'https://example.com/ed.jpg', 2, 12, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (13, 'Taylor Swift 내한공연', 'Eras Tour', '테일러 스위프트 첫 내한', '2026-09-10', '2026-09-12', 180000, 'EXCLUSIVE', '2026-08-10', '2026-09-10', 'https://example.com/taylor.jpg', 1, 13, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (14, 'Bruno Mars 내한공연', '24K Magic', '브루노 마스 콘서트', '2026-05-30', '2026-05-31', 95000, 'GENERAL', '2026-04-30', '2026-05-30', 'https://example.com/bruno.jpg', 2, 14, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status)
+VALUES (15, '잔나비 콘서트', 'PANORAMA', '잔나비 전국투어 서울', '2026-02-28', '2026-03-01', 45000, 'GENERAL', '2026-01-28', '2026-02-28', 'https://example.com/jannabi.jpg', 4, 15, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+-- 추가 SHOWS (16~60)
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (16, 'AKMU 전국투어 서울', '항해 앵콜', '밴드 라이브 기반 전국투어 서울 공연', '2026-04-04', '2026-04-05', 68000, 'GENERAL', '2026-03-04', '2026-04-04', 'https://example.com/shows/akmu_seoul.jpg', 4, 16, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (17, 'DAY6 콘서트', 'Welcome to the Show', 'DAY6 라이브 밴드 콘서트', '2026-04-18', '2026-04-19', 74000, 'EXCLUSIVE', '2026-03-18', '2026-04-18', 'https://example.com/shows/day6_show.jpg', 2, 17, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (18, '10CM 소극장 콘서트', '너에게 닿기를', '감성 어쿠스틱 중심 소극장 공연', '2026-04-25', '2026-04-27', 39000, 'GENERAL', '2026-03-25', '2026-04-25', 'https://example.com/shows/10cm_smallhall.jpg', 5, 18, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (19, '검정치마 투어', 'Teen Troubles Live', '인디 록 사운드 단독 투어', '2026-05-02', '2026-05-03', 47000, 'GENERAL', '2026-04-02', '2026-05-02', 'https://example.com/shows/blackskirt_tour.jpg', 4, 19, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (20, 'HYUKOH 단독공연', 'AAA Live', '하이브리드 록 사운드 공연', '2026-05-09', '2026-05-10', 52000, 'GENERAL', '2026-04-09', '2026-05-09', 'https://example.com/shows/hyukoh_live.jpg', 4, 20, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (21, '이무진 전국투어', '별책부록', '보컬 중심 라이브 투어', '2026-05-16', '2026-05-17', 56000, 'GENERAL', '2026-04-16', '2026-05-16', 'https://example.com/shows/leemujin_tour.jpg', 8, 21, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (22, '박효신 콘서트', '겨울소리', '오케스트라 협연 스페셜 공연', '2026-06-06', '2026-06-07', 98000, 'EXCLUSIVE', '2026-05-06', '2026-06-06', 'https://example.com/shows/parkhyoshin_winter.jpg', 1, 22, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (23, '성시경 연말 콘서트', '축가 2026', '연말 시즌 대표 발라드 공연', '2026-12-19', '2026-12-21', 83000, 'EXCLUSIVE', '2026-11-19', '2026-12-19', 'https://example.com/shows/sungsikyung_yearend.jpg', 4, 23, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (24, '폴킴 팬콘서트', '마음, 둘', '토크+라이브 결합 팬콘서트', '2026-06-20', '2026-06-21', 44000, 'GENERAL', '2026-05-20', '2026-06-20', 'https://example.com/shows/paulkim_fancon.jpg', 5, 24, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (25, '볼빨간사춘기 투어', 'Seoul Breeze', '밴드셋 기반 인디팝 공연', '2026-07-03', '2026-07-04', 51000, 'GENERAL', '2026-06-03', '2026-07-03', 'https://example.com/shows/bol4_tour.jpg', 4, 25, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (26, 'YB 록 페스타', 'Rock Will Never Die', '강한 사운드 중심 록 공연', '2026-07-11', '2026-07-12', 62000, 'GENERAL', '2026-06-11', '2026-07-11', 'https://example.com/shows/yb_rockfesta.jpg', 6, 26, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (27, '자우림 단독 공연', '스테이 위드 미', '레전드 밴드 정규 셋리스트 공연', '2026-07-18', '2026-07-19', 59000, 'GENERAL', '2026-06-18', '2026-07-18', 'https://example.com/shows/jaurim_live.jpg', 7, 27, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (28, '국카스텐 콘서트', 'Pulse', '하드록 중심 단독 공연', '2026-07-25', '2026-07-26', 53000, 'GENERAL', '2026-06-25', '2026-07-25', 'https://example.com/shows/guckkasten_pulse.jpg', 8, 28, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (29, '장범준 소극장 공연', '잠이 오질 않네요', '어쿠스틱 소극장 시즌 공연', '2026-08-01', '2026-08-03', 41000, 'GENERAL', '2026-07-01', '2026-08-01', 'https://example.com/shows/jangbumjun_smallhall.jpg', 5, 29, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (30, '백예린 단독 라이브', 'Every letter I sent you', 'R&B 기반 라이브 공연', '2026-08-08', '2026-08-09', 46000, 'GENERAL', '2026-07-08', '2026-08-08', 'https://example.com/shows/baekyerin_live.jpg', 4, 30, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (31, 'Charlie Puth Live in Seoul', 'One Night Only', '글로벌 팝 스타 내한 단독 공연', '2026-08-15', '2026-08-16', 105000, 'EXCLUSIVE', '2026-07-15', '2026-08-15', 'https://example.com/shows/charlieputh_live.jpg', 2, 31, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (32, 'Dua Lipa Live in Korea', 'Future Nostalgia Night', '댄스팝 중심 내한 공연', '2026-08-22', '2026-08-23', 118000, 'EXCLUSIVE', '2026-07-22', '2026-08-22', 'https://example.com/shows/dualipa_live.jpg', 1, 32, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (33, 'Maroon 5 Live in Seoul', 'V Tour Korea', '히트곡 중심 밴드 내한 공연', '2026-08-29', '2026-08-30', 124000, 'GENERAL', '2026-07-29', '2026-08-29', 'https://example.com/shows/maroon5_live.jpg', 1, 33, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (34, 'Imagine Dragons Live', 'Mercury Seoul', '록 기반 글로벌 밴드 내한공연', '2026-09-05', '2026-09-06', 111000, 'GENERAL', '2026-08-05', '2026-09-05', 'https://example.com/shows/imagine_dragons_live.jpg', 2, 34, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (35, 'Sam Smith Live in Seoul', 'Gloria Tour', '보컬 중심 팝 라이브', '2026-09-12', '2026-09-13', 97000, 'GENERAL', '2026-08-12', '2026-09-12', 'https://example.com/shows/samsmith_live.jpg', 2, 35, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (36, 'BTS 부산 스페셜', 'Busan Festa', '부산 지역 스페셜 공연', '2026-09-19', '2026-09-20', 172000, 'EXCLUSIVE', '2026-08-19', '2026-09-19', 'https://example.com/shows/bts_busan_festa.jpg', 6, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (37, 'BLACKPINK 부산 콘서트', 'Pink Wave Busan', '부산 스타디움 투어 공연', '2026-09-26', '2026-09-27', 149000, 'EXCLUSIVE', '2026-08-26', '2026-09-26', 'https://example.com/shows/blackpink_busan.jpg', 6, 2, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (38, 'SEVENTEEN 대구 공연', 'Follow Again Daegu', '대구 지역 앵콜 공연', '2026-10-03', '2026-10-04', 92000, 'GENERAL', '2026-09-03', '2026-10-03', 'https://example.com/shows/seventeen_daegu.jpg', 7, 3, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (39, 'TWICE 대전 공연', 'Ready To Be Daejeon', '대전 특별 편성 공연', '2026-10-10', '2026-10-11', 88000, 'GENERAL', '2026-09-10', '2026-10-10', 'https://example.com/shows/twice_daejeon.jpg', 9, 6, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (40, 'IU 제주 콘서트', 'Island Mood', '제주 야외무대 스페셜 콘서트', '2026-10-17', '2026-10-18', 81000, 'EXCLUSIVE', '2026-09-17', '2026-10-17', 'https://example.com/shows/iu_jeju.jpg', 10, 9, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (41, '태연 부산 라이브', 'VOICE in Busan', '보컬 중심 부산 특별 공연', '2026-10-24', '2026-10-25', 67000, 'GENERAL', '2026-09-24', '2026-10-24', 'https://example.com/shows/taeyeon_busan.jpg', 6, 10, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (42, 'NCT 127 광주 공연', 'NEO CITY Gwangju', '광주 지역 단독 공연', '2026-11-01', '2026-11-02', 72000, 'GENERAL', '2026-10-01', '2026-11-01', 'https://example.com/shows/nct127_gwangju.jpg', 8, 7, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (43, 'NewJeans 대구 팬콘', 'Bunnies in Daegu', '팬 참여형 스페셜 팬콘', '2026-11-08', '2026-11-09', 76000, 'EXCLUSIVE', '2026-10-08', '2026-11-08', 'https://example.com/shows/newjeans_daegu.jpg', 7, 8, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (44, 'Stray Kids 부산 공연', 'MANIAC Busan', '부산 대형 공연장 일정', '2026-11-15', '2026-11-16', 102000, 'EXCLUSIVE', '2026-10-15', '2026-11-15', 'https://example.com/shows/skz_busan.jpg', 6, 5, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (45, 'Bruno Mars 추가공연', '24K Magic Extra', '매진으로 인한 추가 편성 공연', '2026-11-22', '2026-11-23', 116000, 'GENERAL', '2026-10-22', '2026-11-22', 'https://example.com/shows/bruno_extra.jpg', 2, 14, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (46, 'Coldplay 추가공연', 'Music of the Spheres Extra', '내한 2차 추가 공연', '2026-11-29', '2026-11-30', 158000, 'EXCLUSIVE', '2026-10-29', '2026-11-29', 'https://example.com/shows/coldplay_extra_2.jpg', 1, 11, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (47, 'Taylor Swift 추가공연', 'Eras Tour Extra Seoul', '요청 폭주로 추가된 2회차 일정', '2026-12-06', '2026-12-07', 230000, 'EXCLUSIVE', '2026-11-06', '2026-12-06', 'https://example.com/shows/taylor_extra.jpg', 1, 13, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (48, '뮤지컬 레미제라블', 'Les Miserables Korea', '대형 라이선스 뮤지컬 내한팀', '2026-06-13', '2026-07-19', 96000, 'GENERAL', '2026-05-13', '2026-06-13', 'https://example.com/shows/lesmis_korea.jpg', 5, 39, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (49, '뮤지컬 위키드', 'Wicked Seoul Season', '서울 장기 공연 시즌', '2026-08-01', '2026-09-20', 102000, 'GENERAL', '2026-07-01', '2026-08-01', 'https://example.com/shows/wicked_seoul.jpg', 5, 37, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (50, '연극 햄릿', 'HAMLET 2026', '현대적 연출의 셰익스피어 연극', '2026-06-20', '2026-07-05', 35000, 'GENERAL', '2026-05-20', '2026-06-20', 'https://example.com/shows/hamlet_2026.jpg', 7, 36, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (51, '연극 리어왕', 'KING LEAR', '원전 기반 고전극 재해석', '2026-09-03', '2026-09-21', 31000, 'GENERAL', '2026-08-03', '2026-09-03', 'https://example.com/shows/kinglear.jpg', 7, 36, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (52, '코미디 연극 수상한 집', 'Funny House', '코미디 장르의 가족형 연극', '2026-09-26', '2026-10-18', 28000, 'GENERAL', '2026-08-26', '2026-09-26', 'https://example.com/shows/funny_house.jpg', 9, 38, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (53, '연극 어느 날', 'One Day Story', '현대극 기반 감정선 중심 작품', '2026-10-01', '2026-10-26', 26000, 'GENERAL', '2026-09-01', '2026-10-01', 'https://example.com/shows/one_day_story.jpg', 9, 40, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (54, '뮤지컬 맘마미아', 'Mamma Mia Korea', '가족 관람형 인기 뮤지컬', '2026-10-10', '2026-11-29', 89000, 'GENERAL', '2026-09-10', '2026-10-10', 'https://example.com/shows/mammamia_korea.jpg', 5, 37, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (55, '연극 오셀로', 'OTHELLO', '고전 비극 무대화 작품', '2026-11-05', '2026-11-23', 29500, 'GENERAL', '2026-10-05', '2026-11-05', 'https://example.com/shows/othello.jpg', 7, 36, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (56, '코미디 연극 웃픈 인생', 'Laugh and Cry', '코미디+휴먼 드라마 결합 작품', '2026-11-12', '2026-12-06', 33000, 'GENERAL', '2026-10-12', '2026-11-12', 'https://example.com/shows/laugh_and_cry.jpg', 9, 38, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (57, '뮤지컬 지킬앤하이드', 'Jekyll and Hyde', '스테디셀러 라이선스 뮤지컬', '2026-11-21', '2027-01-31', 115000, 'EXCLUSIVE', '2026-10-21', '2026-11-21', 'https://example.com/shows/jekyll_hyde.jpg', 4, 37, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (58, '드라마 연극 봄의 기억', 'Memory of Spring', '서정적 드라마 장르 연극', '2026-12-03', '2026-12-28', 24500, 'GENERAL', '2026-11-03', '2026-12-03', 'https://example.com/shows/memory_of_spring.jpg', 9, 40, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (59, '국립극단 정기공연', '시즌 레퍼토리', '국립극단 시즌 레퍼토리 연극', '2027-01-08', '2027-02-07', 38000, 'GENERAL', '2026-12-08', '2027-01-08', 'https://example.com/shows/national_repertory.jpg', 7, 36, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, sale_type, sale_start_date, sale_end_date, image, venue_id, performer_id, created_at, created_by, status) VALUES (60, '서울시뮤지컬 갈라', 'Seoul Musical Gala', '주요 넘버로 구성한 갈라 콘서트', '2027-01-15', '2027-01-17', 52000, 'GENERAL', '2026-12-15', '2027-01-15', 'https://example.com/shows/seoul_musical_gala.jpg', 4, 37, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+-- ==========================
+-- 공연-장르 매핑 (1~63)
+-- ==========================
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (1, 1, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (2, 2, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (3, 3, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (4, 4, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (5, 5, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (6, 6, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (7, 7, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (8, 8, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (9, 9, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (10, 9, 6, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (11, 10, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (12, 11, 4, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (13, 11, 5, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (14, 12, 4, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (15, 13, 4, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (16, 14, 4, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (17, 14, 3, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (18, 15, 7, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (19, 16, 7, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (20, 17, 5, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (21, 18, 6, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (22, 19, 7, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (23, 20, 7, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (24, 21, 6, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (25, 22, 6, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (26, 23, 6, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (27, 24, 6, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (28, 25, 7, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (29, 26, 5, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (30, 27, 5, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (31, 28, 5, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (32, 29, 7, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (33, 30, 3, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (34, 31, 4, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (35, 32, 4, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (36, 33, 4, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (37, 34, 5, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (38, 35, 4, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (39, 36, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (40, 37, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (41, 38, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (42, 39, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (43, 40, 6, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (44, 41, 6, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (45, 42, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (46, 43, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (47, 44, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (48, 45, 4, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (49, 46, 5, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (50, 47, 4, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (51, 48, 10, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (52, 49, 10, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (53, 50, 8, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (54, 51, 8, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (55, 52, 9, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (56, 53, 8, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (57, 54, 10, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (58, 55, 8, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (59, 56, 9, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (60, 57, 10, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (61, 58, 8, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (62, 59, 8, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (63, 60, 10, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+-- ==========================
+-- 좌석 생성 (section/row_no/seat_no/is_active)
+-- ==========================
+-- A구역
+INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (1, 'A', '1', '1', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (2, 'A', '1', '2', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (3, 'A', '1', '3', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (4, 'A', '2', '1', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (5, 'A', '2', '2', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (6, 'A', '2', '3', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+-- B구역
+INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (7, 'B', '1', '1', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (8, 'B', '1', '2', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (9, 'B', '1', '3', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (10, 'B', '2', '1', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (11, 'B', '2', '2', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (12, 'B', '2', '3', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+-- ==========================
+-- 공연 등급 (show_id = 1,2 샘플)
+-- ==========================
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (1, 1, 'VIP', 'VIP석', 220000, 1);
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (2, 1, 'R', 'R석', 176000, 2);
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (3, 1, 'S', 'S석', 132000, 3);
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (4, 1, 'A', 'A석', 99000, 4);
+
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (5, 2, 'VIP', 'VIP석', 198000, 1);
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (6, 2, 'R', 'R석', 154000, 2);
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (7, 2, 'S', 'S석', 110000, 3);
+
+-- ==========================
+-- 공연-좌석 매핑 (show_id = 1)
+-- ==========================
+-- A구역 → VIP
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (1, 1, 1, 1);
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (2, 1, 2, 1);
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (3, 1, 3, 1);
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (4, 1, 4, 1);
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (5, 1, 5, 1);
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (6, 1, 6, 1);
+
+-- B구역 → R석
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (7, 1, 7, 2);
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (8, 1, 8, 2);
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (9, 1, 9, 2);
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (10, 1, 10, 2);
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (11, 1, 11, 2);
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (12, 1, 12, 2);
+
+-- ==========================
+-- 공연 회차 (Performance) - show_id = 1
+-- ==========================
+INSERT INTO PERFORMANCE (id, show_id, round_no, start_time, end_time, order_open_time, order_close_time, state, max_can_hold_count, hold_time, created_at, created_by, status)
+VALUES (1, 1, 1, '2026-03-01 19:00:00', '2026-03-01 21:30:00', '2026-02-01 10:00:00', '2026-03-01 18:00:00', 'OPEN', 4, 300, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO PERFORMANCE (id, show_id, round_no, start_time, end_time, order_open_time, order_close_time, state, max_can_hold_count, hold_time, created_at, created_by, status)
+VALUES (2, 1, 2, '2026-03-02 17:00:00', '2026-03-02 19:30:00', '2026-02-01 10:00:00', '2026-03-02 16:00:00', 'OPEN', 4, 300, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+INSERT INTO PERFORMANCE (id, show_id, round_no, start_time, end_time, order_open_time, order_close_time, state, max_can_hold_count, hold_time, created_at, created_by, status)
+VALUES (3, 1, 3, '2026-03-03 17:00:00', '2026-03-03 19:30:00', '2026-02-01 10:00:00', '2026-03-03 16:00:00', 'OPEN', 4, 300, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+-- ==========================
+-- 회차별 좌석 상태 (performance_id = 1)
+-- ==========================
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (1, 1, 1, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (2, 1, 2, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (3, 1, 3, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (4, 1, 4, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (5, 1, 5, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (6, 1, 6, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (7, 1, 7, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (8, 1, 8, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (9, 1, 9, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (10, 1, 10, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (11, 1, 11, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (12, 1, 12, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
