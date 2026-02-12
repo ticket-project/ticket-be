@@ -39,17 +39,15 @@ public class Show extends BaseEntity {
 
     private String image;
 
-    @Enumerated(EnumType.STRING)
-    private Region region;
-
-    private String venue;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Venue venue;
 
     private Integer runningMinutes;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Performer performer;
 
-    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final Long viewCount, final SaleType saleType, final LocalDate saleStartDate, final LocalDate saleEndDate, final String image, final Region region, final String venue, final Performer performer, final Integer runningMinutes) {
+    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final Long viewCount, final SaleType saleType, final LocalDate saleStartDate, final LocalDate saleEndDate, final String image, final Venue venue, final Performer performer, final Integer runningMinutes) {
         this.title = title;
         this.subTitle = subTitle;
         this.info = info;
@@ -60,7 +58,6 @@ public class Show extends BaseEntity {
         this.saleStartDate = saleStartDate;
         this.saleEndDate = saleEndDate;
         this.image = image;
-        this.region = region;
         this.venue = venue;
         this.performer = performer;
         this.runningMinutes = runningMinutes;
