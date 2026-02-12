@@ -133,7 +133,6 @@ public class TestDataFactory {
         return FIXTURE.giveMeBuilder(Show.class)
                 .setNull("id")
                 .set("status", EntityStatus.ACTIVE)
-                .set(javaGetter(Show::getRegion), Region.SEOUL)
                 .set(javaGetter(Show::getTitle), "만약에 우리")
                 .sample();
     }
