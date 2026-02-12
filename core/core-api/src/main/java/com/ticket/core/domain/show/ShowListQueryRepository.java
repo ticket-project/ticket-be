@@ -31,6 +31,7 @@ import static com.ticket.core.domain.show.QCategory.category;
 import static com.ticket.core.domain.show.QGenre.genre;
 import static com.ticket.core.domain.show.QShow.show;
 import static com.ticket.core.domain.show.QShowGenre.showGenre;
+import static com.ticket.core.domain.show.QVenue.venue;
 
 /**
  * Show 목록 조회 전용 Repository
@@ -90,6 +91,7 @@ public class ShowListQueryRepository {
         // Show 정보 조회
         List<Show> shows = queryFactory
                 .selectFrom(show)
+                .leftJoin(show.venue, venue).fetchJoin()
                 .where(show.id.in(ids))
                 .orderBy(primaryOrder, tieBreakerOrder)
                 .fetch();
@@ -100,7 +102,9 @@ public class ShowListQueryRepository {
                         genreMap.getOrDefault(s.getId(), new ArrayList<>()),
                         s.getStartDate(), s.getEndDate(), s.getViewCount(),
                         s.getSaleType(), s.getSaleStartDate(), s.getSaleEndDate(),
-                        s.getCreatedAt(), s.getRegion(), s.getVenue()))
+                        s.getCreatedAt(),
+                        s.getVenue() != null ? s.getVenue().getRegion() : null,
+                        s.getVenue() != null ? s.getVenue().getName() : null))
                 .toList());
 
         boolean hasNext = results.size() > size;
@@ -130,7 +134,7 @@ public class ShowListQueryRepository {
     public List<ShowSummaryResponse> findLatestShows(String categoryCode, int limit) {
         return queryFactory
                 .select(Projections.constructor(ShowSummaryResponse.class,
-                        show.id, show.title, show.image, show.startDate, show.endDate, show.venue, show.createdAt))
+                        show.id, show.title, show.image, show.startDate, show.endDate, show.venue.name, show.createdAt))
                 .distinct()
                 .from(show)
                 .leftJoin(showGenre).on(showGenre.show.eq(show))
@@ -145,7 +149,7 @@ public class ShowListQueryRepository {
     public List<ShowOpeningSoonSummaryResponse> findShowsSaleOpeningSoon(String categoryCode, int limit) {
         return queryFactory
                 .select(Projections.constructor(ShowOpeningSoonSummaryResponse.class,
-                        show.id, show.title, show.image, show.venue, show.saleStartDate))
+                        show.id, show.title, show.image, show.venue.name, show.saleStartDate))
                 .distinct()
                 .from(show)
                 .leftJoin(showGenre).on(showGenre.show.eq(show))
@@ -194,7 +198,7 @@ public class ShowListQueryRepository {
 
         List<ShowOpeningSoonDetailResponse> results = queryFactory
                 .select(Projections.constructor(ShowOpeningSoonDetailResponse.class,
-                        show.id, show.title, show.subTitle, show.image, show.venue, show.region,
+                        show.id, show.title, show.subTitle, show.image, show.venue.name, show.venue.region,
                         show.startDate, show.endDate, show.saleStartDate, show.saleEndDate, show.viewCount))
                 .from(show)
                 .where(show.id.in(ids))
@@ -251,8 +255,8 @@ public class ShowListQueryRepository {
 
         List<ShowSearchResponse> results = queryFactory
                 .select(Projections.constructor(ShowSearchResponse.class,
-                        show.id, show.title, show.image, show.venue,
-                        show.startDate, show.endDate, show.region, show.viewCount))
+                        show.id, show.title, show.image, show.venue.name,
+                        show.startDate, show.endDate, show.venue.region, show.viewCount))
                 .from(show)
                 .where(show.id.in(ids))
                 .orderBy(primaryOrder, tieBreakerOrder)

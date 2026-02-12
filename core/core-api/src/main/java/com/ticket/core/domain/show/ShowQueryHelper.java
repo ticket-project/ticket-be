@@ -120,7 +120,7 @@ public class ShowQueryHelper {
     }
 
     public BooleanExpression regionEq(Region region) {
-        return region != null ? show.region.eq(region) : null;
+        return region != null ? show.venue.region.eq(region) : null;
     }
 
     public BooleanExpression titleContains(String title) {
