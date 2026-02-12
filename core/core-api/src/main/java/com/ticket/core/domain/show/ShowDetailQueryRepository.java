@@ -38,6 +38,7 @@ public class ShowDetailQueryRepository {
         Show showEntity = queryFactory
                 .selectFrom(show)
                 .leftJoin(show.performer, performer).fetchJoin()
+                .leftJoin(show.venue).fetchJoin()
                 .where(show.id.eq(showId))
                 .fetchOne();
 
@@ -83,6 +84,19 @@ public class ShowDetailQueryRepository {
                 ? new PerformerInfo(performerEntity.getId(), performerEntity.getName(), performerEntity.getProfileImageUrl())
                 : null;
 
+        Venue venueEntity = showEntity.getVenue();
+        ShowDetailResponse.VenueInfo venueInfo = venueEntity != null
+                ? new ShowDetailResponse.VenueInfo(
+                        venueEntity.getId(),
+                        venueEntity.getName(),
+                        venueEntity.getAddress(),
+                        venueEntity.getRegion(),
+                        venueEntity.getLatitude(),
+                        venueEntity.getLongitude(),
+                        venueEntity.getPhone(),
+                        venueEntity.getImageUrl())
+                : null;
+
         return new ShowDetailResponse(
                 showEntity.getId(),
                 showEntity.getTitle(),
@@ -95,8 +109,7 @@ public class ShowDetailQueryRepository {
                 showEntity.getSaleStartDate(),
                 showEntity.getSaleEndDate(),
                 showEntity.getImage(),
-                showEntity.getRegion(),
-                showEntity.getVenue(),
+                venueInfo,
                 performerInfo,
                 genreNames,
                 grades,

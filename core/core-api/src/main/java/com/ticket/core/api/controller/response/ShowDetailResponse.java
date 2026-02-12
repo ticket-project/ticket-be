@@ -46,11 +46,8 @@ public record ShowDetailResponse(
         @Schema(description = "포스터 이미지 URL")
         String image,
 
-        @Schema(description = "지역")
-        Region region,
-
-        @Schema(description = "공연 장소")
-        String venue,
+        @Schema(description = "공연장 정보")
+        VenueInfo venue,
 
         @Schema(description = "출연자 정보")
         PerformerInfo performer,
@@ -90,5 +87,17 @@ public record ShowDetailResponse(
             @Schema(description = "예매 오픈 시간") LocalDateTime orderOpenTime,
             @Schema(description = "예매 마감 시간") LocalDateTime orderCloseTime,
             @Schema(description = "회차 상태") PerformanceState state
+    ) {}
+
+    @Schema(description = "공연장 정보")
+    public record VenueInfo(
+            @Schema(description = "공연장 ID") Long id,
+            @Schema(description = "공연장 이름") String name,
+            @Schema(description = "공연장 주소") String address,
+            @Schema(description = "지역") Region region,
+            @Schema(description = "위도") BigDecimal latitude,
+            @Schema(description = "경도") BigDecimal longitude,
+            @Schema(description = "전화번호") String phone,
+            @Schema(description = "공연장 이미지") String imageUrl
     ) {}
 }
