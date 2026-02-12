@@ -25,6 +25,7 @@ INSERT INTO GENRES (id, category_id, name, code, created_at, created_by) VALUES 
 -- ==========================
 
 -- K-POP 그룹 (1~15)
+
 INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
 VALUES (1, 'BTS 월드투어', 'Yet To Come in Seoul', 'BTS 데뷔 10주년 기념 콘서트', '2026-03-01', '2026-03-03', 150000, 'ACTIVE', 'EXCLUSIVE', '2026-02-01', '2026-03-01', 'https://example.com/bts.jpg', 'SEOUL', '잠실올림픽주경기장', '2026-01-01 10:00:00', 'seed');
 INSERT INTO SHOWS (id, title, sub_title, info, start_date, end_date, view_count, status, sale_type, sale_start_date, sale_end_date, image, region, venue, created_at, created_by)
