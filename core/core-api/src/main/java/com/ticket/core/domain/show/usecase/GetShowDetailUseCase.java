@@ -22,10 +22,11 @@ public class GetShowDetailUseCase {
     public record Output(ShowDetailResponse show) {}
 
     public Output execute(Input input) {
-        ShowDetailResponse detail = showDetailQueryRepository.findShowDetail(input.showId());
-        if (detail == null) {
-            throw new CoreException(ErrorType.NOT_FOUND_DATA, "공연을 찾을 수 없습니다. id=" + input.showId());
-        }
+        ShowDetailResponse detail = showDetailQueryRepository.findShowDetail(input.showId())
+                .orElseThrow(() -> new CoreException(
+                        ErrorType.NOT_FOUND_DATA,
+                        "공연을 찾을 수 없습니다. id=" + input.showId()
+                ));
         return new Output(detail);
     }
 }

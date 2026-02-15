@@ -135,7 +135,7 @@ public class ShowQueryHelper {
     }
 
     public BooleanExpression keywordContains(String keyword) {
-        return StringUtils.hasText(keyword) ? show.title.containsIgnoreCase(keyword) : null;
+        return titleContains(keyword);
     }
 
     public BooleanExpression saleStartDateGoe(LocalDate from) {
