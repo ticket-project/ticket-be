@@ -9,6 +9,7 @@ import com.ticket.core.domain.performance.Performance;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.ticket.core.domain.performance.QPerformance.performance;
 import static com.ticket.core.domain.show.QGenre.genre;
@@ -33,7 +34,7 @@ public class ShowDetailQueryRepository {
      * 공연 상세 정보 조회
      * - Show 기본정보 + Performer + 장르 목록 + 등급/가격 + 회차
      */
-    public ShowDetailResponse findShowDetail(Long showId) {
+    public Optional<ShowDetailResponse> findShowDetail(Long showId) {
         // 1. Show + Performer 조회
         Show showEntity = queryFactory
                 .selectFrom(show)
@@ -43,7 +44,7 @@ public class ShowDetailQueryRepository {
                 .fetchOne();
 
         if (showEntity == null) {
-            return null;
+            return Optional.empty();
         }
 
         // 2. 장르 목록 조회
@@ -97,7 +98,7 @@ public class ShowDetailQueryRepository {
                         venueEntity.getImageUrl())
                 : null;
 
-        return new ShowDetailResponse(
+        ShowDetailResponse response = new ShowDetailResponse(
                 showEntity.getId(),
                 showEntity.getTitle(),
                 showEntity.getSubTitle(),
@@ -116,5 +117,6 @@ public class ShowDetailQueryRepository {
                 grades,
                 performances
         );
+        return Optional.of(response);
     }
 }
