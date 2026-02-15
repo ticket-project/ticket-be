@@ -4,7 +4,7 @@ import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "COMMON_CODE_DETAIL")
+@Table(name = "COMMON_CODE_DETAILS")
 public class CommonCodeDetailEntity extends BaseEntity {
 
     @EmbeddedId

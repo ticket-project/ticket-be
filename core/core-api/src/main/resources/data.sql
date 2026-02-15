@@ -1,8 +1,8 @@
 -- ==========================
 -- 카테고리 생성
 -- ==========================
-INSERT INTO CATEGORYS (id, name, code, created_at, created_by, status) VALUES (1, '콘서트', 'CONCERT', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO CATEGORYS (id, name, code, created_at, created_by, status) VALUES (2, '연극', 'THEATER', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO CATEGORIES (id, name, code, created_at, created_by, status) VALUES (1, '콘서트', 'CONCERT', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO CATEGORIES (id, name, code, created_at, created_by, status) VALUES (2, '연극', 'THEATER', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- ==========================
 -- 장르 생성 (카테고리별)
@@ -67,18 +67,18 @@ INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, sta
 -- ==========================
 -- 공연장(Venue) 생성
 -- ==========================
-INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (1, '잠실올림픽주경기장', '서울특별시 송파구 올림픽로 25', 'SEOUL', 37.51536200, 127.07332200, '02-2240-8800', 'https://example.com/venues/jamsil.jpg');
-INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (2, '고척스카이돔', '서울특별시 구로구 경인로 430', 'SEOUL', 37.49818700, 126.86715800, '02-2128-2300', 'https://example.com/venues/gocheok.jpg');
-INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (3, '인천 인스파이어 아레나', '인천광역시 중구 공항문화로 127', 'INCHEON', 37.46011200, 126.43805900, '032-729-2000', 'https://example.com/venues/inspire.jpg');
-INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (4, '올림픽공원 체조경기장', '서울특별시 송파구 올림픽로 424', 'SEOUL', 37.52125600, 127.12596100, '02-410-1114', 'https://example.com/venues/kspo.jpg');
-INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (5, '블루스퀘어 신한카드홀', '서울특별시 용산구 이태원로 294', 'SEOUL', 37.54131500, 126.99724500, '02-1588-5212', 'https://example.com/venues/bluesquare.jpg');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (1, '잠실올림픽주경기장', '서울특별시 송파구 올림픽로 25', 'SEOUL', 37.51536200, 127.07332200, '02-2240-8800', 'https://example.com/venues/jamsil.jpg');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (2, '고척스카이돔', '서울특별시 구로구 경인로 430', 'SEOUL', 37.49818700, 126.86715800, '02-2128-2300', 'https://example.com/venues/gocheok.jpg');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (3, '인천 인스파이어 아레나', '인천광역시 중구 공항문화로 127', 'INCHEON', 37.46011200, 126.43805900, '032-729-2000', 'https://example.com/venues/inspire.jpg');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (4, '올림픽공원 체조경기장', '서울특별시 송파구 올림픽로 424', 'SEOUL', 37.52125600, 127.12596100, '02-410-1114', 'https://example.com/venues/kspo.jpg');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (5, '블루스퀘어 신한카드홀', '서울특별시 용산구 이태원로 294', 'SEOUL', 37.54131500, 126.99724500, '02-1588-5212', 'https://example.com/venues/bluesquare.jpg');
 
 -- 추가 공연장
-INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (6, '부산아시아드주경기장', '부산광역시 연제구 월드컵대로 344', 'GYEONGSANG', 35.19029500, 129.05923100, '051-500-2114', 'https://example.com/venues/busan_asiad.jpg');
-INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (7, '대구 EXCO 오디토리움', '대구광역시 북구 엑스코로 10', 'GYEONGSANG', 35.90611900, 128.61363700, '053-601-5000', 'https://example.com/venues/daegu_exco.jpg');
-INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (8, '광주 유니버시아드체육관', '광주광역시 서구 금화로 278', 'JEOLLA', 35.13487400, 126.87522100, '062-613-8240', 'https://example.com/venues/gwangju_uni.jpg');
-INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (9, '대전컨벤션센터 제2전시장', '대전광역시 유성구 엑스포로 107', 'CHUNGCHEONG', 36.37317000, 127.38027000, '042-250-1100', 'https://example.com/venues/dcc2.jpg');
-INSERT INTO VENUE (id, name, address, region, latitude, longitude, phone, image_url) VALUES (10, '제주국제컨벤션센터', '제주특별자치도 서귀포시 중문관광로 224', 'JEJU', 33.24709200, 126.40887000, '064-735-1000', 'https://example.com/venues/icc_jeju.jpg');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (6, '부산아시아드주경기장', '부산광역시 연제구 월드컵대로 344', 'GYEONGSANG', 35.19029500, 129.05923100, '051-500-2114', 'https://example.com/venues/busan_asiad.jpg');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (7, '대구 EXCO 오디토리움', '대구광역시 북구 엑스코로 10', 'GYEONGSANG', 35.90611900, 128.61363700, '053-601-5000', 'https://example.com/venues/daegu_exco.jpg');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (8, '광주 유니버시아드체육관', '광주광역시 서구 금화로 278', 'JEOLLA', 35.13487400, 126.87522100, '062-613-8240', 'https://example.com/venues/gwangju_uni.jpg');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (9, '대전컨벤션센터 제2전시장', '대전광역시 유성구 엑스포로 107', 'CHUNGCHEONG', 36.37317000, 127.38027000, '042-250-1100', 'https://example.com/venues/dcc2.jpg');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (10, '제주국제컨벤션센터', '제주특별자치도 서귀포시 중문관광로 224', 'JEJU', 33.24709200, 126.40887000, '064-735-1000', 'https://example.com/venues/icc_jeju.jpg');
 
 -- ==========================
 -- 공연 생성 (1~60)
@@ -247,20 +247,20 @@ INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) 
 -- 좌석 생성 (section/row_no/seat_no)
 -- ==========================
 -- A구역
-INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (1, 'A', '1', '1', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (2, 'A', '1', '2', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (3, 'A', '1', '3', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (4, 'A', '2', '1', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (5, 'A', '2', '2', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (6, 'A', '2', '3', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status) VALUES (1, 'A', '1', '1', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status) VALUES (2, 'A', '1', '2', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status) VALUES (3, 'A', '1', '3', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status) VALUES (4, 'A', '2', '1', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status) VALUES (5, 'A', '2', '2', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status) VALUES (6, 'A', '2', '3', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- B구역
-INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (7, 'B', '1', '1', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (8, 'B', '1', '2', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (9, 'B', '1', '3', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (10, 'B', '2', '1', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (11, 'B', '2', '2', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (12, 'B', '2', '3', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status) VALUES (7, 'B', '1', '1', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status) VALUES (8, 'B', '1', '2', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status) VALUES (9, 'B', '1', '3', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status) VALUES (10, 'B', '2', '1', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status) VALUES (11, 'B', '2', '2', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status) VALUES (12, 'B', '2', '3', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- ==========================
 -- 공연 등급 (show_id = 1,2 샘플)
@@ -296,58 +296,58 @@ INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (12, 1, 12, 
 -- ==========================
 -- 공연 회차 (Performance) - show_id = 1
 -- ==========================
-INSERT INTO PERFORMANCE (id, show_id, round_no, start_time, end_time, order_open_time, order_close_time, state, max_can_hold_count, hold_time, created_at, created_by, status)
+INSERT INTO PERFORMANCES (id, show_id, round_no, start_time, end_time, order_open_time, order_close_time, state, max_can_hold_count, hold_time, created_at, created_by, status)
 VALUES (1, 1, 1, '2026-03-01 19:00:00', '2026-03-01 21:30:00', '2026-02-01 10:00:00', '2026-03-01 18:00:00', 'OPEN', 4, 300, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
-INSERT INTO PERFORMANCE (id, show_id, round_no, start_time, end_time, order_open_time, order_close_time, state, max_can_hold_count, hold_time, created_at, created_by, status)
+INSERT INTO PERFORMANCES (id, show_id, round_no, start_time, end_time, order_open_time, order_close_time, state, max_can_hold_count, hold_time, created_at, created_by, status)
 VALUES (2, 1, 2, '2026-03-02 17:00:00', '2026-03-02 19:30:00', '2026-02-01 10:00:00', '2026-03-02 16:00:00', 'OPEN', 4, 300, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
-INSERT INTO PERFORMANCE (id, show_id, round_no, start_time, end_time, order_open_time, order_close_time, state, max_can_hold_count, hold_time, created_at, created_by, status)
+INSERT INTO PERFORMANCES (id, show_id, round_no, start_time, end_time, order_open_time, order_close_time, state, max_can_hold_count, hold_time, created_at, created_by, status)
 VALUES (3, 1, 3, '2026-03-03 17:00:00', '2026-03-03 19:30:00', '2026-02-01 10:00:00', '2026-03-03 16:00:00', 'OPEN', 4, 300, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- ==========================
 -- 회차별 좌석 상태 (performance_id = 1)
 -- ==========================
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (1, 1, 1, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (2, 1, 2, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (3, 1, 3, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (4, 1, 4, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (5, 1, 5, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (6, 1, 6, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (7, 1, 7, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (8, 1, 8, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (9, 1, 9, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (10, 1, 10, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (11, 1, 11, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (12, 1, 12, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (1, 1, 1, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (2, 1, 2, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (3, 1, 3, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (4, 1, 4, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (5, 1, 5, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (6, 1, 6, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (7, 1, 7, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (8, 1, 8, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (9, 1, 9, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (10, 1, 10, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (11, 1, 11, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (12, 1, 12, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 -- ==========================
 -- 회차별 좌석 상태 (performance_id = 2)
 -- ==========================
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (13, 2, 1, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (14, 2, 2, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (15, 2, 3, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (16, 2, 4, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (17, 2, 5, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (18, 2, 6, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (19, 2, 7, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (20, 2, 8, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (21, 2, 9, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (22, 2, 10, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (23, 2, 11, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (24, 2, 12, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (13, 2, 1, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (14, 2, 2, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (15, 2, 3, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (16, 2, 4, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (17, 2, 5, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (18, 2, 6, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (19, 2, 7, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (20, 2, 8, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (21, 2, 9, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (22, 2, 10, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (23, 2, 11, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (24, 2, 12, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- ==========================
 -- 회차별 좌석 상태 (performance_id = 3)
 -- ==========================
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (25, 3, 1, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (26, 3, 2, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (27, 3, 3, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (28, 3, 4, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (29, 3, 5, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (30, 3, 6, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (31, 3, 7, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (32, 3, 8, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (33, 3, 9, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (34, 3, 10, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (35, 3, 11, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (36, 3, 12, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (25, 3, 1, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (26, 3, 2, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (27, 3, 3, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (28, 3, 4, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (29, 3, 5, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (30, 3, 6, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (31, 3, 7, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (32, 3, 8, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (33, 3, 9, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (34, 3, 10, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (35, 3, 11, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEATS (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (36, 3, 12, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');

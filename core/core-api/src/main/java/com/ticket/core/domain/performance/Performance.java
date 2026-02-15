@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "PERFORMANCE")
+@Table(name = "PERFORMANCES")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Performance extends BaseEntity {
 

@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "HOLD")
+@Table(name = "HOLDS")
 public class Hold extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
