@@ -67,18 +67,18 @@ INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, sta
 -- ==========================
 -- 공연장(Venue) 생성
 -- ==========================
-INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (1, '잠실올림픽주경기장', '서울특별시 송파구 올림픽로 25', 'SEOUL', 37.51536200, 127.07332200, '02-2240-8800', 'https://example.com/venues/jamsil.jpg');
-INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (2, '고척스카이돔', '서울특별시 구로구 경인로 430', 'SEOUL', 37.49818700, 126.86715800, '02-2128-2300', 'https://example.com/venues/gocheok.jpg');
-INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (3, '인천 인스파이어 아레나', '인천광역시 중구 공항문화로 127', 'INCHEON', 37.46011200, 126.43805900, '032-729-2000', 'https://example.com/venues/inspire.jpg');
-INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (4, '올림픽공원 체조경기장', '서울특별시 송파구 올림픽로 424', 'SEOUL', 37.52125600, 127.12596100, '02-410-1114', 'https://example.com/venues/kspo.jpg');
-INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (5, '블루스퀘어 신한카드홀', '서울특별시 용산구 이태원로 294', 'SEOUL', 37.54131500, 126.99724500, '02-1588-5212', 'https://example.com/venues/bluesquare.jpg');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url, created_at, created_by, status) VALUES (1, '잠실올림픽주경기장', '서울특별시 송파구 올림픽로 25', 'SEOUL', 37.51536200, 127.07332200, '02-2240-8800', 'https://example.com/venues/jamsil.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url, created_at, created_by, status) VALUES (2, '고척스카이돔', '서울특별시 구로구 경인로 430', 'SEOUL', 37.49818700, 126.86715800, '02-2128-2300', 'https://example.com/venues/gocheok.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url, created_at, created_by, status) VALUES (3, '인천 인스파이어 아레나', '인천광역시 중구 공항문화로 127', 'INCHEON', 37.46011200, 126.43805900, '032-729-2000', 'https://example.com/venues/inspire.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url, created_at, created_by, status) VALUES (4, '올림픽공원 체조경기장', '서울특별시 송파구 올림픽로 424', 'SEOUL', 37.52125600, 127.12596100, '02-410-1114', 'https://example.com/venues/kspo.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url, created_at, created_by, status) VALUES (5, '블루스퀘어 신한카드홀', '서울특별시 용산구 이태원로 294', 'SEOUL', 37.54131500, 126.99724500, '02-1588-5212', 'https://example.com/venues/bluesquare.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- 추가 공연장
-INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (6, '부산아시아드주경기장', '부산광역시 연제구 월드컵대로 344', 'GYEONGSANG', 35.19029500, 129.05923100, '051-500-2114', 'https://example.com/venues/busan_asiad.jpg');
-INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (7, '대구 EXCO 오디토리움', '대구광역시 북구 엑스코로 10', 'GYEONGSANG', 35.90611900, 128.61363700, '053-601-5000', 'https://example.com/venues/daegu_exco.jpg');
-INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (8, '광주 유니버시아드체육관', '광주광역시 서구 금화로 278', 'JEOLLA', 35.13487400, 126.87522100, '062-613-8240', 'https://example.com/venues/gwangju_uni.jpg');
-INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (9, '대전컨벤션센터 제2전시장', '대전광역시 유성구 엑스포로 107', 'CHUNGCHEONG', 36.37317000, 127.38027000, '042-250-1100', 'https://example.com/venues/dcc2.jpg');
-INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url) VALUES (10, '제주국제컨벤션센터', '제주특별자치도 서귀포시 중문관광로 224', 'JEJU', 33.24709200, 126.40887000, '064-735-1000', 'https://example.com/venues/icc_jeju.jpg');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url, created_at, created_by, status) VALUES (6, '부산아시아드주경기장', '부산광역시 연제구 월드컵대로 344', 'GYEONGSANG', 35.19029500, 129.05923100, '051-500-2114', 'https://example.com/venues/busan_asiad.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url, created_at, created_by, status) VALUES (7, '대구 EXCO 오디토리움', '대구광역시 북구 엑스코로 10', 'GYEONGSANG', 35.90611900, 128.61363700, '053-601-5000', 'https://example.com/venues/daegu_exco.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url, created_at, created_by, status) VALUES (8, '광주 유니버시아드체육관', '광주광역시 서구 금화로 278', 'JEOLLA', 35.13487400, 126.87522100, '062-613-8240', 'https://example.com/venues/gwangju_uni.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url, created_at, created_by, status) VALUES (9, '대전컨벤션센터 제2전시장', '대전광역시 유성구 엑스포로 107', 'CHUNGCHEONG', 36.37317000, 127.38027000, '042-250-1100', 'https://example.com/venues/dcc2.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO VENUES (id, name, address, region, latitude, longitude, phone, image_url, created_at, created_by, status) VALUES (10, '제주국제컨벤션센터', '제주특별자치도 서귀포시 중문관광로 224', 'JEJU', 33.24709200, 126.40887000, '064-735-1000', 'https://example.com/venues/icc_jeju.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- ==========================
 -- 공연 생성 (1~60)
@@ -265,33 +265,33 @@ INSERT INTO SEATS (id, section, row_no, seat_no, created_at, created_by, status)
 -- ==========================
 -- 공연 등급 (show_id = 1,2 샘플)
 -- ==========================
-INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (1, 1, 'VIP', 'VIP석', 220000, 1);
-INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (2, 1, 'R', 'R석', 176000, 2);
-INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (3, 1, 'S', 'S석', 132000, 3);
-INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (4, 1, 'A', 'A석', 99000, 4);
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order, created_at, created_by, status) VALUES (1, 1, 'VIP', 'VIP석', 220000, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order, created_at, created_by, status) VALUES (2, 1, 'R', 'R석', 176000, 2, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order, created_at, created_by, status) VALUES (3, 1, 'S', 'S석', 132000, 3, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order, created_at, created_by, status) VALUES (4, 1, 'A', 'A석', 99000, 4, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
-INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (5, 2, 'VIP', 'VIP석', 198000, 1);
-INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (6, 2, 'R', 'R석', 154000, 2);
-INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order) VALUES (7, 2, 'S', 'S석', 110000, 3);
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order, created_at, created_by, status) VALUES (5, 2, 'VIP', 'VIP석', 198000, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order, created_at, created_by, status) VALUES (6, 2, 'R', 'R석', 154000, 2, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_GRADES (id, show_id, grade_code, grade_name, price, sort_order, created_at, created_by, status) VALUES (7, 2, 'S', 'S석', 110000, 3, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- ==========================
 -- 공연-좌석 매핑 (show_id = 1)
 -- ==========================
 -- A구역 → VIP
-INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (1, 1, 1, 1);
-INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (2, 1, 2, 1);
-INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (3, 1, 3, 1);
-INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (4, 1, 4, 1);
-INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (5, 1, 5, 1);
-INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (6, 1, 6, 1);
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id, created_at, created_by, status) VALUES (1, 1, 1, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id, created_at, created_by, status) VALUES (2, 1, 2, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id, created_at, created_by, status) VALUES (3, 1, 3, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id, created_at, created_by, status) VALUES (4, 1, 4, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id, created_at, created_by, status) VALUES (5, 1, 5, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id, created_at, created_by, status) VALUES (6, 1, 6, 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- B구역 → R석
-INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (7, 1, 7, 2);
-INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (8, 1, 8, 2);
-INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (9, 1, 9, 2);
-INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (10, 1, 10, 2);
-INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (11, 1, 11, 2);
-INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id) VALUES (12, 1, 12, 2);
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id, created_at, created_by, status) VALUES (7, 1, 7, 2, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id, created_at, created_by, status) VALUES (8, 1, 8, 2, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id, created_at, created_by, status) VALUES (9, 1, 9, 2, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id, created_at, created_by, status) VALUES (10, 1, 10, 2, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id, created_at, created_by, status) VALUES (11, 1, 11, 2, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SHOW_SEATS (id, show_id, seat_id, show_grade_id, created_at, created_by, status) VALUES (12, 1, 12, 2, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- ==========================
 -- 공연 회차 (Performance) - show_id = 1
