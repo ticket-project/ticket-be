@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "COMMON_CODE_GROUP")
+@Table(name = "COMMON_CODE_GROUPS")
 public class CommonCodeGroupEntity extends BaseEntity {
 
     @Id

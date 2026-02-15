@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Entity
-@Table(name = "PERFORMANCE_SEAT")
+@Table(name = "PERFORMANCE_SEATS")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PerformanceSeat extends BaseEntity {
 

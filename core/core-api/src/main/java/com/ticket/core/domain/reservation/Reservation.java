@@ -4,7 +4,7 @@ import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "RESERVATION")
+@Table(name = "RESERVATIONS")
 public class Reservation extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

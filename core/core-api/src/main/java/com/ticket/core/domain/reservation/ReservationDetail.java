@@ -3,7 +3,7 @@ package com.ticket.core.domain.reservation;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "RESERVATION_DETAIL")
+@Table(name = "RESERVATION_DETAILS")
 public class ReservationDetail {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

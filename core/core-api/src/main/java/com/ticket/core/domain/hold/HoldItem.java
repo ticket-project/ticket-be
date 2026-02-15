@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "HOLD_ITEM")
+@Table(name = "HOLD_ITEMS")
 public class HoldItem extends BaseEntity {
 
     @Id
