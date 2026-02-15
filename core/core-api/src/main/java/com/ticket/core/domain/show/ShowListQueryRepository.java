@@ -134,9 +134,10 @@ public class ShowListQueryRepository {
     public List<ShowSummaryResponse> findLatestShows(String categoryCode, int limit) {
         return queryFactory
                 .select(Projections.constructor(ShowSummaryResponse.class,
-                        show.id, show.title, show.image, show.startDate, show.endDate, show.venue.name, show.createdAt))
+                        show.id, show.title, show.image, show.startDate, show.endDate, venue.name, show.createdAt))
                 .distinct()
                 .from(show)
+                .leftJoin(show.venue, venue)
                 .leftJoin(showGenre).on(showGenre.show.eq(show))
                 .leftJoin(genre).on(showGenre.genre.eq(genre))
                 .leftJoin(category).on(genre.category.eq(category))
@@ -149,9 +150,10 @@ public class ShowListQueryRepository {
     public List<ShowOpeningSoonSummaryResponse> findShowsSaleOpeningSoon(String categoryCode, int limit) {
         return queryFactory
                 .select(Projections.constructor(ShowOpeningSoonSummaryResponse.class,
-                        show.id, show.title, show.image, show.venue.name, show.saleStartDate))
+                        show.id, show.title, show.image, venue.name, show.saleStartDate))
                 .distinct()
                 .from(show)
+                .leftJoin(show.venue, venue)
                 .leftJoin(showGenre).on(showGenre.show.eq(show))
                 .leftJoin(genre).on(showGenre.genre.eq(genre))
                 .leftJoin(category).on(genre.category.eq(category))
@@ -167,6 +169,7 @@ public class ShowListQueryRepository {
         BooleanBuilder where = new BooleanBuilder();
         where.and(show.saleStartDate.goe(LocalDate.now()));
         where.and(queryHelper.categoryCodeEq(param.getCategory()));
+        where.and(queryHelper.regionEq(param.getRegion()));
         where.and(queryHelper.titleContains(param.getTitle()));
         where.and(queryHelper.saleStartDateGoe(param.getSaleStartDateFrom()));
         where.and(queryHelper.saleStartDateLoe(param.getSaleStartDateTo()));
@@ -198,9 +201,10 @@ public class ShowListQueryRepository {
 
         List<ShowOpeningSoonDetailResponse> results = queryFactory
                 .select(Projections.constructor(ShowOpeningSoonDetailResponse.class,
-                        show.id, show.title, show.subTitle, show.image, show.venue.name, show.venue.region,
+                        show.id, show.title, show.subTitle, show.image, venue.name, venue.region,
                         show.startDate, show.endDate, show.saleStartDate, show.saleEndDate, show.viewCount))
                 .from(show)
+                .leftJoin(show.venue, venue)
                 .where(show.id.in(ids))
                 .orderBy(primaryOrder, tieBreakerOrder)
                 .fetch();
@@ -255,9 +259,10 @@ public class ShowListQueryRepository {
 
         List<ShowSearchResponse> results = queryFactory
                 .select(Projections.constructor(ShowSearchResponse.class,
-                        show.id, show.title, show.image, show.venue.name,
-                        show.startDate, show.endDate, show.venue.region, show.viewCount))
+                        show.id, show.title, show.image, venue.name,
+                        show.startDate, show.endDate, venue.region, show.viewCount))
                 .from(show)
+                .leftJoin(show.venue, venue)
                 .where(show.id.in(ids))
                 .orderBy(primaryOrder, tieBreakerOrder)
                 .fetch();

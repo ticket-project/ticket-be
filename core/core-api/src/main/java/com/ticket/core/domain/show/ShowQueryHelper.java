@@ -4,12 +4,15 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.ticket.core.support.cursor.CursorCodec;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 import static com.ticket.core.domain.show.QCategory.category;
 import static com.ticket.core.domain.show.QGenre.genre;
@@ -61,9 +64,13 @@ public class ShowQueryHelper {
 
     public void applyCursor(BooleanBuilder where, String cursor, SortOrder sortOrder) {
         if (StringUtils.hasText(cursor)) {
-            ShowCursor showCursor = cursorCodec.decode(cursor);
-            validateCursorMatchesRequest(showCursor, sortOrder);
-            where.and(cursorCondition(showCursor, sortOrder));
+            try {
+                ShowCursor showCursor = cursorCodec.decode(cursor);
+                validateCursorMatchesRequest(showCursor, sortOrder);
+                where.and(cursorCondition(showCursor, sortOrder));
+            } catch (IllegalArgumentException | DateTimeParseException ex) {
+                throw new CoreException(ErrorType.INVALID_REQUEST, "cursor 형식이 올바르지 않습니다.");
+            }
         }
     }
 
