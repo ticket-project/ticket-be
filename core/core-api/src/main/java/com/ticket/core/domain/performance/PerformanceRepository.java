@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface PerformanceRepository extends JpaRepository<Performance, Long> {
     Optional<Performance> findByIdAndStateAndStatus(Long performanceId, PerformanceState state, EntityStatus status);
+
+    Optional<Performance> findByIdAndStatus(Long performanceId, EntityStatus status);
 }

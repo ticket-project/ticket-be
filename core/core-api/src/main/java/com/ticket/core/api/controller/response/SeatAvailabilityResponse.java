@@ -7,11 +7,11 @@ import java.util.List;
 @Schema(description = "회차별 등급별 잔여석 응답")
 public record SeatAvailabilityResponse(
 
-        @Schema(description = "등급별 좌석 현황 목록")
+        @Schema(description = "등급별 잔여석 목록")
         List<GradeAvailability> grades
 ) {
 
-    @Schema(description = "등급별 좌석 현황")
+    @Schema(description = "등급별 잔여석")
     public record GradeAvailability(
             @Schema(description = "등급 이름") String gradeName,
             @Schema(description = "정렬 순서") int sortOrder,
