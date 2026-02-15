@@ -21,48 +21,48 @@ INSERT INTO GENRES (id, category_id, name, code, created_at, created_by, status)
 -- ==========================
 -- 아티스트(Performer) 생성
 -- ==========================
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (1, 'BTS', 'https://example.com/performers/bts.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (2, 'BLACKPINK', 'https://example.com/performers/bp.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (3, 'SEVENTEEN', 'https://example.com/performers/svt.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (4, 'aespa', 'https://example.com/performers/aespa.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (5, 'Stray Kids', 'https://example.com/performers/skz.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (6, 'TWICE', 'https://example.com/performers/twice.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (7, 'NCT 127', 'https://example.com/performers/nct127.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (8, 'NewJeans', 'https://example.com/performers/nj.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (9, 'IU', 'https://example.com/performers/iu.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (10, '태연', 'https://example.com/performers/taeyeon.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (11, 'Coldplay', 'https://example.com/performers/coldplay.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (12, 'Ed Sheeran', 'https://example.com/performers/ed.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (13, 'Taylor Swift', 'https://example.com/performers/taylor.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (14, 'Bruno Mars', 'https://example.com/performers/bruno.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (15, '잔나비', 'https://example.com/performers/jannabi.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (1, 'BTS', 'https://example.com/performers/bts.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (2, 'BLACKPINK', 'https://example.com/performers/bp.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (3, 'SEVENTEEN', 'https://example.com/performers/svt.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (4, 'aespa', 'https://example.com/performers/aespa.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (5, 'Stray Kids', 'https://example.com/performers/skz.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (6, 'TWICE', 'https://example.com/performers/twice.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (7, 'NCT 127', 'https://example.com/performers/nct127.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (8, 'NewJeans', 'https://example.com/performers/nj.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (9, 'IU', 'https://example.com/performers/iu.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (10, '태연', 'https://example.com/performers/taeyeon.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (11, 'Coldplay', 'https://example.com/performers/coldplay.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (12, 'Ed Sheeran', 'https://example.com/performers/ed.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (13, 'Taylor Swift', 'https://example.com/performers/taylor.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (14, 'Bruno Mars', 'https://example.com/performers/bruno.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (15, '잔나비', 'https://example.com/performers/jannabi.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- 추가 아티스트
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (16, 'AKMU', 'https://example.com/performers/akmu.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (17, 'DAY6', 'https://example.com/performers/day6.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (18, '10CM', 'https://example.com/performers/10cm.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (19, '검정치마', 'https://example.com/performers/blackskirt.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (20, 'HYUKOH', 'https://example.com/performers/hyukoh.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (21, '이무진', 'https://example.com/performers/leemujin.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (22, '박효신', 'https://example.com/performers/parkhyoshin.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (23, '성시경', 'https://example.com/performers/sungsikyung.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (24, '폴킴', 'https://example.com/performers/paulkim.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (25, '볼빨간사춘기', 'https://example.com/performers/bol4.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (26, 'YB', 'https://example.com/performers/yb.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (27, '자우림', 'https://example.com/performers/jaurim.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (28, '국카스텐', 'https://example.com/performers/guckkasten.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (29, '장범준', 'https://example.com/performers/jangbumjune.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (30, '백예린', 'https://example.com/performers/baekyerin.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (31, 'Charlie Puth', 'https://example.com/performers/charlieputh.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (32, 'Dua Lipa', 'https://example.com/performers/dualipa.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (33, 'Maroon 5', 'https://example.com/performers/maroon5.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (34, 'Imagine Dragons', 'https://example.com/performers/imaginedragons.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (35, 'Sam Smith', 'https://example.com/performers/samsmith.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (36, '국립극단', 'https://example.com/performers/nationaltheater.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (37, '서울시뮤지컬단', 'https://example.com/performers/seoulmusical.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (38, '극단청춘', 'https://example.com/performers/youththeater.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (39, '뮤지컬컴퍼니R', 'https://example.com/performers/musicalr.jpg', 1);
-INSERT INTO PERFORMERS (id, name, profile_image_url, is_active) VALUES (40, '연우무대', 'https://example.com/performers/yeonwoostage.jpg', 1);
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (16, 'AKMU', 'https://example.com/performers/akmu.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (17, 'DAY6', 'https://example.com/performers/day6.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (18, '10CM', 'https://example.com/performers/10cm.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (19, '검정치마', 'https://example.com/performers/blackskirt.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (20, 'HYUKOH', 'https://example.com/performers/hyukoh.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (21, '이무진', 'https://example.com/performers/leemujin.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (22, '박효신', 'https://example.com/performers/parkhyoshin.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (23, '성시경', 'https://example.com/performers/sungsikyung.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (24, '폴킴', 'https://example.com/performers/paulkim.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (25, '볼빨간사춘기', 'https://example.com/performers/bol4.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (26, 'YB', 'https://example.com/performers/yb.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (27, '자우림', 'https://example.com/performers/jaurim.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (28, '국카스텐', 'https://example.com/performers/guckkasten.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (29, '장범준', 'https://example.com/performers/jangbumjune.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (30, '백예린', 'https://example.com/performers/baekyerin.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (31, 'Charlie Puth', 'https://example.com/performers/charlieputh.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (32, 'Dua Lipa', 'https://example.com/performers/dualipa.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (33, 'Maroon 5', 'https://example.com/performers/maroon5.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (34, 'Imagine Dragons', 'https://example.com/performers/imaginedragons.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (35, 'Sam Smith', 'https://example.com/performers/samsmith.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (36, '국립극단', 'https://example.com/performers/nationaltheater.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (37, '서울시뮤지컬단', 'https://example.com/performers/seoulmusical.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (38, '극단청춘', 'https://example.com/performers/youththeater.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (39, '뮤지컬컴퍼니R', 'https://example.com/performers/musicalr.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMERS (id, name, profile_image_url, created_at, created_by, status) VALUES (40, '연우무대', 'https://example.com/performers/yeonwoostage.jpg', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- ==========================
 -- 공연장(Venue) 생성
@@ -244,23 +244,23 @@ INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) 
 INSERT INTO SHOW_GENRES (id, show_id, genre_id, created_at, created_by, status) VALUES (63, 60, 10, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- ==========================
--- 좌석 생성 (section/row_no/seat_no/is_active)
+-- 좌석 생성 (section/row_no/seat_no)
 -- ==========================
 -- A구역
-INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (1, 'A', '1', '1', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (2, 'A', '1', '2', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (3, 'A', '1', '3', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (4, 'A', '2', '1', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (5, 'A', '2', '2', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (6, 'A', '2', '3', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (1, 'A', '1', '1', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (2, 'A', '1', '2', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (3, 'A', '1', '3', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (4, 'A', '2', '1', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (5, 'A', '2', '2', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (6, 'A', '2', '3', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- B구역
-INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (7, 'B', '1', '1', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (8, 'B', '1', '2', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (9, 'B', '1', '3', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (10, 'B', '2', '1', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (11, 'B', '2', '2', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
-INSERT INTO SEAT (id, section, row_no, seat_no, is_active, created_at, created_by, status) VALUES (12, 'B', '2', '3', 1, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (7, 'B', '1', '1', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (8, 'B', '1', '2', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (9, 'B', '1', '3', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (10, 'B', '2', '1', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (11, 'B', '2', '2', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO SEAT (id, section, row_no, seat_no, created_at, created_by, status) VALUES (12, 'B', '2', '3', '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 
 -- ==========================
 -- 공연 등급 (show_id = 1,2 샘플)
@@ -320,3 +320,34 @@ INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created
 INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (10, 1, 10, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (11, 1, 11, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
 INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (12, 1, 12, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+-- ==========================
+-- 회차별 좌석 상태 (performance_id = 2)
+-- ==========================
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (13, 2, 1, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (14, 2, 2, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (15, 2, 3, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (16, 2, 4, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (17, 2, 5, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (18, 2, 6, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (19, 2, 7, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (20, 2, 8, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (21, 2, 9, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (22, 2, 10, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (23, 2, 11, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (24, 2, 12, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+
+-- ==========================
+-- 회차별 좌석 상태 (performance_id = 3)
+-- ==========================
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (25, 3, 1, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (26, 3, 2, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (27, 3, 3, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (28, 3, 4, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (29, 3, 5, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (30, 3, 6, 'AVAILABLE', 220000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (31, 3, 7, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (32, 3, 8, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (33, 3, 9, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (34, 3, 10, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (35, 3, 11, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
+INSERT INTO PERFORMANCE_SEAT (id, performance_id, seat_id, state, price, created_at, created_by, status) VALUES (36, 3, 12, 'AVAILABLE', 176000, '2026-01-01 10:00:00', 'seed', 'ACTIVE');
