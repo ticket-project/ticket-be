@@ -1,5 +1,6 @@
 package com.ticket.core.domain.show;
 
+import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,21 +12,26 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "SHOW_GRADES")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ShowGrade {
+public class ShowGrade extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "show_id", nullable = false)
     private Show show;
 
+    @Column(nullable = false)
     private String gradeCode;
 
+    @Column(nullable = false)
     private String gradeName;
 
+    @Column(nullable = false)
     private BigDecimal price;
 
+    @Column(nullable = false)
     private Integer sortOrder;
 
 }

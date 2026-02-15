@@ -16,19 +16,19 @@ public class Seat extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String section;
 
-    private String row_no;
+    @Column(name = "row_no", nullable = false)
+    private String rowNo;
 
-    private String seat_no;
+    @Column(name = "seat_no", nullable = false)
+    private String seatNo;
 
-    private boolean isActive;
-
-    public Seat(final String section, final String row_no, final String seat_no, final boolean isActive) {
+    public Seat(final String section, final String rowNo, final String seatNo) {
         this.section = section;
-        this.row_no = row_no;
-        this.seat_no = seat_no;
-        this.isActive = isActive;
+        this.rowNo = rowNo;
+        this.seatNo = seatNo;
     }
 
 }
