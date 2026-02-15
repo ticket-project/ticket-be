@@ -5,7 +5,6 @@ import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceRepository;
 import com.ticket.core.domain.performanceseat.SeatAvailabilityQueryRepository;
 import com.ticket.core.enums.EntityStatus;
-import com.ticket.core.enums.PerformanceState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import org.springframework.stereotype.Service;
@@ -32,9 +31,11 @@ public class GetSeatAvailabilityUseCase {
 
     public Output execute(Input input) {
         Performance performance = performanceRepository
-                .findByIdAndStateAndStatus(input.performanceId(), PerformanceState.OPEN, EntityStatus.ACTIVE)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA,
-                        "회차를 찾을 수 없습니다. id=" + input.performanceId()));
+                .findByIdAndStatus(input.performanceId(), EntityStatus.ACTIVE)
+                .orElseThrow(() -> new CoreException(
+                        ErrorType.NOT_FOUND_DATA,
+                        "회차를 찾을 수 없습니다. id=" + input.performanceId()
+                ));
 
         SeatAvailabilityResponse response = seatAvailabilityQueryRepository
                 .findSeatAvailability(performance.getId(), performance.getShow().getId());

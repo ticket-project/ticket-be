@@ -22,10 +22,7 @@ public class SeatAvailabilityQueryRepository {
     }
 
     /**
-     * 특정 회차의 등급별 잔여석 현황을 조회합니다.
-     *
-     * PerformanceSeat → ShowSeat (seat_id 기준) → ShowGrade
-     * ShowGrade 기준 GROUP BY하여 등급별 총석수 / 잔여석수 집계
+     * 특정 회차의 등급별 잔여 좌석 수를 조회합니다.
      */
     public SeatAvailabilityResponse findSeatAvailability(Long performanceId, Long showId) {
 
