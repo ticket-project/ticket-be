@@ -1,5 +1,6 @@
 package com.ticket.core.domain.show;
 
+import com.ticket.core.domain.BaseEntity;
 import com.ticket.core.domain.seat.Seat;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -10,19 +11,22 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "SHOW_SEATS")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ShowSeat {
+public class ShowSeat extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "show_id", nullable = false)
     private Show show;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seat_id", nullable = false)
     private Seat seat;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "show_grade_id", nullable = false)
     private ShowGrade showGrade;
 
 }

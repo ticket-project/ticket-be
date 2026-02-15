@@ -1,5 +1,6 @@
 package com.ticket.core.domain.show;
 
+import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "PERFORMERS")
-public class Performer {
+public class Performer extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +19,5 @@ public class Performer {
     private String name;
 
     private String profileImageUrl;
-
-    private boolean isActive;
 
 }
