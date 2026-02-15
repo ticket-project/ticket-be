@@ -10,6 +10,8 @@ import com.ticket.core.support.exception.ErrorType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 public class GetSeatAvailabilityUseCase {
@@ -37,8 +39,16 @@ public class GetSeatAvailabilityUseCase {
                         "회차를 찾을 수 없습니다. id=" + input.performanceId()
                 ));
 
+        if (performance.getShow() == null) {
+            throw new CoreException(ErrorType.NOT_FOUND_DATA,
+                    "회차에 연결된 공연을 찾을 수 없습니다. id=" + input.performanceId());
+        }
+
         SeatAvailabilityResponse response = seatAvailabilityQueryRepository
                 .findSeatAvailability(performance.getId(), performance.getShow().getId());
+        if (response == null) {
+            response = new SeatAvailabilityResponse(List.of());
+        }
 
         return new Output(response);
     }
