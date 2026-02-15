@@ -22,6 +22,14 @@ reviews:
   suggested_reviewers: false
   auto_assign_reviewers: false
   poem: false
+  tools:
+    hadolint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    sqlfluff:
+      enabled: true
+
 
   # 경로별 리뷰 지침 및 제외 폴더
   path_instructions:
@@ -94,10 +102,4 @@ code_generation:
           - Given-When-Then 패턴을 적용
 
 # ─────────── 코드 분석 도구(Tools) ───────────
-tools:
-  hadolint:
-    enabled: true
-  gitleaks:
-    enabled: true
-  sqlfluff:
-    enabled: true
+
