@@ -104,6 +104,7 @@ public class ShowDetailQueryRepository {
                 showEntity.getInfo(),
                 showEntity.getStartDate(),
                 showEntity.getEndDate(),
+                showEntity.getRunningMinutes(),
                 showEntity.getViewCount(),
                 showEntity.getSaleType(),
                 showEntity.getSaleStartDate(),

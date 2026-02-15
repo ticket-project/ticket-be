@@ -30,6 +30,8 @@ public record ShowDetailResponse(
 
         @Schema(description = "공연 종료일")
         LocalDate endDate,
+        @Schema(description = "Running time in minutes")
+        Integer runningMinutes,
 
         @Schema(description = "조회수")
         Long viewCount,
