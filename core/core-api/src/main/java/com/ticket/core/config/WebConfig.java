@@ -15,14 +15,6 @@ public class WebConfig implements WebMvcConfigurer {
         resolvers.add(new LoginMemberArgumentResolver());
     }
 
-//    @Override
-//    public void addInterceptors(final InterceptorRegistry registry) {
-//        registry.addInterceptor(new AuthInterceptor())
-//                .order(1)
-//                .addPathPatterns("/api/**")
-//                .excludePathPatterns("/api/v1/auth/**");
-//    }
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
