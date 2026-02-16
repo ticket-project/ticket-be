@@ -2,7 +2,7 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.request.AddHoldRequest;
 import com.ticket.core.domain.hold.HoldService;
-import com.ticket.core.domain.member.MemberDetails;
+import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -30,8 +30,8 @@ public class HoldController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "이미 선점된 좌석")
     })
     @PostMapping
-    public ApiResponse<Long> hold(MemberDetails memberDetails, @RequestBody @Valid AddHoldRequest request) {
-        final Long holdId = holdService.hold(memberDetails.getMemberId(), request.toNewHold());
+    public ApiResponse<Long> hold(MemberPrincipal memberPrincipal, @RequestBody @Valid AddHoldRequest request) {
+        final Long holdId = holdService.hold(memberPrincipal.getMemberId(), request.toNewHold());
         return ApiResponse.success(holdId);
     }
 
