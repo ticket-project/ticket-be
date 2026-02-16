@@ -3,10 +3,13 @@ package com.ticket.core.domain.auth.oauth2;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.member.MemberRepository;
+import com.ticket.core.domain.member.MemberSocialAccount;
+import com.ticket.core.domain.member.MemberSocialAccountRepository;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -17,14 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
+@RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
     private final MemberRepository memberRepository;
-
-    public CustomOAuth2UserService(final MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
+    private final MemberSocialAccountRepository memberSocialAccountRepository;
 
     @Override
     @Transactional
@@ -38,7 +39,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private Member getOrCreateMember(final OAuth2UserInfo userInfo) {
-        return memberRepository.findBySocialProviderAndSocialId(userInfo.provider(), userInfo.providerId())
+        return memberSocialAccountRepository.findBySocialProviderAndSocialId(userInfo.provider(), userInfo.providerId())
+                .map(MemberSocialAccount::getMember)
                 .orElseGet(() -> createOrLinkMember(userInfo));
     }
 
@@ -51,17 +53,24 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private Member linkSocialAccount(final Member existingMember, final OAuth2UserInfo userInfo) {
-        if (existingMember.getSocialProvider() == null || existingMember.getSocialId() == null) {
-            existingMember.linkSocialAccount(userInfo.provider(), userInfo.providerId());
-            return existingMember;
-        }
+        return memberSocialAccountRepository.findByMemberAndSocialProvider(existingMember, userInfo.provider())
+                .map(linkedAccount -> validateSameSocialAccount(linkedAccount, userInfo))
+                .orElseGet(() -> addSocialAccount(existingMember, userInfo));
+    }
 
-        final boolean sameSocialAccount = existingMember.getSocialProvider() == userInfo.provider()
-                && existingMember.getSocialId().equals(userInfo.providerId());
-        if (!sameSocialAccount) {
+    private Member validateSameSocialAccount(final MemberSocialAccount linkedAccount, final OAuth2UserInfo userInfo) {
+        if (!linkedAccount.isSameSocialId(userInfo.providerId())) {
             throw new CoreException(ErrorType.MEMBER_DUPLICATE_EMAIL, "Email is already linked to another social account.");
         }
+        return linkedAccount.getMember();
+    }
 
+    private Member addSocialAccount(final Member existingMember, final OAuth2UserInfo userInfo) {
+        memberSocialAccountRepository.save(MemberSocialAccount.create(
+                existingMember,
+                userInfo.provider(),
+                userInfo.providerId()
+        ));
         return existingMember;
     }
 
@@ -70,11 +79,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         final Member member = Member.createSocialMember(
                 Email.create(email),
                 displayName,
-                Role.MEMBER,
+                Role.MEMBER
+        );
+        final Member savedMember = memberRepository.save(member);
+        memberSocialAccountRepository.save(MemberSocialAccount.create(
+                savedMember,
                 userInfo.provider(),
                 userInfo.providerId()
-        );
-        return memberRepository.save(member);
+        ));
+        return savedMember;
     }
 
     private String resolveEmail(final OAuth2UserInfo userInfo) {
