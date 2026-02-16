@@ -2,7 +2,7 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.response.MemberResponse;
 import com.ticket.core.domain.member.Member;
-import com.ticket.core.domain.member.MemberDetails;
+import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.member.MemberService;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,9 +32,9 @@ public class MemberController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
     @GetMapping
-    public ApiResponse<MemberResponse> getCurrentMember(MemberDetails memberDetails) {
-        log.info("loginMember={}", memberDetails);
-        final Member findMember = memberService.findById(memberDetails.getMemberId());
+    public ApiResponse<MemberResponse> getCurrentMember(MemberPrincipal memberPrincipal) {
+        log.info("loginMember={}", memberPrincipal);
+        final Member findMember = memberService.findById(memberPrincipal.getMemberId());
         return ApiResponse.success(new MemberResponse(findMember.getId(), findMember.getEmail().getEmail(), findMember.getName(), findMember.getRole().name()));
     }
 }

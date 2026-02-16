@@ -1,7 +1,7 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.request.AddReservationRequest;
-import com.ticket.core.domain.member.MemberDetails;
+import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.reservation.ReservationService;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,8 +31,8 @@ public class ReservationController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "좌석 충돌 (이미 예약됨)")
     })
     @PostMapping
-    public ApiResponse<Void> reserveV1(MemberDetails memberDetails, @RequestBody @Valid AddReservationRequest request) {
-        reservationService.addReservation(request.toNewReservation(memberDetails.getMemberId()));
+    public ApiResponse<Void> reserveV1(MemberPrincipal memberPrincipal, @RequestBody @Valid AddReservationRequest request) {
+        reservationService.addReservation(request.toNewReservation(memberPrincipal.getMemberId()));
         return ApiResponse.success(null);
     }
 
