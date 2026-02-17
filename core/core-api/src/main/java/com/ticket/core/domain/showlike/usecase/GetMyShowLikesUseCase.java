@@ -5,6 +5,7 @@ import com.ticket.core.domain.showlike.ShowLikeQueryRepository;
 import com.ticket.core.support.cursor.CursorSlice;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,15 +13,12 @@ import org.springframework.util.StringUtils;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class GetMyShowLikesUseCase {
 
     private static final int MAX_SIZE = 100;
 
     private final ShowLikeQueryRepository showLikeQueryRepository;
-
-    public GetMyShowLikesUseCase(final ShowLikeQueryRepository showLikeQueryRepository) {
-        this.showLikeQueryRepository = showLikeQueryRepository;
-    }
 
     public record Input(Long memberId, String cursor, int size) {
     }

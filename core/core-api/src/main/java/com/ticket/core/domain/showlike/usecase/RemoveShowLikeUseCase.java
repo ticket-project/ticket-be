@@ -5,23 +5,17 @@ import com.ticket.core.domain.show.ShowJpaRepository;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class RemoveShowLikeUseCase {
 
     private final ShowLikeRepository showLikeRepository;
     private final ShowJpaRepository showJpaRepository;
-
-    public RemoveShowLikeUseCase(
-            final ShowLikeRepository showLikeRepository,
-            final ShowJpaRepository showJpaRepository
-    ) {
-        this.showLikeRepository = showLikeRepository;
-        this.showJpaRepository = showJpaRepository;
-    }
 
     public record Input(Long memberId, Long showId) {
     }

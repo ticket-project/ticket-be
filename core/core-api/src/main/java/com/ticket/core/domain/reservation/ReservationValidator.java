@@ -3,16 +3,14 @@ package com.ticket.core.domain.reservation;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ReservationValidator {
 
     private final ReservationDetailRepository reservationDetailRepository;
-
-    public ReservationValidator(final ReservationDetailRepository reservationDetailRepository) {
-        this.reservationDetailRepository = reservationDetailRepository;
-    }
 
     public void validateNew(final int reserveRequestSeatSize,
                             final Long memberId,

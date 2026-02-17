@@ -7,6 +7,7 @@ import com.ticket.core.domain.member.vo.EncodedPassword;
 import com.ticket.core.domain.member.vo.RawPassword;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,16 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     private final MemberRepository memberRepository;
     private final PasswordService passwordService;
-
-    public AuthService(final MemberRepository memberRepository, final PasswordService passwordService) {
-        this.memberRepository = memberRepository;
-        this.passwordService = passwordService;
-    }
 
     @Transactional
     public Long register(final AddMember addMember) {
