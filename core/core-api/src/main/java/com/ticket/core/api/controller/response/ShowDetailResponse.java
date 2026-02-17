@@ -36,7 +36,7 @@ public record ShowDetailResponse(
         @Schema(description = "조회수")
         Long viewCount,
 
-        @Schema(description = "판매 타입")
+        @Schema(description = "판매 타입", example = "{\"code\":\"GENERAL\",\"name\":\"일반판매\"}")
         SaleType saleType,
 
         @Schema(description = "판매 시작일")
