@@ -85,7 +85,10 @@ public interface ShowControllerDocs {
                                                     "startDate": "2026-03-01",
                                                     "endDate": "2026-05-31",
                                                     "viewCount": 15000,
-                                                    "saleType": "GENERAL",
+                                                    "saleType": {
+                                                      "code": "GENERAL",
+                                                      "name": "일반판매"
+                                                    },
                                                     "saleStartDate": "2026-01-01",
                                                     "saleEndDate": "2026-02-28",
                                                     "createdAt": "2026-01-01T10:00:00",
