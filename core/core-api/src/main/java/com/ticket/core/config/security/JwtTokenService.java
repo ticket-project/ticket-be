@@ -48,6 +48,7 @@ public class JwtTokenService {
 
     public MemberPrincipal parse(final String token) {
         final Claims claims = Jwts.parser()
+                .requireIssuer(jwtProperties.getIssuer())
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
