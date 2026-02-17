@@ -30,7 +30,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             final HttpSecurity http,
-            final JwtAuthenticationFilter jwtAuthenticationFilter,
+            final JwtTokenService jwtTokenService,
             final CustomOAuth2UserService customOAuth2UserService,
             final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
             final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
@@ -63,7 +63,7 @@ public class SecurityConfig {
                         .failureHandler(oAuth2AuthenticationFailureHandler)
                 );
 
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenService), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

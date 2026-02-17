@@ -1,10 +1,11 @@
 package com.ticket.core.config.security;
 
 import com.ticket.core.domain.member.MemberPrincipal;
+import io.jsonwebtoken.JwtException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -12,8 +13,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
-@Component
+
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String BEARER_PREFIX = "Bearer ";
@@ -42,8 +45,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 memberPrincipal.getAuthorities()
                         );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (RuntimeException e) {
-                SecurityContextHolder.clearContext();
+            } catch (JwtException | IllegalArgumentException e) {
+                log.debug("JWT 인증 실패: {}", e.getMessage());
             }
         }
 
