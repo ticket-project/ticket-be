@@ -15,11 +15,11 @@ import com.ticket.core.api.controller.response.ShowSearchResponse;
 import com.ticket.core.api.controller.response.ShowSummaryResponse;
 import com.ticket.core.domain.show.ShowQueryHelper.SortOrder;
 import com.ticket.core.support.cursor.CursorSlice;
+import com.ticket.core.support.image.ImageUrlResolver;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,10 +42,16 @@ public class ShowListQueryRepository {
 
     private final JPAQueryFactory queryFactory;
     private final ShowQueryHelper queryHelper;
+    private final ImageUrlResolver imageUrlResolver;
 
-    public ShowListQueryRepository(JPAQueryFactory queryFactory, ShowQueryHelper queryHelper) {
+    public ShowListQueryRepository(
+            JPAQueryFactory queryFactory,
+            ShowQueryHelper queryHelper,
+            ImageUrlResolver imageUrlResolver
+    ) {
         this.queryFactory = queryFactory;
         this.queryHelper = queryHelper;
+        this.imageUrlResolver = imageUrlResolver;
     }
 
     // ========== 메인 페이지 API ==========
@@ -99,6 +105,7 @@ public class ShowListQueryRepository {
         List<ShowResponse> results = new ArrayList<>(shows.stream()
                 .map(s -> new ShowResponse(
                         s.getId(), s.getTitle(), s.getSubTitle(),
+                        imageUrlResolver.resolve(s.getImage()),
                         genreMap.getOrDefault(s.getId(), new ArrayList<>()),
                         s.getStartDate(), s.getEndDate(), s.getViewCount(),
                         s.getSaleType(), s.getSaleStartDate(), s.getSaleEndDate(),
@@ -132,7 +139,7 @@ public class ShowListQueryRepository {
     }
 
     public List<ShowSummaryResponse> findLatestShows(String categoryCode, int limit) {
-        return queryFactory
+        List<ShowSummaryResponse> results = queryFactory
                 .select(Projections.constructor(ShowSummaryResponse.class,
                         show.id, show.title, show.image, show.startDate, show.endDate, venue.name, show.createdAt))
                 .distinct()
@@ -145,10 +152,13 @@ public class ShowListQueryRepository {
                 .orderBy(show.createdAt.desc())
                 .limit(limit)
                 .fetch();
+        return results.stream()
+                .map(this::resolveImage)
+                .toList();
     }
 
     public List<ShowOpeningSoonSummaryResponse> findShowsSaleOpeningSoon(String categoryCode, int limit) {
-        return queryFactory
+        List<ShowOpeningSoonSummaryResponse> results = queryFactory
                 .select(Projections.constructor(ShowOpeningSoonSummaryResponse.class,
                         show.id, show.title, show.image, venue.name, show.saleStartDate))
                 .distinct()
@@ -161,6 +171,9 @@ public class ShowListQueryRepository {
                 .orderBy(show.saleStartDate.asc())
                 .limit(limit)
                 .fetch();
+        return results.stream()
+                .map(this::resolveImage)
+                .toList();
     }
 
     public CursorSlice<ShowOpeningSoonDetailResponse> findSaleOpeningSoonPage(
@@ -207,7 +220,10 @@ public class ShowListQueryRepository {
                 .leftJoin(show.venue, venue)
                 .where(show.id.in(ids))
                 .orderBy(primaryOrder, tieBreakerOrder)
-                .fetch();
+                .fetch()
+                .stream()
+                .map(this::resolveImage)
+                .toList();
 
         boolean hasNext = results.size() > size;
         if (hasNext) results = results.subList(0, size);
@@ -265,7 +281,10 @@ public class ShowListQueryRepository {
                 .leftJoin(show.venue, venue)
                 .where(show.id.in(ids))
                 .orderBy(primaryOrder, tieBreakerOrder)
-                .fetch();
+                .fetch()
+                .stream()
+                .map(this::resolveImage)
+                .toList();
 
         boolean hasNext = results.size() > size;
         if (hasNext) results = results.subList(0, size);
@@ -327,5 +346,56 @@ public class ShowListQueryRepository {
             }
         }
         return genreMap;
+    }
+
+    private ShowSummaryResponse resolveImage(final ShowSummaryResponse response) {
+        return new ShowSummaryResponse(
+                response.id(),
+                response.title(),
+                imageUrlResolver.resolve(response.image()),
+                response.startDate(),
+                response.endDate(),
+                response.venue(),
+                response.createdAt()
+        );
+    }
+
+    private ShowOpeningSoonSummaryResponse resolveImage(final ShowOpeningSoonSummaryResponse response) {
+        return new ShowOpeningSoonSummaryResponse(
+                response.id(),
+                response.title(),
+                imageUrlResolver.resolve(response.image()),
+                response.venue(),
+                response.saleStartDate()
+        );
+    }
+
+    private ShowOpeningSoonDetailResponse resolveImage(final ShowOpeningSoonDetailResponse response) {
+        return new ShowOpeningSoonDetailResponse(
+                response.id(),
+                response.title(),
+                response.subTitle(),
+                imageUrlResolver.resolve(response.image()),
+                response.venue(),
+                response.region(),
+                response.startDate(),
+                response.endDate(),
+                response.saleStartDate(),
+                response.saleEndDate(),
+                response.viewCount()
+        );
+    }
+
+    private ShowSearchResponse resolveImage(final ShowSearchResponse response) {
+        return new ShowSearchResponse(
+                response.id(),
+                response.title(),
+                imageUrlResolver.resolve(response.image()),
+                response.venue(),
+                response.startDate(),
+                response.endDate(),
+                response.region(),
+                response.viewCount()
+        );
     }
 }

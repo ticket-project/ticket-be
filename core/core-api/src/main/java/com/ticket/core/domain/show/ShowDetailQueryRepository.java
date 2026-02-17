@@ -6,6 +6,7 @@ import com.ticket.core.api.controller.response.ShowDetailResponse.GradeInfo;
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceInfo;
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformerInfo;
 import com.ticket.core.domain.performance.Performance;
+import com.ticket.core.support.image.ImageUrlResolver;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,9 +26,14 @@ import static com.ticket.core.domain.show.QShowGrade.showGrade;
 public class ShowDetailQueryRepository {
 
     private final JPAQueryFactory queryFactory;
+    private final ImageUrlResolver imageUrlResolver;
 
-    public ShowDetailQueryRepository(JPAQueryFactory queryFactory) {
+    public ShowDetailQueryRepository(
+            JPAQueryFactory queryFactory,
+            ImageUrlResolver imageUrlResolver
+    ) {
         this.queryFactory = queryFactory;
+        this.imageUrlResolver = imageUrlResolver;
     }
 
     /**
@@ -82,7 +88,10 @@ public class ShowDetailQueryRepository {
         // 5. Performer 정보 매핑
         Performer performerEntity = showEntity.getPerformer();
         PerformerInfo performerInfo = performerEntity != null
-                ? new PerformerInfo(performerEntity.getId(), performerEntity.getName(), performerEntity.getProfileImageUrl())
+                ? new PerformerInfo(
+                        performerEntity.getId(),
+                        performerEntity.getName(),
+                        imageUrlResolver.resolve(performerEntity.getProfileImageUrl()))
                 : null;
 
         Venue venueEntity = showEntity.getVenue();
@@ -95,7 +104,7 @@ public class ShowDetailQueryRepository {
                         venueEntity.getLatitude(),
                         venueEntity.getLongitude(),
                         venueEntity.getPhone(),
-                        venueEntity.getImageUrl())
+                        imageUrlResolver.resolve(venueEntity.getImageUrl()))
                 : null;
 
         ShowDetailResponse response = new ShowDetailResponse(
@@ -110,7 +119,7 @@ public class ShowDetailQueryRepository {
                 showEntity.getSaleType(),
                 showEntity.getSaleStartDate(),
                 showEntity.getSaleEndDate(),
-                showEntity.getImage(),
+                imageUrlResolver.resolve(showEntity.getImage()),
                 venueInfo,
                 performerInfo,
                 genreNames,

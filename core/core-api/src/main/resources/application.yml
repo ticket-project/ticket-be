@@ -57,6 +57,10 @@ security:
     access-token-expiration-seconds: ${JWT_ACCESS_TOKEN_EXPIRATION_SECONDS}
 
 app:
+  image:
+    public-path: /images
+    storage-path: ${APP_IMAGE_STORAGE_PATH:./storage/images}
+    cache-max-age: 7d
   cors:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:3000}
   auth:

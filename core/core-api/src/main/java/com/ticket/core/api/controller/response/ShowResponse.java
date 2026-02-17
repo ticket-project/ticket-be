@@ -8,17 +8,20 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "공연 정보 응답")
+@Schema(description = "공연 목록 응답")
 public record ShowResponse(
 
         @Schema(description = "공연 ID", example = "20")
         Long id,
 
-        @Schema(description = "공연 제목", example = "뮤지컬 위키드")
+        @Schema(description = "공연 제목", example = "뮤지컬 물랑루즈")
         String title,
 
         @Schema(description = "공연 부제목", example = "10주년 기념 공연")
         String subTitle,
+
+        @Schema(description = "공연 썸네일 이미지 URL", example = "http://example.com/image.jpg")
+        String image,
 
         @Schema(description = "장르 이름 목록", example = "[\"힙합\", \"R&B\"]")
         List<String> genreNames,
@@ -41,13 +44,13 @@ public record ShowResponse(
         @Schema(description = "판매 종료일", example = "2026-02-28")
         LocalDate saleEndDate,
 
-        @Schema(description = "생성일", example = "2026-02-28T14:00:00")
+        @Schema(description = "생성일시", example = "2026-02-28T14:00:00")
         LocalDateTime createdAt,
 
         @Schema(description = "지역")
         Region region,
 
-        @Schema(description = "장소", example = "예술의전당")
+        @Schema(description = "공연장 이름", example = "블루스퀘어")
         String venue
 ) {
 }

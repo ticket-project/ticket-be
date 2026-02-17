@@ -79,6 +79,7 @@ public class SecurityConfig {
 
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", corsConfiguration);
+        source.registerCorsConfiguration("/images/**", corsConfiguration);
         return source;
     }
 }
