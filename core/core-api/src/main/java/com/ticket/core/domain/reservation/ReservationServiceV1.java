@@ -6,6 +6,7 @@ import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.domain.performanceseat.PerformanceSeat;
 import com.ticket.core.domain.performanceseat.PerformanceSeatFinder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.util.List;
  * 비관적 락을 통한 예매 서비스 (동시성 문제 방지)
  */
 @Service
+@RequiredArgsConstructor
 public class ReservationServiceV1 implements ReservationService {
 
     private final MemberFinder memberFinder;
@@ -22,19 +24,6 @@ public class ReservationServiceV1 implements ReservationService {
     private final PerformanceSeatFinder performanceSeatFinder;
     private final ReservationValidator reservationValidator;
     private final ReservationManager reservationManager;
-
-    public ReservationServiceV1(final MemberFinder memberFinder,
-                                final PerformanceFinder performanceFinder,
-                                final PerformanceSeatFinder performanceSeatFinder,
-                                final ReservationValidator reservationValidator,
-                                final ReservationManager reservationManager
-) {
-        this.memberFinder = memberFinder;
-        this.performanceFinder = performanceFinder;
-        this.performanceSeatFinder = performanceSeatFinder;
-        this.reservationValidator = reservationValidator;
-        this.reservationManager = reservationManager;
-    }
 
     @Transactional
     public void addReservation(final NewReservation newReservation) {

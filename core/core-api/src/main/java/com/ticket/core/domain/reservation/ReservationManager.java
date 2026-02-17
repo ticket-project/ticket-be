@@ -1,20 +1,17 @@
 package com.ticket.core.domain.reservation;
 
 import com.ticket.core.domain.performanceseat.PerformanceSeat;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class ReservationManager {
 
     private final ReservationRepository reservationRepository;
     private final ReservationDetailRepository reservationDetailRepository;
-
-    public ReservationManager(final ReservationRepository reservationRepository, final ReservationDetailRepository reservationDetailRepository) {
-        this.reservationRepository = reservationRepository;
-        this.reservationDetailRepository = reservationDetailRepository;
-    }
 
     public void add(final Long memberId, final Long performanceId, final List<PerformanceSeat> performanceSeats) {
         performanceSeats.forEach(PerformanceSeat::reserve);

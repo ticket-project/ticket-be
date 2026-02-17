@@ -5,6 +5,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.response.ShowLikeSummaryResponse;
 import com.ticket.core.support.cursor.CursorSlice;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -17,13 +18,10 @@ import static com.ticket.core.domain.show.QVenue.venue;
 import static com.ticket.core.domain.showlike.QShowLike.showLike;
 
 @Repository
+@RequiredArgsConstructor
 public class ShowLikeQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-
-    public ShowLikeQueryRepository(final JPAQueryFactory queryFactory) {
-        this.queryFactory = queryFactory;
-    }
 
     public CursorSlice<ShowLikeSummaryResponse> findMyLikedShows(
             final Long memberId,

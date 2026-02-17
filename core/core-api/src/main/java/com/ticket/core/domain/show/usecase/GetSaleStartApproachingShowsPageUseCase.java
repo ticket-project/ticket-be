@@ -4,6 +4,7 @@ import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.domain.show.ShowListQueryRepository;
 import com.ticket.core.support.cursor.CursorSlice;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,13 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class GetSaleStartApproachingShowsPageUseCase {
     
     private final ShowListQueryRepository showListQueryRepository;
-
-    public GetSaleStartApproachingShowsPageUseCase(ShowListQueryRepository showListQueryRepository) {
-        this.showListQueryRepository = showListQueryRepository;
-    }
 
     public record Input(SaleOpeningSoonSearchParam param, int size, String sort) {}
     

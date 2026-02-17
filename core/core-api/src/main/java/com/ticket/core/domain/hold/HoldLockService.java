@@ -12,6 +12,7 @@ import com.ticket.core.domain.seat.SeatRepository;
 import com.ticket.core.enums.HoldState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
  * v1: Redisson 분산락을 통한 좌석 선점 서비스 (동시성 문제 방지)
  */
 //@Service
+@RequiredArgsConstructor
 public class HoldLockService implements HoldService {
     private final MemberFinder memberFinder;
     private final PerformanceFinder performanceFinder;
@@ -27,20 +29,6 @@ public class HoldLockService implements HoldService {
     private final HoldRepository holdRepository;
     private final HoldItemRepository holdItemRepository;
     private final SeatRepository seatRepository;
-
-    public HoldLockService(final MemberFinder memberFinder,
-                           final PerformanceFinder performanceFinder,
-                           final PerformanceSeatFinder performanceSeatFinder,
-                           final HoldRepository holdRepository,
-                           final HoldItemRepository holdItemRepository,
-                           final SeatRepository seatRepository) {
-        this.memberFinder = memberFinder;
-        this.performanceFinder = performanceFinder;
-        this.performanceSeatFinder = performanceSeatFinder;
-        this.holdRepository = holdRepository;
-        this.holdItemRepository = holdItemRepository;
-        this.seatRepository = seatRepository;
-    }
 
     @DistributedLock(prefix = "SEAT", dynamicKey = "#newHold.getSeatIds()")
     public Long hold(final Long memberId, final NewHold newHold) {

@@ -11,6 +11,7 @@ import com.ticket.core.domain.seat.SeatRepository;
 import com.ticket.core.enums.HoldState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
 import org.redisson.api.RScript;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  * v2: Redis Lua script 활용한 선점, 선점 해제
  */
 @Service
+@RequiredArgsConstructor
 public class HoldRedisService implements HoldService {
     private static final Logger log = LoggerFactory.getLogger(HoldRedisService.class);
     private final RedissonClient redissonClient;
@@ -36,16 +38,6 @@ public class HoldRedisService implements HoldService {
     private final PerformanceSeatFinder performanceSeatFinder;
     private final HoldRepository holdRepository;
     private final HoldItemRepository holdItemRepository;
-
-    public HoldRedisService(final RedissonClient redissonClient, final MemberFinder memberFinder, final PerformanceFinder performanceFinder, final SeatRepository seatRepository, final HoldRepository holdRepository, final PerformanceSeatFinder performanceSeatFinder, final HoldItemRepository holdItemRepository) {
-        this.redissonClient = redissonClient;
-        this.memberFinder = memberFinder;
-        this.performanceFinder = performanceFinder;
-        this.seatRepository = seatRepository;
-        this.holdRepository = holdRepository;
-        this.performanceSeatFinder = performanceSeatFinder;
-        this.holdItemRepository = holdItemRepository;
-    }
 
     private static final String HOLD_SCRIPT = """
         local memberId = ARGV[1]

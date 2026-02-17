@@ -7,6 +7,7 @@ import com.ticket.core.domain.performanceseat.SeatAvailabilityQueryRepository;
 import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,18 +15,11 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class GetSeatAvailabilityUseCase {
 
     private final PerformanceRepository performanceRepository;
     private final SeatAvailabilityQueryRepository seatAvailabilityQueryRepository;
-
-    public GetSeatAvailabilityUseCase(
-            PerformanceRepository performanceRepository,
-            SeatAvailabilityQueryRepository seatAvailabilityQueryRepository
-    ) {
-        this.performanceRepository = performanceRepository;
-        this.seatAvailabilityQueryRepository = seatAvailabilityQueryRepository;
-    }
 
     public record Input(Long performanceId) {}
 

@@ -6,6 +6,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.ticket.core.support.cursor.CursorCodec;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -21,14 +23,12 @@ import static com.ticket.core.domain.show.QShow.show;
 /**
  * Show 쿼리에서 공통으로 사용되는 조건/정렬/커서 유틸리티
  */
+@Getter
 @Component
+@RequiredArgsConstructor
 public class ShowQueryHelper {
 
     private final CursorCodec cursorCodec;
-
-    public ShowQueryHelper(CursorCodec cursorCodec) {
-        this.cursorCodec = cursorCodec;
-    }
 
     // ========== 정렬 ==========
 
@@ -57,10 +57,6 @@ public class ShowQueryHelper {
     }
 
     // ========== 커서 ==========
-
-    public CursorCodec getCursorCodec() {
-        return cursorCodec;
-    }
 
     public void applyCursor(BooleanBuilder where, String cursor, SortOrder sortOrder) {
         if (StringUtils.hasText(cursor)) {
