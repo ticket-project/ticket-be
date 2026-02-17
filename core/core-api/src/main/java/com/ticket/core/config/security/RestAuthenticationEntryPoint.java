@@ -3,6 +3,7 @@ package com.ticket.core.config.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.response.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -15,13 +16,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 @Component
+@RequiredArgsConstructor
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
-
-    public RestAuthenticationEntryPoint(final ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
 
     @Override
     public void commence(

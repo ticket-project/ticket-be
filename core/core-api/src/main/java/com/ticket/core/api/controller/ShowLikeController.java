@@ -12,28 +12,18 @@ import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/shows")
+@RequiredArgsConstructor
 public class ShowLikeController implements ShowLikeControllerDocs {
 
     private final AddShowLikeUseCase addShowLikeUseCase;
     private final RemoveShowLikeUseCase removeShowLikeUseCase;
     private final GetShowLikeStatusUseCase getShowLikeStatusUseCase;
     private final GetMyShowLikesUseCase getMyShowLikesUseCase;
-
-    public ShowLikeController(
-            final AddShowLikeUseCase addShowLikeUseCase,
-            final RemoveShowLikeUseCase removeShowLikeUseCase,
-            final GetShowLikeStatusUseCase getShowLikeStatusUseCase,
-            final GetMyShowLikesUseCase getMyShowLikesUseCase
-    ) {
-        this.addShowLikeUseCase = addShowLikeUseCase;
-        this.removeShowLikeUseCase = removeShowLikeUseCase;
-        this.getShowLikeStatusUseCase = getShowLikeStatusUseCase;
-        this.getMyShowLikesUseCase = getMyShowLikesUseCase;
-    }
 
     @Override
     @PostMapping("/{showId}/likes")

@@ -2,6 +2,7 @@ package com.ticket.core.config.security;
 
 import com.ticket.core.domain.member.MemberPrincipal;
 import io.jsonwebtoken.JwtException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,14 +18,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Slf4j
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String BEARER_PREFIX = "Bearer ";
     private final JwtTokenService jwtTokenService;
-
-    public JwtAuthenticationFilter(final JwtTokenService jwtTokenService) {
-        this.jwtTokenService = jwtTokenService;
-    }
 
     @Override
     protected void doFilterInternal(

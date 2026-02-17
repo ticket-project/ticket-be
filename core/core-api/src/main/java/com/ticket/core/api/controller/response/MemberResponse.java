@@ -1,8 +1,10 @@
 package com.ticket.core.api.controller.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
 @Schema(description = "회원 정보 응답")
+@Getter
 public class MemberResponse {
 
     @Schema(description = "회원 ID", example = "1")
@@ -24,20 +26,5 @@ public class MemberResponse {
         this.role = role;
     }
 
-    public Long getMemberId() {
-        return memberId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getRole() {
-        return role;
-    }
 }
 

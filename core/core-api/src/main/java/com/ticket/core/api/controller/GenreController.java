@@ -6,6 +6,7 @@ import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,13 +20,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/genres")
 @Tag(name = "Genre", description = "장르 관련 API")
+@RequiredArgsConstructor
 public class GenreController {
 
     private final GetGenresByCategoryUseCase getGenresByCategoryUseCase;
-
-    public GenreController(final GetGenresByCategoryUseCase getGenresByCategoryUseCase) {
-        this.getGenresByCategoryUseCase = getGenresByCategoryUseCase;
-    }
 
     /**
      * 카테고리별 장르 목록 조회

@@ -1,5 +1,8 @@
 package com.ticket.core.support.exception;
 
+import lombok.Getter;
+
+@Getter
 public class CoreException extends RuntimeException {
 
     private final ErrorType errorType;
@@ -15,11 +18,4 @@ public class CoreException extends RuntimeException {
         this.data = data;
     }
 
-    public ErrorType getErrorType() {
-        return errorType;
-    }
-
-    public Object getData() {
-        return data;
-    }
 }
