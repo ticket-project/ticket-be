@@ -1,5 +1,8 @@
 package com.ticket.core.support.exception;
 
+import lombok.Getter;
+
+@Getter
 public class ErrorMessage {
 
     private final String code;
@@ -16,15 +19,4 @@ public class ErrorMessage {
         this(errorType.getErrorCode().name(), errorType.getMessage(), data);
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public Object getData() {
-        return data;
-    }
 }

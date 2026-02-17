@@ -1,16 +1,14 @@
 package com.ticket.core.domain.auth.oauth2;
 
 import com.ticket.core.enums.SocialProvider;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
+@RequiredArgsConstructor
 public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
 
     private final Map<String, Object> attributes;
-
-    public KakaoOAuth2UserInfo(final Map<String, Object> attributes) {
-        this.attributes = attributes;
-    }
 
     @Override
     public SocialProvider provider() {
