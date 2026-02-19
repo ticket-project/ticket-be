@@ -2,6 +2,7 @@ package com.ticket.core.api.controller.response;
 
 import com.ticket.core.domain.show.Region;
 import com.ticket.core.domain.show.SaleType;
+import com.ticket.core.enums.BookingStatus;
 import com.ticket.core.enums.PerformanceState;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -60,8 +61,8 @@ public record ShowDetailResponse(
         @Schema(description = "좌석 등급 및 가격 목록")
         List<GradeInfo> grades,
 
-        @Schema(description = "공연 회차 목록")
-        List<PerformanceInfo> performances
+        @Schema(description = "공연 날짜별 회차 목록")
+        List<PerformanceDateInfo> performanceDates
 ) {
 
     @Schema(description = "출연자 정보")
@@ -83,12 +84,19 @@ public record ShowDetailResponse(
     @Schema(description = "공연 회차 정보")
     public record PerformanceInfo(
             @Schema(description = "회차 ID") Long id,
-            @Schema(description = "회차 번호") Long roundNo,
+            @Schema(description = "회차 번호") Long performanceNo,
             @Schema(description = "공연 시작 시간") LocalDateTime startTime,
             @Schema(description = "공연 종료 시간") LocalDateTime endTime,
             @Schema(description = "예매 오픈 시간") LocalDateTime orderOpenTime,
             @Schema(description = "예매 마감 시간") LocalDateTime orderCloseTime,
-            @Schema(description = "회차 상태") PerformanceState state
+            @Schema(description = "회차 상태") PerformanceState state,
+            @Schema(description = "예매 상태") BookingStatus bookingStatus
+    ) {}
+
+    @Schema(description = "공연 날짜별 회차 정보")
+    public record PerformanceDateInfo(
+            @Schema(description = "공연 날짜") LocalDate date,
+            @Schema(description = "해당 날짜 회차 목록") List<PerformanceInfo> performances
     ) {}
 
     @Schema(description = "공연장 정보")

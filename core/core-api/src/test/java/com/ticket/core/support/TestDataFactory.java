@@ -76,7 +76,7 @@ public class TestDataFactory {
                 .setNull("id")
                 .set("status", EntityStatus.ACTIVE)
                 .set(javaGetter(Performance::getShow), show)
-                .set(javaGetter(Performance::getRoundNo), 1L)
+                .set(javaGetter(Performance::getPerformanceNo), 1L)
                 .set(javaGetter(Performance::getStartTime), BASE_TIME.plusDays(7))
                 .set(javaGetter(Performance::getEndTime), BASE_TIME.plusDays(7).plusHours(2))
                 .set(javaGetter(Performance::getOrderOpenTime), BASE_TIME.minusDays(1))
