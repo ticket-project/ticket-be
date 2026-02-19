@@ -74,7 +74,7 @@ public class ShowDetailQueryRepository {
         List<Performance> performanceEntities = queryFactory
                 .selectFrom(performance)
                 .where(performance.show.id.eq(showId))
-                .orderBy(performance.performanceNo.asc())
+                .orderBy(performance.startTime.asc(), performance.performanceNo.asc())
                 .fetch();
 
         LocalDateTime now = LocalDateTime.now();
