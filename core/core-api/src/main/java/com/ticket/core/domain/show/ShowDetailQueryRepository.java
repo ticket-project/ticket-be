@@ -3,13 +3,17 @@ package com.ticket.core.domain.show;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.response.ShowDetailResponse;
 import com.ticket.core.api.controller.response.ShowDetailResponse.GradeInfo;
+import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceDateInfo;
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceInfo;
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformerInfo;
 import com.ticket.core.domain.performance.Performance;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.ticket.core.domain.performance.QPerformance.performance;
 import static com.ticket.core.domain.show.QGenre.genre;
@@ -70,13 +74,24 @@ public class ShowDetailQueryRepository {
         List<Performance> performanceEntities = queryFactory
                 .selectFrom(performance)
                 .where(performance.show.id.eq(showId))
-                .orderBy(performance.roundNo.asc())
+                .orderBy(performance.performanceNo.asc())
                 .fetch();
 
+        LocalDateTime now = LocalDateTime.now();
         List<PerformanceInfo> performances = performanceEntities.stream()
                 .map(p -> new PerformanceInfo(
-                        p.getId(), p.getRoundNo(), p.getStartTime(), p.getEndTime(),
-                        p.getOrderOpenTime(), p.getOrderCloseTime(), p.getState()))
+                        p.getId(), p.getPerformanceNo(), p.getStartTime(), p.getEndTime(),
+                        p.getOrderOpenTime(), p.getOrderCloseTime(), p.getState(), p.calculateBookingStatus(now)))
+                .toList();
+
+        List<PerformanceDateInfo> performanceDates = performances.stream()
+                .collect(Collectors.groupingBy(
+                        performanceInfo -> performanceInfo.startTime().toLocalDate(),
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ))
+                .entrySet().stream()
+                .map(entry -> new PerformanceDateInfo(entry.getKey(), entry.getValue()))
                 .toList();
 
         // 5. Performer 정보 매핑
@@ -115,7 +130,7 @@ public class ShowDetailQueryRepository {
                 performerInfo,
                 genreNames,
                 grades,
-                performances
+                performanceDates
         );
         return Optional.of(response);
     }
