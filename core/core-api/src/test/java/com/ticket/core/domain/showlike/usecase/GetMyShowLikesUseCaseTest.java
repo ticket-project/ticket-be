@@ -1,7 +1,10 @@
 package com.ticket.core.domain.showlike.usecase;
 
 import com.ticket.core.api.controller.response.ShowLikeSummaryResponse;
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberRepository;
 import com.ticket.core.domain.showlike.ShowLikeQueryRepository;
+import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.cursor.CursorSlice;
 import com.ticket.core.support.exception.CoreException;
 import org.junit.jupiter.api.Test;
@@ -16,9 +19,11 @@ import org.springframework.data.domain.SliceImpl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,32 +35,35 @@ class GetMyShowLikesUseCaseTest {
     @Mock
     private ShowLikeQueryRepository showLikeQueryRepository;
 
+    @Mock
+    private MemberRepository memberRepository;
+
     @Test
-    void 잘못된_cursor면_예외가_발생한다() {
-        // when / then
+    void invalid_cursor_throws_exception() {
+        mockActiveMember();
+
         assertThatThrownBy(() -> getMyShowLikesUseCase.execute(
                 new GetMyShowLikesUseCase.Input(1L, "invalid-cursor", 20)
         )).isInstanceOf(CoreException.class);
     }
 
     @Test
-    void size가_허용_범위를_벗어나면_예외가_발생한다() {
-        // when / then
+    void invalid_size_throws_exception() {
         assertThatThrownBy(() -> getMyShowLikesUseCase.execute(
                 new GetMyShowLikesUseCase.Input(1L, null, 0)
         )).isInstanceOf(CoreException.class);
     }
 
     @Test
-    void 정상_요청이면_찜_목록과_nextCursor를_반환한다() {
-        // given
+    void returns_slice_and_next_cursor_on_success() {
+        mockActiveMember();
         final ShowLikeSummaryResponse response = new ShowLikeSummaryResponse(
                 10L,
-                "테스트 공연",
+                "test show",
                 "https://example.com/test.jpg",
                 LocalDate.of(2026, 3, 1),
                 LocalDate.of(2026, 3, 2),
-                "테스트 공연장",
+                "test venue",
                 LocalDateTime.of(2026, 2, 17, 10, 0)
         );
         final Slice<ShowLikeSummaryResponse> slice =
@@ -63,14 +71,17 @@ class GetMyShowLikesUseCaseTest {
         when(showLikeQueryRepository.findMyLikedShows(1L, 123L, 20))
                 .thenReturn(new CursorSlice<>(slice, "122"));
 
-        // when
         final GetMyShowLikesUseCase.Output output = getMyShowLikesUseCase.execute(
                 new GetMyShowLikesUseCase.Input(1L, "123", 20)
         );
 
-        // then
         assertThat(output.shows().getContent()).hasSize(1);
-        assertThat(output.shows().getContent().getFirst().title()).isEqualTo("테스트 공연");
+        assertThat(output.shows().getContent().getFirst().title()).isEqualTo("test show");
         assertThat(output.nextCursor()).isEqualTo("122");
+    }
+
+    private void mockActiveMember() {
+        when(memberRepository.findByIdAndStatus(1L, EntityStatus.ACTIVE))
+                .thenReturn(Optional.of(mock(Member.class)));
     }
 }

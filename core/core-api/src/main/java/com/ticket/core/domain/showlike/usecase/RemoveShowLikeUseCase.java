@@ -1,6 +1,8 @@
 package com.ticket.core.domain.showlike.usecase;
 
 import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
+import com.ticket.core.domain.member.MemberRepository;
+import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.domain.show.ShowJpaRepository;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
 import com.ticket.core.support.exception.CoreException;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RemoveShowLikeUseCase {
 
     private final ShowLikeRepository showLikeRepository;
+    private final MemberRepository memberRepository;
     private final ShowJpaRepository showJpaRepository;
 
     public record Input(Long memberId, Long showId) {
@@ -25,6 +28,7 @@ public class RemoveShowLikeUseCase {
 
     public Output execute(final Input input) {
         validateInput(input);
+        validateMemberExists(input.memberId());
         validateShowExists(input.showId());
 
         showLikeRepository.findByMember_IdAndShow_Id(input.memberId(), input.showId())
@@ -42,6 +46,12 @@ public class RemoveShowLikeUseCase {
     private void validateShowExists(final Long showId) {
         if (!showJpaRepository.existsById(showId)) {
             throw new CoreException(ErrorType.NOT_FOUND_DATA, "공연을 찾을 수 없습니다. id=" + showId);
+        }
+    }
+
+    private void validateMemberExists(final Long memberId) {
+        if (memberRepository.findByIdAndStatus(memberId, EntityStatus.ACTIVE).isEmpty()) {
+            throw new CoreException(ErrorType.NOT_FOUND_DATA, "member not found. id=" + memberId);
         }
     }
 }

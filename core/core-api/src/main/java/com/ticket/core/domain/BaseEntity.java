@@ -36,4 +36,13 @@ public class BaseEntity {
 
     private LocalDateTime deletedAt;
 
+    protected void markDeleted(final LocalDateTime deletedAt) {
+        this.status = EntityStatus.DELETED;
+        this.deletedAt = deletedAt;
+    }
+
+    public boolean isDeleted() {
+        return status == EntityStatus.DELETED;
+    }
+
 }
