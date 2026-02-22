@@ -9,6 +9,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Getter
 @Entity
 @Table(name = "MEMBERS", uniqueConstraints = {
@@ -45,6 +48,18 @@ public class Member extends BaseEntity {
             final Role role
     ) {
         return new Member(email, null, name, role);
+    }
+
+    public void withdraw() {
+        markDeleted(LocalDateTime.now());
+        this.email = Email.create(buildWithdrawnEmail());
+        this.encodedPassword = null;
+    }
+
+    private String buildWithdrawnEmail() {
+        final String idPart = id == null ? "unknown" : id.toString();
+        final String randomPart = UUID.randomUUID().toString().replace("-", "");
+        return "deleted_" + idPart + "_" + randomPart + "@withdrawn.ticket";
     }
 
 }

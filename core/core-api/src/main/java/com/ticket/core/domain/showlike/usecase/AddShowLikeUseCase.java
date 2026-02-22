@@ -3,6 +3,7 @@ package com.ticket.core.domain.showlike.usecase;
 import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberRepository;
+import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.domain.show.Show;
 import com.ticket.core.domain.show.ShowJpaRepository;
 import com.ticket.core.domain.showlike.ShowLike;
@@ -36,7 +37,7 @@ public class AddShowLikeUseCase {
             return new Output(new ShowLikeStatusResponse(input.showId(), true));
         }
 
-        final Member member = memberRepository.findById(input.memberId())
+        final Member member = memberRepository.findByIdAndStatus(input.memberId(), EntityStatus.ACTIVE)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA,
                         "회원을 찾을 수 없습니다. id=" + input.memberId()));
         final Show show = showJpaRepository.findById(input.showId())

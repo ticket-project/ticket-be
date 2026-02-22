@@ -6,6 +6,7 @@ import com.ticket.core.domain.member.MemberRepository;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.EncodedPassword;
 import com.ticket.core.domain.member.vo.RawPassword;
+import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.exception.CoreException;
 import org.junit.jupiter.api.Nested;
@@ -80,7 +81,7 @@ class AuthServiceTest {
                     "test",
                     Role.MEMBER
             );
-            when(memberRepository.findByEmail_Email(email.getEmail())).thenReturn(Optional.of(member));
+            when(memberRepository.findByEmail_EmailAndStatus(email.getEmail(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
             when(passwordService.matches(rawPassword, member.getEncodedPassword())).thenReturn(true);
             //when
             final Member loggedInMember = authService.login(email.getEmail(), rawPassword.getPassword());
@@ -106,7 +107,7 @@ class AuthServiceTest {
             final RawPassword rawPassword = RawPassword.create("1234");
             final EncodedPassword encodedPassword = EncodedPassword.create("encoded(1234)");
             final Member member = new Member(email, encodedPassword, "test", Role.MEMBER);
-            when(memberRepository.findByEmail_Email(email.getEmail())).thenReturn(Optional.of(member));
+            when(memberRepository.findByEmail_EmailAndStatus(email.getEmail(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
             when(passwordService.matches(rawPassword, encodedPassword)).thenReturn(false);
             //then
             assertThatThrownBy(() -> authService.login(email.getEmail(), rawPassword.getPassword())).isInstanceOf(CoreException.class);

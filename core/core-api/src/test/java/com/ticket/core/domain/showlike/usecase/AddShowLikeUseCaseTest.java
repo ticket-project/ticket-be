@@ -6,6 +6,7 @@ import com.ticket.core.domain.show.Show;
 import com.ticket.core.domain.show.ShowJpaRepository;
 import com.ticket.core.domain.showlike.ShowLike;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
+import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.exception.CoreException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,7 +62,7 @@ class AddShowLikeUseCaseTest {
         final Show show = mock(Show.class);
 
         when(showLikeRepository.existsByMember_IdAndShow_Id(memberId, showId)).thenReturn(false);
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
         when(showJpaRepository.findById(showId)).thenReturn(Optional.of(show));
 
         // when
@@ -83,7 +84,7 @@ class AddShowLikeUseCaseTest {
         final Member member = mock(Member.class);
 
         when(showLikeRepository.existsByMember_IdAndShow_Id(memberId, showId)).thenReturn(false);
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
         when(showJpaRepository.findById(showId)).thenReturn(Optional.empty());
 
         // when / then

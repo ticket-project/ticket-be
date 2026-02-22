@@ -89,8 +89,16 @@ public record ShowDetailResponse(
             @Schema(description = "공연 종료 시간") LocalDateTime endTime,
             @Schema(description = "예매 오픈 시간") LocalDateTime orderOpenTime,
             @Schema(description = "예매 마감 시간") LocalDateTime orderCloseTime,
-            @Schema(description = "회차 상태") PerformanceState state,
-            @Schema(description = "예매 상태") BookingStatus bookingStatus
+            @Schema(
+                    description = "회차 상태 (OPEN: 예매 오픈, CLOSE: 예매 마감)",
+                    allowableValues = {"OPEN", "CLOSE"},
+                    example = "OPEN"
+            ) PerformanceState state,
+            @Schema(
+                    description = "예매 상태 (BEFORE_OPEN: 오픈 전, ON_SALE: 예매 중, CLOSED: 마감)",
+                    allowableValues = {"BEFORE_OPEN", "ON_SALE", "CLOSED"},
+                    example = "ON_SALE"
+            ) BookingStatus bookingStatus
     ) {}
 
     @Schema(description = "공연 날짜별 회차 정보")
