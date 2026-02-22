@@ -7,7 +7,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 @Entity
@@ -53,5 +55,11 @@ public class MemberSocialAccount extends BaseEntity {
 
     public boolean isSameSocialId(final String providerId) {
         return socialId.equals(providerId);
+    }
+
+    public void withdraw() {
+        markDeleted(LocalDateTime.now());
+        final String idPart = id == null ? "unknown" : id.toString();
+        this.socialId = "deleted_" + idPart + "_" + UUID.randomUUID();
     }
 }

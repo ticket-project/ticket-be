@@ -5,8 +5,10 @@ import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberRepository;
 import com.ticket.core.domain.member.vo.EncodedPassword;
 import com.ticket.core.domain.member.vo.RawPassword;
+import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,16 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     private final MemberRepository memberRepository;
     private final PasswordService passwordService;
-
-    public AuthService(final MemberRepository memberRepository, final PasswordService passwordService) {
-        this.memberRepository = memberRepository;
-        this.passwordService = passwordService;
-    }
 
     @Transactional
     public Long register(final AddMember addMember) {
@@ -44,7 +42,7 @@ public class AuthService {
     }
 
     public Member login(final String email, final String password) {
-        final Member foundMember = memberRepository.findByEmail_Email(email)
+        final Member foundMember = memberRepository.findByEmail_EmailAndStatus(email, EntityStatus.ACTIVE)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA));
 
         if (!passwordService.matches(RawPassword.create(password), foundMember.getEncodedPassword())) {

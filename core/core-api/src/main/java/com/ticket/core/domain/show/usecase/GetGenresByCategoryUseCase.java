@@ -3,6 +3,7 @@ package com.ticket.core.domain.show.usecase;
 import com.ticket.core.api.controller.response.GenreResponse;
 import com.ticket.core.domain.show.Genre;
 import com.ticket.core.domain.show.GenreRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,13 +11,10 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class GetGenresByCategoryUseCase {
 
     private final GenreRepository genreRepository;
-
-    public GetGenresByCategoryUseCase(final GenreRepository genreRepository) {
-        this.genreRepository = genreRepository;
-    }
 
     public record Input(String categoryCode) {
     }

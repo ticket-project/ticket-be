@@ -2,16 +2,14 @@ package com.ticket.core.domain.auth;
 
 import com.ticket.core.domain.member.vo.EncodedPassword;
 import com.ticket.core.domain.member.vo.RawPassword;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class PasswordService {
     private final PasswordEncoder passwordEncoder;
-
-    public PasswordService(final PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
 
     public String encode(final String rawPassword) {
         return passwordEncoder.encode(rawPassword);

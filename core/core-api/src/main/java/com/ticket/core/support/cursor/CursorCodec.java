@@ -2,19 +2,17 @@ package com.ticket.core.support.cursor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticket.core.domain.show.ShowCursor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Component
+@RequiredArgsConstructor
 public class CursorCodec {
 
     private final ObjectMapper objectMapper;
-
-    public CursorCodec(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
 
     public String encode(ShowCursor cursor) {
         try {

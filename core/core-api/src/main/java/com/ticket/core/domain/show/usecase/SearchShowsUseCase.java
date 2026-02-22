@@ -4,6 +4,7 @@ import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.api.controller.response.ShowSearchResponse;
 import com.ticket.core.domain.show.ShowListQueryRepository;
 import com.ticket.core.support.cursor.CursorSlice;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,12 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class SearchShowsUseCase {
     private final ShowListQueryRepository showListQueryRepository;
-
-    public SearchShowsUseCase(final ShowListQueryRepository showListQueryRepository) {
-        this.showListQueryRepository = showListQueryRepository;
-    }
 
     public record Input(ShowSearchRequest request, int size, String sort) {
     }

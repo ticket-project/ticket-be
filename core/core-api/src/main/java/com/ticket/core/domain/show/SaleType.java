@@ -1,5 +1,8 @@
 package com.ticket.core.domain.show;
 
+import lombok.Getter;
+
+@Getter
 public enum SaleType {
     GENERAL("일반판매"),
     EXCLUSIVE("단독판매");
@@ -10,7 +13,8 @@ public enum SaleType {
         this.description = description;
     }
 
-    public String getDescription() {
-        return description;
+    public String getCode() {
+        return name();
     }
+
 }

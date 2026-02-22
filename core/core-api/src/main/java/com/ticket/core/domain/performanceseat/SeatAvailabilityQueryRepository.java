@@ -4,6 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.response.SeatAvailabilityResponse;
 import com.ticket.core.enums.PerformanceSeatState;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,13 +14,10 @@ import static com.ticket.core.domain.show.QShowGrade.showGrade;
 import static com.ticket.core.domain.show.QShowSeat.showSeat;
 
 @Repository
+@RequiredArgsConstructor
 public class SeatAvailabilityQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-
-    public SeatAvailabilityQueryRepository(JPAQueryFactory queryFactory) {
-        this.queryFactory = queryFactory;
-    }
 
     /**
      * 특정 회차의 등급별 잔여 좌석 수를 조회합니다.

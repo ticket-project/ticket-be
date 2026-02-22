@@ -1,6 +1,7 @@
 package com.ticket.core.aop;
 
 import com.ticket.core.support.CustomSpringELParser;
+import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,17 +17,13 @@ import java.util.List;
 
 @Component
 @Aspect
+@RequiredArgsConstructor
 public class DistributedLockAop {
     private static final String REDISSON_LOCK_PREFIX = "LOCK:";
     private static final Logger log = LoggerFactory.getLogger(DistributedLockAop.class);
 
     private final RedissonClient redissonClient;
     private final AopForTransaction aopForTransaction;
-
-    public DistributedLockAop(final RedissonClient redissonClient, final AopForTransaction aopForTransaction) {
-        this.redissonClient = redissonClient;
-        this.aopForTransaction = aopForTransaction;
-    }
 
     @Around("@annotation(com.ticket.core.aop.DistributedLock)")
     public Object around(final ProceedingJoinPoint joinPoint) throws Throwable {

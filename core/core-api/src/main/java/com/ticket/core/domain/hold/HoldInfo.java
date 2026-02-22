@@ -1,8 +1,11 @@
 package com.ticket.core.domain.hold;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
 public class HoldInfo {
     private final Long memberId;
     private final Long performanceId;
@@ -16,19 +19,4 @@ public class HoldInfo {
         this.expiredAt = expiredAt;
     }
 
-    public Long getMemberId() {
-        return memberId;
-    }
-
-    public Long getPerformanceId() {
-        return performanceId;
-    }
-
-    public List<Long> getSeatIds() {
-        return seatIds;
-    }
-
-    public LocalDateTime getExpiredAt() {
-        return expiredAt;
-    }
 }

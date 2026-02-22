@@ -24,7 +24,10 @@ public class SecurityConfig {
     private static final String[] AUTHENTICATED_API_PATTERNS = {
             "/api/v1/members/**",
             "/api/v1/holds/**",
-            "/api/v1/reservations/**"
+            "/api/v1/reservations/**",
+            "/api/v1/shows/likes/**",
+            "/api/v1/shows/*/likes",
+            "/api/v1/shows/*/likes/**"
     };
 
     @Bean

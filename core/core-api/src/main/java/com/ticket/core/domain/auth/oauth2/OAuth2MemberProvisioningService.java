@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import static com.ticket.core.enums.EntityStatus.ACTIVE;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -22,7 +24,12 @@ public class OAuth2MemberProvisioningService {
     private final MemberSocialAccountRepository memberSocialAccountRepository;
 
     public Member getOrCreateMember(final OAuth2UserInfo userInfo) {
-        return memberSocialAccountRepository.findBySocialProviderAndSocialId(userInfo.provider(), userInfo.providerId())
+        return memberSocialAccountRepository.findBySocialProviderAndSocialIdAndStatusAndMember_Status(
+                        userInfo.provider(),
+                        userInfo.providerId(),
+                        ACTIVE,
+                        ACTIVE
+                )
                 .map(MemberSocialAccount::getMember)
                 .orElseGet(() -> createOrLinkMember(userInfo));
     }
@@ -30,13 +37,13 @@ public class OAuth2MemberProvisioningService {
     private Member createOrLinkMember(final OAuth2UserInfo userInfo) {
         final String email = resolveEmail(userInfo);
 
-        return memberRepository.findByEmail_Email(email)
+        return memberRepository.findByEmail_EmailAndStatus(email, ACTIVE)
                 .map(existingMember -> linkSocialAccount(existingMember, userInfo))
                 .orElseGet(() -> createSocialMember(userInfo, email));
     }
 
     private Member linkSocialAccount(final Member existingMember, final OAuth2UserInfo userInfo) {
-        return memberSocialAccountRepository.findByMemberAndSocialProvider(existingMember, userInfo.provider())
+        return memberSocialAccountRepository.findByMemberAndSocialProviderAndStatus(existingMember, userInfo.provider(), ACTIVE)
                 .map(linkedAccount -> validateSameSocialAccount(linkedAccount, userInfo))
                 .orElseGet(() -> addSocialAccount(existingMember, userInfo));
     }

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:file:~/test;MODE=Oracle;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
+    url: jdbc:h2:file:~/test;MODE=Oracle;AUTO_SERVER=TRUE
     driver-class-name: org.h2.Driver
     username: sa
     password:
