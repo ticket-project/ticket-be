@@ -4,19 +4,25 @@ import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 
 public enum ShowSortKey {
-    POPULAR("popular"),          // 기본: 인기순
-    LATEST("latest"),            // 최신순
-    SHOW_START_APPROACHING("showStartApproaching"),   // 공연 임박순
-    SALE_START_APPROACHING("saleStartApproaching");    // 판매 오픈 예정순 (판매시작일 오름차순)
+    POPULAR("popular", "인기순"),
+    LATEST("latest", "최신순"),
+    SHOW_START_APPROACHING("showStartApproaching", "공연 임박순"),
+    SALE_START_APPROACHING("saleStartApproaching", "판매 오픈 임박순");
 
     private final String apiValue;
+    private final String description;
 
-    ShowSortKey(String apiValue) {
+    ShowSortKey(final String apiValue, final String description) {
         this.apiValue = apiValue;
+        this.description = description;
     }
 
     public String getApiValue() {
         return apiValue;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public static ShowSortKey fromApiValue(String v) {

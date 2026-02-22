@@ -52,6 +52,10 @@ public enum ErrorType {
         return message;
     }
 
+    public String getDescription() {
+        return message;
+    }
+
     public ErrorCode getErrorCode() {
         return errorCode;
     }
