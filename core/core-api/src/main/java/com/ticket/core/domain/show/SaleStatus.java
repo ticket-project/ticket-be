@@ -23,6 +23,10 @@ public enum SaleStatus {
         return description;
     }
 
+    public String getCode() {
+        return name();
+    }
+
     /**
      * 판매 시작일과 종료일을 기준으로 현재 판매 상태를 계산
      */
