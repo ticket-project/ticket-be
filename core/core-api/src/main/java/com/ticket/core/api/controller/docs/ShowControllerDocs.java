@@ -257,7 +257,7 @@ public interface ShowControllerDocs {
                     
                     ## 검색 조건
                     - **keyword**: 공연명 검색 (부분 일치)
-                    - **category**: 카테고리 필터 (CONCERT, THEATER 등)
+                    - **category**: 카테고리 필터 (CONCERT, THEATER, MISICAL 등)
                     - **saleStatus**: 판매 상태 필터 (UPCOMING, ON_SALE, CLOSED)
                     - **startDateFrom/To**: 공연 시작일 범위
                     - **region**: 지역 필터

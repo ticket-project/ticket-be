@@ -19,7 +19,7 @@ public class ShowParam {
     @Schema(
             description = "장르 필터",
             example = "KPOP",
-            allowableValues = {"KPOP", "POP", "HIPHOP", "RNB", "ROCK", "BALLAD", "INDIE", "DRAMA", "COMEDY"},
+            allowableValues = {"KPOP", "POP", "HIPHOP", "RNB", "ROCK", "BALLAD", "INDIE", "LIMITED_RUN", "STEADY_SELLER", "LICENSED", "ORIGINAL"},
             requiredMode = NOT_REQUIRED
     )
     private String genre;

@@ -28,7 +28,7 @@ public class ShowSearchRequest {
     @Schema(
             description = "카테고리 필터",
             example = "CONCERT",
-            allowableValues = {"CONCERT", "THEATER"},
+            allowableValues = {"CONCERT", "THEATER", "MUSICAL"},
             requiredMode = NOT_REQUIRED
     )
     private String category;
