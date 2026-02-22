@@ -33,7 +33,7 @@ public class GenreController {
     @GetMapping
     @Operation(summary = "장르 목록 조회", description = "카테고리별 장르 목록을 조회합니다. 카테고리 코드를 지정하지 않으면 전체 장르를 조회합니다.")
     public ApiResponse<List<GenreResponse>> getGenres(
-            @Parameter(description = "카테고리 코드 (예: CONCERT, THEATER)", example = "CONCERT")
+            @Parameter(description = "카테고리 코드 (예: CONCERT, THEATER, MUSICAL)", example = "CONCERT")
             @RequestParam(required = false) final String category
     ) {
         final GetGenresByCategoryUseCase.Input input = new GetGenresByCategoryUseCase.Input(category);
