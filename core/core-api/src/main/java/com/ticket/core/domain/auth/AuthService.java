@@ -45,7 +45,8 @@ public class AuthService {
         final Member foundMember = memberRepository.findByEmail_EmailAndStatus(email, EntityStatus.ACTIVE)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA));
 
-        if (!passwordService.matches(RawPassword.create(password), foundMember.getEncodedPassword())) {
+        if (foundMember.getEncodedPassword() == null
+                || !passwordService.matches(RawPassword.create(password), foundMember.getEncodedPassword())) {
             throw new CoreException(ErrorType.MEMBER_NOT_MATCH_PASSWORD);
         }
         return foundMember;

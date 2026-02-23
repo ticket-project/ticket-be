@@ -1,5 +1,6 @@
 package com.ticket.core.api.controller.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.ticket.core.domain.member.AddMember;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.RawPassword;
@@ -10,7 +11,8 @@ import jakarta.validation.constraints.NotBlank;
 @Schema(description = "회원가입 요청")
 public class AddMemberRequest {
 
-    @Schema(description = "이메일 주소", example = "user@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "로그인 아이디(이메일)", example = "user@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
+    @JsonAlias({"id", "loginId"})
     @NotBlank
     private String email;
 
@@ -22,7 +24,8 @@ public class AddMemberRequest {
     @NotBlank
     private String name;
 
-    public AddMemberRequest() {}
+    public AddMemberRequest() {
+    }
 
     public String getEmail() {
         return email;
@@ -40,4 +43,3 @@ public class AddMemberRequest {
         return new AddMember(Email.create(email), RawPassword.create(password), name, Role.MEMBER);
     }
 }
-
