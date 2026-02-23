@@ -1,35 +1,66 @@
 package com.ticket.core.api.controller;
 
+import com.ticket.core.api.controller.docs.AuthControllerDocs;
+import com.ticket.core.api.controller.request.AddMemberRequest;
+import com.ticket.core.api.controller.request.LoginMemberRequest;
+import com.ticket.core.api.controller.response.AuthLoginResponse;
+import com.ticket.core.config.security.JwtTokenService;
 import com.ticket.core.config.security.OAuth2EndpointConstants;
+import com.ticket.core.domain.auth.AuthService;
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.support.response.ApiResponse;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Map;
 
-@Tag(name = "Auth", description = "Social auth API")
 @RestController
 @RequestMapping("/api/v1/auth")
-public class AuthController {
+@RequiredArgsConstructor
+public class AuthController implements AuthControllerDocs {
 
     private static final String GOOGLE_REGISTRATION_ID = "google";
     private static final String KAKAO_REGISTRATION_ID = "kakao";
+    private static final String TOKEN_TYPE_BEARER = "Bearer";
 
-    @Operation(summary = "Social login URLs", description = "Returns OAuth2 entry URLs for Google and Kakao")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "URLs returned")
-    })
+    private final AuthService authService;
+    private final JwtTokenService jwtTokenService;
+
+    @Override
+    @PostMapping("/signup")
+    public ApiResponse<Long> signUp(@Valid @RequestBody final AddMemberRequest request) {
+        final Long memberId = authService.register(request.toAddMember());
+        return ApiResponse.success(memberId);
+    }
+
+    @Override
+    @PostMapping("/login")
+    public ApiResponse<AuthLoginResponse> login(@Valid @RequestBody final LoginMemberRequest request) {
+        final Member member = authService.login(request.getEmail(), request.getPassword());
+        final MemberPrincipal principal = new MemberPrincipal(member.getId(), member.getRole());
+        final String accessToken = jwtTokenService.createAccessToken(principal);
+
+        return ApiResponse.success(new AuthLoginResponse(
+                accessToken,
+                TOKEN_TYPE_BEARER,
+                jwtTokenService.getAccessTokenExpirationSeconds(),
+                member.getId()
+        ));
+    }
+
+    @Override
     @GetMapping("/social/urls")
     public ApiResponse<Map<String, String>> getSocialLoginUrls() {
         final String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
@@ -39,10 +70,7 @@ public class AuthController {
         ));
     }
 
-    @Operation(summary = "Logout", description = "Invalidates server session and client should discard JWT token")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Logout handled")
-    })
+    @Override
     @PostMapping("/logout")
     public ApiResponse<Void> logout(final HttpServletRequest request, final HttpServletResponse response) {
         final HttpSession session = request.getSession(false);
