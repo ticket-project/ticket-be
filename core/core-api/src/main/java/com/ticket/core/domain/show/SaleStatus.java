@@ -1,6 +1,6 @@
 package com.ticket.core.domain.show;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * 판매 상태를 나타내는 Enum
@@ -30,16 +30,16 @@ public enum SaleStatus {
     /**
      * 판매 시작일과 종료일을 기준으로 현재 판매 상태를 계산
      */
-    public static SaleStatus calculate(LocalDate saleStartDate, LocalDate saleEndDate) {
-        LocalDate today = LocalDate.now();
+    public static SaleStatus calculate(LocalDateTime saleStartDate, LocalDateTime saleEndDate) {
+        LocalDateTime now = LocalDateTime.now();
         
         if (saleStartDate == null || saleEndDate == null) {
             return null;
         }
         
-        if (today.isBefore(saleStartDate)) {
+        if (now.isBefore(saleStartDate)) {
             return UPCOMING;
-        } else if (today.isAfter(saleEndDate)) {
+        } else if (now.isAfter(saleEndDate)) {
             return CLOSED;
         } else {
             return ON_SALE;

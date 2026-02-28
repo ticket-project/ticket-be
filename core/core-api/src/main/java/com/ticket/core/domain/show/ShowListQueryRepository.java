@@ -22,6 +22,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -157,7 +158,7 @@ public class ShowListQueryRepository {
                 .leftJoin(showGenre).on(showGenre.show.eq(show))
                 .leftJoin(genre).on(showGenre.genre.eq(genre))
                 .leftJoin(category).on(genre.category.eq(category))
-                .where(queryHelper.categoryCodeEq(categoryCode), queryHelper.saleStartDateGoe(LocalDate.now()))
+                .where(queryHelper.categoryCodeEq(categoryCode), queryHelper.saleStartDateGoe(LocalDateTime.now()))
                 .orderBy(show.saleStartDate.asc())
                 .limit(limit)
                 .fetch();
@@ -167,7 +168,7 @@ public class ShowListQueryRepository {
             SaleOpeningSoonSearchParam param, int size, String sort) {
 
         BooleanBuilder where = new BooleanBuilder();
-        where.and(show.saleStartDate.goe(LocalDate.now()));
+        where.and(show.saleStartDate.goe(LocalDateTime.now()));
         where.and(queryHelper.categoryCodeEq(param.getCategory()));
         where.and(queryHelper.regionEq(param.getRegion()));
         where.and(queryHelper.titleContains(param.getTitle()));

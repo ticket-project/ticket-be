@@ -3,6 +3,7 @@ package com.ticket.core.api.controller.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Schema(description = "판매 오픈 예정 공연 정보 응답")
 public record ShowOpeningSoonResponse(
@@ -25,10 +26,10 @@ public record ShowOpeningSoonResponse(
         @Schema(description = "공연 종료일", example = "2026-08-01")
         LocalDate endDate,
 
-        @Schema(description = "티켓 판매 시작일", example = "2026-02-01")
-        LocalDate saleStartDate,
+        @Schema(description = "티켓 판매 시작일", example = "2026-02-01T00:00:00")
+        LocalDateTime saleStartDate,
 
-        @Schema(description = "티켓 판매 종료일", example = "2026-07-21")
-        LocalDate saleEndDate
+        @Schema(description = "티켓 판매 종료일", example = "2026-07-21T23:59:59")
+        LocalDateTime saleEndDate
 ) {
 }
