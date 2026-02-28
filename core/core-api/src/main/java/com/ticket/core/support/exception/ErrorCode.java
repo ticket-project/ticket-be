@@ -31,7 +31,7 @@ public enum ErrorCode {
 
     //공연
     E7000("미지원 공연 정렬"),
-    ;
+    E7001("이미 찜한 공연");
 
     private final String description;
 
