@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/shows")
+@RequestMapping("/api/v1/likes")
 @RequiredArgsConstructor
 public class ShowLikeController implements ShowLikeControllerDocs {
 
@@ -26,7 +26,7 @@ public class ShowLikeController implements ShowLikeControllerDocs {
     private final GetMyShowLikesUseCase getMyShowLikesUseCase;
 
     @Override
-    @PostMapping("/{showId}/likes")
+    @PostMapping("/shows/{showId}")
     public ApiResponse<ShowLikeStatusResponse> likeShow(
             final MemberPrincipal memberPrincipal,
             @PathVariable final Long showId
@@ -38,7 +38,7 @@ public class ShowLikeController implements ShowLikeControllerDocs {
     }
 
     @Override
-    @DeleteMapping("/{showId}/likes")
+    @DeleteMapping("/shows/{showId}")
     public ApiResponse<ShowLikeStatusResponse> unlikeShow(
             final MemberPrincipal memberPrincipal,
             @PathVariable final Long showId
@@ -50,7 +50,7 @@ public class ShowLikeController implements ShowLikeControllerDocs {
     }
 
     @Override
-    @GetMapping("/{showId}/likes")
+    @GetMapping("/shows/{showId}")
     public ApiResponse<ShowLikeStatusResponse> getLikeStatus(
             final MemberPrincipal memberPrincipal,
             @PathVariable final Long showId
@@ -62,7 +62,7 @@ public class ShowLikeController implements ShowLikeControllerDocs {
     }
 
     @Override
-    @GetMapping("/me/likes")
+    @GetMapping("/shows/me")
     public ApiResponse<SliceResponse<ShowLikeSummaryResponse>> getMyLikes(
             final MemberPrincipal memberPrincipal,
             @RequestParam(required = false) final String cursor,
