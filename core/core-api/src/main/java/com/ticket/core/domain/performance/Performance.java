@@ -57,19 +57,4 @@ public class Performance extends BaseEntity {
         return requestReserveCount > maxCanHoldCount;
     }
 
-    public BookingStatus calculateBookingStatus(final LocalDateTime now) {
-        if (state != PerformanceState.OPEN) {
-            return BookingStatus.CLOSED;
-        }
-        if (orderOpenTime == null || orderCloseTime == null) {
-            return BookingStatus.CLOSED;
-        }
-        if (now.isBefore(orderOpenTime)) {
-            return BookingStatus.BEFORE_OPEN;
-        }
-        if (now.isAfter(orderCloseTime)) {
-            return BookingStatus.CLOSED;
-        }
-        return BookingStatus.ON_SALE;
-    }
 }

@@ -31,20 +31,31 @@ public record ShowDetailResponse(
 
         @Schema(description = "공연 종료일")
         LocalDate endDate,
-        @Schema(description = "Running time in minutes")
+
+        @Schema(description = "러닝타임(분)")
         Integer runningMinutes,
 
         @Schema(description = "조회수")
         Long viewCount,
 
+        @Schema(description = "공연 전체 찜 개수")
+        Long likeCount,
+
+        @Schema(
+                description = "예매 상태 (공연 기준, BEFORE_OPEN: 오픈 전, ON_SALE: 예매 중, CLOSED: 마감)",
+                allowableValues = {"BEFORE_OPEN", "ON_SALE", "CLOSED"},
+                example = "ON_SALE"
+        )
+        BookingStatus bookingStatus,
+
         @Schema(description = "판매 타입", example = "{\"code\":\"GENERAL\",\"name\":\"일반판매\"}")
         SaleType saleType,
 
         @Schema(description = "판매 시작일")
-        LocalDate saleStartDate,
+        LocalDateTime saleStartDate,
 
         @Schema(description = "판매 종료일")
-        LocalDate saleEndDate,
+        LocalDateTime saleEndDate,
 
         @Schema(description = "포스터 이미지 URL")
         String image,
@@ -90,16 +101,12 @@ public record ShowDetailResponse(
             @Schema(description = "예매 오픈 시간") LocalDateTime orderOpenTime,
             @Schema(description = "예매 마감 시간") LocalDateTime orderCloseTime,
             @Schema(
-                    description = "회차 상태 (OPEN: 예매 오픈, CLOSE: 예매 마감)",
+                    description = "회차 상태 (OPEN: 예매 가능, CLOSE: 예매 마감)",
                     allowableValues = {"OPEN", "CLOSE"},
                     example = "OPEN"
-            ) PerformanceState state,
-            @Schema(
-                    description = "예매 상태 (BEFORE_OPEN: 오픈 전, ON_SALE: 예매 중, CLOSED: 마감)",
-                    allowableValues = {"BEFORE_OPEN", "ON_SALE", "CLOSED"},
-                    example = "ON_SALE"
-            ) BookingStatus bookingStatus
-    ) {}
+            ) PerformanceState state
+    ) {
+    }
 
     @Schema(description = "공연 날짜별 회차 정보")
     public record PerformanceDateInfo(
