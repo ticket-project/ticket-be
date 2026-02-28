@@ -106,7 +106,7 @@ public class ShowQueryHelper {
                 yield show.startDate.gt(last).or(show.startDate.eq(last).and(show.id.gt(lastId)));
             }
             case SALE_START_APPROACHING -> {
-                var last = LocalDate.parse(cursor.lastValue());
+                var last = LocalDateTime.parse(cursor.lastValue());
                 yield show.saleStartDate.gt(last).or(show.saleStartDate.eq(last).and(show.id.gt(lastId)));
             }
         };
@@ -134,19 +134,19 @@ public class ShowQueryHelper {
         return titleContains(keyword);
     }
 
-    public BooleanExpression saleStartDateGoe(LocalDate from) {
+    public BooleanExpression saleStartDateGoe(LocalDateTime from) {
         return from != null ? show.saleStartDate.goe(from) : null;
     }
 
-    public BooleanExpression saleStartDateLoe(LocalDate to) {
+    public BooleanExpression saleStartDateLoe(LocalDateTime to) {
         return to != null ? show.saleStartDate.loe(to) : null;
     }
 
-    public BooleanExpression saleEndDateGoe(LocalDate from) {
+    public BooleanExpression saleEndDateGoe(LocalDateTime from) {
         return from != null ? show.saleEndDate.goe(from) : null;
     }
 
-    public BooleanExpression saleEndDateLoe(LocalDate to) {
+    public BooleanExpression saleEndDateLoe(LocalDateTime to) {
         return to != null ? show.saleEndDate.loe(to) : null;
     }
 
@@ -160,11 +160,11 @@ public class ShowQueryHelper {
 
     public BooleanExpression saleStatusCondition(SaleStatus saleStatus) {
         if (saleStatus == null) return null;
-        LocalDate today = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
         return switch (saleStatus) {
-            case UPCOMING -> show.saleStartDate.gt(today);
-            case ON_SALE -> show.saleStartDate.loe(today).and(show.saleEndDate.goe(today));
-            case CLOSED -> show.saleEndDate.lt(today);
+            case UPCOMING -> show.saleStartDate.gt(now);
+            case ON_SALE -> show.saleStartDate.loe(now).and(show.saleEndDate.goe(now));
+            case CLOSED -> show.saleEndDate.lt(now);
         };
     }
 }

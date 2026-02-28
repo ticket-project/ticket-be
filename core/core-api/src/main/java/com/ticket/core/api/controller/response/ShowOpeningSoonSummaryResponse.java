@@ -2,7 +2,7 @@ package com.ticket.core.api.controller.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * 메인 화면용 판매 오픈 예정 공연 요약 응답 (5개)
@@ -22,6 +22,6 @@ public record ShowOpeningSoonSummaryResponse(
         @Schema(description = "장소", example = "예술의전당")
         String venue,
 
-        @Schema(description = "티켓 판매 시작일", example = "2026-02-01")
-        LocalDate saleStartDate
+        @Schema(description = "티켓 판매 시작일", example = "2026-02-01T00:00:00")
+        LocalDateTime saleStartDate
 ) {}

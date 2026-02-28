@@ -35,11 +35,11 @@ public record ShowResponse(
         @Schema(description = "판매 타입", example = "{\"code\":\"GENERAL\",\"name\":\"일반판매\"}")
         SaleType saleType,
 
-        @Schema(description = "판매 시작일", example = "2026-01-01")
-        LocalDate saleStartDate,
+        @Schema(description = "판매 시작일", example = "2026-01-01T00:00:00")
+        LocalDateTime saleStartDate,
 
-        @Schema(description = "판매 종료일", example = "2026-02-28")
-        LocalDate saleEndDate,
+        @Schema(description = "판매 종료일", example = "2026-02-28T23:59:59")
+        LocalDateTime saleEndDate,
 
         @Schema(description = "생성일", example = "2026-02-28T14:00:00")
         LocalDateTime createdAt,

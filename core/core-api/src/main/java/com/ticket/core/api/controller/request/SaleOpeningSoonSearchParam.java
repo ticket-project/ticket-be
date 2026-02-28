@@ -2,8 +2,9 @@ package com.ticket.core.api.controller.request;
 
 import com.ticket.core.domain.show.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 
@@ -37,31 +38,35 @@ public class SaleOpeningSoonSearchParam {
 
     @Schema(
             description = "판매 시작일 필터 (이 날짜 이후)",
-            example = "2026-03-01",
+            example = "2026-03-01T00:00:00",
             requiredMode = NOT_REQUIRED
     )
-    private LocalDate saleStartDateFrom;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime saleStartDateFrom;
 
     @Schema(
             description = "판매 시작일 필터 (이 날짜 이전)",
-            example = "2026-04-01",
+            example = "2026-04-01T23:59:59",
             requiredMode = NOT_REQUIRED
     )
-    private LocalDate saleStartDateTo;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime saleStartDateTo;
 
     @Schema(
             description = "판매 종료일 필터 (이 날짜 이후)",
-            example = "2026-05-01",
+            example = "2026-05-01T00:00:00",
             requiredMode = NOT_REQUIRED
     )
-    private LocalDate saleEndDateFrom;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime saleEndDateFrom;
 
     @Schema(
             description = "판매 종료일 필터 (이 날짜 이전)",
-            example = "2026-06-01",
+            example = "2026-06-01T23:59:59",
             requiredMode = NOT_REQUIRED
     )
-    private LocalDate saleEndDateTo;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime saleEndDateTo;
 
     @Schema(
             description = """
@@ -78,10 +83,10 @@ public class SaleOpeningSoonSearchParam {
             String category,
             String title,
             Region region,
-            LocalDate saleStartDateFrom,
-            LocalDate saleStartDateTo,
-            LocalDate saleEndDateFrom,
-            LocalDate saleEndDateTo,
+            LocalDateTime saleStartDateFrom,
+            LocalDateTime saleStartDateTo,
+            LocalDateTime saleEndDateFrom,
+            LocalDateTime saleEndDateTo,
             String cursor
     ) {
         this.category = category;
@@ -106,19 +111,19 @@ public class SaleOpeningSoonSearchParam {
         return region;
     }
 
-    public LocalDate getSaleStartDateFrom() {
+    public LocalDateTime getSaleStartDateFrom() {
         return saleStartDateFrom;
     }
 
-    public LocalDate getSaleStartDateTo() {
+    public LocalDateTime getSaleStartDateTo() {
         return saleStartDateTo;
     }
 
-    public LocalDate getSaleEndDateFrom() {
+    public LocalDateTime getSaleEndDateFrom() {
         return saleEndDateFrom;
     }
 
-    public LocalDate getSaleEndDateTo() {
+    public LocalDateTime getSaleEndDateTo() {
         return saleEndDateTo;
     }
 

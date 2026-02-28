@@ -2,12 +2,14 @@ package com.ticket.core.domain.show;
 
 
 import com.ticket.core.domain.BaseEntity;
+import com.ticket.core.enums.BookingStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -33,9 +35,9 @@ public class Show extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SaleType saleType;
 
-    private LocalDate saleStartDate;
+    private LocalDateTime saleStartDate;
 
-    private LocalDate saleEndDate;
+    private LocalDateTime saleEndDate;
 
     private String image;
 
@@ -47,7 +49,7 @@ public class Show extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Performer performer;
 
-    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final Long viewCount, final SaleType saleType, final LocalDate saleStartDate, final LocalDate saleEndDate, final String image, final Venue venue, final Performer performer, final Integer runningMinutes) {
+    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final Long viewCount, final SaleType saleType, final LocalDateTime saleStartDate, final LocalDateTime saleEndDate, final String image, final Venue venue, final Performer performer, final Integer runningMinutes) {
         this.title = title;
         this.subTitle = subTitle;
         this.info = info;
@@ -61,6 +63,19 @@ public class Show extends BaseEntity {
         this.venue = venue;
         this.performer = performer;
         this.runningMinutes = runningMinutes;
+    }
+
+    public BookingStatus getBookingStatus(final LocalDateTime now) {
+        if (saleStartDate == null || saleEndDate == null) {
+            return BookingStatus.CLOSED;
+        }
+        if (now.isBefore(saleStartDate)) {
+            return BookingStatus.BEFORE_OPEN;
+        }
+        if (now.isAfter(saleEndDate)) {
+            return BookingStatus.CLOSED;
+        }
+        return BookingStatus.ON_SALE;
     }
 
 }
