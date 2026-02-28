@@ -8,7 +8,7 @@ import java.util.List;
 public record MetaCodesResponse(
 
         @Schema(description = "카테고리 코드 목록")
-        List<CategoryCodeItem> category,
+        List<CategoryCodeItem> categories,
 
         @Schema(description = "장르 코드 목록")
         List<GenreCodeItem> genres,
