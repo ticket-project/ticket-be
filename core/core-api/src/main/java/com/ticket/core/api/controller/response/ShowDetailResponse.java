@@ -36,10 +36,10 @@ public record ShowDetailResponse(
         Integer runningMinutes,
 
         @Schema(description = "조회수")
-        Long viewCount,
+        long viewCount,
 
         @Schema(description = "공연 전체 찜 개수")
-        Long likeCount,
+        long likeCount,
 
         @Schema(
                 description = "예매 상태 (공연 기준, BEFORE_OPEN: 오픈 전, ON_SALE: 예매 중, CLOSED: 마감)",

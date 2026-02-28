@@ -33,6 +33,6 @@ public record ShowSearchResponse(
         Region region,
 
         @Schema(description = "조회수", example = "15000")
-        Long viewCount
+        long viewCount
 ) {
 }

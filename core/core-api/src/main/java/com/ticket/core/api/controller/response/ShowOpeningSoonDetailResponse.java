@@ -43,6 +43,6 @@ public record ShowOpeningSoonDetailResponse(
         LocalDateTime saleEndDate,
 
         @Schema(description = "조회수 (인기순 정렬 기준)", example = "15000")
-        Long viewCount
+        long viewCount
 ) {
 }
