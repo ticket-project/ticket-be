@@ -62,7 +62,7 @@ public class ShowLikeController implements ShowLikeControllerDocs {
     }
 
     @Override
-    @GetMapping("/likes")
+    @GetMapping("/me/likes")
     public ApiResponse<SliceResponse<ShowLikeSummaryResponse>> getMyLikes(
             final MemberPrincipal memberPrincipal,
             @RequestParam(required = false) final String cursor,
