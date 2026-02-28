@@ -102,7 +102,7 @@ public class HoldRedisService implements HoldService {
         final List<Object> result = script.eval(
                 RScript.Mode.READ_WRITE,
                 HOLD_SCRIPT,
-                RScript.ReturnType.MULTI,
+                RScript.ReturnType.LIST,
                 keys,
                 foundMember.getId().toString(),
                 foundPerformance.getId().toString(),
@@ -144,7 +144,7 @@ public class HoldRedisService implements HoldService {
         return script.eval(
                 RScript.Mode.READ_WRITE,
                 RELEASE_SCRIPT,
-                RScript.ReturnType.MULTI,
+                RScript.ReturnType.LIST,
                 keys,
                 memberId.toString()
         );

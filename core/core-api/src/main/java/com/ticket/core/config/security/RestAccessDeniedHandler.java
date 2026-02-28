@@ -1,6 +1,6 @@
 package com.ticket.core.config.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     @Override
     public void handle(
@@ -30,6 +30,6 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(ErrorType.AUTHORIZATION_ERROR.getStatus().value());
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        objectMapper.writeValue(response.getWriter(), ApiResponse.error(ErrorType.AUTHORIZATION_ERROR));
+        jsonMapper.writeValue(response.getWriter(), ApiResponse.error(ErrorType.AUTHORIZATION_ERROR));
     }
 }
