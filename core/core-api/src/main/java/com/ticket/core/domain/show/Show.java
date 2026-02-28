@@ -30,7 +30,7 @@ public class Show extends BaseEntity {
 
     private LocalDate endDate;
 
-    private Long viewCount;
+    private long viewCount;
 
     @Enumerated(EnumType.STRING)
     private SaleType saleType;
@@ -49,7 +49,7 @@ public class Show extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Performer performer;
 
-    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final Long viewCount, final SaleType saleType, final LocalDateTime saleStartDate, final LocalDateTime saleEndDate, final String image, final Venue venue, final Performer performer, final Integer runningMinutes) {
+    public Show(final String title, final String subTitle, final String info, final LocalDate startDate, final LocalDate endDate, final long viewCount, final SaleType saleType, final LocalDateTime saleStartDate, final LocalDateTime saleEndDate, final String image, final Venue venue, final Performer performer, final Integer runningMinutes) {
         this.title = title;
         this.subTitle = subTitle;
         this.info = info;

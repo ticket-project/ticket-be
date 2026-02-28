@@ -8,18 +8,13 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
 import com.ticket.core.api.controller.request.ShowParam;
 import com.ticket.core.api.controller.request.ShowSearchRequest;
-import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
-import com.ticket.core.api.controller.response.ShowOpeningSoonSummaryResponse;
-import com.ticket.core.api.controller.response.ShowResponse;
-import com.ticket.core.api.controller.response.ShowSearchResponse;
-import com.ticket.core.api.controller.response.ShowSummaryResponse;
+import com.ticket.core.api.controller.response.*;
 import com.ticket.core.domain.show.ShowQueryHelper.SortOrder;
 import com.ticket.core.support.cursor.CursorSlice;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -125,7 +120,7 @@ public class ShowListQueryRepository {
 
     private String resolveLastValue(ShowResponse last, SortOrder sortOrder) {
         return switch (sortOrder.key()) {
-            case POPULAR -> last.viewCount().toString();
+            case POPULAR -> String.valueOf(last.viewCount());
             case LATEST -> last.createdAt().toString();
             case SHOW_START_APPROACHING -> last.startDate().toString();
             case SALE_START_APPROACHING -> last.saleStartDate().toString();

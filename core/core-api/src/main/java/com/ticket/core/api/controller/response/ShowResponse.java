@@ -30,7 +30,7 @@ public record ShowResponse(
         LocalDate endDate,
 
         @Schema(description = "조회수", example = "15000")
-        Long viewCount,
+        long viewCount,
 
         @Schema(description = "판매 타입", example = "GENERAL")
         SaleType saleType,
