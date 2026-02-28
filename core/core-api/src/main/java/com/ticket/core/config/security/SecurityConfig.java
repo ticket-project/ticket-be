@@ -21,13 +21,16 @@ import java.util.List;
 @EnableConfigurationProperties({JwtProperties.class, CorsProperties.class})
 public class SecurityConfig {
 
-    private static final String[] AUTHENTICATED_API_PATTERNS = {
-            "/api/v1/members/**",
-            "/api/v1/holds/**",
-            "/api/v1/reservations/**",
-            "/api/v1/shows/likes/**",
-            "/api/v1/shows/*/likes",
-            "/api/v1/shows/*/likes/**"
+    // 인증 없이 접근 가능한 API (화이트리스트)
+    // 여기에 없는 API는 전부 인증 필수
+    private static final String[] PUBLIC_API_PATTERNS = {
+            "/",
+            "/api/v1/auth/**",
+            "/api/v1/shows/**",
+            "/api/v1/genres/**",
+            "/api/v1/meta/**",
+            "/swagger-ui/**",
+            "/api-docs/**",
     };
 
     @Bean
@@ -52,8 +55,8 @@ public class SecurityConfig {
                         .accessDeniedHandler(restAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(AUTHENTICATED_API_PATTERNS).authenticated()
-                        .anyRequest().permitAll()
+                        .requestMatchers(PUBLIC_API_PATTERNS).permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authorization ->
