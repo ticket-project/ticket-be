@@ -1,7 +1,9 @@
 package com.ticket.core.support.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public enum ErrorType {
     DEFAULT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.E500, "알 수 없는 에러입니다."),
     NOT_FOUND_DATA(HttpStatus.NOT_FOUND, ErrorCode.E404, "요청하신 정보를 찾을 수 없습니다."),
@@ -32,7 +34,8 @@ public enum ErrorType {
     SEAT_ALREADY_HOLD(HttpStatus.CONFLICT, ErrorCode.E6000, "좌석이 이미 선점되었습니다."),
 
     //공연
-    NOT_SUPPORT_SHOW_SORT(HttpStatus.BAD_REQUEST, ErrorCode.E7000, "지원하지 않는 정렬 조건입니다.");
+    NOT_SUPPORT_SHOW_SORT(HttpStatus.BAD_REQUEST, ErrorCode.E7000, "지원하지 않는 정렬 조건입니다."),
+    SHOW_LIKE_ALREADY_EXISTS(HttpStatus.CONFLICT, ErrorCode.E7001, "이미 찜한 공연입니다."),;
 
     private final HttpStatus status;
     private final ErrorCode errorCode;
@@ -44,19 +47,8 @@ public enum ErrorType {
         this.message = message;
     }
 
-    public HttpStatus getStatus() {
-        return status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
     public String getDescription() {
         return message;
     }
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
 }

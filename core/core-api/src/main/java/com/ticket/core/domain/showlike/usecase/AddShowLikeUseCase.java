@@ -48,10 +48,8 @@ public class AddShowLikeUseCase {
         try {
             showLikeRepository.save(new ShowLike(member, show));
         } catch (DataIntegrityViolationException e) {
-            // 동시성으로 이미 저장된 경우 멱등 성공으로 처리
-            if (!showLikeRepository.existsByMember_IdAndShow_Id(input.memberId(), input.showId())) {
-                throw e;
-            }
+            throw new CoreException(ErrorType.SHOW_LIKE_ALREADY_EXISTS,
+                    "이미 찜한 공연입니다. memberId=" + input.memberId() + ", showId=" + input.showId());
         }
 
         return new Output(new ShowLikeStatusResponse(input.showId(), true, countLikes(input.showId())));

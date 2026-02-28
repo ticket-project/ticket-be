@@ -4,9 +4,11 @@ import com.ticket.core.domain.BaseEntity;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.show.Show;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.util.Objects;
 
+@Getter
 @Entity
 @Table(
         name = "SHOW_LIKES",
@@ -40,15 +42,4 @@ public class ShowLike extends BaseEntity {
         this.show = Objects.requireNonNull(show, "show must not be null");
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Member getMember() {
-        return member;
-    }
-
-    public Show getShow() {
-        return show;
-    }
 }

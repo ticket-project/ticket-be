@@ -47,7 +47,7 @@ public record ShowDetailResponse(
         )
         BookingStatus bookingStatus,
 
-        @Schema(description = "판매 타입", example = "{\"code\":\"GENERAL\",\"name\":\"일반판매\"}")
+        @Schema(description = "판매 타입", example = "GENERAL")
         SaleType saleType,
 
         @Schema(description = "판매 시작일")
