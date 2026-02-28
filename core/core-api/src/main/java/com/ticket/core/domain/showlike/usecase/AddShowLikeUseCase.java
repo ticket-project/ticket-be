@@ -33,13 +33,14 @@ public class AddShowLikeUseCase {
     public Output execute(final Input input) {
         validateInput(input);
 
+        final Member member = memberRepository.findByIdAndStatus(input.memberId(), EntityStatus.ACTIVE)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA,
+                        "회원을 찾을 수 없습니다. id=" + input.memberId()));
+
         if (showLikeRepository.existsByMember_IdAndShow_Id(input.memberId(), input.showId())) {
             return new Output(new ShowLikeStatusResponse(input.showId(), true, countLikes(input.showId())));
         }
 
-        final Member member = memberRepository.findByIdAndStatus(input.memberId(), EntityStatus.ACTIVE)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA,
-                        "회원을 찾을 수 없습니다. id=" + input.memberId()));
         final Show show = showJpaRepository.findById(input.showId())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA,
                         "공연을 찾을 수 없습니다. id=" + input.showId()));
