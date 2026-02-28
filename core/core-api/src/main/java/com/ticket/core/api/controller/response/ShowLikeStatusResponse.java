@@ -9,6 +9,9 @@ public record ShowLikeStatusResponse(
         Long showId,
 
         @Schema(description = "찜 여부", example = "true")
-        boolean liked
+        boolean liked,
+
+        @Schema(description = "공연 전체 찜 개수", example = "128")
+        long likeCount
 ) {
 }

@@ -2,9 +2,9 @@ package com.ticket.core.domain.showlike.usecase;
 
 import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
 import com.ticket.core.domain.member.MemberRepository;
-import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.domain.show.ShowJpaRepository;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
+import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,11 @@ public class RemoveShowLikeUseCase {
         showLikeRepository.findByMember_IdAndShow_Id(input.memberId(), input.showId())
                 .ifPresent(showLikeRepository::delete);
 
-        return new Output(new ShowLikeStatusResponse(input.showId(), false));
+        return new Output(new ShowLikeStatusResponse(
+                input.showId(),
+                false,
+                showLikeRepository.countByShow_IdAndStatus(input.showId(), EntityStatus.ACTIVE)
+        ));
     }
 
     private void validateInput(final Input input) {
@@ -51,7 +55,7 @@ public class RemoveShowLikeUseCase {
 
     private void validateMemberExists(final Long memberId) {
         if (memberRepository.findByIdAndStatus(memberId, EntityStatus.ACTIVE).isEmpty()) {
-            throw new CoreException(ErrorType.NOT_FOUND_DATA, "member not found. id=" + memberId);
+            throw new CoreException(ErrorType.NOT_FOUND_DATA, "회원을 찾을 수 없습니다. id=" + memberId);
         }
     }
 }
