@@ -3,6 +3,12 @@ spring:
     import:
       - logging.yml
       - redis.yml
+  http:
+    serviceclient:
+      kakao:
+        base-url: https://kapi.kakao.com
+        connect-timeout: 5s
+        read-timeout: 3s
   security:
     oauth2:
       client:
@@ -64,4 +70,3 @@ app:
     oauth2-failure-redirect-uri: ${OAUTH2_FAILURE_REDIRECT_URI}
     kakao:
       admin-key: ${KAKAO_ADMIN_KEY}
-      unlink-url: https://kapi.kakao.com/v1/user/unlink

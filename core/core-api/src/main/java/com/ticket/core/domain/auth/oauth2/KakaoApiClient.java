@@ -10,7 +10,7 @@ import org.springframework.web.service.annotation.PostExchange;
  * 카카오 API 선언적 HTTP 클라이언트
  * Spring Framework 7 / Spring Boot 4의 HTTP Interface Client 기능 활용
  */
-@HttpExchange(url = "${app.auth.kakao.base-url:https://kapi.kakao.com}")
+@HttpExchange
 public interface KakaoApiClient {
 
     @PostExchange(url = "/v1/user/unlink", contentType = "application/x-www-form-urlencoded")
