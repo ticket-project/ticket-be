@@ -1,11 +1,9 @@
 package com.ticket.core.api.controller;
 
+import com.ticket.core.api.controller.docs.GenreControllerDocs;
 import com.ticket.core.api.controller.response.GenreResponse;
 import com.ticket.core.domain.show.usecase.GetGenresByCategoryUseCase;
 import com.ticket.core.support.response.ApiResponse;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +17,8 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v1/genres")
-@Tag(name = "Genre", description = "장르 관련 API")
 @RequiredArgsConstructor
-public class GenreController {
+public class GenreController implements GenreControllerDocs {
 
     private final GetGenresByCategoryUseCase getGenresByCategoryUseCase;
 
@@ -30,10 +27,9 @@ public class GenreController {
      * - categoryCode가 없으면 전체 장르 조회
      * - categoryCode가 있으면 해당 카테고리에 속한 장르만 조회
      */
+    @Override
     @GetMapping
-    @Operation(summary = "장르 목록 조회", description = "카테고리별 장르 목록을 조회합니다. 카테고리 코드를 지정하지 않으면 전체 장르를 조회합니다.")
     public ApiResponse<List<GenreResponse>> getGenres(
-            @Parameter(description = "카테고리 코드 (예: CONCERT, THEATER, MUSICAL)", example = "CONCERT")
             @RequestParam(required = false) final String category
     ) {
         final GetGenresByCategoryUseCase.Input input = new GetGenresByCategoryUseCase.Input(category);
