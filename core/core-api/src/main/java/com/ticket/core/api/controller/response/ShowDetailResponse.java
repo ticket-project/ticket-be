@@ -43,7 +43,6 @@ public record ShowDetailResponse(
 
         @Schema(
                 description = "예매 상태 (공연 기준, BEFORE_OPEN: 오픈 전, ON_SALE: 예매 중, CLOSED: 마감)",
-                allowableValues = {"BEFORE_OPEN", "ON_SALE", "CLOSED"},
                 example = "ON_SALE"
         )
         BookingStatus bookingStatus,
