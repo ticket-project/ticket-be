@@ -43,6 +43,7 @@ public class KakaoUnlinkService {
         try {
             kakaoApiClient.unlink(KAKAO_ADMIN_AUTH_PREFIX + adminKey, formData);
         } catch (Exception e) {
+            log.error("카카오 unlink 호출 실패", e);
             throw new CoreException(ErrorType.DEFAULT_ERROR, "카카오 unlink 호출에 실패했습니다.");
         }
     }

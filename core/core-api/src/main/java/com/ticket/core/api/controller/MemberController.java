@@ -25,7 +25,6 @@ public class MemberController implements MemberControllerDocs {
     @Override
     @GetMapping
     public ApiResponse<MemberResponse> getCurrentMember(MemberPrincipal memberPrincipal) {
-        log.info("loginMember={}", memberPrincipal);
         final Member findMember = memberService.findById(memberPrincipal.getMemberId());
         return ApiResponse.success(new MemberResponse(findMember.getId(), findMember.getEmail().getEmail(), findMember.getName(), findMember.getRole().name()));
     }
@@ -33,7 +32,6 @@ public class MemberController implements MemberControllerDocs {
     @Override
     @DeleteMapping
     public ApiResponse<Void> withdrawCurrentMember(final MemberPrincipal memberPrincipal) {
-        log.info("withdrawMember memberId={}", memberPrincipal.getMemberId());
         memberService.withdraw(memberPrincipal.getMemberId());
         SecurityContextHolder.clearContext();
         return ApiResponse.success();
