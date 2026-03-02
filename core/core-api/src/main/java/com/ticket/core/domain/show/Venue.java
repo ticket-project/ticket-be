@@ -34,4 +34,13 @@ public class Venue extends BaseEntity {
 
     private String phone;
     private String imageUrl;
+
+    // --- 좌석 맵 SVG 레이아웃 ---
+    private int viewBoxWidth;
+    private int viewBoxHeight;
+    private double seatDiameter;
+    @Column(name = "GAP_X")
+    private double gapX;
+    @Column(name = "GAP_Y")
+    private double gapY;
 }
