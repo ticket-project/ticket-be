@@ -8,6 +8,8 @@ import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.api.controller.response.ShowSearchCountResponse;
 import com.ticket.core.api.controller.response.ShowSearchResponse;
+import com.ticket.core.api.controller.response.ShowSeatResponse;
+import com.ticket.core.api.controller.response.VenueLayoutResponse;
 import com.ticket.core.domain.show.usecase.GetLatestShowsUseCase;
 import com.ticket.core.domain.show.usecase.GetSaleStartApproachingShowsUseCase;
 import com.ticket.core.support.response.ApiResponse;
@@ -26,6 +28,39 @@ import org.springdoc.core.annotations.ParameterObject;
  */
 @Tag(name = "공연(Show)", description = "공연 정보 조회 API")
 public interface ShowControllerDocs {
+
+    // ========== 공연장 레이아웃 API ==========
+
+    @Operation(
+            summary = "공연장 레이아웃 조회",
+            description = """
+                    공연 ID로 해당 공연장의 레이아웃(SVG viewBox, 무대 위치)을 조회합니다.
+                    공연장 정보는 거의 변하지 않으므로 캐싱에 적합합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
+    })
+    ApiResponse<VenueLayoutResponse> getVenueLayout(
+            @Parameter(description = "공연 ID", example = "1", required = true) Long showId
+    );
+
+    // ========== 좌석 정보 API ==========
+
+    @Operation(
+            summary = "공연 좌석 정보 조회",
+            description = """
+                    공연 ID로 해당 공연의 등급 목록과 좌석별 좌표/등급 정보를 조회합니다.
+                    같은 공연의 모든 회차는 동일한 좌석 구성이므로 공연 단위로 조회합니다.
+                    이 정보는 거의 변하지 않으므로 캐싱에 적합합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
+    })
+    ApiResponse<ShowSeatResponse> getShowSeats(
+            @Parameter(description = "공연 ID", example = "1", required = true) Long showId
+    );
 
     // ========== 상세 조회 API ==========
 
