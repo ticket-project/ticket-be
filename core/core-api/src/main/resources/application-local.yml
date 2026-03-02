@@ -15,7 +15,6 @@ spring:
       ddl-auto: create
     defer-datasource-initialization: true
 
-  sql:
-    init:
-      mode: always   # schema.sql/data.sql 쓰면 always로 변경
-      encoding: UTF-8
+app:
+  seed:
+    enabled: true

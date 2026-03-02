@@ -16,3 +16,7 @@ decorator:
   datasource:
     p6spy:
       enable-logging: false
+
+app:
+  seed:
+    enabled: true

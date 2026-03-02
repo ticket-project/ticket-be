@@ -128,6 +128,11 @@ public class SeatWebSocketController {
             final Principal principal
     ) {
         final Long memberId = extractMemberId(principal);
+        if (memberId == null) {
+            log.warn("비인가 사용자의 좌석 선택 요청 차단: performanceId={}, seatId={}", performanceId, payload.seatId());
+            return;
+        }
+        
         log.info("좌석 선택 요청: performanceId={}, seatId={}, memberId={}", performanceId, payload.seatId(), memberId);
         seatEventPublisher.publishSeatSelected(performanceId, payload.seatId(), memberId);
     }
@@ -146,6 +151,11 @@ public class SeatWebSocketController {
             final Principal principal
     ) {
         final Long memberId = extractMemberId(principal);
+        if (memberId == null) {
+            log.warn("비인가 사용자의 좌석 해제 요청 차단: performanceId={}, seatId={}", performanceId, payload.seatId());
+            return;
+        }
+
         log.info("좌석 해제 요청: performanceId={}, seatId={}, memberId={}", performanceId, payload.seatId(), memberId);
         seatEventPublisher.publishSeatDeselected(performanceId, payload.seatId(), memberId);
     }
