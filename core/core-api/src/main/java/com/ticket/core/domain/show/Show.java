@@ -20,10 +20,14 @@ public class Show extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 1000)
     private String title;
 
+    @Column(length = 500)
     private String subTitle;
 
+    @Lob
+    @Column(columnDefinition = "CLOB")
     private String info;
 
     private LocalDate startDate;
