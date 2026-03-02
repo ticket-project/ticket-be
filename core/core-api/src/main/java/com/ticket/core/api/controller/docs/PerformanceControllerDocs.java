@@ -1,6 +1,7 @@
 package com.ticket.core.api.controller.docs;
 
 import com.ticket.core.api.controller.response.SeatAvailabilityResponse;
+import com.ticket.core.api.controller.response.SeatStatusResponse;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,6 +22,20 @@ public interface PerformanceControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     })
     ApiResponse<SeatAvailabilityResponse> getSeatAvailability(
+            @Parameter(description = "공연 회차 ID", example = "1", required = true) Long performanceId
+    );
+
+    @Operation(
+            summary = "회차별 좌석 상태 조회",
+            description = """
+                    특정 회차의 모든 좌석 상태(AVAILABLE, HELD, RESERVED 등)를 조회합니다.
+                    실시간으로 변동될 수 있는 데이터입니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
+    })
+    ApiResponse<SeatStatusResponse> getSeatStatus(
             @Parameter(description = "공연 회차 ID", example = "1", required = true) Long performanceId
     );
 }

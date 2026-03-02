@@ -25,10 +25,19 @@ public class Seat extends BaseEntity {
     @Column(name = "seat_no", nullable = false)
     private String seatNo;
 
-    public Seat(final String section, final String rowNo, final String seatNo) {
+    private int floor;
+
+    private double x;
+
+    private double y;
+
+    public Seat(final String section, final String rowNo, final String seatNo, final int floor, final double x, final double y) {
         this.section = section;
         this.rowNo = rowNo;
         this.seatNo = seatNo;
+        this.floor = floor;
+        this.x = x;
+        this.y = y;
     }
 
 }
