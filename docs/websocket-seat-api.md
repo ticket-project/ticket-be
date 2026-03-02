@@ -1,130 +1,148 @@
-# 좌석 실시간 WebSocket API 가이드
+# 좌석 실시간 WebSocket 연동 가이드 (프론트 공유용)
 
-## 1. 연결 정보
+## 1. 목표
+좌석 선택/해제 상태를 관람 회차(`performanceId`) 단위로 실시간 동기화한다.
 
+## 2. 연결 정보
 | 항목 | 값 |
 |---|---|
-| **엔드포인트** | `ws://서버주소/ws` (SockJS) |
-| **프로토콜** | STOMP over WebSocket |
-| **인증** | STOMP CONNECT 프레임의 `Authorization: Bearer {JWT}` 헤더 |
+| 엔드포인트 | `/ws` (SockJS) |
+| 프로토콜 | STOMP over WebSocket |
+| 브로커 구독 prefix | `/topic` |
+| 클라이언트 발행 prefix | `/app` |
+| 인증 헤더 | STOMP `CONNECT` frame의 `Authorization: Bearer {JWT}` |
 
----
+예시 URL:
+- 로컬: `http://localhost:8080/ws`
+- 운영: `https://{host}/ws`
 
-## 2. 구독 (서버 → 클라이언트)
-
-### 토픽
-```
+## 3. 구독(서버 -> 클라이언트)
+구독 destination:
+```text
 /topic/performance/{performanceId}/seats
 ```
 
-### 수신 메시지 형식
+메시지 스키마:
 ```json
 {
   "performanceId": 1,
   "seatId": 42,
   "action": "SELECTED",
-  "memberId": 1,
-  "timestamp": "2026-03-02T16:00:00"
+  "memberId": 1001,
+  "timestamp": "2026-03-02T18:45:12.123"
 }
 ```
 
-| 필드 | 타입 | 설명 |
-|---|---|---|
-| `performanceId` | `Long` | 공연 회차 ID |
-| `seatId` | `Long` | 좌석 ID |
-| `action` | `String` | `"SELECTED"` 또는 `"DESELECTED"` |
-| `memberId` | `Long?` | 선택한 사용자 ID (비인증 시 `null`) |
-| `timestamp` | `String` | ISO 8601 시각 |
+필드 정의:
+- `performanceId` (`number`): 회차 ID
+- `seatId` (`number`): 좌석 ID
+- `action` (`"SELECTED" | "DESELECTED"`): 좌석 상태 변경 이벤트
+- `memberId` (`number`): 이벤트를 발생시킨 회원 ID
+- `timestamp` (`string`, ISO-8601): 서버 이벤트 시각
 
----
-
-## 3. 전송 (클라이언트 → 서버)
-
-### 좌석 선택
+## 4. 발행(클라이언트 -> 서버)
+좌석 선택:
+```text
+/app/performance/{performanceId}/select-seat
 ```
-Destination: /app/performance/{performanceId}/select-seat
-Payload: { "seatId": 42 }
-```
-
-### 좌석 선택 해제
-```
-Destination: /app/performance/{performanceId}/deselect-seat
-Payload: { "seatId": 42 }
+payload:
+```json
+{ "seatId": 42 }
 ```
 
----
-
-## 4. 프론트엔드 연동 예시
-
-### 의존성
-```bash
-npm install sockjs-client @stomp/stompjs
+좌석 선택 해제:
+```text
+/app/performance/{performanceId}/deselect-seat
+```
+payload:
+```json
+{ "seatId": 42 }
 ```
 
-### TypeScript/JavaScript 코드
-```typescript
+## 5. 인증/권한 동작
+- `CONNECT` 시 JWT가 유효하면 사용자 컨텍스트가 설정된다.
+- JWT가 없거나 유효하지 않아도 **연결 자체는 성립**될 수 있다.
+- 단, 인증 사용자가 아니면 `select-seat`/`deselect-seat` 요청은 서버에서 무시된다(브로드캐스트 없음).
+
+프론트 권장:
+- 연결 전 Access Token 존재 여부 확인
+- 토큰 만료 시 재발급 후 재연결
+- 발행 후 일정 시간 내 이벤트 미수신 시 실패 처리(낙관적 UI 롤백 등)
+
+## 6. 프론트 예시 코드 (@stomp/stompjs)
+```ts
+import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
 
 const performanceId = 1;
-const accessToken = 'your-jwt-token';
+const accessToken = 'YOUR_JWT';
 
-// 1. 연결
-const socket = new SockJS('http://localhost:8080/ws');
-const stompClient = Stomp.over(socket);
-
-stompClient.connect(
-  { Authorization: `Bearer ${accessToken}` },
-  () => {
-    console.log('WebSocket 연결 성공');
-
-    // 2. 좌석 상태 변경 구독
-    stompClient.subscribe(
+const client = new Client({
+  webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+  connectHeaders: {
+    Authorization: `Bearer ${accessToken}`,
+  },
+  reconnectDelay: 3000,
+  onConnect: () => {
+    client.subscribe(
       `/topic/performance/${performanceId}/seats`,
-      (message) => {
-        const data = JSON.parse(message.body);
-        if (data.action === 'SELECTED') {
-          // 해당 좌석 비활성화 (다른 유저가 선택)
-          disableSeat(data.seatId);
-        } else if (data.action === 'DESELECTED') {
-          // 해당 좌석 활성화 (다른 유저가 선택 해제)
-          enableSeat(data.seatId);
+      (message: IMessage) => {
+        const body = JSON.parse(message.body);
+
+        if (body.action === 'SELECTED') {
+          // 좌석 비활성화 처리
+        }
+
+        if (body.action === 'DESELECTED') {
+          // 좌석 활성화 처리
         }
       }
     );
-
-    // 3. 좌석 선택
-    stompClient.send(
-      `/app/performance/${performanceId}/select-seat`,
-      {},
-      JSON.stringify({ seatId: 42 })
-    );
-
-    // 4. 좌석 선택 해제
-    stompClient.send(
-      `/app/performance/${performanceId}/deselect-seat`,
-      {},
-      JSON.stringify({ seatId: 42 })
-    );
   },
-  (error) => {
-    console.error('WebSocket 연결 실패:', error);
-  }
-);
+  onStompError: (frame) => {
+    console.error('STOMP ERROR', frame.headers['message'], frame.body);
+  },
+  onWebSocketError: (event) => {
+    console.error('WS ERROR', event);
+  },
+});
 
-// 연결 해제
-// stompClient.disconnect();
+client.activate();
+
+export const selectSeat = (seatId: number) => {
+  client.publish({
+    destination: `/app/performance/${performanceId}/select-seat`,
+    body: JSON.stringify({ seatId }),
+  });
+};
+
+export const deselectSeat = (seatId: number) => {
+  client.publish({
+    destination: `/app/performance/${performanceId}/deselect-seat`,
+    body: JSON.stringify({ seatId }),
+  });
+};
+
+// 필요 시
+// client.deactivate();
 ```
 
----
+## 7. 초기 데이터 로딩(REST)
+실시간 동기화 전에 아래 API로 초기 상태를 먼저 조회한다.
 
-## 5. 관련 REST API
+- `GET /api/v1/shows/{showId}/venue-layout`
+- `GET /api/v1/shows/{showId}/seats`
+- `GET /api/v1/performances/{performanceId}/seats/status`
+- `GET /api/v1/performances/{performanceId}/seats/availability`
 
-| API | URL | 설명 |
-|---|---|---|
-| 공연장 레이아웃 | `GET /api/v1/shows/{showId}/venue-layout` | viewBox, 좌석 지름 |
-| 좌석 정보 | `GET /api/v1/shows/{showId}/seats` | 등급/좌표/가격 |
-| 좌석 상태 | `GET /api/v1/performances/{id}/seats/status` | 전체 좌석 상태 (초기 로드용) |
-| 등급별 잔여석 | `GET /api/v1/performances/{id}/seats/availability` | 등급별 잔여 좌석 수 |
+권장 순서:
+1. REST로 좌석/레이아웃/초기 상태 조회
+2. WebSocket 연결 및 구독
+3. 좌석 선택/해제 이벤트 발행
+4. 수신 이벤트로 UI 동기화
 
-> **권장 흐름:** 페이지 진입 시 REST API로 초기 데이터 로드 → WebSocket 구독으로 실시간 업데이트 수신
+## 8. 참고(백엔드 구현 기준)
+- `WebSocketConfig`: `/ws`, `/app`, `/topic` 설정
+- `WebSocketAuthInterceptor`: `CONNECT`의 `Authorization` JWT 파싱
+- `SeatWebSocketController`: `select-seat`, `deselect-seat` 처리
+- `SeatEventPublisher`: `/topic/performance/{performanceId}/seats` 브로드캐스트
