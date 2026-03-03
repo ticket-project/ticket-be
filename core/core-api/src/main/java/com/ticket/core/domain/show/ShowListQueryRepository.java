@@ -94,7 +94,7 @@ public class ShowListQueryRepository {
 
         List<ShowResponse> results = new ArrayList<>(shows.stream()
                 .map(s -> new ShowResponse(
-                        s.getId(), s.getTitle(), s.getSubTitle(),
+                        s.getId(), s.getTitle(), s.getSubTitle(), s.getImage(),
                         genreMap.getOrDefault(s.getId(), new ArrayList<>()),
                         s.getStartDate(), s.getEndDate(), s.getViewCount(),
                         s.getSaleType(), s.getSaleStartDate(), s.getSaleEndDate(),
