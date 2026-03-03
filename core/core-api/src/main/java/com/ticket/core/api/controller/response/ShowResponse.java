@@ -20,6 +20,9 @@ public record ShowResponse(
         @Schema(description = "공연 부제목", example = "10주년 기념 공연")
         String subTitle,
 
+        @Schema(description = "공연 포스터 이미지", example = "http://example.com/image.jpg")
+        String image,
+
         @Schema(description = "장르 이름 목록", example = "[\"힙합\", \"R&B\"]")
         List<String> genreNames,
 
