@@ -50,6 +50,16 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Copy deploy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST_IP }}
+          username: ubuntu
+          key: ${{ secrets.SSH_KEY }}
+          source: "deploy/server/docker-compose.yml,deploy/server/nginx/nginx.conf"
+          target: "/home/ubuntu/deploy-tmp"
+          strip_components: 2
+
       - name: Deploy to Ubuntu server
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -61,6 +71,12 @@ jobs:
             IMAGE="${{ secrets.DOCKER_USERNAME }}/ticket-be:latest"
             DEPLOY_DIR="/home/ubuntu"
 
+            # Copy deploy files
+            cp /home/ubuntu/deploy-tmp/docker-compose.yml $DEPLOY_DIR/docker-compose.yml
+            mkdir -p $DEPLOY_DIR/nginx
+            cp /home/ubuntu/deploy-tmp/nginx/nginx.conf $DEPLOY_DIR/nginx/nginx.conf
+            rm -rf /home/ubuntu/deploy-tmp
+
             if command -v docker-compose >/dev/null 2>&1; then
               COMPOSE="docker-compose"
             else
@@ -69,5 +85,6 @@ jobs:
 
             echo "${{ secrets.DOCKER_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
             sudo docker pull "$IMAGE"
+            sudo $COMPOSE -f $DEPLOY_DIR/docker-compose.yml down --remove-orphans || true
             sudo DOCKER_IMAGE="$IMAGE" $COMPOSE -f $DEPLOY_DIR/docker-compose.yml up -d --remove-orphans
             sudo docker image prune -f
