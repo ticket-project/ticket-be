@@ -1,8 +1,8 @@
 package com.ticket.core.domain.showlike.usecase;
 
 import com.ticket.core.api.controller.response.ShowLikeSummaryResponse;
-import com.ticket.core.domain.member.MemberRepository;
-import com.ticket.core.enums.EntityStatus;
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.showlike.ShowLikeQueryRepository;
 import com.ticket.core.support.cursor.CursorSlice;
 import com.ticket.core.support.exception.CoreException;
@@ -20,7 +20,7 @@ public class GetMyShowLikesUseCase {
 
     private static final int MAX_SIZE = 100;
 
-    private final MemberRepository memberRepository;
+    private final MemberFinder memberFinder;
     private final ShowLikeQueryRepository showLikeQueryRepository;
 
     public record Input(Long memberId, String cursor, int size) {
@@ -31,10 +31,10 @@ public class GetMyShowLikesUseCase {
 
     public Output execute(final Input input) {
         validateInput(input);
-        validateMemberExists(input.memberId());
+        final Member member = memberFinder.findActiveMemberById(input.memberId());
         final Long cursorLikeId = parseCursor(input.cursor());
         final CursorSlice<ShowLikeSummaryResponse> result =
-                showLikeQueryRepository.findMyLikedShows(input.memberId(), cursorLikeId, input.size());
+                showLikeQueryRepository.findMyLikedShows(member.getId(), cursorLikeId, input.size());
         return new Output(result.slice(), result.nextCursor());
     }
 
@@ -59,10 +59,5 @@ public class GetMyShowLikesUseCase {
             throw new CoreException(ErrorType.INVALID_REQUEST, "size는 1 이상 " + MAX_SIZE + " 이하여야 합니다.");
         }
     }
-
-    private void validateMemberExists(final Long memberId) {
-        if (memberRepository.findByIdAndStatus(memberId, EntityStatus.ACTIVE).isEmpty()) {
-            throw new CoreException(ErrorType.NOT_FOUND_DATA, "member not found. id=" + memberId);
-        }
-    }
 }
+

@@ -2,10 +2,10 @@ package com.ticket.core.domain.auth;
 
 import com.ticket.core.domain.member.AddMember;
 import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.member.MemberRepository;
 import com.ticket.core.domain.member.vo.EncodedPassword;
 import com.ticket.core.domain.member.vo.RawPassword;
-import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +22,7 @@ public class AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     private final MemberRepository memberRepository;
+    private final MemberFinder memberFinder;
     private final PasswordService passwordService;
 
     @Transactional
@@ -42,8 +43,7 @@ public class AuthService {
     }
 
     public Member login(final String email, final String password) {
-        final Member foundMember = memberRepository.findByEmail_EmailAndStatus(email, EntityStatus.ACTIVE)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA));
+        final Member foundMember = memberFinder.findActiveMemberByEmail(email);
 
         if (foundMember.getEncodedPassword() == null
                 || !passwordService.matches(RawPassword.create(password), foundMember.getEncodedPassword())) {
