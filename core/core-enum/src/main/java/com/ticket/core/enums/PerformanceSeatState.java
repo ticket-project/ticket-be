@@ -1,8 +1,9 @@
 package com.ticket.core.enums;
 
 public enum PerformanceSeatState {
-    AVAILABLE("예약 가능"),
-    HELD("선점됨");
+    AVAILABLE("예매가능"),
+    HELD("선점됨"),
+    SELECTED("선택됨");
 
     private final String description;
 

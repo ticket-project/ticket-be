@@ -7,10 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
-
-import java.security.Principal;
 
 /**
  * <h2>좌석 선택/해제 WebSocket 메시지 핸들러</h2>
@@ -119,15 +116,15 @@ public class SeatWebSocketController {
      *
      * @param performanceId 공연 회차 ID (URL 경로 변수)
      * @param payload       선택할 좌석 정보 ({@code {"seatId": 42}})
-     * @param principal     STOMP CONNECT 시 인증된 사용자 (JWT 미전송 시 null)
+     * @param memberPrincipal     STOMP CONNECT 시 인증된 사용자 (JWT 미전송 시 null)
      */
     @MessageMapping("/performance/{performanceId}/select-seat")
     public void selectSeat(
             @DestinationVariable final Long performanceId,
             @Payload final SeatSelectionPayload payload,
-            final Principal principal
+            final MemberPrincipal memberPrincipal
     ) {
-        final Long memberId = extractMemberId(principal);
+        final Long memberId = extractMemberId(memberPrincipal);
         if (memberId == null) {
             log.warn("비인가 사용자의 좌석 선택 요청 차단: performanceId={}, seatId={}", performanceId, payload.seatId());
             return;
@@ -142,15 +139,15 @@ public class SeatWebSocketController {
      *
      * @param performanceId 공연 회차 ID (URL 경로 변수)
      * @param payload       해제할 좌석 정보 ({@code {"seatId": 42}})
-     * @param principal     STOMP CONNECT 시 인증된 사용자 (JWT 미전송 시 null)
+     * @param memberPrincipal     STOMP CONNECT 시 인증된 사용자 (JWT 미전송 시 null)
      */
     @MessageMapping("/performance/{performanceId}/deselect-seat")
     public void deselectSeat(
             @DestinationVariable final Long performanceId,
             @Payload final SeatSelectionPayload payload,
-            final Principal principal
+            final MemberPrincipal memberPrincipal
     ) {
-        final Long memberId = extractMemberId(principal);
+        final Long memberId = extractMemberId(memberPrincipal);
         if (memberId == null) {
             log.warn("비인가 사용자의 좌석 해제 요청 차단: performanceId={}, seatId={}", performanceId, payload.seatId());
             return;
@@ -160,12 +157,8 @@ public class SeatWebSocketController {
         seatEventPublisher.publishSeatDeselected(performanceId, payload.seatId(), memberId);
     }
 
-    private Long extractMemberId(final Principal principal) {
-        if (principal instanceof UsernamePasswordAuthenticationToken auth
-                && auth.getPrincipal() instanceof MemberPrincipal memberPrincipal) {
-            return memberPrincipal.getMemberId();
-        }
-        return null;
+    private Long extractMemberId(final MemberPrincipal memberPrincipal) {
+        return memberPrincipal.getMemberId();
     }
 
     /**
