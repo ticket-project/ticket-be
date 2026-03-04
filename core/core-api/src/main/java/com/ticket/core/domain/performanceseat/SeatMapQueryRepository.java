@@ -4,7 +4,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.response.SeatStatusResponse;
 import com.ticket.core.api.controller.response.ShowSeatResponse;
-import com.ticket.core.api.controller.response.VenueLayoutResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -54,7 +53,7 @@ public class SeatMapQueryRepository {
         return queryFactory
                 .select(Projections.constructor(SeatStatusResponse.SeatState.class,
                         performanceSeat.seat.id,
-                        performanceSeat.state.stringValue()
+                        performanceSeat.state
                 ))
                 .from(performanceSeat)
                 .where(performanceSeat.performance.id.eq(performanceId))
