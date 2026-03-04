@@ -39,7 +39,10 @@ public class ShowDetailQueryRepository {
                 .selectFrom(show)
                 .leftJoin(show.performer, performer).fetchJoin()
                 .leftJoin(show.venue).fetchJoin()
-                .where(show.id.eq(showId))
+                .where(
+                        show.id.eq(showId),
+                        show.status.eq(EntityStatus.ACTIVE)
+                )
                 .fetchOne();
 
         if (showEntity == null) {
@@ -65,7 +68,10 @@ public class ShowDetailQueryRepository {
 
         final List<Performance> performanceEntities = queryFactory
                 .selectFrom(performance)
-                .where(performance.show.id.eq(showId))
+                .where(
+                        performance.show.id.eq(showId),
+                        performance.status.eq(EntityStatus.ACTIVE)
+                )
                 .orderBy(performance.startTime.asc(), performance.performanceNo.asc())
                 .fetch();
 
