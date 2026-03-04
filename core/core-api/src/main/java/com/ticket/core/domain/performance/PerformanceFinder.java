@@ -2,6 +2,7 @@ package com.ticket.core.domain.performance;
 
 import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.enums.PerformanceState;
+import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -22,4 +23,9 @@ public class PerformanceFinder {
                 .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND_DATA));
     }
 
+    public Performance findActivePerformancesById(final Long performanceId) {
+        return performanceRepository
+                .findByIdAndStatus(performanceId, EntityStatus.ACTIVE)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA, "회차를 찾을 수 없습니다. id=" + performanceId));
+    }
 }

@@ -27,7 +27,7 @@ public class ReservationServiceV1 implements ReservationService {
 
     @Transactional
     public void addReservation(final NewReservation newReservation) {
-        final Member foundMember = memberFinder.find(newReservation.getMemberId());
+        final Member foundMember = memberFinder.findActiveMemberById(newReservation.getMemberId());
         final Performance foundPerformance = performanceFinder.findOpenPerformance(newReservation.getPerformanceId());
         final List<PerformanceSeat> foundPerformanceSeats = performanceSeatFinder.findAvailablePerformanceSeats(
                 newReservation.getSeatIds(),

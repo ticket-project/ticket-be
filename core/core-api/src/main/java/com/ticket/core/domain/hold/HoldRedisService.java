@@ -85,7 +85,7 @@ public class HoldRedisService implements HoldService {
     @Transactional
     public Long hold(final Long memberId, final NewHold newHold) {
         //여기 밑에 select 하는 것들이 뭔가 성능상 나빠보이는데, 이 방법 밖에 없나?
-        final Member foundMember = memberFinder.find(memberId);
+        final Member foundMember = memberFinder.findActiveMemberById(memberId);
         final Performance foundPerformance = performanceFinder.findOpenPerformance(newHold.getPerformanceId());
         final List<Seat> foundSeats = seatRepository.findByIdIn(newHold.getSeatIds());
         final List<PerformanceSeat> foundPerformanceSeats = performanceSeatFinder.findAllByPerformanceAndSeatIn(foundPerformance, foundSeats);
