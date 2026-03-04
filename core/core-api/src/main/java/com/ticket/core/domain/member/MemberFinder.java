@@ -12,8 +12,14 @@ public class MemberFinder {
 
     private final MemberRepository memberRepository;
 
-    public Member find(final Long id) {
+    public Member findActiveMemberById(final Long id) {
         return memberRepository.findByIdAndStatus(id, EntityStatus.ACTIVE)
                 .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND_DATA));
     }
+
+    public Member findActiveMemberByEmail(final String email) {
+        return memberRepository.findByEmail_EmailAndStatus(email, EntityStatus.ACTIVE)
+                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND_DATA));
+    }
 }
+

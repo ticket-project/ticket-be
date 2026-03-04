@@ -1,8 +1,9 @@
 package com.ticket.core.domain.showlike.usecase;
 
 import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
-import com.ticket.core.domain.member.MemberRepository;
-import com.ticket.core.domain.show.ShowJpaRepository;
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberFinder;
+import com.ticket.core.domain.show.ShowFinder;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
 import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.exception.CoreException;
@@ -17,8 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class GetShowLikeStatusUseCase {
 
     private final ShowLikeRepository showLikeRepository;
-    private final MemberRepository memberRepository;
-    private final ShowJpaRepository showJpaRepository;
+    private final MemberFinder memberFinder;
+    private final ShowFinder showFinder;
 
     public record Input(Long memberId, Long showId) {
     }
@@ -28,10 +29,10 @@ public class GetShowLikeStatusUseCase {
 
     public Output execute(final Input input) {
         validateInput(input);
-        validateMemberExists(input.memberId());
-        validateShowExists(input.showId());
+        final Member member = memberFinder.findActiveMemberById(input.memberId());
+        showFinder.validateShowExists(input.showId());
 
-        final boolean liked = showLikeRepository.existsByMember_IdAndShow_Id(input.memberId(), input.showId());
+        final boolean liked = showLikeRepository.existsByMember_IdAndShow_Id(member.getId(), input.showId());
         final long likeCount = showLikeRepository.countByShow_IdAndStatus(input.showId(), EntityStatus.ACTIVE);
         return new Output(new ShowLikeStatusResponse(input.showId(), liked, likeCount));
     }
@@ -41,16 +42,5 @@ public class GetShowLikeStatusUseCase {
             throw new CoreException(ErrorType.INVALID_REQUEST, "memberId와 showId는 필수입니다.");
         }
     }
-
-    private void validateShowExists(final Long showId) {
-        if (!showJpaRepository.existsById(showId)) {
-            throw new CoreException(ErrorType.NOT_FOUND_DATA, "공연을 찾을 수 없습니다. id=" + showId);
-        }
-    }
-
-    private void validateMemberExists(final Long memberId) {
-        if (memberRepository.findByIdAndStatus(memberId, EntityStatus.ACTIVE).isEmpty()) {
-            throw new CoreException(ErrorType.NOT_FOUND_DATA, "회원을 찾을 수 없습니다. id=" + memberId);
-        }
-    }
 }
+

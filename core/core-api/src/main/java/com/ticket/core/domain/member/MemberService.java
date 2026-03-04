@@ -22,7 +22,7 @@ public class MemberService {
     private final KakaoUnlinkService kakaoUnlinkService;
 
     public Member findById(final Long memberId) {
-        return memberFinder.find(memberId);
+        return memberFinder.findActiveMemberById(memberId);
     }
 
     /**
@@ -37,7 +37,7 @@ public class MemberService {
 
     @Transactional
     protected List<String> withdrawInTransaction(final Long memberId) {
-        final Member member = memberFinder.find(memberId);
+        final Member member = memberFinder.findActiveMemberById(memberId);
         final List<MemberSocialAccount> socialAccounts = memberSocialAccountRepository.findAllByMember(member);
 
         // 카카오 소셜 ID를 미리 수집 (트랜잭션 밖에서 사용)

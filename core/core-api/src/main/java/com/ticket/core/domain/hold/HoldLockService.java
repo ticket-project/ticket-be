@@ -32,7 +32,7 @@ public class HoldLockService implements HoldService {
 
     @DistributedLock(prefix = "SEAT", dynamicKey = "#newHold.getSeatIds()")
     public Long hold(final Long memberId, final NewHold newHold) {
-        final Member foundMember = memberFinder.find(memberId);
+        final Member foundMember = memberFinder.findActiveMemberById(memberId);
         final Performance foundPerformance = performanceFinder.findOpenPerformance(newHold.getPerformanceId());
         final List<Seat> foundSeats = seatRepository.findByIdIn(newHold.getSeatIds());
         final List<PerformanceSeat> availablePerformanceSeats = performanceSeatFinder.findAllByPerformanceAndSeatIn(foundPerformance, foundSeats);

@@ -46,7 +46,7 @@ class HoldLockServiceTest {
         final List<Seat> seats = TestDataFactory.createSeats(5);
         final List<Long> seatIds = List.of(1L, 2L, 3L, 4L, 5L);
 
-        when(memberFinder.find(member.getId())).thenReturn(member);
+        when(memberFinder.findActiveMemberById(member.getId())).thenReturn(member);
         when(seatRepository.findByIdIn(seatIds)).thenReturn(seats);
         when(performanceFinder.findOpenPerformance(performance.getId())).thenReturn(performance);
         when(performanceSeatFinder.findAllByPerformanceAndSeatIn(performance, seats)).thenReturn(Collections.emptyList());

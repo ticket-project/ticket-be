@@ -2,9 +2,8 @@ package com.ticket.core.domain.performanceseat.usecase;
 
 import com.ticket.core.api.controller.response.VenueLayoutResponse;
 import com.ticket.core.domain.show.Show;
-import com.ticket.core.domain.show.ShowJpaRepository;
+import com.ticket.core.domain.show.ShowFinder;
 import com.ticket.core.domain.show.Venue;
-import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GetVenueLayoutUseCase {
 
-    private final ShowJpaRepository showJpaRepository;
+    private final ShowFinder showFinder;
 
     public record Input(Long showId) {}
     public record Output(VenueLayoutResponse layout) {}
 
     public Output execute(Input input) {
-        Show show = showJpaRepository.findByIdAndStatus(input.showId(), EntityStatus.ACTIVE)
-                .orElseThrow(() -> new CoreException(
-                        ErrorType.NOT_FOUND_DATA,
-                        "공연을 찾을 수 없습니다. id=" + input.showId()
-                ));
+        Show show = showFinder.findActiveShow(input.showId());
 
         Venue venue = show.getVenue();
         if (venue == null) {

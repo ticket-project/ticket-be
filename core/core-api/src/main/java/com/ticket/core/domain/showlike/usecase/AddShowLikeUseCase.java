@@ -2,9 +2,9 @@ package com.ticket.core.domain.showlike.usecase;
 
 import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
 import com.ticket.core.domain.member.Member;
-import com.ticket.core.domain.member.MemberRepository;
+import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.show.Show;
-import com.ticket.core.domain.show.ShowJpaRepository;
+import com.ticket.core.domain.show.ShowFinder;
 import com.ticket.core.domain.showlike.ShowLike;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
 import com.ticket.core.enums.EntityStatus;
@@ -21,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AddShowLikeUseCase {
 
     private final ShowLikeRepository showLikeRepository;
-    private final MemberRepository memberRepository;
-    private final ShowJpaRepository showJpaRepository;
+    private final MemberFinder memberFinder;
+    private final ShowFinder showFinder;
 
     public record Input(Long memberId, Long showId) {
     }
@@ -33,17 +33,13 @@ public class AddShowLikeUseCase {
     public Output execute(final Input input) {
         validateInput(input);
 
-        final Member member = memberRepository.findByIdAndStatus(input.memberId(), EntityStatus.ACTIVE)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA,
-                        "회원을 찾을 수 없습니다. id=" + input.memberId()));
+        final Member member = memberFinder.findActiveMemberById(input.memberId());
 
         if (showLikeRepository.existsByMember_IdAndShow_Id(input.memberId(), input.showId())) {
             return new Output(new ShowLikeStatusResponse(input.showId(), true, countLikes(input.showId())));
         }
 
-        final Show show = showJpaRepository.findById(input.showId())
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA,
-                        "공연을 찾을 수 없습니다. id=" + input.showId()));
+        final Show show = showFinder.findActiveShow(input.showId());
 
         try {
             showLikeRepository.save(new ShowLike(member, show));
@@ -65,3 +61,4 @@ public class AddShowLikeUseCase {
         return showLikeRepository.countByShow_IdAndStatus(showId, EntityStatus.ACTIVE);
     }
 }
+

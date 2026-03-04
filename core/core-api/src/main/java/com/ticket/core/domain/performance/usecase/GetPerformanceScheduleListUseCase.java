@@ -3,6 +3,7 @@ package com.ticket.core.domain.performance.usecase;
 import com.ticket.core.api.controller.response.PerformanceScheduleListResponse;
 import com.ticket.core.api.controller.response.PerformanceScheduleListResponse.PerformanceScheduleItem;
 import com.ticket.core.domain.performance.Performance;
+import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.domain.performance.PerformanceRepository;
 import com.ticket.core.domain.show.Show;
 import com.ticket.core.enums.EntityStatus;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetPerformanceScheduleListUseCase {
 
+    private final PerformanceFinder performanceFinder;
     private final PerformanceRepository performanceRepository;
 
     public record Input(Long performanceId) {
@@ -28,14 +30,9 @@ public class GetPerformanceScheduleListUseCase {
     }
 
     public Output execute(final Input input) {
-        final Performance selectedPerformance = performanceRepository
-                .findByIdAndStatus(input.performanceId(), EntityStatus.ACTIVE)
-                .orElseThrow(() -> new CoreException(
-                        ErrorType.NOT_FOUND_DATA,
-                        "회차를 찾을 수 없습니다. id=" + input.performanceId()
-                ));
+        final Performance findPerformance = performanceFinder.findActivePerformancesById(input.performanceId());
 
-        final Show show = selectedPerformance.getShow();
+        final Show show = findPerformance.getShow();
         if (show == null) {
             throw new CoreException(
                     ErrorType.NOT_FOUND_DATA,
@@ -56,7 +53,7 @@ public class GetPerformanceScheduleListUseCase {
 
         final PerformanceScheduleListResponse response = new PerformanceScheduleListResponse(
                 show.getId(),
-                selectedPerformance.getId(),
+                findPerformance.getId(),
                 scheduleItems
         );
         return new Output(response);
