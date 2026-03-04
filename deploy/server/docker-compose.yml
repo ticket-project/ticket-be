@@ -5,7 +5,7 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - core-api.env
+      - core-api.env.txt
     environment:
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
