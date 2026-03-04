@@ -3,7 +3,6 @@ package com.ticket.core.domain.performance.usecase;
 import com.ticket.core.api.controller.response.PerformanceSummaryResponse;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
-import com.ticket.core.domain.performance.PerformanceRepository;
 import com.ticket.core.domain.show.Region;
 import com.ticket.core.domain.show.Show;
 import com.ticket.core.domain.show.Venue;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GetPerformanceSummaryUseCase {
 
-    private final PerformanceRepository performanceRepository;
     private final PerformanceFinder performanceFinder;
 
     public record Input(Long performanceId) {

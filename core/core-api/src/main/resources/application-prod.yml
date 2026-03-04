@@ -19,4 +19,4 @@ decorator:
 
 app:
   seed:
-    enabled: true
+    enabled: false
