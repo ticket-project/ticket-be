@@ -67,8 +67,11 @@ services:
 volumes:
   redis-data:
   certbot-etc:
+    external: true
   certbot-var:
+    external: true
   certbot-webroot:
+    external: true
 
 networks:
   ticket-net:
