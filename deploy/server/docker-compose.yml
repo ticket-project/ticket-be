@@ -40,16 +40,35 @@ services:
     container_name: ticket-nginx
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - certbot-etc:/etc/letsencrypt:ro
+      - certbot-var:/var/lib/letsencrypt
+      - certbot-webroot:/var/www/certbot:ro
     depends_on:
       - app
     restart: unless-stopped
     networks:
       - ticket-net
 
+  certbot:
+    image: certbot/certbot
+    container_name: ticket-certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - certbot-webroot:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    restart: unless-stopped
+    networks:
+      - ticket-net
+
 volumes:
   redis-data:
+  certbot-etc:
+  certbot-var:
+  certbot-webroot:
 
 networks:
   ticket-net:
