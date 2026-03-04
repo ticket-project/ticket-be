@@ -1,55 +1,70 @@
-name: Spring Boot CI/CD with Docker
+name: Backend CI/CD (Docker Hub)
 
-# 1. 동작 조건: master 브랜치에 push 될 때 실행
 on:
   push:
     branches: [ "master" ]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ticket-be
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest # GitHub의 우분투 서버 빌려 쓰기
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
-      # 2. 코드 가져오기
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # 3. JDK 설치
       - name: Set up JDK 25
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: '25'
-          distribution: 'temurin'
+          cache: gradle
 
-      # 4. Spring Boot 빌드
-      - name: Build with Gradle
+      - name: Build bootJar
         run: |
           chmod +x ./gradlew
-          ./gradlew clean build -x test
+          ./gradlew clean :core:core-api:bootJar -x test
 
-      # 5. 도커 허브 로그인
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 6. 도커 이미지 빌드 및 푸시
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v4
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/backend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/ticket-be:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      # 7. Ubuntu 서버에 접속해서 배포 (Pull & Run)
-      - name: Deploy to Ubuntu Server
-        uses: appleboy/ssh-action@master
+      - name: Deploy to Ubuntu server
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.HOST_IP }}
-          username: ubuntu # 서버 계정명 (ec2-user, ubuntu 등)
+          username: ubuntu
           key: ${{ secrets.SSH_KEY }}
           script: |
-            # 서버의 기존 이미지 최신화 및 컨테이너 재시작
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
-            sudo docker-compose -f /home/ubuntu/docker-compose.yml up -d
+            set -e
+            IMAGE="${{ secrets.DOCKER_USERNAME }}/ticket-be:latest"
+            DEPLOY_DIR="/home/ubuntu"
+
+            if command -v docker-compose >/dev/null 2>&1; then
+              COMPOSE="docker-compose"
+            else
+              COMPOSE="docker compose"
+            fi
+
+            echo "${{ secrets.DOCKER_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            sudo docker pull "$IMAGE"
+            sudo DOCKER_IMAGE="$IMAGE" $COMPOSE -f $DEPLOY_DIR/docker-compose.yml up -d --remove-orphans
+            sudo docker image prune -f
