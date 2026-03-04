@@ -1,5 +1,5 @@
 plugins {
-    id 'org.asciidoctor.jvm.convert' version '4.0.4'
+    // id 'org.asciidoctor.jvm.convert' version '4.0.4'
 }
 
 tasks.named('bootJar') {
@@ -11,10 +11,10 @@ tasks.named('jar') {
 }
 
 configurations {
-    asciidoctorExt
+    // asciidoctorExt
 }
 ext {
-    snippetsDir = file('build/generated-snippets')
+    // snippetsDir = file('build/generated-snippets')
 }
 
 dependencies {
@@ -52,9 +52,9 @@ dependencies {
     //swagger
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1"
 
-    // REST Docs
-    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    // REST Docs (disabled)
+    // asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    // testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
     // Querydsl
     implementation "com.querydsl:querydsl-jpa:5.1.0:jakarta"
@@ -75,17 +75,18 @@ tasks.named("clean") {
     }
 }
 
-test {
-    outputs.dir snippetsDir
-}
-asciidoctor {
-    inputs.dir snippetsDir
-    configurations 'asciidoctorExt'
-    dependsOn test
-}
-bootJar {
-    dependsOn asciidoctor
-    from("${asciidoctor.outputDir}") {
-        into 'static/docs'
-    }
-}
+// test {
+//     outputs.dir snippetsDir
+// }
+// asciidoctor {
+//     inputs.dir(snippetsDir).optional()
+//     configurations 'asciidoctorExt'
+//     dependsOn test
+//     onlyIf { snippetsDir.exists() }
+// }
+// bootJar {
+//     dependsOn asciidoctor
+//     from("${asciidoctor.outputDir}") {
+//         into 'static/docs'
+//     }
+// }
