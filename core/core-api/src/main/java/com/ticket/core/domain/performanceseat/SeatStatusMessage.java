@@ -1,28 +1,28 @@
 package com.ticket.core.domain.performanceseat;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * WebSocket으로 전달되는 좌석 상태 변경 메시지 DTO.
+ * Redis Pub/Sub 전송을 위해 Serializable 구현.
  */
 public record SeatStatusMessage(
         Long performanceId,
         Long seatId,
         SeatAction action,
-        Long memberId,
         LocalDateTime timestamp
-) {
+) implements Serializable {
 
     public enum SeatAction {
         SELECTED,
-        DESELECTED
+        DESELECTED,
+        HELD,
+        RELEASED,
+        RESERVED
     }
 
-    public static SeatStatusMessage selected(final Long performanceId, final Long seatId, final Long memberId) {
-        return new SeatStatusMessage(performanceId, seatId, SeatAction.SELECTED, memberId, LocalDateTime.now());
-    }
-
-    public static SeatStatusMessage deselected(final Long performanceId, final Long seatId, final Long memberId) {
-        return new SeatStatusMessage(performanceId, seatId, SeatAction.DESELECTED, memberId, LocalDateTime.now());
+    public static SeatStatusMessage of(Long performanceId, Long seatId, SeatAction action) {
+        return new SeatStatusMessage(performanceId, seatId, action, LocalDateTime.now());
     }
 }
