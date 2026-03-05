@@ -4,6 +4,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.response.SeatStatusResponse;
 import com.ticket.core.api.controller.response.ShowSeatResponse;
+import com.ticket.core.enums.PerformanceSeatState;
+import com.ticket.core.enums.SeatStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -47,18 +49,25 @@ public class SeatMapQueryRepository {
     }
 
     /**
-     * 회차별 좌석 상태를 조회합니다 (seatId + state만).
+     * 회차별 좌석 상태를 조회합니다.
+     * DB의 PerformanceSeatState를 API 응답용 SeatStatus로 변환합니다.
+     * AVAILABLE → AVAILABLE, RESERVED → OCCUPIED
      */
     public List<SeatStatusResponse.SeatState> findSeatStatuses(Long performanceId) {
         return queryFactory
-                .select(Projections.constructor(SeatStatusResponse.SeatState.class,
-                        performanceSeat.seat.id,
-                        performanceSeat.state
-                ))
+                .select(performanceSeat.seat.id, performanceSeat.state)
                 .from(performanceSeat)
                 .where(performanceSeat.performance.id.eq(performanceId))
                 .orderBy(performanceSeat.seat.id.asc())
-                .fetch();
+                .fetch()
+                .stream()
+                .map(tuple -> new SeatStatusResponse.SeatState(
+                        tuple.get(performanceSeat.seat.id),
+                        tuple.get(performanceSeat.state) == PerformanceSeatState.AVAILABLE
+                                ? SeatStatus.AVAILABLE
+                                : SeatStatus.OCCUPIED
+                ))
+                .toList();
     }
 
 }
