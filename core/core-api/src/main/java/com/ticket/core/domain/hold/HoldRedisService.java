@@ -106,6 +106,7 @@ public class HoldRedisService implements HoldService {
         final List<Long> seatIds = foundSeats.stream().map(Seat::getId).toList();
 
         // Select → Hold 전이: SELECTING 키 삭제 (SeatSelectionService에 위임)
+        //TODO 선택 상태 강제 해제 시 SELECT 소유자 검증이 필요합니다.
         seatIds.forEach(seatId -> seatSelectionService.forceDeselect(perfId, seatId));
 
         final List<Object> keys = seatIds.stream()
