@@ -41,12 +41,9 @@ public class PerformanceSeat extends BaseEntity {
     }
 
     public void reserve() {
-        this.state = PerformanceSeatState.HELD;
+        this.state = PerformanceSeatState.RESERVED;
     }
 
-    public void hold() {
-        this.state = PerformanceSeatState.HELD;
-    }
 
     public void release() {
         this.state = PerformanceSeatState.AVAILABLE;
