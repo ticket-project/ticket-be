@@ -23,7 +23,7 @@ public class PerformanceFinder {
                 .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND_DATA));
     }
 
-    public Performance findActivePerformancesById(final Long performanceId) {
+    public Performance findActiveById(final Long performanceId) {
         return performanceRepository
                 .findByIdAndStatus(performanceId, EntityStatus.ACTIVE)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA, "회차를 찾을 수 없습니다. id=" + performanceId));
