@@ -1,5 +1,6 @@
 package com.ticket.core.config;
 
+import com.ticket.core.config.security.CorsProperties;
 import com.ticket.core.config.security.WebSocketAuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final WebSocketAuthInterceptor webSocketAuthInterceptor;
+    private final CorsProperties corsProperties;
 
     @Override
     public void configureMessageBroker(final MessageBrokerRegistry registry) {
@@ -25,7 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(final StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")
+                .setAllowedOrigins(corsProperties.getAllowedOrigins().toArray(String[]::new))
                 .withSockJS();
     }
 
