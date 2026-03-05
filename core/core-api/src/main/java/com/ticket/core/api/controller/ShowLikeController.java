@@ -2,16 +2,13 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.ShowLikeControllerDocs;
 import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
-import com.ticket.core.api.controller.response.ShowLikeSummaryResponse;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.showlike.usecase.AddShowLikeUseCase;
-import com.ticket.core.domain.showlike.usecase.GetMyShowLikesUseCase;
 import com.ticket.core.domain.showlike.usecase.GetShowLikeStatusUseCase;
 import com.ticket.core.domain.showlike.usecase.RemoveShowLikeUseCase;
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.response.ApiResponse;
-import com.ticket.core.support.response.SliceResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +20,6 @@ public class ShowLikeController implements ShowLikeControllerDocs {
     private final AddShowLikeUseCase addShowLikeUseCase;
     private final RemoveShowLikeUseCase removeShowLikeUseCase;
     private final GetShowLikeStatusUseCase getShowLikeStatusUseCase;
-    private final GetMyShowLikesUseCase getMyShowLikesUseCase;
 
     @Override
     @PostMapping("/shows/{showId}")
@@ -59,19 +55,6 @@ public class ShowLikeController implements ShowLikeControllerDocs {
         final GetShowLikeStatusUseCase.Input input = new GetShowLikeStatusUseCase.Input(memberId, showId);
         final GetShowLikeStatusUseCase.Output output = getShowLikeStatusUseCase.execute(input);
         return ApiResponse.success(output.response());
-    }
-
-    @Override
-    @GetMapping("/shows/me")
-    public ApiResponse<SliceResponse<ShowLikeSummaryResponse>> getMyLikes(
-            final MemberPrincipal memberPrincipal,
-            @RequestParam(required = false) final String cursor,
-            @RequestParam(defaultValue = "20") final int size
-    ) {
-        final Long memberId = requireMemberId(memberPrincipal);
-        final GetMyShowLikesUseCase.Input input = new GetMyShowLikesUseCase.Input(memberId, cursor, size);
-        final GetMyShowLikesUseCase.Output output = getMyShowLikesUseCase.execute(input);
-        return ApiResponse.success(SliceResponse.from(output.shows(), output.nextCursor()));
     }
 
     private Long requireMemberId(final MemberPrincipal memberPrincipal) {
