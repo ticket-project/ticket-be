@@ -8,6 +8,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 /**
  * STOMP CONNECT 프레임에서 JWT 토큰을 추출하여 인증을 처리하는 인터셉터.
  * Spring Security의 WebSocket 보안보다 먼저 실행되도록 @Order 설정.
+ * 인증 실패 시 연결을 차단합니다.
  */
 @Slf4j
 @Component
@@ -51,9 +53,11 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                     log.info("WebSocket 인증 성공: memberId={}", memberPrincipal.getMemberId());
                 } catch (JwtException | IllegalArgumentException e) {
                     log.warn("WebSocket JWT 인증 실패: {}", e.getMessage());
+                    throw new MessageDeliveryException("JWT 인증 실패");
                 }
             } else {
-                log.debug("WebSocket CONNECT: Authorization 헤더 없음 (비인증 연결)");
+                log.warn("WebSocket CONNECT: Authorization 헤더 없음 → 연결 차단");
+                throw new MessageDeliveryException("인증 정보가 없습니다");
             }
         }
 
