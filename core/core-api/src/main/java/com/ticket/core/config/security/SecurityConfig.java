@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,20 +21,6 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties({JwtProperties.class, CorsProperties.class})
 public class SecurityConfig {
-
-    // 인증 없이 접근 가능한 API (화이트리스트)
-    // 여기에 없는 API는 전부 인증 필수
-    private static final String[] PUBLIC_API_PATTERNS = {
-            "/",
-            "/api/v1/auth/**",
-            "/api/v1/shows/**",
-            "/api/v1/performances/**",
-            "/api/v1/genres/**",
-            "/api/v1/meta/**",
-            "/swagger-ui/**",
-            "/api-docs/**",
-            "/ws/**",
-    };
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -57,7 +44,18 @@ public class SecurityConfig {
                         .accessDeniedHandler(restAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PUBLIC_API_PATTERNS).permitAll()
+                        // 정적 리소스 & 인프라
+                        .requestMatchers("/", "/swagger-ui/**", "/api-docs/**", "/ws/**").permitAll()
+                        // 인증 관련
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        // 읽기 전용 공개 API (GET만)
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/shows/**",
+                                "/api/v1/performances/**",
+                                "/api/v1/genres/**",
+                                "/api/v1/meta/**"
+                        ).permitAll()
+                        // 나머지 전부 인증 필수
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -87,6 +85,7 @@ public class SecurityConfig {
 
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", corsConfiguration);
+        source.registerCorsConfiguration("/ws/**", corsConfiguration);
         return source;
     }
 }
