@@ -6,6 +6,11 @@ import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.domain.performanceseat.PerformanceSeat;
 import com.ticket.core.domain.performanceseat.PerformanceSeatFinder;
+import com.ticket.core.domain.performanceseat.SeatEventPublisher;
+import com.ticket.core.domain.performanceseat.SeatRedisKey;
+import com.ticket.core.domain.performanceseat.SeatSelectionService;
+import com.ticket.core.domain.performanceseat.SeatStatusMessage;
+import com.ticket.core.domain.performanceseat.SeatStatusMessage.SeatAction;
 import com.ticket.core.domain.seat.Seat;
 import com.ticket.core.domain.seat.SeatRepository;
 import com.ticket.core.enums.HoldState;
@@ -21,7 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +45,8 @@ public class HoldRedisService implements HoldService {
     private final PerformanceSeatFinder performanceSeatFinder;
     private final HoldRepository holdRepository;
     private final HoldItemRepository holdItemRepository;
+    private final SeatSelectionService seatSelectionService;
+    private final SeatEventPublisher seatEventPublisher;
 
     private static final String HOLD_SCRIPT = """
         local memberId = ARGV[1]
@@ -93,10 +102,14 @@ public class HoldRedisService implements HoldService {
             throw new CoreException(ErrorType.NOT_FOUND_DATA);
         }
         final RScript script = redissonClient.getScript(StringCodec.INSTANCE);
-
+        final Long perfId = foundPerformance.getId();
         final List<Long> seatIds = foundSeats.stream().map(Seat::getId).toList();
+
+        // Select → Hold 전이: SELECTING 키 삭제 (SeatSelectionService에 위임)
+        seatIds.forEach(seatId -> seatSelectionService.forceDeselect(perfId, seatId));
+
         final List<Object> keys = seatIds.stream()
-                .map(seatId -> "seat:hold:{perf:" + foundPerformance.getId() + "}:" + seatId)
+                .map(seatId -> (Object) SeatRedisKey.hold(perfId, seatId))
                 .collect(Collectors.toList());
 
         final List<Object> result = script.eval(
@@ -105,7 +118,7 @@ public class HoldRedisService implements HoldService {
                 RScript.ReturnType.LIST,
                 keys,
                 foundMember.getId().toString(),
-                foundPerformance.getId().toString(),
+                perfId.toString(),
                 foundPerformance.getHoldTime().toString()
         );
 
@@ -126,7 +139,25 @@ public class HoldRedisService implements HoldService {
         holdItemRepository.saveAll(holdItems);
         //todo 이력용으로 hold에 저장하긴 했는데, hold의 state도 관리를 해야하나? 해줘야겠지. 성공했는지 실패했는지 알 수가 없으니.
         //선점이 결제까지 완료 되었는지, 아니면 결제에서 실패했는지 시간초과인지 등
+
+        // Hold 성공 이벤트 발행
+        seatIds.forEach(seatId ->
+                seatEventPublisher.publish(SeatStatusMessage.of(perfId, seatId, SeatAction.HELD))
+        );
+
         return hold.getId();
+    }
+
+    /**
+     * 특정 공연의 HOLDING 상태 좌석 ID 목록을 조회합니다.
+     */
+    public Set<Long> getHoldingSeatIds(Long performanceId) {
+        final String pattern = SeatRedisKey.holdPattern(performanceId);
+        final Set<Long> seatIds = new HashSet<>();
+        for (String key : redissonClient.getKeys().getKeysByPattern(pattern)) {
+            seatIds.add(SeatRedisKey.extractSeatId(key));
+        }
+        return seatIds;
     }
 
     /**
@@ -138,16 +169,23 @@ public class HoldRedisService implements HoldService {
         RScript script = redissonClient.getScript(StringCodec.INSTANCE);
 
         List<Object> keys = seatIds.stream()
-                .map(seatId -> "seat:hold:{perf:" + performanceId + "}:" + seatId)
+                .map(seatId -> (Object) SeatRedisKey.hold(performanceId, seatId))
                 .collect(Collectors.toList());
 
-        return script.eval(
+        List<String> releasedKeys = script.eval(
                 RScript.Mode.READ_WRITE,
                 RELEASE_SCRIPT,
                 RScript.ReturnType.LIST,
                 keys,
                 memberId.toString()
         );
+
+        // Release 성공 이벤트 발행
+        seatIds.forEach(seatId ->
+                seatEventPublisher.publish(SeatStatusMessage.of(performanceId, seatId, SeatAction.RELEASED))
+        );
+
+        return releasedKeys;
     }
 
 }
