@@ -37,7 +37,6 @@ public class HoldLockService implements HoldService {
         final List<Seat> foundSeats = seatRepository.findByIdIn(newHold.getSeatIds());
         final List<PerformanceSeat> availablePerformanceSeats = performanceSeatFinder.findAllByPerformanceAndSeatIn(foundPerformance, foundSeats);
         validatePerformanceSeats(newHold, availablePerformanceSeats);
-        availablePerformanceSeats.forEach(PerformanceSeat::hold);
 
         final Hold savedHold = saveHold(foundMember, foundPerformance);
         saveHoldItems(availablePerformanceSeats, savedHold);
