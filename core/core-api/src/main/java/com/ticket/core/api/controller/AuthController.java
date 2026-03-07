@@ -9,7 +9,6 @@ import com.ticket.core.api.controller.response.AuthLoginResponse;
 import com.ticket.core.config.security.JwtProperties;
 import com.ticket.core.config.security.JwtTokenService;
 import com.ticket.core.config.security.OAuth2EndpointConstants;
-import com.ticket.core.domain.auth.AuthEventLogger;
 import com.ticket.core.domain.auth.AuthService;
 import com.ticket.core.domain.auth.OAuth2AuthCodeService;
 import com.ticket.core.domain.auth.RefreshTokenService;
@@ -43,13 +42,11 @@ public class AuthController implements AuthControllerDocs {
     private final RefreshTokenService refreshTokenService;
     private final OAuth2AuthCodeService oAuth2AuthCodeService;
     private final MemberFinder memberFinder;
-    private final AuthEventLogger authEventLogger;
 
     @Override
     @PostMapping("/signup")
     public ApiResponse<Long> signUp(@Valid @RequestBody final AddMemberRequest request) {
         final Long memberId = authService.register(request.toAddMember());
-        authEventLogger.signUp(memberId);
         return ApiResponse.success(memberId);
     }
 
@@ -58,10 +55,8 @@ public class AuthController implements AuthControllerDocs {
     public ApiResponse<AuthLoginResponse> login(@Valid @RequestBody final LoginMemberRequest request) {
         try {
             final Member member = authService.login(request.getEmail(), request.getPassword());
-            authEventLogger.loginSuccess(member.getId());
             return ApiResponse.success(issueTokens(member.getId(), member.getRole().name()));
         } catch (AuthException e) {
-            authEventLogger.loginFail(request.getEmail(), "인증 실패");
             throw e;
         }
     }
@@ -74,13 +69,10 @@ public class AuthController implements AuthControllerDocs {
 
         final Member member = memberFinder.findActiveMemberById(memberId);
 
-        // Token Rotation: 기존 Refresh Token 삭제 + 새 토큰 발급
         final String newRefreshToken = refreshTokenService.rotate(
                 request.getRefreshToken(), memberId, jwtProperties.getRefreshTokenExpirationSeconds());
         final MemberPrincipal principal = new MemberPrincipal(member.getId(), member.getRole());
         final String newAccessToken = jwtTokenService.createAccessToken(principal);
-
-        authEventLogger.tokenRefresh(memberId);
         return ApiResponse.success(new AuthLoginResponse(
                 newAccessToken,
                 newRefreshToken,
@@ -97,7 +89,6 @@ public class AuthController implements AuthControllerDocs {
                 .orElseThrow(() -> new AuthException(ErrorType.AUTHENTICATION_ERROR, "유효하지 않거나 만료된 인증 코드입니다."));
 
         final Member member = memberFinder.findActiveMemberById(memberId);
-        authEventLogger.oauth2LoginSuccess(memberId, "oauth2");
         return ApiResponse.success(issueTokens(member.getId(), member.getRole().name()));
     }
 
@@ -117,9 +108,13 @@ public class AuthController implements AuthControllerDocs {
             @AuthenticationPrincipal final MemberPrincipal principal,
             @Valid @RequestBody final RefreshTokenRequest request
     ) {
+        final Long tokenOwnerId = refreshTokenService.validateWithoutConsume(request.getRefreshToken())
+                .orElseThrow(() -> new AuthException(ErrorType.AUTHENTICATION_ERROR, "유효하지 않은 리프레시 토큰입니다."));
+        if (!tokenOwnerId.equals(principal.getMemberId())) {
+            throw new AuthException(ErrorType.AUTHORIZATION_ERROR, "본인의 토큰만 무효화할 수 있습니다.");
+        }
         // Refresh Token만 무효화 (Access Token은 짧은 만료로 자연 무효화)
         refreshTokenService.revoke(request.getRefreshToken());
-        authEventLogger.logout(principal.getMemberId());
         return ApiResponse.success();
     }
 
