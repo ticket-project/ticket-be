@@ -3,25 +3,27 @@ package com.ticket.core.api.controller;
 import com.ticket.core.api.controller.docs.AuthControllerDocs;
 import com.ticket.core.api.controller.request.AddMemberRequest;
 import com.ticket.core.api.controller.request.LoginMemberRequest;
+import com.ticket.core.api.controller.request.OAuth2TokenExchangeRequest;
+import com.ticket.core.api.controller.request.RefreshTokenRequest;
 import com.ticket.core.api.controller.response.AuthLoginResponse;
+import com.ticket.core.config.security.JwtProperties;
 import com.ticket.core.config.security.JwtTokenService;
 import com.ticket.core.config.security.OAuth2EndpointConstants;
+import com.ticket.core.domain.auth.AuthEventLogger;
 import com.ticket.core.domain.auth.AuthService;
+import com.ticket.core.domain.auth.OAuth2AuthCodeService;
+import com.ticket.core.domain.auth.RefreshTokenService;
 import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.member.MemberPrincipal;
+import com.ticket.core.enums.Role;
+import com.ticket.core.support.exception.AuthException;
+import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.response.ApiResponse;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Map;
@@ -37,27 +39,66 @@ public class AuthController implements AuthControllerDocs {
 
     private final AuthService authService;
     private final JwtTokenService jwtTokenService;
+    private final JwtProperties jwtProperties;
+    private final RefreshTokenService refreshTokenService;
+    private final OAuth2AuthCodeService oAuth2AuthCodeService;
+    private final MemberFinder memberFinder;
+    private final AuthEventLogger authEventLogger;
 
     @Override
     @PostMapping("/signup")
     public ApiResponse<Long> signUp(@Valid @RequestBody final AddMemberRequest request) {
         final Long memberId = authService.register(request.toAddMember());
+        authEventLogger.signUp(memberId);
         return ApiResponse.success(memberId);
     }
 
     @Override
     @PostMapping("/login")
     public ApiResponse<AuthLoginResponse> login(@Valid @RequestBody final LoginMemberRequest request) {
-        final Member member = authService.login(request.getEmail(), request.getPassword());
-        final MemberPrincipal principal = new MemberPrincipal(member.getId(), member.getRole());
-        final String accessToken = jwtTokenService.createAccessToken(principal);
+        try {
+            final Member member = authService.login(request.getEmail(), request.getPassword());
+            authEventLogger.loginSuccess(member.getId());
+            return ApiResponse.success(issueTokens(member.getId(), member.getRole().name()));
+        } catch (AuthException e) {
+            authEventLogger.loginFail(request.getEmail(), "인증 실패");
+            throw e;
+        }
+    }
 
+    @Override
+    @PostMapping("/refresh")
+    public ApiResponse<AuthLoginResponse> refresh(@Valid @RequestBody final RefreshTokenRequest request) {
+        final Long memberId = refreshTokenService.validate(request.getRefreshToken())
+                .orElseThrow(() -> new AuthException(ErrorType.AUTHENTICATION_ERROR, "유효하지 않거나 만료된 리프레시 토큰입니다."));
+
+        final Member member = memberFinder.findActiveMemberById(memberId);
+
+        // Token Rotation: 기존 Refresh Token 삭제 + 새 토큰 발급
+        final String newRefreshToken = refreshTokenService.rotate(
+                request.getRefreshToken(), memberId, jwtProperties.getRefreshTokenExpirationSeconds());
+        final MemberPrincipal principal = new MemberPrincipal(member.getId(), member.getRole());
+        final String newAccessToken = jwtTokenService.createAccessToken(principal);
+
+        authEventLogger.tokenRefresh(memberId);
         return ApiResponse.success(new AuthLoginResponse(
-                accessToken,
+                newAccessToken,
+                newRefreshToken,
                 TOKEN_TYPE_BEARER,
                 jwtTokenService.getAccessTokenExpirationSeconds(),
                 member.getId()
         ));
+    }
+
+    @Override
+    @PostMapping("/oauth2/token")
+    public ApiResponse<AuthLoginResponse> exchangeOAuth2Token(@Valid @RequestBody final OAuth2TokenExchangeRequest request) {
+        final Long memberId = oAuth2AuthCodeService.consumeCode(request.getCode())
+                .orElseThrow(() -> new AuthException(ErrorType.AUTHENTICATION_ERROR, "유효하지 않거나 만료된 인증 코드입니다."));
+
+        final Member member = memberFinder.findActiveMemberById(memberId);
+        authEventLogger.oauth2LoginSuccess(memberId, "oauth2");
+        return ApiResponse.success(issueTokens(member.getId(), member.getRole().name()));
     }
 
     @Override
@@ -72,26 +113,33 @@ public class AuthController implements AuthControllerDocs {
 
     @Override
     @PostMapping("/logout")
-    public ApiResponse<Void> logout(final HttpServletRequest request, final HttpServletResponse response) {
-        final HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-        SecurityContextHolder.clearContext();
-        expireSessionCookie(request, response);
+    public ApiResponse<Void> logout(
+            @AuthenticationPrincipal final MemberPrincipal principal,
+            @Valid @RequestBody final RefreshTokenRequest request
+    ) {
+        // Refresh Token만 무효화 (Access Token은 짧은 만료로 자연 무효화)
+        refreshTokenService.revoke(request.getRefreshToken());
+        authEventLogger.logout(principal.getMemberId());
         return ApiResponse.success();
+    }
+
+    private AuthLoginResponse issueTokens(final Long memberId, final String roleName) {
+        final MemberPrincipal principal = new MemberPrincipal(
+                memberId, Role.valueOf(roleName));
+        final String accessToken = jwtTokenService.createAccessToken(principal);
+        final String refreshToken = refreshTokenService.createRefreshToken(
+                memberId, jwtProperties.getRefreshTokenExpirationSeconds());
+
+        return new AuthLoginResponse(
+                accessToken,
+                refreshToken,
+                TOKEN_TYPE_BEARER,
+                jwtTokenService.getAccessTokenExpirationSeconds(),
+                memberId
+        );
     }
 
     private String buildSocialLoginUrl(final String baseUrl, final String registrationId) {
         return baseUrl + OAuth2EndpointConstants.AUTHORIZATION_BASE_URI + "/" + registrationId;
-    }
-
-    private void expireSessionCookie(final HttpServletRequest request, final HttpServletResponse response) {
-        final Cookie cookie = new Cookie("JSESSIONID", null);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(request.isSecure());
-        response.addCookie(cookie);
     }
 }
