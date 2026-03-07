@@ -18,5 +18,3 @@ spring:
 app:
   seed:
     enabled: true
-server:
-  port: 8081

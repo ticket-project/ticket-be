@@ -64,6 +64,7 @@ security:
     issuer: ticket
     secret-key: ${JWT_SECRET}
     access-token-expiration-seconds: ${JWT_ACCESS_TOKEN_EXPIRATION_SECONDS}
+    refresh-token-expiration-seconds: ${JWT_REFRESH_TOKEN_EXPIRATION_SECONDS}
 
 app:
   cors:
