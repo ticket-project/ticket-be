@@ -7,7 +7,9 @@ import com.ticket.core.domain.member.vo.RawPassword;
 import com.ticket.core.enums.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "회원가입 요청")
 public class AddMemberRequest {
 
@@ -25,18 +27,6 @@ public class AddMemberRequest {
     private String name;
 
     public AddMemberRequest() {
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public AddMember toAddMember() {
