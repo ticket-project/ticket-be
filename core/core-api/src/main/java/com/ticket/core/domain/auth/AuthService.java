@@ -2,10 +2,11 @@ package com.ticket.core.domain.auth;
 
 import com.ticket.core.domain.member.AddMember;
 import com.ticket.core.domain.member.Member;
-import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.member.MemberRepository;
 import com.ticket.core.domain.member.vo.EncodedPassword;
 import com.ticket.core.domain.member.vo.RawPassword;
+import com.ticket.core.enums.EntityStatus;
+import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -22,7 +25,6 @@ public class AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     private final MemberRepository memberRepository;
-    private final MemberFinder memberFinder;
     private final PasswordService passwordService;
 
     @Transactional
@@ -43,12 +45,20 @@ public class AuthService {
     }
 
     public Member login(final String email, final String password) {
-        final Member foundMember = memberFinder.findActiveMemberByEmail(email);
+        final Optional<Member> optMember = memberRepository.findByEmail_EmailAndStatus(email, EntityStatus.ACTIVE);
 
+        if (optMember.isEmpty()) {
+            // 타이밍 공격 방어: 회원이 없어도 해싱을 수행하여 응답 시간을 동일하게 유지
+            passwordService.encode("timing-guard-dummy-password");
+            throw new AuthException(ErrorType.AUTHENTICATION_ERROR);
+        }
+
+        final Member foundMember = optMember.get();
         if (foundMember.getEncodedPassword() == null
                 || !passwordService.matches(RawPassword.create(password), foundMember.getEncodedPassword())) {
-            throw new CoreException(ErrorType.MEMBER_NOT_MATCH_PASSWORD);
+            throw new AuthException(ErrorType.AUTHENTICATION_ERROR);
         }
         return foundMember;
     }
 }
+
