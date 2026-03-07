@@ -4,6 +4,7 @@ import com.ticket.core.enums.SocialProvider;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
@@ -22,15 +23,17 @@ public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
 
     @Override
     public String email() {
-        final Map<String, Object> kakaoAccount = getMap(attributes, "kakao_account");
-        return (String) kakaoAccount.get("email");
+        return Optional.ofNullable(getMap(attributes, "kakao_account"))
+                .map(account -> (String) account.get("email"))
+                .orElse(null);
     }
 
     @Override
     public String name() {
-        final Map<String, Object> kakaoAccount = getMap(attributes, "kakao_account");
-        final Map<String, Object> profile = getMap(kakaoAccount, "profile");
-        return (String) profile.get("nickname");
+        return Optional.ofNullable(getMap(attributes, "kakao_account"))
+                .map(account -> getMap(account, "profile"))
+                .map(profile -> (String) profile.get("nickname"))
+                .orElse(null);
     }
 
     @SuppressWarnings("unchecked")
@@ -39,6 +42,7 @@ public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
         if (value instanceof Map<?, ?> mapValue) {
             return (Map<String, Object>) mapValue;
         }
-        return Map.of();
+        return null;
     }
 }
+
