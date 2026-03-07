@@ -11,12 +11,6 @@ import java.util.UUID;
 
 /**
  * Redis 기반 Refresh Token 관리 서비스.
- * <p>
- * 저장 구조:
- * - Key: "refresh_token:{tokenValue}" → Value: memberId (String)
- * - TTL: refreshTokenExpirationSeconds
- * <p>
- * Token Rotation: refresh 시 기존 토큰 삭제 + 새 토큰 발급
  */
 @Service
 @RequiredArgsConstructor
@@ -36,26 +30,46 @@ public class RefreshTokenService {
     }
 
     /**
-     * Refresh Token을 검증하고 memberId를 반환합니다.
+     * Refresh Token을 검증하고 원자적으로 소비합니다.
      */
     public Optional<Long> validate(final String tokenValue) {
+        final RBucket<String> bucket = redissonClient.getBucket(KEY_PREFIX + tokenValue);
+        final String memberId = bucket.getAndDelete();
+        if (memberId == null) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(Long.parseLong(memberId));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Refresh Token을 소비하지 않고 소유자 memberId만 검증합니다.
+     */
+    public Optional<Long> validateWithoutConsume(final String tokenValue) {
         final RBucket<String> bucket = redissonClient.getBucket(KEY_PREFIX + tokenValue);
         final String memberId = bucket.get();
         if (memberId == null) {
             return Optional.empty();
         }
-        return Optional.of(Long.parseLong(memberId));
+        try {
+            return Optional.of(Long.parseLong(memberId));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 
     /**
-     * Refresh Token을 삭제합니다 (로그아웃 시 사용).
+     * Refresh Token을 삭제합니다.
      */
     public void revoke(final String tokenValue) {
         redissonClient.getBucket(KEY_PREFIX + tokenValue).delete();
     }
 
     /**
-     * Token Rotation: 기존 토큰 삭제 후 새 토큰 발급.
+     * Token Rotation: 기존 토큰 제거 + 새 토큰 발급.
      */
     public String rotate(final String oldTokenValue, final Long memberId, final long expirationSeconds) {
         revoke(oldTokenValue);

@@ -47,6 +47,11 @@ public class OAuth2AuthCodeService {
         if (memberId == null) {
             return Optional.empty();
         }
-        return Optional.of(Long.parseLong(memberId));
+
+        try {
+            return Optional.of(Long.parseLong(memberId));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 }

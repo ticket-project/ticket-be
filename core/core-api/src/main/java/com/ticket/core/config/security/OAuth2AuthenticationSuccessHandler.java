@@ -2,21 +2,19 @@ package com.ticket.core.config.security;
 
 import com.ticket.core.domain.auth.OAuth2AuthCodeService;
 import com.ticket.core.domain.member.MemberPrincipal;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * OAuth2 인증 성공 시 1회용 auth code를 생성하여 프론트엔드로 리다이렉트.
- * 프론트엔드는 이 code로 POST /auth/oauth2/token을 호출하여 실제 토큰을 교환합니다.
- * → Access Token이 URL에 노출되지 않습니다.
+ * OAuth2 로그인 성공 시 1회성 auth code를 발급하고 프론트엔드로 리다이렉트합니다.
  */
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
