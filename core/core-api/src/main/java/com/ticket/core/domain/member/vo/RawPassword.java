@@ -48,7 +48,7 @@ public class RawPassword {
             throw new CoreException(ErrorType.INVALID_REQUEST, "password는 숫자를 포함해야 합니다.");
         }
         if (!HAS_SPECIAL.matcher(trimmedValue).find()) {
-            throw new CoreException(ErrorType.INVALID_REQUEST, "password는 특수문자를 포함해야 합니다.");
+            throw new CoreException(ErrorType.INVALID_REQUEST, "password는 특수문자(!@#$%^&* 등)를 포함해야 합니다.");
         }
         return trimmedValue;
     }
