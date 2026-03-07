@@ -9,18 +9,4 @@ public record AuthLoginResponse(@Schema(description = "액세스 토큰(JWT)") S
                                 @Schema(description = "액세스 토큰 만료 시간(초)", example = "1800") long expiresIn,
                                 @Schema(description = "회원 ID", example = "1") Long memberId) {
 
-    public AuthLoginResponse(
-            final String accessToken,
-            final String refreshToken,
-            final String tokenType,
-            final long expiresIn,
-            final Long memberId
-    ) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        this.tokenType = tokenType;
-        this.expiresIn = expiresIn;
-        this.memberId = memberId;
-    }
-
 }
