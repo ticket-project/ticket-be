@@ -5,7 +5,6 @@ import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.show.ShowFinder;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
-import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,7 @@ public class GetShowLikeStatusUseCase {
         showFinder.validateShowExists(input.showId());
 
         final boolean liked = showLikeRepository.existsByMember_IdAndShow_Id(member.getId(), input.showId());
-        final long likeCount = showLikeRepository.countByShow_IdAndStatus(input.showId(), EntityStatus.ACTIVE);
+        final long likeCount = showLikeRepository.countByShow_Id(input.showId());
         return new Output(new ShowLikeStatusResponse(input.showId(), liked, likeCount));
     }
 
@@ -43,4 +42,3 @@ public class GetShowLikeStatusUseCase {
         }
     }
 }
-
