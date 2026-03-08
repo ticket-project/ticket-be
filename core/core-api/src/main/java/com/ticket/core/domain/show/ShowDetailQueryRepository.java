@@ -8,7 +8,6 @@ import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceInf
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformerInfo;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.enums.BookingStatus;
-import com.ticket.core.enums.EntityStatus;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -35,7 +34,7 @@ public class ShowDetailQueryRepository {
     }
 
     public Optional<ShowDetailResponse> findShowDetail(final Long showId) {
-        final Show showEntity = fetchActiveShow(showId);
+        final Show showEntity = fetchShow(showId);
         if (showEntity == null) {
             return Optional.empty();
         }
@@ -48,15 +47,12 @@ public class ShowDetailQueryRepository {
         return Optional.of(toShowDetailResponse(showEntity, genreNames, grades, performanceDates, likeCount));
     }
 
-    private Show fetchActiveShow(final Long showId) {
+    private Show fetchShow(final Long showId) {
         return queryFactory
                 .selectFrom(show)
                 .leftJoin(show.performer, performer).fetchJoin()
                 .leftJoin(show.venue).fetchJoin()
-                .where(
-                        show.id.eq(showId),
-                        show.status.eq(EntityStatus.ACTIVE)
-                )
+                .where(show.id.eq(showId))
                 .fetchOne();
     }
 
@@ -91,7 +87,7 @@ public class ShowDetailQueryRepository {
     }
 
     private List<PerformanceDateInfo> fetchPerformanceDates(final Long showId) {
-        final List<PerformanceInfo> performances = fetchActivePerformances(showId).stream()
+        final List<PerformanceInfo> performances = fetchPerformances(showId).stream()
                 .map(this::toPerformanceInfo)
                 .toList();
 
@@ -106,13 +102,10 @@ public class ShowDetailQueryRepository {
                 .toList();
     }
 
-    private List<Performance> fetchActivePerformances(final Long showId) {
+    private List<Performance> fetchPerformances(final Long showId) {
         return queryFactory
                 .selectFrom(performance)
-                .where(
-                        performance.show.id.eq(showId),
-                        performance.status.eq(EntityStatus.ACTIVE)
-                )
+                .where(performance.show.id.eq(showId))
                 .orderBy(performance.startTime.asc(), performance.performanceNo.asc())
                 .fetch();
     }
@@ -124,8 +117,7 @@ public class ShowDetailQueryRepository {
                 performanceEntity.getStartTime(),
                 performanceEntity.getEndTime(),
                 performanceEntity.getOrderOpenTime(),
-                performanceEntity.getOrderCloseTime(),
-                performanceEntity.getState()
+                performanceEntity.getOrderCloseTime()
         );
     }
 
@@ -133,10 +125,7 @@ public class ShowDetailQueryRepository {
         return Optional.ofNullable(
                 queryFactory.select(showLike.count())
                         .from(showLike)
-                        .where(
-                                showLike.show.id.eq(showId),
-                                showLike.status.eq(EntityStatus.ACTIVE)
-                        )
+                        .where(showLike.show.id.eq(showId))
                         .fetchOne()
         ).orElse(0L);
     }

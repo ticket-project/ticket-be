@@ -2,9 +2,14 @@ package com.ticket.core.domain.performance;
 
 import com.ticket.core.domain.BaseEntity;
 import com.ticket.core.domain.show.Show;
-import com.ticket.core.enums.BookingStatus;
-import com.ticket.core.enums.PerformanceState;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +22,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Performance extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,10 +44,16 @@ public class Performance extends BaseEntity {
     @Column
     private Integer holdTime = 300;
 
-    @Enumerated(value = EnumType.STRING)
-    private PerformanceState state;
-
-    public Performance(final Show show, final Long performanceNo, final LocalDateTime startTime, final LocalDateTime endTime, final LocalDateTime orderOpenTime, final LocalDateTime orderCloseTime, final int maxCanHoldCount, final Integer holdTime, final PerformanceState state) {
+    public Performance(
+            final Show show,
+            final Long performanceNo,
+            final LocalDateTime startTime,
+            final LocalDateTime endTime,
+            final LocalDateTime orderOpenTime,
+            final LocalDateTime orderCloseTime,
+            final int maxCanHoldCount,
+            final Integer holdTime
+    ) {
         this.show = show;
         this.performanceNo = performanceNo;
         this.startTime = startTime;
@@ -50,11 +62,19 @@ public class Performance extends BaseEntity {
         this.orderCloseTime = orderCloseTime;
         this.maxCanHoldCount = maxCanHoldCount;
         this.holdTime = holdTime;
-        this.state = state;
     }
 
     public boolean isOverCount(final long requestReserveCount) {
         return requestReserveCount > maxCanHoldCount;
     }
 
+    public boolean isBookingOpen(final LocalDateTime now) {
+        if (orderOpenTime == null || orderCloseTime == null) {
+            return false;
+        }
+        if (now.isBefore(orderOpenTime)) {
+            return false;
+        }
+        return !now.isAfter(orderCloseTime);
+    }
 }

@@ -2,6 +2,7 @@ package com.ticket.core.api.controller.request;
 
 import com.ticket.core.domain.show.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIR
 /**
  * 판매 오픈 예정 공연 목록 조회 요청 파라미터
  */
+@Getter
 @Schema(description = "판매 오픈 예정 공연 조회 요청 파라미터")
 public class SaleOpeningSoonSearchParam {
 
@@ -99,35 +101,4 @@ public class SaleOpeningSoonSearchParam {
         this.cursor = cursor;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public Region getRegion() {
-        return region;
-    }
-
-    public LocalDateTime getSaleStartDateFrom() {
-        return saleStartDateFrom;
-    }
-
-    public LocalDateTime getSaleStartDateTo() {
-        return saleStartDateTo;
-    }
-
-    public LocalDateTime getSaleEndDateFrom() {
-        return saleEndDateFrom;
-    }
-
-    public LocalDateTime getSaleEndDateTo() {
-        return saleEndDateTo;
-    }
-
-    public String getCursor() {
-        return cursor;
-    }
 }
