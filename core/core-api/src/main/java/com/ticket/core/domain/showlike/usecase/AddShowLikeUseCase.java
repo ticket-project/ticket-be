@@ -7,7 +7,6 @@ import com.ticket.core.domain.show.Show;
 import com.ticket.core.domain.show.ShowFinder;
 import com.ticket.core.domain.showlike.ShowLike;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
-import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +57,6 @@ public class AddShowLikeUseCase {
     }
 
     private long countLikes(final Long showId) {
-        return showLikeRepository.countByShow_IdAndStatus(showId, EntityStatus.ACTIVE);
+        return showLikeRepository.countByShow_Id(showId);
     }
 }
-

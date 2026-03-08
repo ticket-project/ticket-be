@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import static com.ticket.core.enums.EntityStatus.ACTIVE;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -24,11 +22,9 @@ public class OAuth2MemberProvisioningService {
     private final MemberSocialAccountRepository memberSocialAccountRepository;
 
     public Member getOrCreateMember(final OAuth2UserInfo userInfo) {
-        return memberSocialAccountRepository.findBySocialProviderAndSocialIdAndStatusAndMember_Status(
+        return memberSocialAccountRepository.findActiveBySocialProviderAndSocialId(
                         userInfo.provider(),
-                        userInfo.providerId(),
-                        ACTIVE,
-                        ACTIVE
+                        userInfo.providerId()
                 )
                 .map(MemberSocialAccount::getMember)
                 .orElseGet(() -> createOrLinkMember(userInfo));
@@ -37,13 +33,13 @@ public class OAuth2MemberProvisioningService {
     private Member createOrLinkMember(final OAuth2UserInfo userInfo) {
         final String email = resolveEmail(userInfo);
 
-        return memberRepository.findByEmail_EmailAndStatus(email, ACTIVE)
+        return memberRepository.findByEmail_EmailAndDeletedAtIsNull(email)
                 .map(existingMember -> linkSocialAccount(existingMember, userInfo))
                 .orElseGet(() -> createSocialMember(userInfo, email));
     }
 
     private Member linkSocialAccount(final Member existingMember, final OAuth2UserInfo userInfo) {
-        return memberSocialAccountRepository.findByMemberAndSocialProviderAndStatus(existingMember, userInfo.provider(), ACTIVE)
+        return memberSocialAccountRepository.findByMemberAndSocialProviderAndDeletedAtIsNull(existingMember, userInfo.provider())
                 .map(linkedAccount -> validateSameSocialAccount(linkedAccount, userInfo))
                 .orElseGet(() -> addSocialAccount(existingMember, userInfo));
     }

@@ -8,7 +8,6 @@ import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceInf
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformerInfo;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.enums.BookingStatus;
-import com.ticket.core.enums.EntityStatus;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -35,54 +34,64 @@ public class ShowDetailQueryRepository {
     }
 
     public Optional<ShowDetailResponse> findShowDetail(final Long showId) {
-        final Show showEntity = queryFactory
-                .selectFrom(show)
-                .leftJoin(show.performer, performer).fetchJoin()
-                .leftJoin(show.venue).fetchJoin()
-                .where(
-                        show.id.eq(showId),
-                        show.status.eq(EntityStatus.ACTIVE)
-                )
-                .fetchOne();
-
+        final Show showEntity = fetchShow(showId);
         if (showEntity == null) {
             return Optional.empty();
         }
 
-        final List<String> genreNames = queryFactory
+        final List<String> genreNames = fetchGenreNames(showId);
+        final List<GradeInfo> grades = fetchGrades(showId);
+        final List<PerformanceDateInfo> performanceDates = fetchPerformanceDates(showId);
+        final long likeCount = fetchLikeCount(showId);
+
+        return Optional.of(toShowDetailResponse(showEntity, genreNames, grades, performanceDates, likeCount));
+    }
+
+    private Show fetchShow(final Long showId) {
+        return queryFactory
+                .selectFrom(show)
+                .leftJoin(show.performer, performer).fetchJoin()
+                .leftJoin(show.venue).fetchJoin()
+                .where(show.id.eq(showId))
+                .fetchOne();
+    }
+
+    private List<String> fetchGenreNames(final Long showId) {
+        return queryFactory
                 .select(genre.name)
                 .from(showGenre)
                 .join(showGenre.genre, genre)
                 .where(showGenre.show.id.eq(showId))
                 .fetch();
+    }
 
-        final List<ShowGrade> gradeEntities = queryFactory
+    private List<GradeInfo> fetchGrades(final Long showId) {
+        return queryFactory
                 .selectFrom(showGrade)
                 .where(showGrade.show.id.eq(showId))
                 .orderBy(showGrade.sortOrder.asc())
-                .fetch();
+                .fetch()
+                .stream()
+                .map(this::toGradeInfo)
+                .toList();
+    }
 
-        final List<GradeInfo> grades = gradeEntities.stream()
-                .map(g -> new GradeInfo(g.getId(), g.getGradeCode(), g.getGradeName(), g.getPrice(), g.getSortOrder()))
+    private GradeInfo toGradeInfo(final ShowGrade grade) {
+        return new GradeInfo(
+                grade.getId(),
+                grade.getGradeCode(),
+                grade.getGradeName(),
+                grade.getPrice(),
+                grade.getSortOrder()
+        );
+    }
+
+    private List<PerformanceDateInfo> fetchPerformanceDates(final Long showId) {
+        final List<PerformanceInfo> performances = fetchPerformances(showId).stream()
+                .map(this::toPerformanceInfo)
                 .toList();
 
-        final List<Performance> performanceEntities = queryFactory
-                .selectFrom(performance)
-                .where(
-                        performance.show.id.eq(showId),
-                        performance.status.eq(EntityStatus.ACTIVE)
-                )
-                .orderBy(performance.startTime.asc(), performance.performanceNo.asc())
-                .fetch();
-
-        final BookingStatus showBookingStatus = showEntity.getBookingStatus(LocalDateTime.now());
-        final List<PerformanceInfo> performances = performanceEntities.stream()
-                .map(p -> new PerformanceInfo(
-                        p.getId(), p.getPerformanceNo(), p.getStartTime(), p.getEndTime(),
-                        p.getOrderOpenTime(), p.getOrderCloseTime(), p.getState()))
-                .toList();
-
-        final List<PerformanceDateInfo> performanceDates = performances.stream()
+        return performances.stream()
                 .collect(Collectors.groupingBy(
                         performanceInfo -> performanceInfo.startTime().toLocalDate(),
                         LinkedHashMap::new,
@@ -91,36 +100,46 @@ public class ShowDetailQueryRepository {
                 .entrySet().stream()
                 .map(entry -> new PerformanceDateInfo(entry.getKey(), entry.getValue()))
                 .toList();
+    }
 
-        final long likeCount = Optional.ofNullable(
+    private List<Performance> fetchPerformances(final Long showId) {
+        return queryFactory
+                .selectFrom(performance)
+                .where(performance.show.id.eq(showId))
+                .orderBy(performance.startTime.asc(), performance.performanceNo.asc())
+                .fetch();
+    }
+
+    private PerformanceInfo toPerformanceInfo(final Performance performanceEntity) {
+        return new PerformanceInfo(
+                performanceEntity.getId(),
+                performanceEntity.getPerformanceNo(),
+                performanceEntity.getStartTime(),
+                performanceEntity.getEndTime(),
+                performanceEntity.getOrderOpenTime(),
+                performanceEntity.getOrderCloseTime()
+        );
+    }
+
+    private long fetchLikeCount(final Long showId) {
+        return Optional.ofNullable(
                 queryFactory.select(showLike.count())
                         .from(showLike)
-                        .where(
-                                showLike.show.id.eq(showId),
-                                showLike.status.eq(EntityStatus.ACTIVE)
-                        )
+                        .where(showLike.show.id.eq(showId))
                         .fetchOne()
         ).orElse(0L);
+    }
 
-        final Performer performerEntity = showEntity.getPerformer();
-        final PerformerInfo performerInfo = performerEntity != null
-                ? new PerformerInfo(performerEntity.getId(), performerEntity.getName(), performerEntity.getProfileImageUrl())
-                : null;
+    private ShowDetailResponse toShowDetailResponse(
+            final Show showEntity,
+            final List<String> genreNames,
+            final List<GradeInfo> grades,
+            final List<PerformanceDateInfo> performanceDates,
+            final long likeCount
+    ) {
+        final BookingStatus bookingStatus = showEntity.getBookingStatus(LocalDateTime.now());
 
-        final Venue venueEntity = showEntity.getVenue();
-        final ShowDetailResponse.VenueInfo venueInfo = venueEntity != null
-                ? new ShowDetailResponse.VenueInfo(
-                venueEntity.getId(),
-                venueEntity.getName(),
-                venueEntity.getAddress(),
-                venueEntity.getRegion(),
-                venueEntity.getLatitude(),
-                venueEntity.getLongitude(),
-                venueEntity.getPhone(),
-                venueEntity.getImageUrl())
-                : null;
-
-        final ShowDetailResponse response = new ShowDetailResponse(
+        return new ShowDetailResponse(
                 showEntity.getId(),
                 showEntity.getTitle(),
                 showEntity.getSubTitle(),
@@ -130,17 +149,43 @@ public class ShowDetailQueryRepository {
                 showEntity.getRunningMinutes(),
                 showEntity.getViewCount(),
                 likeCount,
-                showBookingStatus,
+                bookingStatus,
                 showEntity.getSaleType(),
                 showEntity.getSaleStartDate(),
                 showEntity.getSaleEndDate(),
                 showEntity.getImage(),
-                venueInfo,
-                performerInfo,
+                toVenueInfo(showEntity.getVenue()),
+                toPerformerInfo(showEntity.getPerformer()),
                 genreNames,
                 grades,
                 performanceDates
         );
-        return Optional.of(response);
+    }
+
+    private PerformerInfo toPerformerInfo(final Performer performerEntity) {
+        if (performerEntity == null) {
+            return null;
+        }
+        return new PerformerInfo(
+                performerEntity.getId(),
+                performerEntity.getName(),
+                performerEntity.getProfileImageUrl()
+        );
+    }
+
+    private ShowDetailResponse.VenueInfo toVenueInfo(final Venue venueEntity) {
+        if (venueEntity == null) {
+            return null;
+        }
+        return new ShowDetailResponse.VenueInfo(
+                venueEntity.getId(),
+                venueEntity.getName(),
+                venueEntity.getAddress(),
+                venueEntity.getRegion(),
+                venueEntity.getLatitude(),
+                venueEntity.getLongitude(),
+                venueEntity.getPhone(),
+                venueEntity.getImageUrl()
+        );
     }
 }

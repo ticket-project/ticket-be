@@ -4,7 +4,6 @@ import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
 import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.show.ShowFinder;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
-import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,7 @@ public class RemoveShowLikeUseCase {
         return new Output(new ShowLikeStatusResponse(
                 input.showId(),
                 false,
-                showLikeRepository.countByShow_IdAndStatus(input.showId(), EntityStatus.ACTIVE)
+                showLikeRepository.countByShow_Id(input.showId())
         ));
     }
 
@@ -47,4 +46,3 @@ public class RemoveShowLikeUseCase {
         }
     }
 }
-

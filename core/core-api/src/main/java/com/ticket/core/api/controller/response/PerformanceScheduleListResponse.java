@@ -1,12 +1,11 @@
 package com.ticket.core.api.controller.response;
 
-import com.ticket.core.enums.PerformanceState;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "일정 변경용 회차 목록 응답")
+@Schema(description = "회차 목록 응답")
 public record PerformanceScheduleListResponse(
         @Schema(description = "공연 ID", example = "1")
         Long showId,
@@ -27,10 +26,7 @@ public record PerformanceScheduleListResponse(
             Long performanceNo,
 
             @Schema(description = "회차 시작 일시", example = "2026-04-04T14:00:00")
-            LocalDateTime startTime,
-
-            @Schema(description = "회차 상태", example = "OPEN")
-            PerformanceState state
+            LocalDateTime startTime
     ) {
     }
 }

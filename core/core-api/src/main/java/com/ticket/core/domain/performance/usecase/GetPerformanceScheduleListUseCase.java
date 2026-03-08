@@ -6,7 +6,6 @@ import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.domain.performance.PerformanceRepository;
 import com.ticket.core.domain.show.Show;
-import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -41,13 +40,12 @@ public class GetPerformanceScheduleListUseCase {
         }
 
         final List<PerformanceScheduleItem> scheduleItems = performanceRepository
-                .findAllByShowIdAndStatusOrderByStartTimeAscPerformanceNoAsc(show.getId(), EntityStatus.ACTIVE)
+                .findAllByShowIdOrderByStartTimeAscPerformanceNoAsc(show.getId())
                 .stream()
                 .map(performance -> new PerformanceScheduleItem(
                         performance.getId(),
                         performance.getPerformanceNo(),
-                        performance.getStartTime(),
-                        performance.getState()
+                        performance.getStartTime()
                 ))
                 .toList();
 

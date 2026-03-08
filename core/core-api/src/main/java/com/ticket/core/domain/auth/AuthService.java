@@ -5,7 +5,6 @@ import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberRepository;
 import com.ticket.core.domain.member.vo.EncodedPassword;
 import com.ticket.core.domain.member.vo.RawPassword;
-import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
@@ -45,7 +44,7 @@ public class AuthService {
     }
 
     public Member login(final String email, final String password) {
-        final Optional<Member> optMember = memberRepository.findByEmail_EmailAndStatus(email, EntityStatus.ACTIVE);
+        final Optional<Member> optMember = memberRepository.findByEmail_EmailAndDeletedAtIsNull(email);
 
         if (optMember.isEmpty()) {
             // 타이밍 공격 방어: 회원이 없어도 해싱을 수행하여 응답 시간을 동일하게 유지
@@ -61,4 +60,3 @@ public class AuthService {
         return foundMember;
     }
 }
-
