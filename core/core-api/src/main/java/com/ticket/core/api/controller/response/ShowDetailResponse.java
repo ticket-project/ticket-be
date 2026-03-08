@@ -3,7 +3,6 @@ package com.ticket.core.api.controller.response;
 import com.ticket.core.domain.show.Region;
 import com.ticket.core.domain.show.SaleType;
 import com.ticket.core.enums.BookingStatus;
-import com.ticket.core.enums.PerformanceState;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
@@ -32,7 +31,7 @@ public record ShowDetailResponse(
         @Schema(description = "공연 종료일")
         LocalDate endDate,
 
-        @Schema(description = "러닝타임")
+        @Schema(description = "러닝타임(분)")
         Integer runningMinutes,
 
         @Schema(description = "조회수")
@@ -41,19 +40,16 @@ public record ShowDetailResponse(
         @Schema(description = "공연 전체 찜 개수")
         long likeCount,
 
-        @Schema(
-                description = "예매 상태 (공연 기준, BEFORE_OPEN: 오픈 전, ON_SALE: 예매 중, CLOSED: 마감)",
-                example = "ON_SALE"
-        )
+        @Schema(description = "예매 상태", example = "ON_SALE")
         BookingStatus bookingStatus,
 
         @Schema(description = "판매 타입", example = "GENERAL")
         SaleType saleType,
 
-        @Schema(description = "판매 시작일")
+        @Schema(description = "판매 시작일시")
         LocalDateTime saleStartDate,
 
-        @Schema(description = "판매 종료일")
+        @Schema(description = "판매 종료일시")
         LocalDateTime saleEndDate,
 
         @Schema(description = "포스터 이미지 URL")
@@ -68,7 +64,7 @@ public record ShowDetailResponse(
         @Schema(description = "장르 목록")
         List<String> genreNames,
 
-        @Schema(description = "좌석 등급 및 가격 목록")
+        @Schema(description = "좌석 등급과 가격 목록")
         List<GradeInfo> grades,
 
         @Schema(description = "공연 날짜별 회차 목록")
@@ -98,12 +94,7 @@ public record ShowDetailResponse(
             @Schema(description = "공연 시작 시간") LocalDateTime startTime,
             @Schema(description = "공연 종료 시간") LocalDateTime endTime,
             @Schema(description = "예매 오픈 시간") LocalDateTime orderOpenTime,
-            @Schema(description = "예매 마감 시간") LocalDateTime orderCloseTime,
-            @Schema(
-                    description = "회차 상태 (OPEN: 예매 가능, CLOSE: 예매 마감)",
-                    allowableValues = {"OPEN", "CLOSE"},
-                    example = "OPEN"
-            ) PerformanceState state
+            @Schema(description = "예매 마감 시간") LocalDateTime orderCloseTime
     ) {
     }
 
