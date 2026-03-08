@@ -9,8 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.ticket.core.enums.EntityStatus.ACTIVE;
-
 @Slf4j
 @Service
 @Transactional(readOnly = true)
@@ -38,11 +36,9 @@ public class MemberService {
     @Transactional
     protected List<String> withdrawInTransaction(final Long memberId) {
         final Member member = memberFinder.findActiveMemberById(memberId);
-        final List<MemberSocialAccount> socialAccounts = memberSocialAccountRepository.findAllByMember(member);
+        final List<MemberSocialAccount> socialAccounts = memberSocialAccountRepository.findAllByMemberAndDeletedAtIsNull(member);
 
-        // 카카오 소셜 ID를 미리 수집 (트랜잭션 밖에서 사용)
         final List<String> kakaoSocialIds = socialAccounts.stream()
-                .filter(account -> account.getStatus() == ACTIVE)
                 .filter(account -> account.getSocialProvider() == SocialProvider.KAKAO)
                 .map(MemberSocialAccount::getSocialId)
                 .toList();
@@ -62,7 +58,7 @@ public class MemberService {
             try {
                 kakaoUnlinkService.unlinkByUserId(socialId);
             } catch (Exception e) {
-                log.warn("카카오 unlink 실패 (socialId={}), 추후 재처리 필요", socialId, e);
+                log.warn("카카오 unlink 실패 (socialId={}), 추후 수동처리 필요", socialId, e);
             }
         });
     }
