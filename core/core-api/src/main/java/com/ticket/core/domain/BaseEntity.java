@@ -1,7 +1,8 @@
 package com.ticket.core.domain;
 
-import com.ticket.core.enums.EntityStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -29,20 +30,4 @@ public class BaseEntity {
 
     @LastModifiedBy
     private String updatedBy;
-
-    @Getter
-    @Enumerated(EnumType.STRING)
-    private EntityStatus status = EntityStatus.ACTIVE;
-
-    private LocalDateTime deletedAt;
-
-    protected void markDeleted(final LocalDateTime deletedAt) {
-        this.status = EntityStatus.DELETED;
-        this.deletedAt = deletedAt;
-    }
-
-    public boolean isDeleted() {
-        return status == EntityStatus.DELETED;
-    }
-
 }

@@ -2,7 +2,18 @@ package com.ticket.core.domain.member;
 
 import com.ticket.core.domain.BaseEntity;
 import com.ticket.core.enums.SocialProvider;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +46,9 @@ public class MemberSocialAccount extends BaseEntity {
     @Column(name = "social_id", nullable = false)
     private String socialId;
 
+    @Column
+    private LocalDateTime deletedAt;
+
     private MemberSocialAccount(
             final Member member,
             final SocialProvider socialProvider,
@@ -58,8 +72,12 @@ public class MemberSocialAccount extends BaseEntity {
     }
 
     public void withdraw() {
-        markDeleted(LocalDateTime.now());
+        this.deletedAt = LocalDateTime.now();
         final String idPart = id == null ? "unknown" : id.toString();
         this.socialId = "deleted_" + idPart + "_" + UUID.randomUUID();
+    }
+
+    public boolean isDeleted() {
+        return deletedAt != null;
     }
 }

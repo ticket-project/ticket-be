@@ -1,6 +1,5 @@
 package com.ticket.core.domain.member;
 
-import com.ticket.core.enums.EntityStatus;
 import com.ticket.core.enums.SocialProvider;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,21 +16,18 @@ public interface MemberSocialAccountRepository extends JpaRepository<MemberSocia
             JOIN FETCH msa.member m
             WHERE msa.socialProvider = :socialProvider
               AND msa.socialId = :socialId
-              AND msa.status = :socialAccountStatus
-              AND m.status = :memberStatus
+              AND msa.deletedAt IS NULL
+              AND m.deletedAt IS NULL
             """)
-    Optional<MemberSocialAccount> findBySocialProviderAndSocialIdAndStatusAndMember_Status(
+    Optional<MemberSocialAccount> findActiveBySocialProviderAndSocialId(
             @Param("socialProvider") SocialProvider socialProvider,
-            @Param("socialId") String socialId,
-            @Param("socialAccountStatus") EntityStatus socialAccountStatus,
-            @Param("memberStatus") EntityStatus memberStatus
+            @Param("socialId") String socialId
     );
 
-    Optional<MemberSocialAccount> findByMemberAndSocialProviderAndStatus(
+    Optional<MemberSocialAccount> findByMemberAndSocialProviderAndDeletedAtIsNull(
             Member member,
-            SocialProvider socialProvider,
-            EntityStatus status
+            SocialProvider socialProvider
     );
 
-    List<MemberSocialAccount> findAllByMember(Member member);
+    List<MemberSocialAccount> findAllByMemberAndDeletedAtIsNull(Member member);
 }
