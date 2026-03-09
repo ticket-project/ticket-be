@@ -53,8 +53,7 @@ public class AuthService {
         }
 
         final Member foundMember = optMember.get();
-        if (foundMember.getEncodedPassword() == null
-                || !passwordService.matches(RawPassword.create(password), foundMember.getEncodedPassword())) {
+        if (foundMember.getEncodedPassword() == null || !passwordService.matches(RawPassword.create(password), foundMember.getEncodedPassword())) {
             throw new AuthException(ErrorType.AUTHENTICATION_ERROR);
         }
         return foundMember;
