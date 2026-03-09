@@ -21,7 +21,7 @@ public class GetVenueLayoutUseCase {
     public record Output(VenueLayoutResponse layout) {}
 
     public Output execute(Input input) {
-        Show show = showFinder.findActiveShow(input.showId());
+        Show show = showFinder.findById(input.showId());
 
         Venue venue = show.getVenue();
         if (venue == null) {

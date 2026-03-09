@@ -34,7 +34,7 @@ public class GetSeatStatusUseCase {
     public record Output(SeatStatusResponse status) {}
 
     public Output execute(Input input) {
-        final Performance performance = performanceFinder.findActiveById(input.performanceId());
+        final Performance performance = performanceFinder.findById(input.performanceId());
         final Long perfId = performance.getId();
 
         // 1. DB 조회 (RESERVED → OCCUPIED, 나머지 → AVAILABLE)

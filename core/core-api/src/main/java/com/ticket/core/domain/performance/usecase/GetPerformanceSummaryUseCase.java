@@ -26,7 +26,7 @@ public class GetPerformanceSummaryUseCase {
     }
 
     public Output execute(final Input input) {
-        final Performance performance = performanceFinder.findActiveById(input.performanceId());
+        final Performance performance = performanceFinder.findById(input.performanceId());
 
         final Show show = performance.getShow();
         if (show == null) {

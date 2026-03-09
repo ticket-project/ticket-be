@@ -38,7 +38,7 @@ public class AddShowLikeUseCase {
             return new Output(new ShowLikeStatusResponse(input.showId(), true, countLikes(input.showId())));
         }
 
-        final Show show = showFinder.findActiveShow(input.showId());
+        final Show show = showFinder.findById(input.showId());
 
         try {
             showLikeRepository.save(new ShowLike(member, show));

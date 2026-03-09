@@ -29,7 +29,7 @@ public class GetPerformanceScheduleListUseCase {
     }
 
     public Output execute(final Input input) {
-        final Performance findPerformance = performanceFinder.findActiveById(input.performanceId());
+        final Performance findPerformance = performanceFinder.findById(input.performanceId());
 
         final Show show = findPerformance.getShow();
         if (show == null) {

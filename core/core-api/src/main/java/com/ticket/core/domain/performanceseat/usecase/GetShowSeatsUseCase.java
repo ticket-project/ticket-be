@@ -22,7 +22,7 @@ public class GetShowSeatsUseCase {
     public record Output(ShowSeatResponse seatInfo) {}
 
     public Output execute(Input input) {
-        final Show show = showFinder.findActiveShow(input.showId());
+        final Show show = showFinder.findById(input.showId());
 
         List<ShowSeatResponse.SeatInfo> seats = seatMapQueryRepository.findShowSeats(show.getId());
 
