@@ -13,7 +13,7 @@ public class ShowFinder {
     private final ShowJpaRepository showJpaRepository;
     private final ShowDetailQueryRepository showDetailQueryRepository;
 
-    public Show findActiveShow(final Long showId) {
+    public Show findById(final Long showId) {
         return showJpaRepository.findById(showId)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA,
                         "공연을 찾을 수 없습니다. id=" + showId));

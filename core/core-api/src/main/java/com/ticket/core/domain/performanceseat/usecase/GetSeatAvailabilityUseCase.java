@@ -25,7 +25,7 @@ public class GetSeatAvailabilityUseCase {
     public record Output(SeatAvailabilityResponse availability) {}
 
     public Output execute(Input input) {
-        final Performance performance = performanceFinder.findActiveById(input.performanceId());
+        final Performance performance = performanceFinder.findById(input.performanceId());
 
         if (performance.getShow() == null) {
             throw new CoreException(ErrorType.NOT_FOUND_DATA,
