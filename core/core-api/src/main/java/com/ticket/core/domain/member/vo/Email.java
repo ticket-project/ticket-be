@@ -1,20 +1,15 @@
 package com.ticket.core.domain.member.vo;
 
-import com.ticket.core.support.exception.CoreException;
-import com.ticket.core.support.exception.ErrorType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 @Embeddable
 public class Email {
 
     private String email;
-
-    private static final Pattern EMAIL_PATTERN =
-            Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     protected Email() {}
 
@@ -24,16 +19,9 @@ public class Email {
 
     private static String validate(final String email) {
         if (email == null) {
-            throw new CoreException(ErrorType.INVALID_REQUEST, "email은 null일 수 없습니다.");
+            return "";
         }
-        String trimmed = email.trim();
-        if (trimmed.isEmpty()) {
-            throw new CoreException(ErrorType.INVALID_REQUEST, "email은 빈 값일 수 없습니다.");
-        }
-        if (!EMAIL_PATTERN.matcher(trimmed).matches()) {
-            throw new CoreException(ErrorType.INVALID_REQUEST, "올바르지 않은 email 형식입니다.");
-        }
-        return trimmed;
+        return email.trim();
     }
 
     public static Email create(final String value) {

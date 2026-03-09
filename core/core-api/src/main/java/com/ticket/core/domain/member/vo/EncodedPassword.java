@@ -1,9 +1,11 @@
 package com.ticket.core.domain.member.vo;
 
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
 
 import java.util.Objects;
 
+@Getter
 @Embeddable
 public class EncodedPassword {
 
@@ -17,10 +19,6 @@ public class EncodedPassword {
 
     public static EncodedPassword create(final String value) {
         return new EncodedPassword(value);
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     @Override
