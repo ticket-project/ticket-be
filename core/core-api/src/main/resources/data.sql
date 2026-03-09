@@ -1728,7 +1728,8 @@ FROM SHOWS s CROSS JOIN SEATS st;
 -- 회차-좌석 매핑 (INSERT...SELECT)
 -- ============================================================
 INSERT INTO PERFORMANCE_SEATS (performance_id, seat_id, state, price, created_at, created_by, status)
-SELECT p.id, st.id, 'AVAILABLE',
+SELECT p.id, st.id,
+    CASE WHEN MOD(st.id * 7 + p.id * 3, 10) < 3 THEN 'RESERVED' ELSE 'AVAILABLE' END,
     (SELECT sg.price FROM SHOW_GRADES sg WHERE sg.show_id = p.show_id AND sg.sort_order = CASE WHEN st.id <= 200 THEN 1 WHEN st.id <= 400 THEN 2 ELSE 3 END),
     '2026-01-01 10:00:00', '시드', 'ACTIVE'
 FROM PERFORMANCES p CROSS JOIN SEATS st;
