@@ -71,29 +71,16 @@ public class SeatSelectionService {
     }
 
     /**
-     * Select → Hold 전이 시, SELECTING 키를 강제 삭제합니다.
-     * 소유권 검증 없이 삭제합니다 (Hold 과정에서 이미 검증됨).
+     * Select 키가 존재하면 삭제합니다.
+     * Select 없이 Hold하는 경우에도 에러 없이 무시됩니다.
      */
-    public void forceDeselect(final Long performanceId, final Long seatId) {
-        redissonClient.getBucket(SeatRedisKey.select(performanceId, seatId), StringCodec.INSTANCE).delete();
-    }
-
-    /**
-     * 특정 공연 회차의 현재 선택된 좌석 목록을 조회합니다.
-     */
-    public List<SeatSelectionInfo> getSelectedSeats(final Long performanceId) {
-        final String pattern = SeatRedisKey.selectPattern(performanceId);
-        final List<SeatSelectionInfo> selections = new ArrayList<>();
-
-        for (final String key : redissonClient.getKeys().getKeysByPattern(pattern)) {
-            final RBucket<String> bucket = redissonClient.getBucket(key, StringCodec.INSTANCE);
-            final String memberId = bucket.get();
-            if (memberId != null) {
-                selections.add(new SeatSelectionInfo(SeatRedisKey.extractSeatId(key), Long.parseLong(memberId)));
-            }
+    public void forceDeselectIfExists(final Long performanceId, final Long seatId) {
+        final RBucket<String> bucket = redissonClient.getBucket(
+                SeatRedisKey.select(performanceId, seatId), StringCodec.INSTANCE);
+        if (bucket.isExists()) {
+            bucket.delete();
+            log.debug("Select 키 정리 완료: performanceId={}, seatId={}", performanceId, seatId);
         }
-
-        return selections;
     }
 
     /**

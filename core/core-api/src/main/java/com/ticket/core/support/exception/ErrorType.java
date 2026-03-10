@@ -26,7 +26,7 @@ public enum ErrorType {
     //좌석
     SEAT_MISMATCH_IN_PERFORMANCE(HttpStatus.BAD_REQUEST, ErrorCode.E4000, "요청한 좌석 정보와 일치하지 않습니다."),
     SEAT_ALREADY_SELECTED(HttpStatus.CONFLICT, ErrorCode.E4001, "이미 선택된 좌석입니다."),
-    SEAT_NOT_OWNED(HttpStatus.FORBIDDEN, ErrorCode.E4002, "본인이 선택한 좌석만 해제할 수 있습니다."),
+    SEAT_NOT_OWNED(HttpStatus.FORBIDDEN, ErrorCode.E4002, "본인이 선택(Select)한 좌석이 아닙니다."),
 
     //예매
     EXCEED_AVAILABLE_SEATS(HttpStatus.CONFLICT, ErrorCode.E5000, "총 예매 가능 좌석을 초과하였습니다."),
@@ -34,6 +34,7 @@ public enum ErrorType {
 
     //선점
     SEAT_ALREADY_HOLD(HttpStatus.CONFLICT, ErrorCode.E6000, "좌석이 이미 선점되었습니다."),
+    SEAT_HOLD_NOT_OWNED(HttpStatus.FORBIDDEN, ErrorCode.E6001, "본인이 선점한 좌석만 해제할 수 있습니다."),
 
     //공연
     NOT_SUPPORT_SHOW_SORT(HttpStatus.BAD_REQUEST, ErrorCode.E7000, "지원하지 않는 정렬 조건입니다."),

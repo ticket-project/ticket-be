@@ -1,9 +1,9 @@
 package com.ticket.core.domain.performanceseat.usecase;
 
 import com.ticket.core.api.controller.response.SeatStatusResponse;
-import com.ticket.core.domain.hold.HoldRedisService;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
+import com.ticket.core.domain.performanceseat.SeatHoldService;
 import com.ticket.core.domain.performanceseat.SeatMapQueryRepository;
 import com.ticket.core.domain.performanceseat.SeatSelectionService;
 import com.ticket.core.enums.SeatStatus;
@@ -28,7 +28,7 @@ public class GetSeatStatusUseCase {
     private final PerformanceFinder performanceFinder;
     private final SeatMapQueryRepository seatMapQueryRepository;
     private final SeatSelectionService seatSelectionService;
-    private final HoldRedisService holdRedisService;
+    private final SeatHoldService seatHoldService;
 
     public record Input(Long performanceId) {}
     public record Output(SeatStatusResponse status) {}
@@ -58,7 +58,7 @@ public class GetSeatStatusUseCase {
 
     private Set<Long> mergeRedisOccupiedIds(Long performanceId) {
         final Set<Long> ids = new HashSet<>(seatSelectionService.getSelectingSeatIds(performanceId));
-        ids.addAll(holdRedisService.getHoldingSeatIds(performanceId));
+        ids.addAll(seatHoldService.getHeldSeatIds(performanceId));
         return ids;
     }
 }
