@@ -8,7 +8,7 @@ public final class CookieUtils {
 
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
     private static final String COOKIE_PATH = "/api/v1/auth";
-    private static final String SAME_SITE = "Strict";
+    private static final String SAME_SITE = "None";
 
     private CookieUtils() {
     }
