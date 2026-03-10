@@ -1,7 +1,6 @@
 package com.ticket.core.domain.showlike.usecase;
 
 import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
-import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.show.Show;
 import com.ticket.core.domain.show.ShowFinder;
@@ -32,16 +31,16 @@ public class AddShowLikeUseCase {
     public Output execute(final Input input) {
         validateInput(input);
 
-        final Member member = memberFinder.findActiveMemberById(input.memberId());
+        memberFinder.findActiveMemberById(input.memberId());
 
-        if (showLikeRepository.existsByMember_IdAndShow_Id(input.memberId(), input.showId())) {
+        if (showLikeRepository.existsByMemberIdAndShow_Id(input.memberId(), input.showId())) {
             return new Output(new ShowLikeStatusResponse(input.showId(), true, countLikes(input.showId())));
         }
 
         final Show show = showFinder.findById(input.showId());
 
         try {
-            showLikeRepository.save(new ShowLike(member, show));
+            showLikeRepository.save(new ShowLike(input.memberId(), show));
         } catch (DataIntegrityViolationException e) {
             throw new CoreException(ErrorType.SHOW_LIKE_ALREADY_EXISTS,
                     "이미 찜한 공연입니다. memberId=" + input.memberId() + ", showId=" + input.showId());

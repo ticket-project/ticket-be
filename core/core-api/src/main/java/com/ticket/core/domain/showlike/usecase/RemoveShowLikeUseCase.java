@@ -30,7 +30,7 @@ public class RemoveShowLikeUseCase {
         memberFinder.findActiveMemberById(input.memberId());
         showFinder.validateShowExists(input.showId());
 
-        showLikeRepository.findByMember_IdAndShow_Id(input.memberId(), input.showId())
+        showLikeRepository.findByMemberIdAndShow_Id(input.memberId(), input.showId())
                 .ifPresent(showLikeRepository::delete);
 
         return new Output(new ShowLikeStatusResponse(

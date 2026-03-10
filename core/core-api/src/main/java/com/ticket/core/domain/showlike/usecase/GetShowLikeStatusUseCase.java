@@ -1,7 +1,6 @@
 package com.ticket.core.domain.showlike.usecase;
 
 import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
-import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.show.ShowFinder;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
@@ -28,10 +27,10 @@ public class GetShowLikeStatusUseCase {
 
     public Output execute(final Input input) {
         validateInput(input);
-        final Member member = memberFinder.findActiveMemberById(input.memberId());
+        memberFinder.findActiveMemberById(input.memberId());
         showFinder.validateShowExists(input.showId());
 
-        final boolean liked = showLikeRepository.existsByMember_IdAndShow_Id(member.getId(), input.showId());
+        final boolean liked = showLikeRepository.existsByMemberIdAndShow_Id(input.memberId(), input.showId());
         final long likeCount = showLikeRepository.countByShow_Id(input.showId());
         return new Output(new ShowLikeStatusResponse(input.showId(), liked, likeCount));
     }

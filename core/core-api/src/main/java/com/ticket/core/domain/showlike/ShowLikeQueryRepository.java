@@ -29,7 +29,7 @@ public class ShowLikeQueryRepository {
             final int size
     ) {
         final BooleanBuilder where = new BooleanBuilder();
-        where.and(showLike.member.id.eq(memberId));
+        where.and(showLike.memberId.eq(memberId));
 
         if (cursorLikeId != null) {
             where.and(showLike.id.lt(cursorLikeId));

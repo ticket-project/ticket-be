@@ -1,7 +1,6 @@
 package com.ticket.core.domain.showlike.usecase;
 
 import com.ticket.core.api.controller.response.ShowLikeSummaryResponse;
-import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.showlike.ShowLikeQueryRepository;
 import com.ticket.core.support.cursor.CursorSlice;
@@ -31,10 +30,10 @@ public class GetMyShowLikesUseCase {
 
     public Output execute(final Input input) {
         validateInput(input);
-        final Member member = memberFinder.findActiveMemberById(input.memberId());
+        memberFinder.findActiveMemberById(input.memberId());
         final Long cursorLikeId = parseCursor(input.cursor());
         final CursorSlice<ShowLikeSummaryResponse> result =
-                showLikeQueryRepository.findMyLikedShows(member.getId(), cursorLikeId, input.size());
+                showLikeQueryRepository.findMyLikedShows(input.memberId(), cursorLikeId, input.size());
         return new Output(result.slice(), result.nextCursor());
     }
 

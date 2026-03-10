@@ -1,7 +1,6 @@
 package com.ticket.core.domain.showlike;
 
 import com.ticket.core.domain.BaseEntity;
-import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.show.Show;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -26,9 +25,8 @@ public class ShowLike extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "show_id", nullable = false)
@@ -37,8 +35,8 @@ public class ShowLike extends BaseEntity {
     protected ShowLike() {
     }
 
-    public ShowLike(final Member member, final Show show) {
-        this.member = Objects.requireNonNull(member, "member must not be null");
+    public ShowLike(final Long memberId, final Show show) {
+        this.memberId = Objects.requireNonNull(memberId, "memberId must not be null");
         this.show = Objects.requireNonNull(show, "show must not be null");
     }
 
