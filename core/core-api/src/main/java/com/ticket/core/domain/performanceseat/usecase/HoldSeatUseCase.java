@@ -1,5 +1,9 @@
 package com.ticket.core.domain.performanceseat.usecase;
 
+import com.ticket.core.domain.order.Order;
+import com.ticket.core.domain.order.OrderRepository;
+import com.ticket.core.domain.order.OrderSeat;
+import com.ticket.core.domain.order.OrderSeatRepository;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.domain.performanceseat.*;
@@ -11,13 +15,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  * 좌석 선점(Hold) UseCase.
- * DB AVAILABLE 상태의 좌석을 Redis Hold로 전이시킵니다.
- * Select 없이도 바로 Hold가 가능합니다.
+ * DB AVAILABLE 상태의 좌석을 Redis Hold로 전이시키고,
+ * PENDING 상태의 주문(Order)을 동시에 생성합니다.
  */
 @Slf4j
 @Service
@@ -29,11 +34,17 @@ public class HoldSeatUseCase {
     private final SeatSelectionService seatSelectionService;
     private final SeatHoldService seatHoldService;
     private final SeatEventPublisher seatEventPublisher;
+    private final OrderRepository orderRepository;
+    private final OrderSeatRepository orderSeatRepository;
 
     public record Input(Long performanceId, List<Long> seatIds, Long memberId) {}
 
-    @Transactional(readOnly = true)
-    public void execute(final Input input) {
+    public record Output(Long orderId, String orderNo, BigDecimal totalAmount, List<SeatInfo> seats) {
+        public record SeatInfo(Long performanceSeatId, BigDecimal price) {}
+    }
+
+    @Transactional
+    public Output execute(final Input input) {
         final Performance performance = performanceFinder.findById(input.performanceId());
 
         // 1. 예매 오픈 시간 검증
@@ -66,12 +77,32 @@ public class HoldSeatUseCase {
             seatSelectionService.forceDeselectIfExists(input.performanceId(), seatId);
         }
 
-        // 6. WebSocket HELD 이벤트 발행
+        // 6. Order(PENDING) 생성
+        final BigDecimal totalAmount = availableSeats.stream()
+                .map(PerformanceSeat::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        final Order order = Order.create(input.memberId(), input.performanceId(), totalAmount);
+        orderRepository.save(order);
+
+        // 7. OrderSeat 별도 저장
+        final List<OrderSeat> orderSeats = availableSeats.stream()
+                .map(seat -> OrderSeat.create(order, seat.getId(), seat.getPrice()))
+                .toList();
+        orderSeatRepository.saveAll(orderSeats);
+
+        // 8. WebSocket HELD 이벤트 발행
         for (final Long seatId : input.seatIds()) {
             seatEventPublisher.publish(SeatStatusMessage.of(input.performanceId(), seatId, SeatAction.HELD));
         }
 
-        log.info("좌석 선점 완료: performanceId={}, seatIds={}, memberId={}, holdTime={}s",
-                input.performanceId(), input.seatIds(), input.memberId(), performance.getHoldTime());
+        log.info("좌석 선점 + 주문 생성 완료: performanceId={}, seatIds={}, memberId={}, orderId={}, orderNo={}",
+                input.performanceId(), input.seatIds(), input.memberId(), order.getId(), order.getOrderNo());
+
+        final List<Output.SeatInfo> seatInfos = availableSeats.stream()
+                .map(s -> new Output.SeatInfo(s.getId(), s.getPrice()))
+                .toList();
+        return new Output(order.getId(), order.getOrderNo(), totalAmount, seatInfos);
     }
 }
+

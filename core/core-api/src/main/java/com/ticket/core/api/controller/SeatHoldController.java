@@ -2,6 +2,7 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.SeatHoldControllerDocs;
 import com.ticket.core.api.controller.request.HoldSeatRequest;
+import com.ticket.core.api.controller.response.HoldSeatResponse;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.performanceseat.usecase.HoldSeatUseCase;
 import com.ticket.core.domain.performanceseat.usecase.ReleaseSeatUseCase;
@@ -20,14 +21,23 @@ public class SeatHoldController implements SeatHoldControllerDocs {
 
     @Override
     @PostMapping("/hold")
-    public ApiResponse<Void> holdSeats(
+    public ApiResponse<HoldSeatResponse> holdSeats(
             @PathVariable final Long performanceId,
             @RequestBody @Valid final HoldSeatRequest request,
             final MemberPrincipal memberPrincipal
     ) {
-        holdSeatUseCase.execute(new HoldSeatUseCase.Input(
+        final HoldSeatUseCase.Output output = holdSeatUseCase.execute(new HoldSeatUseCase.Input(
                 performanceId, request.seatIds(), memberPrincipal.getMemberId()));
-        return ApiResponse.success();
+
+        final HoldSeatResponse response = new HoldSeatResponse(
+                output.orderId(),
+                output.orderNo(),
+                output.totalAmount(),
+                output.seats().stream()
+                        .map(s -> new HoldSeatResponse.SeatInfo(s.performanceSeatId(), s.price()))
+                        .toList()
+        );
+        return ApiResponse.success(response);
     }
 
     @Override
@@ -42,3 +52,4 @@ public class SeatHoldController implements SeatHoldControllerDocs {
         return ApiResponse.success();
     }
 }
+

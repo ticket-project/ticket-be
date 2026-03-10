@@ -34,7 +34,12 @@ public enum ErrorCode {
 
     //공연
     E7000("미지원 공연 정렬"),
-    E7001("이미 찜한 공연");
+    E7001("이미 찜한 공연"),
+
+    //주문
+    E8000("주문 없음"),
+    E8001("주문 상태 불일치"),
+    E8002("주문 소유권 없음");
 
     private final String description;
 
