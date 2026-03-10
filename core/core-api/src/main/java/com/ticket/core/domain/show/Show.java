@@ -2,7 +2,7 @@ package com.ticket.core.domain.show;
 
 
 import com.ticket.core.domain.BaseEntity;
-import com.ticket.core.enums.BookingStatus;
+import com.ticket.core.enums.SaleStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -69,17 +69,17 @@ public class Show extends BaseEntity {
         this.runningMinutes = runningMinutes;
     }
 
-    public BookingStatus getBookingStatus(final LocalDateTime now) {
+    public SaleStatus getSaleStatus(final LocalDateTime now) {
         if (saleStartDate == null || saleEndDate == null) {
-            return BookingStatus.CLOSED;
+            return SaleStatus.CLOSED;
         }
         if (now.isBefore(saleStartDate)) {
-            return BookingStatus.BEFORE_OPEN;
+            return SaleStatus.BEFORE_OPEN;
         }
         if (now.isAfter(saleEndDate)) {
-            return BookingStatus.CLOSED;
+            return SaleStatus.CLOSED;
         }
-        return BookingStatus.ON_SALE;
+        return SaleStatus.ON_SALE;
     }
 
 }

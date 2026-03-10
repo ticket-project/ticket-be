@@ -1,7 +1,7 @@
 package com.ticket.core.api.controller.request;
 
 import com.ticket.core.domain.show.Region;
-import com.ticket.core.enums.BookingStatus;
+import com.ticket.core.enums.SaleStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,12 +34,12 @@ public class ShowSearchRequest {
     private String category;
 
     @Schema(
-            description = "예매 상태 필터",
+            description = "판매 상태 필터",
             example = "ON_SALE",
             allowableValues = {"BEFORE_OPEN", "ON_SALE", "CLOSED"},
             requiredMode = NOT_REQUIRED
     )
-    private BookingStatus bookingStatus;
+    private SaleStatus saleStatus;
 
     @Schema(
             description = "공연 시작일 필터 (이 날짜 이후)",

@@ -7,7 +7,7 @@ import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceDat
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceInfo;
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformerInfo;
 import com.ticket.core.domain.performance.Performance;
-import com.ticket.core.enums.BookingStatus;
+import com.ticket.core.enums.SaleStatus;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -137,7 +137,7 @@ public class ShowDetailQueryRepository {
             final List<PerformanceDateInfo> performanceDates,
             final long likeCount
     ) {
-        final BookingStatus bookingStatus = showEntity.getBookingStatus(LocalDateTime.now());
+        final SaleStatus saleStatus = showEntity.getSaleStatus(LocalDateTime.now());
 
         return new ShowDetailResponse(
                 showEntity.getId(),
@@ -149,7 +149,7 @@ public class ShowDetailQueryRepository {
                 showEntity.getRunningMinutes(),
                 showEntity.getViewCount(),
                 likeCount,
-                bookingStatus,
+                saleStatus,
                 showEntity.getSaleType(),
                 showEntity.getSaleStartDate(),
                 showEntity.getSaleEndDate(),

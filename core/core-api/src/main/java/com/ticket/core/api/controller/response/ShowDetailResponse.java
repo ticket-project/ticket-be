@@ -2,7 +2,7 @@ package com.ticket.core.api.controller.response;
 
 import com.ticket.core.domain.show.Region;
 import com.ticket.core.domain.show.SaleType;
-import com.ticket.core.enums.BookingStatus;
+import com.ticket.core.enums.SaleStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
@@ -40,8 +40,8 @@ public record ShowDetailResponse(
         @Schema(description = "공연 전체 찜 개수")
         long likeCount,
 
-        @Schema(description = "예매 상태", example = "ON_SALE")
-        BookingStatus bookingStatus,
+        @Schema(description = "판매 상태", example = "ON_SALE")
+        SaleStatus saleStatus,
 
         @Schema(description = "판매 타입", example = "GENERAL")
         SaleType saleType,

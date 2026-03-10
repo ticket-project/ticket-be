@@ -189,7 +189,7 @@ public class ShowListQueryRepository {
         where.and(queryHelper.regionEq(request.getRegion()));
         where.and(queryHelper.startDateGoe(request.getStartDateFrom()));
         where.and(queryHelper.startDateLoe(request.getStartDateTo()));
-        where.and(queryHelper.bookingStatusCondition(request.getBookingStatus()));
+        where.and(queryHelper.saleStatusCondition(request.getSaleStatus()));
         appendShowStartApproachingCondition(where, sortOrder);
         return where;
     }

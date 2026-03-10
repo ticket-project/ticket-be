@@ -1,7 +1,7 @@
 package com.ticket.core.domain.show;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.ticket.core.enums.BookingStatus;
+import com.ticket.core.enums.SaleStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -62,13 +62,13 @@ public class ShowQueryHelper {
         return to != null ? show.startDate.loe(to) : null;
     }
 
-    public BooleanExpression bookingStatusCondition(final BookingStatus bookingStatus) {
-        if (bookingStatus == null) {
+    public BooleanExpression saleStatusCondition(final SaleStatus saleStatus) {
+        if (saleStatus == null) {
             return null;
         }
 
         final LocalDateTime now = LocalDateTime.now();
-        return switch (bookingStatus) {
+        return switch (saleStatus) {
             case BEFORE_OPEN -> show.saleStartDate.gt(now);
             case ON_SALE -> show.saleStartDate.loe(now).and(show.saleEndDate.goe(now));
             case CLOSED -> show.saleEndDate.lt(now);

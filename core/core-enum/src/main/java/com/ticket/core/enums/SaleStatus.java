@@ -1,13 +1,13 @@
 package com.ticket.core.enums;
 
-public enum BookingStatus {
-    BEFORE_OPEN("예매 오픈 전"),
-    ON_SALE("예매중"),
-    CLOSED("예매 종료");
+public enum SaleStatus {
+    BEFORE_OPEN("판매 오픈 전"),
+    ON_SALE("판매중"),
+    CLOSED("판매 종료");
 
     private final String description;
 
-    BookingStatus(final String description) {
+    SaleStatus(final String description) {
         this.description = description;
     }
 
