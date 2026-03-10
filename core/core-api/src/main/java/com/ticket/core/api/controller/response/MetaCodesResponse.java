@@ -36,7 +36,6 @@ public record MetaCodesResponse(
     public record EnumCodes(
             @Schema(description = "예매 상태") List<EnumCodeItem> bookingStatus,
             @Schema(description = "회차 좌석 상태") List<EnumCodeItem> performanceSeatState,
-            @Schema(description = "선점 상태") List<EnumCodeItem> holdState,
             @Schema(description = "주문 상태") List<EnumCodeItem> orderState,
             @Schema(description = "소셜 제공자") List<EnumCodeItem> socialProvider,
             @Schema(description = "회원 권한") List<EnumCodeItem> role,

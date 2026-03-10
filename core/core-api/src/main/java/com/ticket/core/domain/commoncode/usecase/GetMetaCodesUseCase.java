@@ -9,7 +9,6 @@ import com.ticket.core.domain.show.Region;
 import com.ticket.core.domain.show.SaleType;
 import com.ticket.core.domain.show.ShowSortKey;
 import com.ticket.core.enums.BookingStatus;
-import com.ticket.core.enums.HoldState;
 import com.ticket.core.enums.OrderState;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.enums.Role;
@@ -44,7 +43,6 @@ public class GetMetaCodesUseCase {
         final MetaCodesResponse.EnumCodes enums = new MetaCodesResponse.EnumCodes(
                 mapEnumValues(BookingStatus.values(), BookingStatus::getCode, BookingStatus::getDescription),
                 mapEnumValues(PerformanceSeatState.values(), PerformanceSeatState::getCode, PerformanceSeatState::getDescription),
-                mapEnumValues(HoldState.values(), HoldState::getCode, HoldState::getDescription),
                 mapEnumValues(OrderState.values(), OrderState::getCode, OrderState::getDescription),
                 mapEnumValues(SocialProvider.values(), SocialProvider::getCode, SocialProvider::getDescription),
                 mapEnumValues(Role.values(), Role::getCode, Role::getDescription),
