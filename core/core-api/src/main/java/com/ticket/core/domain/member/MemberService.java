@@ -14,13 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberService {
 
-    private final MemberFinder memberFinder;
     private final MemberWithdrawalTxService memberWithdrawalTxService;
     private final KakaoUnlinkService kakaoUnlinkService;
-
-    public Member findById(final Long memberId) {
-        return memberFinder.findActiveMemberById(memberId);
-    }
 
     public void withdraw(final Long memberId) {
         final List<String> kakaoSocialIds = memberWithdrawalTxService.withdraw(memberId);

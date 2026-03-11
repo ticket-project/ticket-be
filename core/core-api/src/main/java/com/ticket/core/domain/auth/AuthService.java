@@ -1,10 +1,11 @@
 package com.ticket.core.domain.auth;
 
-import com.ticket.core.domain.member.AddMember;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberRepository;
 import com.ticket.core.domain.member.vo.EncodedPassword;
+import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.RawPassword;
+import com.ticket.core.enums.Role;
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
@@ -27,18 +28,18 @@ public class AuthService {
     private final PasswordService passwordService;
 
     @Transactional
-    public Long register(final AddMember addMember) {
+    public Long register(final Email email, final RawPassword rawPassword, final String name, final Role role) {
         final Member member = new Member(
-                addMember.getEmail(),
-                EncodedPassword.create(passwordService.encode(addMember.getRawPassword().getPassword())),
-                addMember.getName(),
-                addMember.getRole()
+                email,
+                EncodedPassword.create(passwordService.encode(rawPassword.getPassword())),
+                name,
+                role
         );
 
         try {
             return memberRepository.save(member).getId();
         } catch (DataIntegrityViolationException e) {
-            log.warn("이메일 중복 회원가입 시도: {}", addMember.getEmail());
+            log.warn("이메일 중복 회원가입 시도: {}", email);
             throw new CoreException(ErrorType.MEMBER_DUPLICATE_EMAIL);
         }
     }
