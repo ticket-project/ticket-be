@@ -12,7 +12,12 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "HOLD_HISTORY")
+@Table(
+        name = "HOLD_HISTORY",
+        indexes = {
+                @Index(name = "IDX_HOLD_HISTORY_HOLD_TOKEN", columnList = "holdToken")
+        }
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HoldHistory extends BaseEntity {
 

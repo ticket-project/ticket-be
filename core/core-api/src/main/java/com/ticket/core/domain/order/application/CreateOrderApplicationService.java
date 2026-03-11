@@ -9,6 +9,7 @@ import com.ticket.core.domain.order.repository.OrderSeatRepository;
 import com.ticket.core.domain.performanceseat.model.PerformanceSeat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class CreateOrderApplicationService {
     private final OrderSeatRepository orderSeatRepository;
     private final HoldHistoryRepository holdHistoryRepository;
 
+    @Transactional
     public Long createPendingOrder(
             final Long memberId,
             final Long performanceId,

@@ -63,21 +63,25 @@ public class Order extends BaseEntity {
     }
 
     public void confirm(final LocalDateTime now) {
+        validatePendingTransition("confirm");
         this.status = OrderState.CONFIRMED;
         this.confirmedAt = now;
     }
 
     public void expire(final LocalDateTime now) {
+        validatePendingTransition("expire");
         this.status = OrderState.EXPIRED;
         this.expiredAt = now;
     }
 
     public void cancel(final LocalDateTime now) {
+        validatePendingTransition("cancel");
         this.status = OrderState.CANCELED;
         this.canceledAt = now;
     }
 
     public void failPayment(final LocalDateTime now) {
+        validatePendingTransition("failPayment");
         this.status = OrderState.PAYMENT_FAILED;
         this.paymentFailedAt = now;
     }
@@ -87,6 +91,12 @@ public class Order extends BaseEntity {
     }
 
     public boolean isExpired(final LocalDateTime now) {
-        return expiresAt.isBefore(now) || expiresAt.isEqual(now);
+        return isPending() && (expiresAt.isBefore(now) || expiresAt.isEqual(now));
+    }
+
+    private void validatePendingTransition(final String action) {
+        if (!isPending()) {
+            throw new IllegalStateException("PENDING 주문만 " + action + " 할 수 있습니다. currentStatus=" + status);
+        }
     }
 }

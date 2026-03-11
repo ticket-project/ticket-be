@@ -25,7 +25,7 @@ public class HoldSeatAvailabilityValidator {
         final boolean hasUnavailableSeat = performanceSeats.stream()
                 .anyMatch(seat -> seat.getState() != PerformanceSeatState.AVAILABLE);
         if (hasUnavailableSeat) {
-            throw new CoreException(ErrorType.SEAT_COUNT_MISMATCH);
+            throw new CoreException(ErrorType.NOT_EXIST_AVAILABLE_SEAT);
         }
         return performanceSeats;
     }
