@@ -1,5 +1,6 @@
 package com.ticket.core.api.controller.request;
 
+import com.ticket.core.domain.hold.usecase.CreateHoldUseCase;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
@@ -18,5 +19,9 @@ public class CreateHoldRequest {
     private List<Long> seatIds;
 
     public CreateHoldRequest() {
+    }
+
+    public CreateHoldUseCase.Input toInput(final Long performanceId, final Long memberId) {
+        return new CreateHoldUseCase.Input(performanceId, seatIds, memberId);
     }
 }
