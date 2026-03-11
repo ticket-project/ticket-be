@@ -1,11 +1,10 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.MemberControllerDocs;
-import com.ticket.core.api.controller.response.MemberResponse;
 import com.ticket.core.api.controller.response.ShowLikeSummaryResponse;
-import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.member.MemberService;
+import com.ticket.core.domain.member.usecase.GetCurrentMemberUseCase;
+import com.ticket.core.domain.member.usecase.WithdrawCurrentMemberUseCase;
 import com.ticket.core.domain.showlike.usecase.GetMyShowLikesUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
@@ -20,22 +19,24 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class MemberController implements MemberControllerDocs {
 
-    private final MemberService memberService;
+    private final GetCurrentMemberUseCase getCurrentMemberUseCase;
+    private final WithdrawCurrentMemberUseCase withdrawCurrentMemberUseCase;
     private final GetMyShowLikesUseCase getMyShowLikesUseCase;
 
     @Override
     @GetMapping
-    public ApiResponse<MemberResponse> getCurrentMember(MemberPrincipal memberPrincipal) {
-        final Member findMember = memberService.findById(memberPrincipal.getMemberId());
-        return ApiResponse.success(new MemberResponse(findMember.getId(), findMember.getEmail().getEmail(), findMember.getName(), findMember.getRole().name()));
+    public ApiResponse<GetCurrentMemberUseCase.Output> getCurrentMember(final MemberPrincipal memberPrincipal) {
+        final GetCurrentMemberUseCase.Input input = new GetCurrentMemberUseCase.Input(memberPrincipal.getMemberId());
+        return ApiResponse.success(getCurrentMemberUseCase.execute(input));
     }
 
     @Override
     @DeleteMapping
-    public ApiResponse<Void> withdrawCurrentMember(final MemberPrincipal memberPrincipal) {
-        memberService.withdraw(memberPrincipal.getMemberId());
+    public ApiResponse<WithdrawCurrentMemberUseCase.Output> withdrawCurrentMember(final MemberPrincipal memberPrincipal) {
+        final WithdrawCurrentMemberUseCase.Input input = new WithdrawCurrentMemberUseCase.Input(memberPrincipal.getMemberId());
+        final WithdrawCurrentMemberUseCase.Output output = withdrawCurrentMemberUseCase.execute(input);
         SecurityContextHolder.clearContext();
-        return ApiResponse.success();
+        return ApiResponse.success(output);
     }
 
     @Override

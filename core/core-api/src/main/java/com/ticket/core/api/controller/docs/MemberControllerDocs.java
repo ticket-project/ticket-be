@@ -1,8 +1,9 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.api.controller.response.MemberResponse;
 import com.ticket.core.api.controller.response.ShowLikeSummaryResponse;
 import com.ticket.core.domain.member.MemberPrincipal;
+import com.ticket.core.domain.member.usecase.GetCurrentMemberUseCase;
+import com.ticket.core.domain.member.usecase.WithdrawCurrentMemberUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +19,7 @@ public interface MemberControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
-    ApiResponse<MemberResponse> getCurrentMember(
+    ApiResponse<GetCurrentMemberUseCase.Output> getCurrentMember(
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );
 
@@ -27,7 +28,7 @@ public interface MemberControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "탈퇴 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
-    ApiResponse<Void> withdrawCurrentMember(
+    ApiResponse<WithdrawCurrentMemberUseCase.Output> withdrawCurrentMember(
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );
 
