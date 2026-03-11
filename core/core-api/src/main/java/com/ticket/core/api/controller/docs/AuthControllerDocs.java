@@ -1,17 +1,14 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.domain.auth.usecase.ExchangeOAuth2TokenUseCase;
-import com.ticket.core.domain.auth.usecase.GetSocialLoginUrlsUseCase;
-import com.ticket.core.domain.auth.usecase.LoginUseCase;
-import com.ticket.core.domain.auth.usecase.LogoutUseCase;
-import com.ticket.core.domain.auth.usecase.RefreshAuthTokenUseCase;
-import com.ticket.core.domain.auth.usecase.RegisterMemberUseCase;
+import com.ticket.core.domain.auth.usecase.*;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.Map;
 
 @Tag(name = "인증(Auth)", description = "회원가입, 로그인, 토큰 갱신, 로그아웃 및 소셜 로그인 API")
 public interface AuthControllerDocs {
@@ -49,7 +46,7 @@ public interface AuthControllerDocs {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ApiResponse<GetSocialLoginUrlsUseCase.Output> getSocialLoginUrls();
+    ApiResponse<Map<String, String>> getSocialLoginUrls();
 
     @Operation(summary = "로그아웃", description = "Refresh Token을 무효화하고 쿠키를 삭제합니다. Access Token은 짧은 만료 시간으로 자연 무효화됩니다.")
     @ApiResponses(value = {
