@@ -14,6 +14,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -65,10 +67,10 @@ public class AuthController implements AuthControllerDocs {
 
     @Override
     @GetMapping("/social/urls")
-    public ApiResponse<GetSocialLoginUrlsUseCase.Output> getSocialLoginUrls() {
+    public ApiResponse<Map<String, String>> getSocialLoginUrls() {
         final String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
         final GetSocialLoginUrlsUseCase.Input input = new GetSocialLoginUrlsUseCase.Input(baseUrl);
-        return ApiResponse.success(getSocialLoginUrlsUseCase.execute(input));
+        return ApiResponse.success(getSocialLoginUrlsUseCase.execute(input).urls());
     }
 
     @Override
