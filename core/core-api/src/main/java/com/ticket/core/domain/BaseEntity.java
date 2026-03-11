@@ -22,9 +22,6 @@ public class BaseEntity {
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
-    @Version
-    private Long version;
-
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
