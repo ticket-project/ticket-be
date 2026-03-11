@@ -4,40 +4,43 @@ import com.ticket.core.api.controller.request.CreateHoldRequest;
 import com.ticket.core.domain.hold.command.usecase.CreateHoldUseCase;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.support.response.ApiResponse;
-import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 
-@Tag(name = "좌석 선점", description = "좌석 HOLD 및 PENDING 주문 생성 API")
+@Tag(name = "Seat Hold", description = "Seat hold and pending order creation API")
 public interface HoldControllerDocs {
 
     @Operation(
-            summary = "좌석 HOLD 생성",
+            summary = "Create seat hold",
             description = """
-                    좌석 선택 화면에서 '결제하러 가기'를 누를 때 호출합니다.
-                    선택한 좌석들을 Redis에 HOLD 하고 DB에 PENDING 주문을 생성합니다.
-                    다중 좌석은 전부 성공하거나 전부 실패합니다.
-                    응답 Location 헤더로 받은 주문 URI로 주문/결제 화면으로 이동한 뒤 GET /api/v1/orders/{orderId}를 호출하면 됩니다.
+                    Creates a Redis-based hold for the selected seats and creates a pending order in the database.
+                    The response returns both the order URI through the Location header and the order identifier
+                    through the X-Order-Id header so the client can navigate to GET /api/v1/orders/{orderId}.
                     """
     )
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "201",
-                    description = "HOLD 생성 성공",
+                    description = "Hold created",
                     headers = {
-                            @Header(name = "Location", description = "생성된 주문 조회 URI", schema = @Schema(type = "string", example = "/api/v1/orders/1001"))
+                            @Header(name = "Location", description = "Created order resource URI", schema = @Schema(type = "string", example = "/api/v1/orders/1001")),
+                            @Header(name = "X-Order-Id", description = "Created order ID", schema = @Schema(type = "string", example = "1001"))
                     }
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "이미 선점된 좌석",
-                    content = @Content(schema = @Schema(implementation = com.ticket.core.support.response.ApiResponse.class)))
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "409",
+                    description = "Seat already held",
+                    content = @Content(schema = @Schema(implementation = com.ticket.core.support.response.ApiResponse.class))
+            )
     })
     ResponseEntity<ApiResponse<CreateHoldUseCase.Output>> createHold(
-            @Parameter(description = "회차 ID", example = "1", required = true) Long performanceId,
+            @Parameter(description = "Performance ID", example = "1", required = true) Long performanceId,
             CreateHoldRequest request,
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );
