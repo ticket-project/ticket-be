@@ -1,12 +1,7 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.AuthControllerDocs;
-import com.ticket.core.domain.auth.usecase.ExchangeOAuth2TokenUseCase;
-import com.ticket.core.domain.auth.usecase.GetSocialLoginUrlsUseCase;
-import com.ticket.core.domain.auth.usecase.LoginUseCase;
-import com.ticket.core.domain.auth.usecase.LogoutUseCase;
-import com.ticket.core.domain.auth.usecase.RefreshAuthTokenUseCase;
-import com.ticket.core.domain.auth.usecase.RegisterMemberUseCase;
+import com.ticket.core.domain.auth.usecase.*;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
@@ -15,9 +10,9 @@ import com.ticket.core.support.util.CookieUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -30,8 +25,6 @@ public class AuthController implements AuthControllerDocs {
     private final ExchangeOAuth2TokenUseCase exchangeOAuth2TokenUseCase;
     private final GetSocialLoginUrlsUseCase getSocialLoginUrlsUseCase;
     private final LogoutUseCase logoutUseCase;
-    @Value("${app.auth.public-base-url}")
-    private String publicBaseUrl;
 
     @Override
     @PostMapping("/signup")
@@ -73,7 +66,8 @@ public class AuthController implements AuthControllerDocs {
     @Override
     @GetMapping("/social/urls")
     public ApiResponse<GetSocialLoginUrlsUseCase.Output> getSocialLoginUrls() {
-        final GetSocialLoginUrlsUseCase.Input input = new GetSocialLoginUrlsUseCase.Input(publicBaseUrl);
+        final String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        final GetSocialLoginUrlsUseCase.Input input = new GetSocialLoginUrlsUseCase.Input(baseUrl);
         return ApiResponse.success(getSocialLoginUrlsUseCase.execute(input));
     }
 
