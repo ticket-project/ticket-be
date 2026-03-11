@@ -1,4 +1,4 @@
-package com.ticket.core.api.controller.request;
+package com.ticket.core.domain.show.query.model;
 
 import com.ticket.core.domain.show.Region;
 import com.ticket.core.enums.BookingStatus;

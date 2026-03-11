@@ -1,19 +1,21 @@
-package com.ticket.core.domain.show;
+package com.ticket.core.domain.show.query;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
-import com.ticket.core.api.controller.request.ShowParam;
-import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowOpeningSoonSummaryResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.api.controller.response.ShowSearchResponse;
 import com.ticket.core.api.controller.response.ShowSummaryResponse;
-import com.ticket.core.domain.show.ShowSortSupport.SortOrder;
+import com.ticket.core.domain.show.Show;
+import com.ticket.core.domain.show.ShowSortKey;
+import com.ticket.core.domain.show.query.ShowSortSupport.SortOrder;
+import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
+import com.ticket.core.domain.show.query.model.ShowParam;
+import com.ticket.core.domain.show.query.model.ShowSearchRequest;
 import com.ticket.core.support.cursor.CursorSlice;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;

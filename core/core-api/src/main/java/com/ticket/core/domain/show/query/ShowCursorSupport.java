@@ -1,8 +1,10 @@
-package com.ticket.core.domain.show;
+package com.ticket.core.domain.show.query;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.ticket.core.domain.show.ShowSortSupport.SortOrder;
+import com.ticket.core.domain.show.ShowCursor;
+import com.ticket.core.domain.show.ShowSortKey;
+import com.ticket.core.domain.show.query.ShowSortSupport.SortOrder;
 import com.ticket.core.support.cursor.CursorCodec;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;

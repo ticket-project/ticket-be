@@ -3,7 +3,7 @@ package com.ticket.core.domain.showlike.usecase;
 import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
-import com.ticket.core.domain.show.ShowFinder;
+import com.ticket.core.domain.show.query.ShowFinder;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;

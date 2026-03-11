@@ -2,7 +2,9 @@ package com.ticket.core.domain.show;
 
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import lombok.Getter;
 
+@Getter
 public enum ShowSortKey {
     POPULAR("popular", "인기순"),
     LATEST("latest", "최신순"),
@@ -15,14 +17,6 @@ public enum ShowSortKey {
     ShowSortKey(final String apiValue, final String description) {
         this.apiValue = apiValue;
         this.description = description;
-    }
-
-    public String getApiValue() {
-        return apiValue;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public static ShowSortKey fromApiValue(String v) {
