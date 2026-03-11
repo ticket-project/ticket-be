@@ -1,4 +1,4 @@
-package com.ticket.core.domain.commoncode.usecase;
+package com.ticket.core.support.usecase;
 
 import com.ticket.core.api.controller.response.MetaCodesResponse;
 import com.ticket.core.domain.show.Category;
