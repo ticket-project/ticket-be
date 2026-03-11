@@ -26,4 +26,21 @@ public class PerformanceFinder {
         return performanceRepository.findById(performanceId)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA, "회차를 찾을 수 없습니다. id=" + performanceId));
     }
+
+    public Performance findValidPerformanceById(final Long performanceId) {
+        final Performance performance = performanceRepository.findById(performanceId)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA, "회차를 찾을 수 없습니다. id=" + performanceId));
+        validatePerformance(performance);
+        return performance;
+    }
+
+    private void validatePerformance(final Performance performance) {
+        final LocalDateTime now = LocalDateTime.now();
+        if (performance.getOrderOpenTime() == null || now.isBefore(performance.getOrderOpenTime())) {
+            throw new CoreException(ErrorType.NOT_YET_RESERVE_TIME);
+        }
+        if (performance.getOrderCloseTime() == null || now.isAfter(performance.getOrderCloseTime())) {
+            throw new CoreException(ErrorType.PERFORMANCE_IS_PAST);
+        }
+    }
 }

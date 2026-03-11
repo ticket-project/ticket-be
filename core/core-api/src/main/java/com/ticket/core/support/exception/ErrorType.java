@@ -28,12 +28,18 @@ public enum ErrorType {
     SEAT_ALREADY_SELECTED(HttpStatus.CONFLICT, ErrorCode.E4001, "이미 선택된 좌석입니다."),
     SEAT_NOT_OWNED(HttpStatus.FORBIDDEN, ErrorCode.E4002, "본인이 선택한 좌석만 해제할 수 있습니다."),
 
-    //예매
+    //주문
     EXCEED_AVAILABLE_SEATS(HttpStatus.CONFLICT, ErrorCode.E5000, "총 예매 가능 좌석을 초과하였습니다."),
     SEAT_COUNT_MISMATCH(HttpStatus.CONFLICT, ErrorCode.E5001, "요청한 좌석 중 일부가 예약 불가능합니다."),
+    ORDER_NOT_PENDING(HttpStatus.CONFLICT, ErrorCode.E5002, "결제 대기 주문만 처리할 수 있습니다."),
+    ORDER_NOT_OWNED(HttpStatus.FORBIDDEN, ErrorCode.E5003, "본인 주문만 처리할 수 있습니다."),
+    PENDING_ORDER_ALREADY_EXISTS(HttpStatus.CONFLICT, ErrorCode.E5004, "이미 진행 중인 결제 대기 주문이 있습니다."),
+    ORDER_HOLD_EXPIRED(HttpStatus.CONFLICT, ErrorCode.E5005, "홀드가 만료된 주문입니다."),
 
     //선점
     SEAT_ALREADY_HOLD(HttpStatus.CONFLICT, ErrorCode.E6000, "좌석이 이미 선점되었습니다."),
+    EXCEED_HOLD_LIMIT(HttpStatus.CONFLICT, ErrorCode.E6001, "선점 가능한 좌석 수를 초과하였습니다."),
+    HOLD_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E6002, "유효한 선점 정보를 찾을 수 없습니다."),
 
     //공연
     NOT_SUPPORT_SHOW_SORT(HttpStatus.BAD_REQUEST, ErrorCode.E7000, "지원하지 않는 정렬 조건입니다."),
