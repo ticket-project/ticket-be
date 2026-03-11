@@ -2,8 +2,8 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.SeatSelectionControllerDocs;
 import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.performanceseat.usecase.DeselectSeatUseCase;
-import com.ticket.core.domain.performanceseat.usecase.SelectSeatUseCase;
+import com.ticket.core.domain.performanceseat.command.usecase.DeselectSeatUseCase;
+import com.ticket.core.domain.performanceseat.command.usecase.SelectSeatUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
