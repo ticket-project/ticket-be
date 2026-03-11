@@ -31,6 +31,10 @@ public final class OrderDetailResponseMapper {
             final List<PerformanceSeat> performanceSeats,
             final Member member
     ) {
+        if (performanceSeats.isEmpty()) {
+            throw new IllegalArgumentException("performanceSeats는 비어 있을 수 없습니다.");
+        }
+
         final Map<Long, PerformanceSeat> performanceSeatMap = performanceSeats.stream()
                 .collect(Collectors.toMap(PerformanceSeat::getId, Function.identity()));
 
@@ -44,7 +48,9 @@ public final class OrderDetailResponseMapper {
         final BigDecimal ticketAmount = orderSeats.stream()
                 .map(OrderSeat::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        final long remainingSeconds = Math.max(0L, Duration.between(LocalDateTime.now(), order.getExpiresAt()).getSeconds());
+        final long remainingSeconds = order.isPending()
+                ? Math.max(0L, Duration.between(LocalDateTime.now(), order.getExpiresAt()).getSeconds())
+                : 0L;
 
         return new OrderDetailResponse(
                 order.getId(),

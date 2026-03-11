@@ -50,10 +50,23 @@ public class OrderSeat extends BaseEntity {
     }
 
     public void expire() {
+        validateHeldTransition("expire");
         this.status = OrderSeatState.EXPIRED;
     }
 
     public void cancel() {
+        validateHeldTransition("cancel");
         this.status = OrderSeatState.CANCELED;
+    }
+
+    public void confirm() {
+        validateHeldTransition("confirm");
+        this.status = OrderSeatState.CONFIRMED;
+    }
+
+    private void validateHeldTransition(final String action) {
+        if (status != OrderSeatState.HELD) {
+            throw new IllegalStateException("HELD 좌석만 " + action + " 할 수 있습니다. currentStatus=" + status);
+        }
     }
 }

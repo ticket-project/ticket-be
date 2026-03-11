@@ -2,10 +2,11 @@ package com.ticket.core.domain.order.repository;
 
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.enums.OrderState;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -16,5 +17,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Optional<Order> findByHoldToken(String holdToken);
 
-    List<Order> findAllByStatusAndExpiresAtBefore(OrderState status, LocalDateTime expiresAt);
+    Slice<Order> findAllByStatusAndExpiresAtBefore(OrderState status, LocalDateTime expiresAt, Pageable pageable);
 }
