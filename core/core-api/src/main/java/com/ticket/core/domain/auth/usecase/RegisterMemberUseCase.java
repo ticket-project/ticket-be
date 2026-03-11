@@ -3,7 +3,6 @@ package com.ticket.core.domain.auth.usecase;
 import com.ticket.core.domain.auth.AuthService;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.RawPassword;
-import com.ticket.core.enums.Role;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -36,8 +35,7 @@ public class RegisterMemberUseCase {
         return new Output(authService.register(
                 Email.create(input.email()),
                 RawPassword.create(input.password()),
-                input.name(),
-                Role.MEMBER
+                input.name()
         ));
     }
 }

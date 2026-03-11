@@ -35,14 +35,13 @@ public class RefreshTokenService {
     public Optional<Long> validate(final String tokenValue) {
         final RBucket<String> bucket = redissonClient.getBucket(KEY_PREFIX + tokenValue);
         final String memberId = bucket.getAndDelete();
-        if (memberId == null) {
-            return Optional.empty();
-        }
-        try {
-            return Optional.of(Long.parseLong(memberId));
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
+        return parseMemberId(memberId);
+    }
+
+    public Optional<Long> validateAndRevoke(final String tokenValue) {
+        final RBucket<String> bucket = redissonClient.getBucket(KEY_PREFIX + tokenValue);
+        final String memberId = bucket.getAndDelete();
+        return parseMemberId(memberId);
     }
 
     /**
@@ -50,15 +49,7 @@ public class RefreshTokenService {
      */
     public Optional<Long> validateWithoutConsume(final String tokenValue) {
         final RBucket<String> bucket = redissonClient.getBucket(KEY_PREFIX + tokenValue);
-        final String memberId = bucket.get();
-        if (memberId == null) {
-            return Optional.empty();
-        }
-        try {
-            return Optional.of(Long.parseLong(memberId));
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
+        return parseMemberId(bucket.get());
     }
 
     /**
@@ -74,5 +65,16 @@ public class RefreshTokenService {
     public String rotate(final String oldTokenValue, final Long memberId, final long expirationSeconds) {
         revoke(oldTokenValue);
         return createRefreshToken(memberId, expirationSeconds);
+    }
+
+    private Optional<Long> parseMemberId(final String memberId) {
+        if (memberId == null) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(Long.parseLong(memberId));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 }

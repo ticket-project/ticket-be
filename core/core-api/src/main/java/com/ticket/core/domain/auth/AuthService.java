@@ -28,12 +28,12 @@ public class AuthService {
     private final PasswordService passwordService;
 
     @Transactional
-    public Long register(final Email email, final RawPassword rawPassword, final String name, final Role role) {
+    public Long register(final Email email, final RawPassword rawPassword, final String name) {
         final Member member = new Member(
                 email,
                 EncodedPassword.create(passwordService.encode(rawPassword.getPassword())),
                 name,
-                role
+                Role.MEMBER
         );
 
         try {
