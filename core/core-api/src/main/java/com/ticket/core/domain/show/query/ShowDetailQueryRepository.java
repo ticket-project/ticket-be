@@ -1,4 +1,4 @@
-package com.ticket.core.domain.show;
+package com.ticket.core.domain.show.query;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.response.ShowDetailResponse;
@@ -7,6 +7,10 @@ import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceDat
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceInfo;
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformerInfo;
 import com.ticket.core.domain.performance.Performance;
+import com.ticket.core.domain.show.Performer;
+import com.ticket.core.domain.show.Show;
+import com.ticket.core.domain.show.ShowGrade;
+import com.ticket.core.domain.show.Venue;
 import com.ticket.core.enums.BookingStatus;
 import org.springframework.stereotype.Repository;
 

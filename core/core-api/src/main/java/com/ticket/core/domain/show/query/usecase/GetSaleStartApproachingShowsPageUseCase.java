@@ -1,8 +1,8 @@
-package com.ticket.core.domain.show.usecase;
+package com.ticket.core.domain.show.query.usecase;
 
-import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
-import com.ticket.core.domain.show.ShowListQueryRepository;
+import com.ticket.core.domain.show.query.ShowListQueryRepository;
+import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
 import com.ticket.core.support.cursor.CursorSlice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;

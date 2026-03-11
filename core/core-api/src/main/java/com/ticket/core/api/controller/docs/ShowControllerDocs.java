@@ -1,8 +1,5 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.api.controller.request.SaleOpeningSoonSearchParam;
-import com.ticket.core.api.controller.request.ShowParam;
-import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.api.controller.response.ShowDetailResponse;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowResponse;
@@ -10,8 +7,11 @@ import com.ticket.core.api.controller.response.ShowSearchCountResponse;
 import com.ticket.core.api.controller.response.ShowSearchResponse;
 import com.ticket.core.api.controller.response.ShowSeatResponse;
 import com.ticket.core.api.controller.response.VenueLayoutResponse;
-import com.ticket.core.domain.show.usecase.GetLatestShowsUseCase;
-import com.ticket.core.domain.show.usecase.GetSaleStartApproachingShowsUseCase;
+import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
+import com.ticket.core.domain.show.query.model.ShowParam;
+import com.ticket.core.domain.show.query.model.ShowSearchRequest;
+import com.ticket.core.domain.show.query.usecase.GetLatestShowsUseCase;
+import com.ticket.core.domain.show.query.usecase.GetSaleStartApproachingShowsUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
 import io.swagger.v3.oas.annotations.Operation;

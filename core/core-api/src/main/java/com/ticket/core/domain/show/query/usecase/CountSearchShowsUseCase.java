@@ -1,8 +1,8 @@
-package com.ticket.core.domain.show.usecase;
+package com.ticket.core.domain.show.query.usecase;
 
-import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.api.controller.response.ShowSearchCountResponse;
-import com.ticket.core.domain.show.ShowListQueryRepository;
+import com.ticket.core.domain.show.query.ShowListQueryRepository;
+import com.ticket.core.domain.show.query.model.ShowSearchRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

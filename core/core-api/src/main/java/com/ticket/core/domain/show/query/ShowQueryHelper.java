@@ -1,6 +1,7 @@
-package com.ticket.core.domain.show;
+package com.ticket.core.domain.show.query;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.ticket.core.domain.show.Region;
 import com.ticket.core.enums.BookingStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
