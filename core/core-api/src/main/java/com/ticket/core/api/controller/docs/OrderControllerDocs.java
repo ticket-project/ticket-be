@@ -1,7 +1,7 @@
 package com.ticket.core.api.controller.docs;
 
 import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.order.usecase.GetOrderUseCase;
+import com.ticket.core.domain.order.query.usecase.GetOrderDetailUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,7 +16,7 @@ public interface OrderControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "주문 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "본인 주문이 아님")
     })
-    ApiResponse<GetOrderUseCase.Output> getOrder(
+    ApiResponse<GetOrderDetailUseCase.Output> getOrder(
             @Parameter(description = "주문 ID", example = "1001", required = true) Long orderId,
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );

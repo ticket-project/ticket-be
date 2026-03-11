@@ -1,7 +1,7 @@
 package com.ticket.core.api.controller.docs;
 
 import com.ticket.core.api.controller.request.CreateHoldRequest;
-import com.ticket.core.domain.hold.usecase.CreateHoldUseCase;
+import com.ticket.core.domain.hold.command.usecase.CreateHoldUseCase;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.headers.Header;

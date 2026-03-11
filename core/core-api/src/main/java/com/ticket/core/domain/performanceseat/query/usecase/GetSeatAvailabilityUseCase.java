@@ -1,0 +1,43 @@
+package com.ticket.core.domain.performanceseat.query.usecase;
+
+import com.ticket.core.api.controller.response.SeatAvailabilityResponse;
+import com.ticket.core.domain.performance.Performance;
+import com.ticket.core.domain.performance.PerformanceFinder;
+import com.ticket.core.domain.performanceseat.query.SeatAvailabilityQueryRepository;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class GetSeatAvailabilityUseCase {
+
+    private final PerformanceFinder performanceFinder;
+    private final SeatAvailabilityQueryRepository seatAvailabilityQueryRepository;
+
+    public record Input(Long performanceId) {}
+
+    public record Output(SeatAvailabilityResponse availability) {}
+
+    public Output execute(Input input) {
+        final Performance performance = performanceFinder.findById(input.performanceId());
+
+        if (performance.getShow() == null) {
+            throw new CoreException(ErrorType.NOT_FOUND_DATA,
+                    "회차에 연결된 공연을 찾을 수 없습니다. id=" + input.performanceId());
+        }
+
+        SeatAvailabilityResponse response = seatAvailabilityQueryRepository
+                .findSeatAvailability(performance.getId(), performance.getShow().getId());
+        if (response == null) {
+            response = new SeatAvailabilityResponse(List.of());
+        }
+
+        return new Output(response);
+    }
+}

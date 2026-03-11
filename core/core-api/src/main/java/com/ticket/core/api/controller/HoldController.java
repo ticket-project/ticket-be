@@ -2,7 +2,7 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.HoldControllerDocs;
 import com.ticket.core.api.controller.request.CreateHoldRequest;
-import com.ticket.core.domain.hold.usecase.CreateHoldUseCase;
+import com.ticket.core.domain.hold.command.usecase.CreateHoldUseCase;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.support.response.ApiResponse;
 import jakarta.validation.Valid;
@@ -26,7 +26,7 @@ public class HoldController implements HoldControllerDocs {
             @Valid @RequestBody final CreateHoldRequest request,
             final MemberPrincipal memberPrincipal
     ) {
-        final CreateHoldUseCase.Input input = request.toInput(performanceId, memberPrincipal.getMemberId());
+        final CreateHoldUseCase.Input input = new CreateHoldUseCase.Input(performanceId, request.getSeatIds(), memberPrincipal.getMemberId());
         final CreateHoldUseCase.Output output = createHoldUseCase.execute(input);
         return ResponseEntity.created(URI.create("/api/v1/orders/" + output.orderId()))
                 .body(ApiResponse.success(output));

@@ -2,8 +2,8 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.OrderControllerDocs;
 import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.order.usecase.CancelOrderUseCase;
-import com.ticket.core.domain.order.usecase.GetOrderUseCase;
+import com.ticket.core.domain.order.command.usecase.CancelOrderUseCase;
+import com.ticket.core.domain.order.query.usecase.GetOrderDetailUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,17 +13,17 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class OrderController implements OrderControllerDocs {
 
-    private final GetOrderUseCase getOrderUseCase;
+    private final GetOrderDetailUseCase getOrderDetailUseCase;
     private final CancelOrderUseCase cancelOrderUseCase;
 
     @Override
     @GetMapping("/{orderId}")
-    public ApiResponse<GetOrderUseCase.Output> getOrder(
+    public ApiResponse<GetOrderDetailUseCase.Output> getOrder(
             @PathVariable final Long orderId,
             final MemberPrincipal memberPrincipal
     ) {
-        final GetOrderUseCase.Input input = new GetOrderUseCase.Input(orderId, memberPrincipal.getMemberId());
-        final GetOrderUseCase.Output output = getOrderUseCase.execute(input);
+        final GetOrderDetailUseCase.Input input = new GetOrderDetailUseCase.Input(orderId, memberPrincipal.getMemberId());
+        final GetOrderDetailUseCase.Output output = getOrderDetailUseCase.execute(input);
         return ApiResponse.success(output);
     }
 
