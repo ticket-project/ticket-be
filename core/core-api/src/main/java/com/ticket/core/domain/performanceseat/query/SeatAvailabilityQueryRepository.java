@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.ticket.core.domain.performanceseat.model.QPerformanceSeat.performanceSeat;
-import static com.ticket.core.domain.show.QShowGrade.showGrade;
-import static com.ticket.core.domain.show.QShowSeat.showSeat;
+import static com.ticket.core.domain.show.mapping.QShowGrade.showGrade;
+import static com.ticket.core.domain.show.mapping.QShowSeat.showSeat;
 
 @Repository
 @RequiredArgsConstructor

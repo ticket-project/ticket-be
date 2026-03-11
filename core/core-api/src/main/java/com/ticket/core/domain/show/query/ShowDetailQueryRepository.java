@@ -7,10 +7,10 @@ import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceDat
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceInfo;
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformerInfo;
 import com.ticket.core.domain.performance.Performance;
-import com.ticket.core.domain.show.Performer;
 import com.ticket.core.domain.show.Show;
-import com.ticket.core.domain.show.ShowGrade;
-import com.ticket.core.domain.show.Venue;
+import com.ticket.core.domain.show.mapping.ShowGrade;
+import com.ticket.core.domain.show.performer.Performer;
+import com.ticket.core.domain.show.venue.Venue;
 import com.ticket.core.enums.BookingStatus;
 import org.springframework.stereotype.Repository;
 
@@ -21,11 +21,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.ticket.core.domain.performance.QPerformance.performance;
-import static com.ticket.core.domain.show.QGenre.genre;
-import static com.ticket.core.domain.show.QPerformer.performer;
+import static com.ticket.core.domain.show.genre.QGenre.genre;
+import static com.ticket.core.domain.show.mapping.QShowGenre.showGenre;
+import static com.ticket.core.domain.show.mapping.QShowGrade.showGrade;
+import static com.ticket.core.domain.show.performer.QPerformer.performer;
 import static com.ticket.core.domain.show.QShow.show;
-import static com.ticket.core.domain.show.QShowGenre.showGenre;
-import static com.ticket.core.domain.show.QShowGrade.showGrade;
 import static com.ticket.core.domain.showlike.QShowLike.showLike;
 
 @Repository

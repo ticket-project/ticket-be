@@ -1,7 +1,7 @@
 package com.ticket.core.domain.show.query;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.ticket.core.domain.show.Region;
+import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.enums.BookingStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -9,8 +9,8 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static com.ticket.core.domain.show.QCategory.category;
-import static com.ticket.core.domain.show.QGenre.genre;
+import static com.ticket.core.domain.show.category.QCategory.category;
+import static com.ticket.core.domain.show.genre.QGenre.genre;
 import static com.ticket.core.domain.show.QShow.show;
 
 /**

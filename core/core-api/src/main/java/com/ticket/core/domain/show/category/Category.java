@@ -1,4 +1,4 @@
-package com.ticket.core.domain.show;
+package com.ticket.core.domain.show.category;
 
 import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.*;

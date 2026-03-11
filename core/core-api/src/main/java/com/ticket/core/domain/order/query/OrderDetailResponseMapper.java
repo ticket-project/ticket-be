@@ -8,7 +8,7 @@ import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performanceseat.model.PerformanceSeat;
 import com.ticket.core.domain.seat.Seat;
 import com.ticket.core.domain.show.Show;
-import com.ticket.core.domain.show.Venue;
+import com.ticket.core.domain.show.venue.Venue;
 
 import java.math.BigDecimal;
 import java.time.Duration;

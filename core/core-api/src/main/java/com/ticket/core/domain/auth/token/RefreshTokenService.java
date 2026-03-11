@@ -1,4 +1,4 @@
-package com.ticket.core.domain.auth;
+package com.ticket.core.domain.auth.token;
 
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBucket;

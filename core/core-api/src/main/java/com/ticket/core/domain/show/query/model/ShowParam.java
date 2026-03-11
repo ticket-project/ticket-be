@@ -1,6 +1,6 @@
 package com.ticket.core.domain.show.query.model;
 
-import com.ticket.core.domain.show.Region;
+import com.ticket.core.domain.show.meta.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;

@@ -1,6 +1,6 @@
 package com.ticket.core.domain.show.query.model;
 
-import com.ticket.core.domain.show.Region;
+import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.enums.BookingStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

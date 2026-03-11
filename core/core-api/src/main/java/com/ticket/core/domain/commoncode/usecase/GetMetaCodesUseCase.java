@@ -1,13 +1,13 @@
-package com.ticket.core.support.usecase;
+package com.ticket.core.domain.commoncode.usecase;
 
 import com.ticket.core.api.controller.response.MetaCodesResponse;
-import com.ticket.core.domain.show.Category;
-import com.ticket.core.domain.show.CategoryRepository;
-import com.ticket.core.domain.show.Genre;
-import com.ticket.core.domain.show.GenreRepository;
-import com.ticket.core.domain.show.Region;
-import com.ticket.core.domain.show.SaleType;
-import com.ticket.core.domain.show.ShowSortKey;
+import com.ticket.core.domain.show.category.Category;
+import com.ticket.core.domain.show.category.CategoryRepository;
+import com.ticket.core.domain.show.genre.Genre;
+import com.ticket.core.domain.show.genre.GenreRepository;
+import com.ticket.core.domain.show.meta.Region;
+import com.ticket.core.domain.show.meta.SaleType;
+import com.ticket.core.domain.show.meta.ShowSortKey;
 import com.ticket.core.enums.BookingStatus;
 import com.ticket.core.enums.HoldState;
 import com.ticket.core.enums.OrderState;
