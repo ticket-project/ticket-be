@@ -23,7 +23,7 @@ public interface SeatSelectionControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "이미 선택된 좌석")
     })
     ApiResponse<Void> selectSeat(
-            @Parameter(description = "공연 ID", example = "1", required = true) Long performanceId,
+            @Parameter(description = "회차 ID", example = "1", required = true) Long performanceId,
             @Parameter(description = "좌석 ID", example = "42", required = true) Long seatId,
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );
@@ -40,7 +40,7 @@ public interface SeatSelectionControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "본인이 선택한 좌석이 아님")
     })
     ApiResponse<Void> deselectSeat(
-            @Parameter(description = "공연 ID", example = "1", required = true) Long performanceId,
+            @Parameter(description = "회차 ID", example = "1", required = true) Long performanceId,
             @Parameter(description = "좌석 ID", example = "42", required = true) Long seatId,
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );
@@ -57,7 +57,7 @@ public interface SeatSelectionControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "내 선택 좌석 전체 해제 성공")
     })
     ApiResponse<Void> deselectAllSeats(
-            @Parameter(description = "공연 ID", example = "1", required = true) Long performanceId,
+            @Parameter(description = "회차 ID", example = "1", required = true) Long performanceId,
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );
 }
