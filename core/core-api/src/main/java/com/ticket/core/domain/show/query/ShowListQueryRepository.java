@@ -11,7 +11,7 @@ import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.api.controller.response.ShowSearchResponse;
 import com.ticket.core.api.controller.response.ShowSummaryResponse;
 import com.ticket.core.domain.show.Show;
-import com.ticket.core.domain.show.ShowSortKey;
+import com.ticket.core.domain.show.meta.ShowSortKey;
 import com.ticket.core.domain.show.query.ShowSortSupport.SortOrder;
 import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
 import com.ticket.core.domain.show.query.model.ShowParam;
@@ -31,11 +31,11 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static com.ticket.core.domain.show.QCategory.category;
-import static com.ticket.core.domain.show.QGenre.genre;
+import static com.ticket.core.domain.show.category.QCategory.category;
+import static com.ticket.core.domain.show.genre.QGenre.genre;
 import static com.ticket.core.domain.show.QShow.show;
-import static com.ticket.core.domain.show.QShowGenre.showGenre;
-import static com.ticket.core.domain.show.QVenue.venue;
+import static com.ticket.core.domain.show.mapping.QShowGenre.showGenre;
+import static com.ticket.core.domain.show.venue.QVenue.venue;
 
 /**
  * Show 목록 조회 전용 Repository

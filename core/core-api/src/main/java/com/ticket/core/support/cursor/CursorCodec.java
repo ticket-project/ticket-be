@@ -1,7 +1,7 @@
 package com.ticket.core.support.cursor;
 
 import tools.jackson.databind.json.JsonMapper;
-import com.ticket.core.domain.show.ShowCursor;
+import com.ticket.core.domain.show.query.model.ShowCursor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

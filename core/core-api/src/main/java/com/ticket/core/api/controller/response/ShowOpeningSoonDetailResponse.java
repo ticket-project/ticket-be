@@ -1,6 +1,6 @@
 package com.ticket.core.api.controller.response;
 
-import com.ticket.core.domain.show.Region;
+import com.ticket.core.domain.show.meta.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;

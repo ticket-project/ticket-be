@@ -1,7 +1,7 @@
 package com.ticket.core.domain.show.query;
 
 import com.querydsl.core.types.OrderSpecifier;
-import com.ticket.core.domain.show.ShowSortKey;
+import com.ticket.core.domain.show.meta.ShowSortKey;
 import lombok.Getter;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;

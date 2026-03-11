@@ -2,7 +2,7 @@ package com.ticket.core.domain.show.query;
 
 import com.ticket.core.api.controller.response.ShowDetailResponse;
 import com.ticket.core.domain.show.Show;
-import com.ticket.core.domain.show.ShowJpaRepository;
+import com.ticket.core.domain.show.repository.ShowJpaRepository;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;

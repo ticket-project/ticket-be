@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.ticket.core.domain.show.QShow.show;
-import static com.ticket.core.domain.show.QVenue.venue;
+import static com.ticket.core.domain.show.venue.QVenue.venue;
 import static com.ticket.core.domain.showlike.QShowLike.showLike;
 
 @Repository

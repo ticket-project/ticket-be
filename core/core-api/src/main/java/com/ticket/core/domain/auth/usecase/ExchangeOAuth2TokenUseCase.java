@@ -2,7 +2,7 @@ package com.ticket.core.domain.auth.usecase;
 
 import com.ticket.core.api.controller.response.AuthLoginResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
-import com.ticket.core.domain.auth.AuthTokenApplicationService;
+import com.ticket.core.domain.auth.token.AuthTokenApplicationService;
 import com.ticket.core.domain.auth.OAuth2AuthCodeService;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;

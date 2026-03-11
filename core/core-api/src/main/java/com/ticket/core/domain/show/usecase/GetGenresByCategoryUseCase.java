@@ -1,8 +1,8 @@
 package com.ticket.core.domain.show.usecase;
 
 import com.ticket.core.api.controller.response.GenreResponse;
-import com.ticket.core.domain.show.Genre;
-import com.ticket.core.domain.show.GenreRepository;
+import com.ticket.core.domain.show.genre.Genre;
+import com.ticket.core.domain.show.genre.GenreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

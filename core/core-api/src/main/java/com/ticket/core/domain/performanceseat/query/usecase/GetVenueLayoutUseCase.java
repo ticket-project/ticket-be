@@ -3,7 +3,7 @@ package com.ticket.core.domain.performanceseat.query.usecase;
 import com.ticket.core.api.controller.response.VenueLayoutResponse;
 import com.ticket.core.domain.show.Show;
 import com.ticket.core.domain.show.query.ShowFinder;
-import com.ticket.core.domain.show.Venue;
+import com.ticket.core.domain.show.venue.Venue;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.ticket.core.domain.show;
+package com.ticket.core.domain.show.meta;
 
 import lombok.Getter;
 

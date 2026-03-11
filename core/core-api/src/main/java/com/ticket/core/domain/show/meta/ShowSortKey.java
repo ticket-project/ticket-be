@@ -1,4 +1,4 @@
-package com.ticket.core.domain.show;
+package com.ticket.core.domain.show.meta;
 
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;

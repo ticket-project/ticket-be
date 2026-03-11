@@ -1,7 +1,7 @@
 package com.ticket.core.domain.auth.usecase;
 
-import com.ticket.core.domain.auth.AuthTokenApplicationService;
-import com.ticket.core.domain.auth.RefreshTokenService;
+import com.ticket.core.domain.auth.token.AuthTokenApplicationService;
+import com.ticket.core.domain.auth.token.RefreshTokenService;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
