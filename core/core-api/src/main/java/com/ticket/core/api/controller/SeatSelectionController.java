@@ -2,6 +2,7 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.SeatSelectionControllerDocs;
 import com.ticket.core.domain.member.MemberPrincipal;
+import com.ticket.core.domain.performanceseat.command.usecase.DeselectAllSeatsUseCase;
 import com.ticket.core.domain.performanceseat.command.usecase.DeselectSeatUseCase;
 import com.ticket.core.domain.performanceseat.command.usecase.SelectSeatUseCase;
 import com.ticket.core.support.response.ApiResponse;
@@ -15,6 +16,7 @@ public class SeatSelectionController implements SeatSelectionControllerDocs {
 
     private final SelectSeatUseCase selectSeatUseCase;
     private final DeselectSeatUseCase deselectSeatUseCase;
+    private final DeselectAllSeatsUseCase deselectAllSeatsUseCase;
 
     @Override
     @PostMapping("/{seatId}/select")
@@ -35,6 +37,16 @@ public class SeatSelectionController implements SeatSelectionControllerDocs {
             final MemberPrincipal memberPrincipal
     ) {
         deselectSeatUseCase.execute(new DeselectSeatUseCase.Input(performanceId, seatId, memberPrincipal.getMemberId()));
+        return ApiResponse.success();
+    }
+
+    @Override
+    @DeleteMapping("/select")
+    public ApiResponse<Void> deselectAllSeats(
+            @PathVariable final Long performanceId,
+            final MemberPrincipal memberPrincipal
+    ) {
+        deselectAllSeatsUseCase.execute(new DeselectAllSeatsUseCase.Input(performanceId, memberPrincipal.getMemberId()));
         return ApiResponse.success();
     }
 }
