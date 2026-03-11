@@ -40,6 +40,8 @@ public enum ErrorType {
     SEAT_ALREADY_HOLD(HttpStatus.CONFLICT, ErrorCode.E6000, "좌석이 이미 선점되었습니다."),
     EXCEED_HOLD_LIMIT(HttpStatus.CONFLICT, ErrorCode.E6001, "선점 가능한 좌석 수를 초과하였습니다."),
     HOLD_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E6002, "유효한 선점 정보를 찾을 수 없습니다."),
+    HOLD_BUSY(HttpStatus.CONFLICT, ErrorCode.E6003, "좌석 선점 처리 중입니다. 잠시 후 다시 시도해주세요."),
+    HOLD_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.E6004, "좌석 선점 처리 중 오류가 발생했습니다."),
 
     //공연
     NOT_SUPPORT_SHOW_SORT(HttpStatus.BAD_REQUEST, ErrorCode.E7000, "지원하지 않는 정렬 조건입니다."),

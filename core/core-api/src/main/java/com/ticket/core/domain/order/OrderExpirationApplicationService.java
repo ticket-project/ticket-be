@@ -1,45 +1,35 @@
-package com.ticket.core.domain.order.usecase;
+package com.ticket.core.domain.order;
 
 import com.ticket.core.domain.hold.HoldHistory;
 import com.ticket.core.domain.hold.HoldHistoryFinder;
 import com.ticket.core.domain.hold.HoldReleaseApplicationService;
-import com.ticket.core.domain.order.Order;
-import com.ticket.core.domain.order.OrderFinder;
-import com.ticket.core.domain.order.OrderLifecycleDomainService;
-import com.ticket.core.domain.order.OrderSeat;
-import com.ticket.core.domain.order.OrderSeatFinder;
 import com.ticket.core.domain.performanceseat.SeatStatusPublishApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CancelOrderUseCase {
+public class OrderExpirationApplicationService {
 
-    private final OrderFinder orderFinder;
     private final OrderSeatFinder orderSeatFinder;
     private final HoldHistoryFinder holdHistoryFinder;
     private final OrderLifecycleDomainService orderLifecycleDomainService;
     private final HoldReleaseApplicationService holdReleaseApplicationService;
     private final SeatStatusPublishApplicationService seatStatusPublishApplicationService;
 
-    public record Input(Long orderId, Long memberId) {}
-    public record Output() {}
-
-    @Transactional
-    public Output execute(final Input input) {
-        final Order order = orderFinder.findPendingOwnedById(input.orderId(), input.memberId());
+    public void expire(final Order order, final LocalDateTime now) {
         final List<OrderSeat> orderSeats = orderSeatFinder.getOrderSeatsByOrderId(order.getId());
         final List<HoldHistory> holdHistories = holdHistoryFinder.findByHoldToken(order.getHoldToken());
 
-        final LocalDateTime now = LocalDateTime.now();
-        orderLifecycleDomainService.cancel(order, orderSeats, holdHistories, now);
-        holdReleaseApplicationService.releaseByHoldToken(order.getHoldToken());
+        orderLifecycleDomainService.expire(order, orderSeats, holdHistories, now);
+        holdReleaseApplicationService.releaseBySeatIds(
+                order.getPerformanceId(),
+                order.getHoldToken(),
+                orderSeats.stream().map(OrderSeat::getSeatId).toList()
+        );
         seatStatusPublishApplicationService.publishReleased(order.getPerformanceId(), orderSeats);
-        return new Output();
     }
 }

@@ -21,15 +21,14 @@ public class HoldController implements HoldControllerDocs {
 
     @Override
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> createHold(
+    public ResponseEntity<ApiResponse<CreateHoldUseCase.Output>> createHold(
             @PathVariable final Long performanceId,
             @Valid @RequestBody final CreateHoldRequest request,
             final MemberPrincipal memberPrincipal
     ) {
-        final CreateHoldUseCase.Output output = createHoldUseCase.execute(
-                new CreateHoldUseCase.Input(performanceId, request.getSeatIds(), memberPrincipal.getMemberId())
-        );
+        final CreateHoldUseCase.Input input = request.toInput(performanceId, memberPrincipal.getMemberId());
+        final CreateHoldUseCase.Output output = createHoldUseCase.execute(input);
         return ResponseEntity.created(URI.create("/api/v1/orders/" + output.orderId()))
-                .body(ApiResponse.success());
+                .body(ApiResponse.success(output));
     }
 }

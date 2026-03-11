@@ -10,7 +10,7 @@ public class HoldSnapshotCodec {
 
     private final JsonMapper jsonMapper;
 
-    public String encode(final HoldRedisService.HoldSnapshot snapshot) {
+    public String encode(final HoldSnapshot snapshot) {
         try {
             return jsonMapper.writeValueAsString(snapshot);
         } catch (final Exception e) {
@@ -18,9 +18,9 @@ public class HoldSnapshotCodec {
         }
     }
 
-    public HoldRedisService.HoldSnapshot decode(final String payload) {
+    public HoldSnapshot decode(final String payload) {
         try {
-            return jsonMapper.readValue(payload, HoldRedisService.HoldSnapshot.class);
+            return jsonMapper.readValue(payload, HoldSnapshot.class);
         } catch (final Exception e) {
             throw new IllegalStateException("hold snapshot decode failed", e);
         }

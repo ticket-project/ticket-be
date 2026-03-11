@@ -1,6 +1,7 @@
 package com.ticket.core.api.controller.docs;
 
 import com.ticket.core.api.controller.request.CreateHoldRequest;
+import com.ticket.core.domain.hold.usecase.CreateHoldUseCase;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -35,7 +36,7 @@ public interface HoldControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "이미 선점된 좌석",
                     content = @Content(schema = @Schema(implementation = com.ticket.core.support.response.ApiResponse.class)))
     })
-    ResponseEntity<ApiResponse<Void>> createHold(
+    ResponseEntity<ApiResponse<CreateHoldUseCase.Output>> createHold(
             @Parameter(description = "회차 ID", example = "1", required = true) Long performanceId,
             CreateHoldRequest request,
             @Parameter(hidden = true) MemberPrincipal memberPrincipal

@@ -43,14 +43,14 @@ public class HoldRedisService {
         try {
             final boolean locked = multiLock.tryLock(LOCK_WAIT_SECONDS, LOCK_LEASE_SECONDS, TimeUnit.SECONDS);
             if (!locked) {
-                throw new CoreException(ErrorType.SEAT_ALREADY_HOLD);
+                throw new CoreException(ErrorType.HOLD_BUSY);
             }
             ensureSeatsNotHeld(performanceId, normalizedSeatIds);
             saveHold(snapshot, ttl);
             return snapshot;
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new CoreException(ErrorType.SEAT_ALREADY_HOLD);
+            throw new CoreException(ErrorType.HOLD_PROCESSING_FAILED);
         } finally {
             unlockQuietly(multiLock);
         }
@@ -69,26 +69,6 @@ public class HoldRedisService {
             log.error("hold meta 역직렬화 실패: holdToken={}", holdToken, e);
             return Optional.empty();
         }
-    }
-
-    public boolean isActiveHold(final String holdToken, final Long performanceId, final List<Long> seatIds) {
-        final Optional<HoldSnapshot> snapshot = getHold(holdToken);
-        if (snapshot.isEmpty()) {
-            return false;
-        }
-        final List<Long> normalizedSeatIds = seatIds.stream().distinct().sorted().toList();
-        if (!snapshot.get().performanceId().equals(performanceId) || !snapshot.get().seatIds().equals(normalizedSeatIds)) {
-            return false;
-        }
-
-        for (final Long seatId : normalizedSeatIds) {
-            final RBucket<String> bucket = redissonClient.getBucket(SeatRedisKey.hold(performanceId, seatId), StringCodec.INSTANCE);
-            final String storedToken = bucket.get();
-            if (!holdToken.equals(storedToken)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public void releaseHold(final String holdToken) {
@@ -180,11 +160,4 @@ public class HoldRedisService {
         }
     }
 
-    public record HoldSnapshot(
-            String holdToken,
-            Long memberId,
-            Long performanceId,
-            List<Long> seatIds,
-            LocalDateTime expiresAt
-    ) {}
 }

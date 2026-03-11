@@ -1,5 +1,6 @@
 package com.ticket.core.domain.order;
 
+import com.ticket.core.domain.order.usecase.ExpireOrderUseCase;
 import com.ticket.core.enums.OrderState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import java.util.List;
 public class OrderExpirationScheduler {
 
     private final OrderRepository orderRepository;
-    private final OrderService orderService;
+    private final ExpireOrderUseCase expireOrderUseCase;
 
     @Scheduled(fixedDelayString = "300000")
     public void expirePendingOrders() {
@@ -26,7 +27,7 @@ public class OrderExpirationScheduler {
 
         for (final Order order : expiredOrders) {
             try {
-                orderService.expireOrder(order.getId(), LocalDateTime.now());
+                expireOrderUseCase.execute(new ExpireOrderUseCase.Input(order.getId(), LocalDateTime.now()));
             } catch (final RuntimeException e) {
                 log.error("주문 만료 처리 실패: orderId={}", order.getId(), e);
             }
