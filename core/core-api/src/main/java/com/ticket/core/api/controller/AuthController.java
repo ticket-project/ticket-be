@@ -8,14 +8,16 @@ import com.ticket.core.domain.auth.usecase.LogoutUseCase;
 import com.ticket.core.domain.auth.usecase.RefreshAuthTokenUseCase;
 import com.ticket.core.domain.auth.usecase.RegisterMemberUseCase;
 import com.ticket.core.domain.member.MemberPrincipal;
+import com.ticket.core.support.exception.AuthException;
+import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.util.CookieUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -28,6 +30,8 @@ public class AuthController implements AuthControllerDocs {
     private final ExchangeOAuth2TokenUseCase exchangeOAuth2TokenUseCase;
     private final GetSocialLoginUrlsUseCase getSocialLoginUrlsUseCase;
     private final LogoutUseCase logoutUseCase;
+    @Value("${app.auth.public-base-url}")
+    private String publicBaseUrl;
 
     @Override
     @PostMapping("/signup")
@@ -47,9 +51,12 @@ public class AuthController implements AuthControllerDocs {
     @Override
     @PostMapping("/refresh")
     public ApiResponse<RefreshAuthTokenUseCase.Output> refresh(
-            @CookieValue(name = CookieUtils.REFRESH_TOKEN_COOKIE_NAME) final String refreshToken,
+            @CookieValue(name = CookieUtils.REFRESH_TOKEN_COOKIE_NAME, required = false) final String refreshToken,
             final HttpServletResponse response
     ) {
+        if (refreshToken == null) {
+            throw new AuthException(ErrorType.AUTHENTICATION_ERROR);
+        }
         final RefreshAuthTokenUseCase.Input input = new RefreshAuthTokenUseCase.Input(refreshToken);
         return ApiResponse.success(refreshAuthTokenUseCase.execute(input, response));
     }
@@ -66,8 +73,7 @@ public class AuthController implements AuthControllerDocs {
     @Override
     @GetMapping("/social/urls")
     public ApiResponse<GetSocialLoginUrlsUseCase.Output> getSocialLoginUrls() {
-        final String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-        final GetSocialLoginUrlsUseCase.Input input = new GetSocialLoginUrlsUseCase.Input(baseUrl);
+        final GetSocialLoginUrlsUseCase.Input input = new GetSocialLoginUrlsUseCase.Input(publicBaseUrl);
         return ApiResponse.success(getSocialLoginUrlsUseCase.execute(input));
     }
 
@@ -75,9 +81,12 @@ public class AuthController implements AuthControllerDocs {
     @PostMapping("/logout")
     public ApiResponse<LogoutUseCase.Output> logout(
             @AuthenticationPrincipal final MemberPrincipal principal,
-            @CookieValue(name = CookieUtils.REFRESH_TOKEN_COOKIE_NAME) final String refreshToken,
+            @CookieValue(name = CookieUtils.REFRESH_TOKEN_COOKIE_NAME, required = false) final String refreshToken,
             final HttpServletResponse response
     ) {
+        if (refreshToken == null) {
+            throw new AuthException(ErrorType.AUTHENTICATION_ERROR);
+        }
         final LogoutUseCase.Input input = new LogoutUseCase.Input(principal, refreshToken);
         return ApiResponse.success(logoutUseCase.execute(input, response));
     }

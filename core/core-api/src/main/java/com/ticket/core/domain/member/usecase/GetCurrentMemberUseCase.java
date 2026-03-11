@@ -1,10 +1,12 @@
 package com.ticket.core.domain.member.usecase;
 
-import com.ticket.core.api.controller.response.MemberResponse;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -13,12 +15,20 @@ public class GetCurrentMemberUseCase {
 
     public Output execute(final Input input) {
         final Member findMember = memberFinder.findActiveMemberById(input.memberId());
-        return new Output(new MemberResponse(findMember.getId(), findMember.getEmail().getEmail(), findMember.getName(), findMember.getRole().name()));
+        return new Output(
+                findMember.getId(),
+                Optional.ofNullable(findMember.getEmail()).map(email -> email.getEmail()).orElse(""),
+                findMember.getName(),
+                findMember.getRole().name()
+        );
     }
 
     public record Input(Long memberId) {
+        public Input {
+            Objects.requireNonNull(memberId, "memberId는 null일 수 없습니다.");
+        }
     }
 
-    public record Output(MemberResponse memberResponse) {
+    public record Output(Long memberId, String email, String name, String role) {
     }
 }

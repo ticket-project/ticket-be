@@ -17,13 +17,21 @@ public class GetSocialLoginUrlsUseCase {
     public record Output(Map<String, String> urls) {}
 
     public Output execute(final Input input) {
+        final String normalizedBaseUrl = normalizeBaseUrl(input.baseUrl());
         return new Output(Map.of(
-                GOOGLE_REGISTRATION_ID, buildSocialLoginUrl(input.baseUrl(), GOOGLE_REGISTRATION_ID),
-                KAKAO_REGISTRATION_ID, buildSocialLoginUrl(input.baseUrl(), KAKAO_REGISTRATION_ID)
+                GOOGLE_REGISTRATION_ID, buildSocialLoginUrl(normalizedBaseUrl, GOOGLE_REGISTRATION_ID),
+                KAKAO_REGISTRATION_ID, buildSocialLoginUrl(normalizedBaseUrl, KAKAO_REGISTRATION_ID)
         ));
     }
 
     private String buildSocialLoginUrl(final String baseUrl, final String registrationId) {
         return baseUrl + OAuth2EndpointConstants.AUTHORIZATION_BASE_URI + "/" + registrationId;
+    }
+
+    private String normalizeBaseUrl(final String baseUrl) {
+        if (baseUrl == null || baseUrl.isBlank()) {
+            throw new IllegalStateException("app.auth.public-base-url must not be blank");
+        }
+        return baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
     }
 }
