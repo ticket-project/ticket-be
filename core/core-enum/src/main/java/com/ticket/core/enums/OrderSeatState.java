@@ -1,15 +1,14 @@
 package com.ticket.core.enums;
 
-public enum OrderState {
-    PENDING("결제 대기"),
+public enum OrderSeatState {
+    HELD("홀드 중"),
     CONFIRMED("주문 확정"),
     EXPIRED("주문 만료"),
-    CANCELED("주문 취소"),
-    PAYMENT_FAILED("결제 실패");
+    CANCELED("주문 취소");
 
     private final String description;
 
-    OrderState(final String description) {
+    OrderSeatState(final String description) {
         this.description = description;
     }
 

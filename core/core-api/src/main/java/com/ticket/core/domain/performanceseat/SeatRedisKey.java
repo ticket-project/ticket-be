@@ -23,6 +23,7 @@ public final class SeatRedisKey {
     // ── Hold 키 ──
     private static final String HOLD_KEY = "seat:hold:{perf:%d}:%d";
     private static final String HOLD_PATTERN = "seat:hold:{perf:%d}:*";
+    private static final String HOLD_META_KEY = "hold:token:%s";
 
     public static String hold(Long perfId, Long seatId) {
         return String.format(HOLD_KEY, perfId, seatId);
@@ -30,6 +31,10 @@ public final class SeatRedisKey {
 
     public static String holdPattern(Long perfId) {
         return String.format(HOLD_PATTERN, perfId);
+    }
+
+    public static String holdMeta(String holdToken) {
+        return String.format(HOLD_META_KEY, holdToken);
     }
 
     // ── 공통 유틸 ──
