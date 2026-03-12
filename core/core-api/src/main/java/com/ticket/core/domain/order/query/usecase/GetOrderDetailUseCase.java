@@ -26,11 +26,11 @@ public class GetOrderDetailUseCase {
     private final PerformanceSeatFinder performanceSeatFinder;
     private final MemberFinder memberFinder;
 
-    public record Input(Long orderId, Long memberId) {}
+    public record Input(String orderKey, Long memberId) {}
     public record Output(OrderDetailResponse order) {}
 
     public Output execute(final Input input) {
-        final Order order = orderFinder.findOwnedById(input.orderId(), input.memberId());
+        final Order order = orderFinder.findOwnedByOrderKey(input.orderKey(), input.memberId());
         final List<OrderSeat> orderSeats = orderSeatFinder.getOrderSeatsByOrderId(order.getId());
         final List<PerformanceSeat> performanceSeats = performanceSeatFinder.findAllByOrderSeats(orderSeats);
         final Member member = memberFinder.findActiveMemberById(input.memberId());

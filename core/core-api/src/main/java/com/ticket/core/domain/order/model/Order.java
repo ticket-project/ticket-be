@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Entity
@@ -25,6 +26,9 @@ public class Order extends BaseEntity {
 
     @Column(nullable = false)
     private Long performanceId;
+
+    @Column(nullable = false, unique = true, length = 40)
+    private String orderKey;
 
     @Column(nullable = false, unique = true, length = 64)
     private String holdToken;
@@ -56,6 +60,7 @@ public class Order extends BaseEntity {
     ) {
         this.memberId = memberId;
         this.performanceId = performanceId;
+        this.orderKey = generateOrderKey();
         this.holdToken = holdToken;
         this.status = OrderState.PENDING;
         this.totalAmount = totalAmount;
@@ -98,5 +103,9 @@ public class Order extends BaseEntity {
         if (!isPending()) {
             throw new IllegalStateException("PENDING 주문만 " + action + " 할 수 있습니다. currentStatus=" + status);
         }
+    }
+
+    private static String generateOrderKey() {
+        return "ORDER-" + UUID.randomUUID().toString().replace("-", "");
     }
 }

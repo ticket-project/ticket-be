@@ -17,23 +17,23 @@ public class OrderController implements OrderControllerDocs {
     private final CancelOrderUseCase cancelOrderUseCase;
 
     @Override
-    @GetMapping("/{orderId}")
+    @GetMapping("/{orderKey}")
     public ApiResponse<GetOrderDetailUseCase.Output> getOrder(
-            @PathVariable final Long orderId,
+            @PathVariable final String orderKey,
             final MemberPrincipal memberPrincipal
     ) {
-        final GetOrderDetailUseCase.Input input = new GetOrderDetailUseCase.Input(orderId, memberPrincipal.getMemberId());
+        final GetOrderDetailUseCase.Input input = new GetOrderDetailUseCase.Input(orderKey, memberPrincipal.getMemberId());
         final GetOrderDetailUseCase.Output output = getOrderDetailUseCase.execute(input);
         return ApiResponse.success(output);
     }
 
     @Override
-    @DeleteMapping("/{orderId}")
+    @DeleteMapping("/{orderKey}")
     public ApiResponse<Void> cancelOrder(
-            @PathVariable final Long orderId,
+            @PathVariable final String orderKey,
             final MemberPrincipal memberPrincipal
     ) {
-        final CancelOrderUseCase.Input input = new CancelOrderUseCase.Input(orderId, memberPrincipal.getMemberId());
+        final CancelOrderUseCase.Input input = new CancelOrderUseCase.Input(orderKey, memberPrincipal.getMemberId());
         cancelOrderUseCase.execute(input);
         return ApiResponse.success();
     }

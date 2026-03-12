@@ -28,8 +28,8 @@ public class HoldController implements HoldControllerDocs {
     ) {
         final CreateHoldUseCase.Input input = new CreateHoldUseCase.Input(performanceId, request.getSeatIds(), memberPrincipal.getMemberId());
         final CreateHoldUseCase.Output output = createHoldUseCase.execute(input);
-        return ResponseEntity.created(URI.create("/api/v1/orders/" + output.orderId()))
-                .header("X-Order-Id", String.valueOf(output.orderId()))
+        return ResponseEntity.created(URI.create("/api/v1/orders/" + output.orderKey()))
+                .header("X-Order-Key", output.orderKey())
                 .body(ApiResponse.success(output));
     }
 }
