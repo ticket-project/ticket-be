@@ -19,7 +19,10 @@ public interface HoldControllerDocs {
     @Operation(
             summary = "좌석 HOLD 생성",
             description = """
-                    선택한 좌석을 Redis에 HOLD 하고 DB에 PENDING 주문을 생성합니다.
+                    요청한 좌석을 Redis에 HOLD 하고 DB에 PENDING 주문을 생성합니다.
+                    한 회원은 같은 회차에 PENDING 주문을 1건만 가질 수 있습니다.
+                    좌석 선택(selection)은 UX 보조 상태이며 HOLD 생성의 필수 선행 조건이 아닙니다.
+                    다른 사용자가 먼저 선택한 좌석이라도 HOLD 가능한 상태이면 선점이 가능하며, 선점 성공 시 기존 선택 상태는 정리됩니다.
                     응답 헤더로 생성된 주문의 조회 URI(Location)와 주문 ID(X-Order-Id)를 함께 반환합니다.
                     생성된 주문은 GET /api/v1/orders/{orderId}로 조회할 수 있습니다.
                     """

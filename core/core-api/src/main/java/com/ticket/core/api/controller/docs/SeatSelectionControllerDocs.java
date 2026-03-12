@@ -16,6 +16,8 @@ public interface SeatSelectionControllerDocs {
                     특정 좌석을 임시 선택 상태로 변경합니다.
                     Redis에 선택 상태를 저장하고, 성공하면 WebSocket으로 SELECTED 이벤트를 전파합니다.
                     선택 상태는 5분 뒤 자동 만료됩니다.
+                    이 선택 상태는 화면 UX 보조용이며, HOLD 생성의 필수 선행 조건은 아닙니다.
+                    좌석은 실제로 존재하고 해당 회차 소속이며 DB 기준 예매 가능한 상태여야 선택할 수 있습니다.
                     """
     )
     @ApiResponses(value = {
