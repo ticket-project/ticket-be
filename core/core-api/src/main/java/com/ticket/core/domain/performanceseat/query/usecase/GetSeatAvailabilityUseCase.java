@@ -1,7 +1,7 @@
 package com.ticket.core.domain.performanceseat.query.usecase;
 
 import com.ticket.core.api.controller.response.SeatAvailabilityResponse;
-import com.ticket.core.domain.hold.support.HoldRedisService;
+import com.ticket.core.domain.hold.support.HoldManager;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.domain.performanceseat.command.SeatSelectionService;
@@ -24,7 +24,7 @@ public class GetSeatAvailabilityUseCase {
     private final PerformanceFinder performanceFinder;
     private final SeatAvailabilityQueryRepository seatAvailabilityQueryRepository;
     private final SeatSelectionService seatSelectionService;
-    private final HoldRedisService holdRedisService;
+    private final HoldManager holdManager;
     private final SeatAvailabilityCalculator seatAvailabilityCalculator;
 
     public record Input(Long performanceId) {}
@@ -36,7 +36,7 @@ public class GetSeatAvailabilityUseCase {
 
         if (performance.getShow() == null) {
             throw new CoreException(ErrorType.NOT_FOUND_DATA,
-                    "회차에 연결된 공연을 찾을 수 없습니다. id=" + input.performanceId());
+                    "회차와 연결된 공연을 찾을 수 없습니다. id=" + input.performanceId());
         }
 
         final SeatAvailabilityResponse response = seatAvailabilityCalculator.calculate(
@@ -49,7 +49,7 @@ public class GetSeatAvailabilityUseCase {
 
     private Set<Long> mergeRedisOccupiedIds(final Long performanceId) {
         final Set<Long> seatIds = new HashSet<>(seatSelectionService.getSelectingSeatIds(performanceId));
-        seatIds.addAll(holdRedisService.getHoldingSeatIds(performanceId));
+        seatIds.addAll(holdManager.getHoldingSeatIds(performanceId));
         return seatIds;
     }
 }

@@ -2,8 +2,8 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.HoldControllerDocs;
 import com.ticket.core.api.controller.request.CreateHoldRequest;
-import com.ticket.core.domain.hold.command.usecase.CreateHoldUseCase;
 import com.ticket.core.domain.member.MemberPrincipal;
+import com.ticket.core.domain.order.command.usecase.StartOrderUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,17 +17,17 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class HoldController implements HoldControllerDocs {
 
-    private final CreateHoldUseCase createHoldUseCase;
+    private final StartOrderUseCase startOrderUseCase;
 
     @Override
     @PostMapping
-    public ResponseEntity<ApiResponse<CreateHoldUseCase.Output>> createHold(
+    public ResponseEntity<ApiResponse<StartOrderUseCase.Output>> createHold(
             @PathVariable final Long performanceId,
             @Valid @RequestBody final CreateHoldRequest request,
             final MemberPrincipal memberPrincipal
     ) {
-        final CreateHoldUseCase.Input input = new CreateHoldUseCase.Input(performanceId, request.getSeatIds(), memberPrincipal.getMemberId());
-        final CreateHoldUseCase.Output output = createHoldUseCase.execute(input);
+        final StartOrderUseCase.Input input = new StartOrderUseCase.Input(performanceId, request.getSeatIds(), memberPrincipal.getMemberId());
+        final StartOrderUseCase.Output output = startOrderUseCase.execute(input);
         return ResponseEntity.created(URI.create("/api/v1/orders/" + output.orderKey()))
                 .header("X-Order-Key", output.orderKey())
                 .body(ApiResponse.success(output));

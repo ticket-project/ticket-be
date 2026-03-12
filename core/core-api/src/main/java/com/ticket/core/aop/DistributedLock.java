@@ -1,5 +1,7 @@
 package com.ticket.core.aop;
 
+import com.ticket.core.support.exception.ErrorType;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -42,4 +44,14 @@ public @interface DistributedLock {
      * 락을 획득한 이후 leaseTime이 지나면 락을 해제한다.
      */
     long leaseTime() default 3000L;
+
+    /**
+     * 락 획득 실패 시 반환할 도메인 에러
+     */
+    ErrorType errorType() default ErrorType.HOLD_BUSY;
+
+    /**
+     * 락 획득 실패 시 사용할 추가 메시지
+     */
+    String message() default "";
 }

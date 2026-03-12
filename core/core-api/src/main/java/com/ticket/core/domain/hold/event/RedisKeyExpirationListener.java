@@ -1,6 +1,6 @@
 package com.ticket.core.domain.hold.event;
 
-import com.ticket.core.domain.order.application.OrderLifecycleApplicationService;
+import com.ticket.core.domain.order.command.usecase.TerminateOrderUseCase;
 import com.ticket.core.domain.performanceseat.support.SeatEventPublisher;
 import com.ticket.core.domain.performanceseat.support.SeatRedisKey;
 import com.ticket.core.domain.performanceseat.support.SeatStatusMessage;
@@ -21,7 +21,7 @@ import static com.ticket.core.domain.performanceseat.support.SeatStatusMessage.S
 public class RedisKeyExpirationListener implements MessageListener {
 
     private final SeatEventPublisher seatEventPublisher;
-    private final OrderLifecycleApplicationService orderLifecycleApplicationService;
+    private final TerminateOrderUseCase terminateOrderUseCase;
 
     @Override
     public void onMessage(final Message message, final byte[] pattern) {
@@ -46,7 +46,7 @@ public class RedisKeyExpirationListener implements MessageListener {
 
     private void handleHoldExpired(final String expiredKey) {
         final String holdToken = SeatRedisKey.extractHoldToken(expiredKey);
-        orderLifecycleApplicationService.expirePendingOrderByHoldToken(holdToken, LocalDateTime.now());
+        terminateOrderUseCase.expireByHoldToken(holdToken, LocalDateTime.now());
         log.info("홀드 만료 이벤트 처리: holdToken={}", holdToken);
     }
 }

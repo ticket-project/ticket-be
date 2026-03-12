@@ -22,6 +22,7 @@ public class CreateOrderApplicationService {
     private final OrderRepository orderRepository;
     private final OrderSeatRepository orderSeatRepository;
     private final HoldHistoryRepository holdHistoryRepository;
+    private final OrderKeyGenerator orderKeyGenerator;
 
     @Transactional
     public Order createPendingOrder(
@@ -34,9 +35,10 @@ public class CreateOrderApplicationService {
         final BigDecimal totalAmount = performanceSeats.stream()
                 .map(PerformanceSeat::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        final String orderKey = orderKeyGenerator.generate();
 
         final Order order = orderRepository.save(
-                new Order(memberId, performanceId, holdToken, totalAmount, expiresAt)
+                new Order(memberId, performanceId, orderKey, holdToken, totalAmount, expiresAt)
         );
 
         final List<OrderSeat> orderSeats = performanceSeats.stream()
