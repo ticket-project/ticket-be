@@ -10,6 +10,7 @@ import com.ticket.core.domain.order.model.OrderSeat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,6 +24,7 @@ public class OrderExpirationApplicationService {
     private final OrderLifecycleDomainService orderLifecycleDomainService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    @Transactional
     public void expire(final Order order, final LocalDateTime now) {
         final List<OrderSeat> orderSeats = orderSeatFinder.getOrderSeatsByOrderId(order.getId());
         final List<HoldHistory> holdHistories = holdHistoryFinder.findByHoldToken(order.getHoldToken());

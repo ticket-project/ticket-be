@@ -70,21 +70,23 @@ public class HoldHistory extends BaseEntity {
         this.expiresAt = expiresAt;
     }
 
-    public void confirm(final LocalDateTime now, final HoldReleaseReason reason) {
-        this.status = HoldState.CONFIRMED;
-        this.releasedAt = now;
-        this.releaseReason = reason;
-    }
-
     public void expire(final LocalDateTime now, final HoldReleaseReason reason) {
+        ensureActive();
         this.status = HoldState.EXPIRED;
         this.releasedAt = now;
         this.releaseReason = reason;
     }
 
     public void cancel(final LocalDateTime now, final HoldReleaseReason reason) {
+        ensureActive();
         this.status = HoldState.CANCELED;
         this.releasedAt = now;
         this.releaseReason = reason;
+    }
+
+    private void ensureActive() {
+        if (this.status != HoldState.ACTIVE) {
+            throw new IllegalStateException("이미 종료된 hold history 입니다.");
+        }
     }
 }
