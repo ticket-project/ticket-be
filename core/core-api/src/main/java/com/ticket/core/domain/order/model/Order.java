@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Entity
@@ -54,13 +53,14 @@ public class Order extends BaseEntity {
     public Order(
             final Long memberId,
             final Long performanceId,
+            final String orderKey,
             final String holdToken,
             final BigDecimal totalAmount,
             final LocalDateTime expiresAt
     ) {
         this.memberId = memberId;
         this.performanceId = performanceId;
-        this.orderKey = generateOrderKey();
+        this.orderKey = orderKey;
         this.holdToken = holdToken;
         this.status = OrderState.PENDING;
         this.totalAmount = totalAmount;
@@ -105,7 +105,4 @@ public class Order extends BaseEntity {
         }
     }
 
-    private static String generateOrderKey() {
-        return "ORDER-" + UUID.randomUUID().toString().replace("-", "");
-    }
 }

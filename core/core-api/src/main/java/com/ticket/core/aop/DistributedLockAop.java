@@ -1,6 +1,7 @@
 package com.ticket.core.aop;
 
 import com.ticket.core.support.CustomSpringELParser;
+import com.ticket.core.support.exception.CoreException;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -10,55 +11,82 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-
 @Component
 @Aspect
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 public class DistributedLockAop {
-    private static final String REDISSON_LOCK_PREFIX = "LOCK:";
+
+    private static final String LOCK_PREFIX = "LOCK:";
     private static final Logger log = LoggerFactory.getLogger(DistributedLockAop.class);
 
     private final RedissonClient redissonClient;
-    private final AopForTransaction aopForTransaction;
 
     @Around("@annotation(com.ticket.core.aop.DistributedLock)")
     public Object around(final ProceedingJoinPoint joinPoint) throws Throwable {
-        log.info("aop 시작");
         final MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         final DistributedLock distributedLock = signature.getMethod().getAnnotation(DistributedLock.class);
-        List<String> keys = CustomSpringELParser.getDynamicValue(distributedLock.prefix() + "-" + REDISSON_LOCK_PREFIX, signature.getParameterNames(), joinPoint.getArgs(), distributedLock.dynamicKey());
-        final List<String> sortedKey = keys.stream().sorted().toList();
-        final RLock rLock = generateLock(sortedKey);
-        log.info("sortedKey={}", sortedKey);
+        final List<String> keys = CustomSpringELParser.getDynamicValue(
+                lockPrefix(distributedLock.prefix()),
+                signature.getParameterNames(),
+                joinPoint.getArgs(),
+                distributedLock.dynamicKey()
+        ).stream().sorted().toList();
+        final RLock lock = generateLock(keys);
+
         try {
-            final boolean available = rLock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(), distributedLock.timeUnit());
+            final boolean available = lock.tryLock(
+                    distributedLock.waitTime(),
+                    distributedLock.leaseTime(),
+                    distributedLock.timeUnit()
+            );
             if (!available) {
-                log.warn("락 획득 실패 - sortedKey = {}", sortedKey);
-                throw new IllegalStateException("락 획득 실패");
+                log.warn("분산 락 획득에 실패했습니다. keys={}", keys);
+                throw new CoreException(distributedLock.errorType(), resolveMessage(distributedLock));
             }
-            return aopForTransaction.proceed(joinPoint);
-        } catch (InterruptedException e) {
-            throw new InterruptedException("락 획득 실패");
+            return joinPoint.proceed();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new CoreException(distributedLock.errorType(), resolveMessage(distributedLock));
         } finally {
-            try {
-                rLock.unlock();
-            } catch (IllegalMonitorStateException e) {
-                log.error("락 이미 해제됨 - sortedKey = {}", sortedKey, e);
-            }
+            unlockQuietly(lock, keys);
         }
+    }
+
+    private String lockPrefix(final String prefix) {
+        if (prefix == null || prefix.isBlank()) {
+            return LOCK_PREFIX;
+        }
+        return LOCK_PREFIX + prefix + ":";
+    }
+
+    private String resolveMessage(final DistributedLock distributedLock) {
+        return distributedLock.message().isBlank()
+                ? distributedLock.errorType().getDescription()
+                : distributedLock.message();
     }
 
     private RLock generateLock(final List<String> keys) {
         if (keys.size() == 1) {
             return redissonClient.getLock(keys.getFirst());
         }
-        RLock[] locks = keys.stream()
+        final RLock[] locks = keys.stream()
                 .map(redissonClient::getLock)
                 .toArray(RLock[]::new);
         return redissonClient.getMultiLock(locks);
+    }
+
+    private void unlockQuietly(final RLock lock, final List<String> keys) {
+        try {
+            lock.unlock();
+        } catch (final IllegalMonitorStateException e) {
+            log.debug("분산 락 해제 시점에 현재 스레드가 락을 소유하고 있지 않습니다. keys={}", keys, e);
+        }
     }
 }

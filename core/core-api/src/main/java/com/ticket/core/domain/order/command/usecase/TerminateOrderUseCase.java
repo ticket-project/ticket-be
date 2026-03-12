@@ -1,4 +1,4 @@
-package com.ticket.core.domain.order.application;
+package com.ticket.core.domain.order.command.usecase;
 
 import com.ticket.core.domain.hold.finder.HoldHistoryFinder;
 import com.ticket.core.domain.hold.model.HoldHistory;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class OrderLifecycleApplicationService {
+public class TerminateOrderUseCase {
 
     private final OrderFinder orderFinder;
     private final OrderRepository orderRepository;
@@ -30,7 +30,7 @@ public class OrderLifecycleApplicationService {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
-    public void cancelPendingOrder(final String orderKey, final Long memberId, final LocalDateTime now) {
+    public void cancel(final String orderKey, final Long memberId, final LocalDateTime now) {
         final Order order = orderFinder.findPendingOwnedByOrderKey(orderKey, memberId);
         final OrderTransitionContext context = loadTransitionContext(order);
         orderLifecycleDomainService.cancel(order, context.orderSeats(), context.holdHistories(), now);
@@ -38,13 +38,7 @@ public class OrderLifecycleApplicationService {
     }
 
     @Transactional
-    public void expirePendingOrder(final String orderKey, final LocalDateTime now) {
-        final Order order = orderFinder.findByOrderKey(orderKey);
-        expirePendingOrder(order, now);
-    }
-
-    @Transactional
-    public void expirePendingOrder(final Order order, final LocalDateTime now) {
+    public void expire(final Order order, final LocalDateTime now) {
         if (!order.isPending()) {
             return;
         }
@@ -55,13 +49,13 @@ public class OrderLifecycleApplicationService {
     }
 
     @Transactional
-    public void expirePendingOrderByHoldToken(final String holdToken, final LocalDateTime now) {
+    public void expireByHoldToken(final String holdToken, final LocalDateTime now) {
         final Order order = orderRepository.findByHoldToken(holdToken)
                 .orElse(null);
         if (order == null) {
             return;
         }
-        expirePendingOrder(order, now);
+        expire(order, now);
     }
 
     private OrderTransitionContext loadTransitionContext(final Order order) {

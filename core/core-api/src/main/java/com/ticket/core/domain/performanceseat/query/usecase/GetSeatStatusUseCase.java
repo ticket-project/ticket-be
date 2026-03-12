@@ -1,7 +1,7 @@
 package com.ticket.core.domain.performanceseat.query.usecase;
 
 import com.ticket.core.api.controller.response.SeatStatusResponse;
-import com.ticket.core.domain.hold.support.HoldRedisService;
+import com.ticket.core.domain.hold.support.HoldManager;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.domain.performanceseat.command.SeatSelectionService;
@@ -17,7 +17,7 @@ import java.util.Set;
 
 /**
  * 좌석 상태 통합 조회 UseCase.
- * DB(AVAILABLE/RESERVED) + Redis(SELECTING/HOLDING)을 합산하여
+ * DB(AVAILABLE/RESERVED) + Redis(SELECTING/HOLDING)를 합산하여
  * AVAILABLE / OCCUPIED 두 가지 상태로 반환합니다.
  */
 @Service
@@ -28,7 +28,7 @@ public class GetSeatStatusUseCase {
     private final PerformanceFinder performanceFinder;
     private final SeatMapQueryRepository seatMapQueryRepository;
     private final SeatSelectionService seatSelectionService;
-    private final HoldRedisService holdRedisService;
+    private final HoldManager holdManager;
 
     public record Input(Long performanceId) {}
     public record Output(SeatStatusResponse status) {}
@@ -37,16 +37,13 @@ public class GetSeatStatusUseCase {
         final Performance performance = performanceFinder.findById(input.performanceId());
         final Long perfId = performance.getId();
 
-        // 1. DB 조회 (RESERVED → OCCUPIED, 나머지 → AVAILABLE)
         final List<SeatStatusResponse.SeatState> dbStates = seatMapQueryRepository.findSeatStatuses(perfId);
 
-        // 2. Redis SELECTING + HOLDING seatId 합산
         final Set<Long> redisOccupiedIds = mergeRedisOccupiedIds(perfId);
         if (redisOccupiedIds.isEmpty()) {
             return new Output(new SeatStatusResponse(dbStates));
         }
 
-        // 3. DB AVAILABLE 중 Redis에 있으면 OCCUPIED로 오버라이드
         final List<SeatStatusResponse.SeatState> merged = dbStates.stream()
                 .map(seat -> seat.status() == SeatStatus.AVAILABLE && redisOccupiedIds.contains(seat.seatId())
                         ? new SeatStatusResponse.SeatState(seat.seatId(), SeatStatus.OCCUPIED)
@@ -58,7 +55,7 @@ public class GetSeatStatusUseCase {
 
     private Set<Long> mergeRedisOccupiedIds(final Long performanceId) {
         final Set<Long> ids = new HashSet<>(seatSelectionService.getSelectingSeatIds(performanceId));
-        ids.addAll(holdRedisService.getHoldingSeatIds(performanceId));
+        ids.addAll(holdManager.getHoldingSeatIds(performanceId));
         return ids;
     }
 }

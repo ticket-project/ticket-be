@@ -14,11 +14,6 @@ public class OrderFinder {
 
     private final OrderRepository orderRepository;
 
-    public Order findByOrderKey(final String orderKey) {
-        return orderRepository.findByOrderKey(orderKey)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA, "주문을 찾을 수 없습니다. orderKey=" + orderKey));
-    }
-
     public Order findOwnedByOrderKey(final String orderKey, final Long memberId) {
         return orderRepository.findByOrderKeyAndMemberId(orderKey, memberId)
                 .orElseThrow(() -> new CoreException(ErrorType.ORDER_NOT_OWNED));

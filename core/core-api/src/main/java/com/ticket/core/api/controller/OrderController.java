@@ -2,11 +2,13 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.OrderControllerDocs;
 import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.order.command.usecase.CancelOrderUseCase;
+import com.ticket.core.domain.order.command.usecase.TerminateOrderUseCase;
 import com.ticket.core.domain.order.query.usecase.GetOrderDetailUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController implements OrderControllerDocs {
 
     private final GetOrderDetailUseCase getOrderDetailUseCase;
-    private final CancelOrderUseCase cancelOrderUseCase;
+    private final TerminateOrderUseCase terminateOrderUseCase;
 
     @Override
     @GetMapping("/{orderKey}")
@@ -33,8 +35,7 @@ public class OrderController implements OrderControllerDocs {
             @PathVariable final String orderKey,
             final MemberPrincipal memberPrincipal
     ) {
-        final CancelOrderUseCase.Input input = new CancelOrderUseCase.Input(orderKey, memberPrincipal.getMemberId());
-        cancelOrderUseCase.execute(input);
+        terminateOrderUseCase.cancel(orderKey, memberPrincipal.getMemberId(), LocalDateTime.now());
         return ApiResponse.success();
     }
 }

@@ -1,6 +1,6 @@
 package com.ticket.core.domain.order.command;
 
-import com.ticket.core.domain.order.application.OrderLifecycleApplicationService;
+import com.ticket.core.domain.order.command.usecase.TerminateOrderUseCase;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.enums.OrderState;
@@ -22,7 +22,7 @@ public class OrderExpirationScheduler {
     private static final int BATCH_SIZE = 100;
 
     private final OrderRepository orderRepository;
-    private final OrderLifecycleApplicationService orderLifecycleApplicationService;
+    private final TerminateOrderUseCase terminateOrderUseCase;
 
     @Scheduled(fixedDelayString = "300000")
     public void expirePendingOrders() {
@@ -40,7 +40,7 @@ public class OrderExpirationScheduler {
             int processedCount = 0;
             for (final Order order : expiredOrders.getContent()) {
                 try {
-                    orderLifecycleApplicationService.expirePendingOrder(order, now);
+                    terminateOrderUseCase.expire(order, now);
                     processedCount++;
                 } catch (final RuntimeException e) {
                     log.error("주문 만료 처리 실패: orderKey={}, orderId={}", order.getOrderKey(), order.getId(), e);
