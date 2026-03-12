@@ -31,7 +31,7 @@ public class HoldTransactionEventListener {
         final HoldSnapshot snapshot = event.snapshot();
         holdManager.release(
                 snapshot.performanceId(),
-                snapshot.holdToken(),
+                snapshot.holdKey(),
                 snapshot.seatIds()
         );
     }

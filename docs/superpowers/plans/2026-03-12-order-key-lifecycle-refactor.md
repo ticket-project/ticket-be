@@ -74,7 +74,7 @@
 
 - [ ] 주문 취소/만료를 공통 lifecycle application service 로 위임한다.
 - [ ] 서비스 한 곳에서 `Order`, `OrderSeat`, `HoldHistory` 전이를 함께 처리한다.
-- [ ] `holdToken` 기반 만료와 `orderKey` 기반 만료가 같은 내부 로직을 타게 정리한다.
+- [ ] `holdKey` 기반 만료와 `orderKey` 기반 만료가 같은 내부 로직을 타게 정리한다.
 - [ ] 컴파일 확인: `./gradlew :core:core-api:compileJava`
 - [ ] 커밋
 
@@ -91,7 +91,7 @@
 
 - [ ] Redis TTL listener 는 만료 감지만 하고 공통 lifecycle service 를 호출하게 바꾼다.
 - [ ] 스케줄러도 같은 lifecycle service 를 호출하게 바꾼다.
-- [ ] hold 해제는 `performanceId + holdToken + seatIds` 기반 한 경로로 통일한다.
+- [ ] hold 해제는 `performanceId + holdKey + seatIds` 기반 한 경로로 통일한다.
 - [ ] 주문 종료 이벤트는 좌석 상태 publish 용 후처리만 남긴다.
 - [ ] 컴파일 확인: `./gradlew :core:core-api:compileJava`
 - [ ] 커밋
@@ -101,6 +101,6 @@
 **Files:**
 - Modify: 영향 받은 문서/응답/컨트롤러 전반
 
-- [ ] 남은 `orderId` 외부 노출, `holdToken` 오남용, 중복 상태 전이 경로를 검색해 제거한다.
+- [ ] 남은 `orderId` 외부 노출, `holdKey` 오남용, 중복 상태 전이 경로를 검색해 제거한다.
 - [ ] 최종 컴파일 확인: `./gradlew :core:core-api:compileJava`
 - [ ] 기능별 커밋과 push 를 정리한다.

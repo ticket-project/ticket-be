@@ -13,7 +13,7 @@ public class HoldHistoryFinder {
 
     private final HoldHistoryRepository holdHistoryRepository;
 
-    public List<HoldHistory> findByHoldToken(final String holdToken) {
-        return holdHistoryRepository.findAllByHoldTokenOrderByIdAsc(holdToken);
+    public List<HoldHistory> findByHoldKey(final String holdKey) {
+        return holdHistoryRepository.findAllByHoldKeyOrderByIdAsc(holdKey);
     }
 }

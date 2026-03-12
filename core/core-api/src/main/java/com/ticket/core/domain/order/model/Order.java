@@ -2,7 +2,14 @@ package com.ticket.core.domain.order.model;
 
 import com.ticket.core.domain.BaseEntity;
 import com.ticket.core.enums.OrderState;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +37,7 @@ public class Order extends BaseEntity {
     private String orderKey;
 
     @Column(nullable = false, unique = true, length = 64)
-    private String holdToken;
+    private String holdKey;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)
@@ -54,14 +61,14 @@ public class Order extends BaseEntity {
             final Long memberId,
             final Long performanceId,
             final String orderKey,
-            final String holdToken,
+            final String holdKey,
             final BigDecimal totalAmount,
             final LocalDateTime expiresAt
     ) {
         this.memberId = memberId;
         this.performanceId = performanceId;
         this.orderKey = orderKey;
-        this.holdToken = holdToken;
+        this.holdKey = holdKey;
         this.status = OrderState.PENDING;
         this.totalAmount = totalAmount;
         this.expiresAt = expiresAt;
@@ -104,5 +111,4 @@ public class Order extends BaseEntity {
             throw new IllegalStateException("PENDING 주문만 " + action + " 할 수 있습니다. currentStatus=" + status);
         }
     }
-
 }

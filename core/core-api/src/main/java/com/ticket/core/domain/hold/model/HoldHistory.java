@@ -3,7 +3,15 @@ package com.ticket.core.domain.hold.model;
 import com.ticket.core.domain.BaseEntity;
 import com.ticket.core.enums.HoldReleaseReason;
 import com.ticket.core.enums.HoldState;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +23,7 @@ import java.time.LocalDateTime;
 @Table(
         name = "HOLD_HISTORY",
         indexes = {
-                @Index(name = "IDX_HOLD_HISTORY_HOLD_TOKEN", columnList = "holdToken")
+                @Index(name = "IDX_HOLD_HISTORY_HOLD_KEY", columnList = "hold_key")
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,7 +34,7 @@ public class HoldHistory extends BaseEntity {
     private Long id;
 
     @Column(nullable = false, length = 64)
-    private String holdToken;
+    private String holdKey;
 
     @Column(nullable = false)
     private Long memberId;
@@ -54,14 +62,14 @@ public class HoldHistory extends BaseEntity {
     private HoldReleaseReason releaseReason;
 
     public HoldHistory(
-            final String holdToken,
+            final String holdKey,
             final Long memberId,
             final Long performanceId,
             final Long performanceSeatId,
             final Long seatId,
             final LocalDateTime expiresAt
     ) {
-        this.holdToken = holdToken;
+        this.holdKey = holdKey;
         this.memberId = memberId;
         this.performanceId = performanceId;
         this.performanceSeatId = performanceSeatId;

@@ -34,7 +34,7 @@ public class TerminateOrderUseCase {
         final Order order = orderFinder.findPendingOwnedByOrderKey(orderKey, memberId);
         final OrderTransitionContext context = loadTransitionContext(order);
         orderLifecycleDomainService.cancel(order, context.orderSeats(), context.holdHistories(), now);
-        applicationEventPublisher.publishEvent(new OrderCancelledEvent(order.getPerformanceId(), order.getHoldToken(), context.seatIds()));
+        applicationEventPublisher.publishEvent(new OrderCancelledEvent(order.getPerformanceId(), order.getHoldKey(), context.seatIds()));
     }
 
     @Transactional
@@ -45,12 +45,12 @@ public class TerminateOrderUseCase {
 
         final OrderTransitionContext context = loadTransitionContext(order);
         orderLifecycleDomainService.expire(order, context.orderSeats(), context.holdHistories(), now);
-        applicationEventPublisher.publishEvent(new OrderExpiredEvent(order.getPerformanceId(), order.getHoldToken(), context.seatIds()));
+        applicationEventPublisher.publishEvent(new OrderExpiredEvent(order.getPerformanceId(), order.getHoldKey(), context.seatIds()));
     }
 
     @Transactional
-    public void expireByHoldToken(final String holdToken, final LocalDateTime now) {
-        final Order order = orderRepository.findByHoldToken(holdToken)
+    public void expireByHoldKey(final String holdKey, final LocalDateTime now) {
+        final Order order = orderRepository.findByHoldKey(holdKey)
                 .orElse(null);
         if (order == null) {
             return;
@@ -60,7 +60,7 @@ public class TerminateOrderUseCase {
 
     private OrderTransitionContext loadTransitionContext(final Order order) {
         final List<OrderSeat> orderSeats = orderSeatFinder.getOrderSeatsByOrderId(order.getId());
-        final List<HoldHistory> holdHistories = holdHistoryFinder.findByHoldToken(order.getHoldToken());
+        final List<HoldHistory> holdHistories = holdHistoryFinder.findByHoldKey(order.getHoldKey());
         final List<Long> seatIds = orderSeats.stream()
                 .map(OrderSeat::getSeatId)
                 .toList();

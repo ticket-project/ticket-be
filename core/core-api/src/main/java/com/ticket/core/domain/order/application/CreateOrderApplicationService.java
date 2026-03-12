@@ -28,7 +28,7 @@ public class CreateOrderApplicationService {
     public Order createPendingOrder(
             final Long memberId,
             final Long performanceId,
-            final String holdToken,
+            final String holdKey,
             final LocalDateTime expiresAt,
             final List<PerformanceSeat> performanceSeats
     ) {
@@ -38,7 +38,7 @@ public class CreateOrderApplicationService {
         final String orderKey = orderKeyGenerator.generate();
 
         final Order order = orderRepository.save(
-                new Order(memberId, performanceId, orderKey, holdToken, totalAmount, expiresAt)
+                new Order(memberId, performanceId, orderKey, holdKey, totalAmount, expiresAt)
         );
 
         final List<OrderSeat> orderSeats = performanceSeats.stream()
@@ -48,7 +48,7 @@ public class CreateOrderApplicationService {
 
         final List<HoldHistory> holdHistories = performanceSeats.stream()
                 .map(seat -> new HoldHistory(
-                        holdToken,
+                        holdKey,
                         memberId,
                         performanceId,
                         seat.getId(),

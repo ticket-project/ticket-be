@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -36,13 +35,14 @@ public class StartOrderUseCase {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public record Input(Long performanceId, List<Long> seatIds, Long memberId) {}
+
     public record Output(String orderKey) {}
 
     @Transactional
     @DistributedLock(
             prefix = "pending-order",
             dynamicKey = "#input.memberId() + ':' + #input.performanceId()",
-            message = "주문 시작 처리 중입니다. 잠시 후 다시 시도해주세요."
+            message = "주문 시작 처리 중입니다. 잠시 후 다시 시도해 주세요."
     )
     public Output execute(final Input input) {
         final List<Long> seatIds = normalizeSeatIds(input.seatIds());
@@ -62,7 +62,7 @@ public class StartOrderUseCase {
         final Order order = createOrderApplicationService.createPendingOrder(
                 input.memberId(),
                 input.performanceId(),
-                snapshot.holdToken(),
+                snapshot.holdKey(),
                 snapshot.expiresAt(),
                 performanceSeats
         );

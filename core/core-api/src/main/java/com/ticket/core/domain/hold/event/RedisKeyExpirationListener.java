@@ -45,8 +45,8 @@ public class RedisKeyExpirationListener implements MessageListener {
     }
 
     private void handleHoldExpired(final String expiredKey) {
-        final String holdToken = SeatRedisKey.extractHoldToken(expiredKey);
-        terminateOrderUseCase.expireByHoldToken(holdToken, LocalDateTime.now());
-        log.info("홀드 만료 이벤트 처리: holdToken={}", holdToken);
+        final String holdKey = SeatRedisKey.extractHoldKey(expiredKey);
+        terminateOrderUseCase.expireByHoldKey(holdKey, LocalDateTime.now());
+        log.info("홀드 만료 이벤트 처리: holdKey={}", holdKey);
     }
 }
