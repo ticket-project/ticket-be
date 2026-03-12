@@ -1,8 +1,11 @@
 package com.ticket.core.domain.performanceseat.query.usecase;
 
 import com.ticket.core.api.controller.response.SeatAvailabilityResponse;
+import com.ticket.core.domain.hold.support.HoldRedisService;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
+import com.ticket.core.domain.performanceseat.command.SeatSelectionService;
+import com.ticket.core.domain.performanceseat.query.SeatAvailabilityCalculator;
 import com.ticket.core.domain.performanceseat.query.SeatAvailabilityQueryRepository;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
@@ -10,7 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @Transactional(readOnly = true)
@@ -19,6 +23,9 @@ public class GetSeatAvailabilityUseCase {
 
     private final PerformanceFinder performanceFinder;
     private final SeatAvailabilityQueryRepository seatAvailabilityQueryRepository;
+    private final SeatSelectionService seatSelectionService;
+    private final HoldRedisService holdRedisService;
+    private final SeatAvailabilityCalculator seatAvailabilityCalculator;
 
     public record Input(Long performanceId) {}
 
@@ -32,12 +39,17 @@ public class GetSeatAvailabilityUseCase {
                     "회차에 연결된 공연을 찾을 수 없습니다. id=" + input.performanceId());
         }
 
-        SeatAvailabilityResponse response = seatAvailabilityQueryRepository
-                .findSeatAvailability(performance.getId(), performance.getShow().getId());
-        if (response == null) {
-            response = new SeatAvailabilityResponse(List.of());
-        }
+        final SeatAvailabilityResponse response = seatAvailabilityCalculator.calculate(
+                seatAvailabilityQueryRepository.findAvailableSeatRows(performance.getId(), performance.getShow().getId()),
+                mergeRedisOccupiedIds(performance.getId())
+        );
 
         return new Output(response);
+    }
+
+    private Set<Long> mergeRedisOccupiedIds(final Long performanceId) {
+        final Set<Long> seatIds = new HashSet<>(seatSelectionService.getSelectingSeatIds(performanceId));
+        seatIds.addAll(holdRedisService.getHoldingSeatIds(performanceId));
+        return seatIds;
     }
 }

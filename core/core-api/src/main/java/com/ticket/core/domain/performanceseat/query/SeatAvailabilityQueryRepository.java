@@ -2,7 +2,6 @@ package com.ticket.core.domain.performanceseat.query;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ticket.core.api.controller.response.SeatAvailabilityResponse;
 import com.ticket.core.enums.PerformanceSeatState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,19 +18,12 @@ public class SeatAvailabilityQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    /**
-     * 특정 회차의 등급별 잔여 좌석 수를 조회합니다.
-     */
-    public SeatAvailabilityResponse findSeatAvailability(Long performanceId, Long showId) {
-
-        List<SeatAvailabilityResponse.GradeAvailability> grades = queryFactory
-                .select(Projections.constructor(SeatAvailabilityResponse.GradeAvailability.class,
+    public List<SeatAvailabilityCalculator.AvailableSeatRow> findAvailableSeatRows(Long performanceId, Long showId) {
+        return queryFactory
+                .select(Projections.constructor(SeatAvailabilityCalculator.AvailableSeatRow.class,
+                        performanceSeat.seat.id,
                         showGrade.gradeName,
-                        showGrade.sortOrder,
-                        performanceSeat.state
-                                .when(PerformanceSeatState.AVAILABLE).then(1L)
-                                .otherwise(0L)
-                                .sum()
+                        showGrade.sortOrder
                 ))
                 .from(performanceSeat)
                 .join(showSeat).on(
@@ -39,11 +31,11 @@ public class SeatAvailabilityQueryRepository {
                         showSeat.show.id.eq(showId)
                 )
                 .join(showGrade).on(showGrade.id.eq(showSeat.showGrade.id))
-                .where(performanceSeat.performance.id.eq(performanceId))
-                .groupBy(showGrade.id, showGrade.gradeCode, showGrade.gradeName, showGrade.price, showGrade.sortOrder)
-                .orderBy(showGrade.sortOrder.asc())
+                .where(
+                        performanceSeat.performance.id.eq(performanceId),
+                        performanceSeat.state.eq(PerformanceSeatState.AVAILABLE)
+                )
+                .orderBy(showGrade.sortOrder.asc(), performanceSeat.seat.id.asc())
                 .fetch();
-
-        return new SeatAvailabilityResponse(grades);
     }
 }
