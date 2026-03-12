@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -26,21 +27,35 @@ public class OrderExpirationScheduler {
     @Scheduled(fixedDelayString = "300000")
     public void expirePendingOrders() {
         final LocalDateTime now = LocalDateTime.now();
-        Slice<Order> expiredOrders;
-        do {
-            expiredOrders = orderRepository.findAllByStatusAndExpiresAtBefore(
+        while (true) {
+            final Slice<Order> expiredOrders = orderRepository.findAllByStatusAndExpiresAtBefore(
                     OrderState.PENDING,
                     now,
-                    PageRequest.of(0, BATCH_SIZE)
+                    PageRequest.of(0, BATCH_SIZE, Sort.by(Sort.Direction.ASC, "id"))
             );
+            if (!expiredOrders.hasContent()) {
+                return;
+            }
 
+            int processedCount = 0;
             for (final Order order : expiredOrders.getContent()) {
                 try {
                     expireOrderUseCase.execute(new ExpireOrderUseCase.Input(order.getId(), now));
+                    processedCount++;
                 } catch (final RuntimeException e) {
                     log.error("주문 만료 처리 실패: orderId={}", order.getId(), e);
                 }
             }
-        } while (expiredOrders.hasContent());
+
+            if (processedCount == 0) {
+                log.warn("주문 만료 배치에서 처리 성공 건이 없어 반복을 중단합니다. pendingCount={}",
+                        expiredOrders.getNumberOfElements());
+                return;
+            }
+
+            if (expiredOrders.getNumberOfElements() < BATCH_SIZE) {
+                return;
+            }
+        }
     }
 }
