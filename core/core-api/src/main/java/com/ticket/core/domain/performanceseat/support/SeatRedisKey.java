@@ -20,6 +20,10 @@ public final class SeatRedisKey {
         return String.format(SELECT_PATTERN, perfId);
     }
 
+    public static boolean isSelectKey(String key) {
+        return key != null && key.startsWith("seat:select:{perf:");
+    }
+
     // ── Hold 키 ──
     private static final String HOLD_KEY = "seat:hold:{perf:%d}:%d";
     private static final String HOLD_PATTERN = "seat:hold:{perf:%d}:*";
@@ -37,8 +41,25 @@ public final class SeatRedisKey {
         return String.format(HOLD_META_KEY, holdToken);
     }
 
+    public static boolean isHoldMetaKey(String key) {
+        return key != null && key.startsWith("hold:token:");
+    }
+
     // ── 공통 유틸 ──
+    public static Long extractPerformanceId(String key) {
+        final int start = key.indexOf("{perf:");
+        final int end = key.indexOf('}', start);
+        if (start < 0 || end < 0) {
+            throw new IllegalArgumentException("performanceId를 추출할 수 없는 key 입니다. key=" + key);
+        }
+        return Long.parseLong(key.substring(start + 6, end));
+    }
+
     public static Long extractSeatId(String key) {
         return Long.parseLong(key.substring(key.lastIndexOf(':') + 1));
+    }
+
+    public static String extractHoldToken(String key) {
+        return key.substring("hold:token:".length());
     }
 }
