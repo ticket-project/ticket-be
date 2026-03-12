@@ -2,9 +2,11 @@ package com.ticket.core.domain.show.query.model;
 
 import com.ticket.core.domain.show.meta.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 
+@Getter
 @Schema(description = "공연 조회 요청 파라미터")
 public class ShowParam {
 
@@ -49,19 +51,4 @@ public class ShowParam {
         this.cursor = cursor;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public Region getRegion() {
-        return region;
-    }
-
-    public String getCursor() {
-        return cursor;
-    }
 }

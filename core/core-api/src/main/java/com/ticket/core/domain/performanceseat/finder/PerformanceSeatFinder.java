@@ -27,16 +27,7 @@ public class PerformanceSeatFinder {
         final List<Long> performanceSeatIds = orderSeats.stream()
                 .map(OrderSeat::getPerformanceSeatId)
                 .toList();
-        final Map<Long, PerformanceSeat> performanceSeatMap = performanceSeatRepository.findAllById(performanceSeatIds).stream()
-                .collect(Collectors.toMap(PerformanceSeat::getId, Function.identity()));
-
-        if (performanceSeatMap.size() != performanceSeatIds.size()) {
-            throw new CoreException(ErrorType.NOT_FOUND_DATA, "주문 좌석 상세 정보를 찾을 수 없습니다.");
-        }
-
-        return performanceSeatIds.stream()
-                .map(performanceSeatMap::get)
-                .toList();
+        return performanceSeatRepository.findAllById(performanceSeatIds);
     }
 
 }
