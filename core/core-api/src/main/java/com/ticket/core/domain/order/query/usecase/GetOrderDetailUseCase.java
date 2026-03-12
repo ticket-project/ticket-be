@@ -18,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class GetOrderDetailUseCase {
 
     private final OrderFinder orderFinder;
@@ -28,7 +29,6 @@ public class GetOrderDetailUseCase {
     public record Input(Long orderId, Long memberId) {}
     public record Output(OrderDetailResponse order) {}
 
-    @Transactional
     public Output execute(final Input input) {
         final Order order = orderFinder.findOwnedById(input.orderId(), input.memberId());
         final List<OrderSeat> orderSeats = orderSeatFinder.getOrderSeatsByOrderId(order.getId());

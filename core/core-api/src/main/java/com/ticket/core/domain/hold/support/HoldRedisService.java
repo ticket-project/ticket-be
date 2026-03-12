@@ -121,6 +121,16 @@ public class HoldRedisService {
         return seatIds;
     }
 
+    private void ensureSeatsNotHeld(final Long performanceId, final List<Long> seatIds) {
+        for (final Long seatId : seatIds) {
+            final RBucket<String> bucket = redissonClient.getBucket(SeatRedisKey.hold(performanceId, seatId), StringCodec.INSTANCE);
+            final String holdToken = bucket.get();
+            if (holdToken != null) {
+                throw new CoreException(ErrorType.SEAT_ALREADY_HOLD);
+            }
+        }
+    }
+
     private void saveHold(final HoldSnapshot snapshot, final Duration ttl) {
         final List<String> createdKeys = new ArrayList<>();
         try {
@@ -145,16 +155,6 @@ public class HoldRedisService {
                 log.warn("hold meta rollback failed: holdToken={}", snapshot.holdToken(), rollbackException);
             }
             throw new IllegalStateException("hold redis save failed", e);
-        }
-    }
-
-    private void ensureSeatsNotHeld(final Long performanceId, final List<Long> seatIds) {
-        for (final Long seatId : seatIds) {
-            final RBucket<String> bucket = redissonClient.getBucket(SeatRedisKey.hold(performanceId, seatId), StringCodec.INSTANCE);
-            final String holdToken = bucket.get();
-            if (holdToken != null) {
-                throw new CoreException(ErrorType.SEAT_ALREADY_HOLD);
-            }
         }
     }
 
