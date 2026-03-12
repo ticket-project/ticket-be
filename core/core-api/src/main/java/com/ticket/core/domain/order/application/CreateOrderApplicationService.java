@@ -1,7 +1,5 @@
 package com.ticket.core.domain.order.application;
 
-import com.ticket.core.domain.hold.model.HoldHistory;
-import com.ticket.core.domain.hold.repository.HoldHistoryRepository;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
 import com.ticket.core.domain.order.repository.OrderRepository;
@@ -21,7 +19,6 @@ public class CreateOrderApplicationService {
 
     private final OrderRepository orderRepository;
     private final OrderSeatRepository orderSeatRepository;
-    private final HoldHistoryRepository holdHistoryRepository;
     private final OrderKeyGenerator orderKeyGenerator;
 
     @Transactional
@@ -45,18 +42,6 @@ public class CreateOrderApplicationService {
                 .map(seat -> new OrderSeat(order, seat.getId(), seat.getSeat().getId(), seat.getPrice()))
                 .toList();
         orderSeatRepository.saveAll(orderSeats);
-
-        final List<HoldHistory> holdHistories = performanceSeats.stream()
-                .map(seat -> new HoldHistory(
-                        holdKey,
-                        memberId,
-                        performanceId,
-                        seat.getId(),
-                        seat.getSeat().getId(),
-                        expiresAt
-                ))
-                .toList();
-        holdHistoryRepository.saveAll(holdHistories);
 
         return order;
     }

@@ -1,6 +1,7 @@
 package com.ticket.core.domain.order.command.usecase;
 
 import com.ticket.core.aop.DistributedLock;
+import com.ticket.core.domain.hold.application.HoldHistoryRecorder;
 import com.ticket.core.domain.hold.event.HoldCreatedEvent;
 import com.ticket.core.domain.hold.model.HoldSnapshot;
 import com.ticket.core.domain.hold.support.HoldManager;
@@ -30,6 +31,7 @@ public class StartOrderUseCase {
     private final PerformanceFinder performanceFinder;
     private final HoldSeatAvailabilityValidator holdSeatAvailabilityValidator;
     private final HoldManager holdManager;
+    private final HoldHistoryRecorder holdHistoryRecorder;
     private final CreateOrderApplicationService createOrderApplicationService;
     private final OrderRepository orderRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -60,6 +62,13 @@ public class StartOrderUseCase {
         applicationEventPublisher.publishEvent(new HoldCreatedEvent(snapshot));
 
         final Order order = createOrderApplicationService.createPendingOrder(
+                input.memberId(),
+                input.performanceId(),
+                snapshot.holdKey(),
+                snapshot.expiresAt(),
+                performanceSeats
+        );
+        holdHistoryRecorder.recordActiveHold(
                 input.memberId(),
                 input.performanceId(),
                 snapshot.holdKey(),
