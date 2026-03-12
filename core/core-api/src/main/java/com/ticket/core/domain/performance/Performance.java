@@ -42,7 +42,7 @@ public class Performance extends BaseEntity {
     private int maxCanHoldCount;
 
     @Column
-    private Integer holdTime = 300;
+    private Integer holdTime = 420;
 
     public Performance(
             final Show show,
