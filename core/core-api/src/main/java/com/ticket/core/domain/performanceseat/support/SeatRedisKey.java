@@ -1,52 +1,48 @@
 package com.ticket.core.domain.performanceseat.support;
 
 /**
- * 좌석 관련 Redis 키를 중앙에서 관리합니다.
- * 키 포맷 변경 시 이 클래스만 수정하면 됩니다.
+ * 좌석 관련 Redis key 규칙을 한 곳에서 관리한다.
  */
 public final class SeatRedisKey {
 
-    private SeatRedisKey() {}
-
-    // ── Select 키 ──
     private static final String SELECT_KEY = "seat:select:{perf:%d}:%d";
     private static final String SELECT_PATTERN = "seat:select:{perf:%d}:*";
 
-    public static String select(Long perfId, Long seatId) {
+    private static final String HOLD_KEY = "seat:hold:{perf:%d}:%d";
+    private static final String HOLD_PATTERN = "seat:hold:{perf:%d}:*";
+    private static final String HOLD_META_KEY = "hold:key:%s";
+
+    private SeatRedisKey() {}
+
+    public static String select(final Long perfId, final Long seatId) {
         return String.format(SELECT_KEY, perfId, seatId);
     }
 
-    public static String selectPattern(Long perfId) {
+    public static String selectPattern(final Long perfId) {
         return String.format(SELECT_PATTERN, perfId);
     }
 
-    public static boolean isSelectKey(String key) {
+    public static boolean isSelectKey(final String key) {
         return key != null && key.startsWith("seat:select:{perf:");
     }
 
-    // ── Hold 키 ──
-    private static final String HOLD_KEY = "seat:hold:{perf:%d}:%d";
-    private static final String HOLD_PATTERN = "seat:hold:{perf:%d}:*";
-    private static final String HOLD_META_KEY = "hold:token:%s";
-
-    public static String hold(Long perfId, Long seatId) {
+    public static String hold(final Long perfId, final Long seatId) {
         return String.format(HOLD_KEY, perfId, seatId);
     }
 
-    public static String holdPattern(Long perfId) {
+    public static String holdPattern(final Long perfId) {
         return String.format(HOLD_PATTERN, perfId);
     }
 
-    public static String holdMeta(String holdToken) {
-        return String.format(HOLD_META_KEY, holdToken);
+    public static String holdMeta(final String holdKey) {
+        return String.format(HOLD_META_KEY, holdKey);
     }
 
-    public static boolean isHoldMetaKey(String key) {
-        return key != null && key.startsWith("hold:token:");
+    public static boolean isHoldMetaKey(final String key) {
+        return key != null && key.startsWith("hold:key:");
     }
 
-    // ── 공통 유틸 ──
-    public static Long extractPerformanceId(String key) {
+    public static Long extractPerformanceId(final String key) {
         final int start = key.indexOf("{perf:");
         final int end = key.indexOf('}', start);
         if (start < 0 || end < 0) {
@@ -55,11 +51,11 @@ public final class SeatRedisKey {
         return Long.parseLong(key.substring(start + 6, end));
     }
 
-    public static Long extractSeatId(String key) {
+    public static Long extractSeatId(final String key) {
         return Long.parseLong(key.substring(key.lastIndexOf(':') + 1));
     }
 
-    public static String extractHoldToken(String key) {
-        return key.substring("hold:token:".length());
+    public static String extractHoldKey(final String key) {
+        return key.substring("hold:key:".length());
     }
 }

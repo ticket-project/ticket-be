@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record HoldSnapshot(
-        String holdToken,
+        String holdKey,
         Long memberId,
         Long performanceId,
         List<Long> seatIds,

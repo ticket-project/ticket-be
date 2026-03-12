@@ -40,9 +40,9 @@ public class HoldManager {
             final Duration ttl
     ) {
         final List<Long> normalizedSeatIds = seatIds.stream().distinct().sorted().toList();
-        final String holdToken = UUID.randomUUID().toString();
+        final String holdKey = UUID.randomUUID().toString();
         final LocalDateTime expiresAt = LocalDateTime.now().plus(ttl);
-        final HoldSnapshot snapshot = new HoldSnapshot(holdToken, memberId, performanceId, normalizedSeatIds, expiresAt);
+        final HoldSnapshot snapshot = new HoldSnapshot(holdKey, memberId, performanceId, normalizedSeatIds, expiresAt);
 
         ensureSeatsNotHeld(performanceId, normalizedSeatIds);
         saveHold(snapshot, ttl);
@@ -51,22 +51,18 @@ public class HoldManager {
 
     @DistributedLock(
             prefix = "hold",
-            dynamicKey = "#seatIds.![#performanceId + ':' + #this]",
-            timeUnit = TimeUnit.SECONDS,
-            waitTime = 3L,
-            leaseTime = 10L,
-            errorType = ErrorType.HOLD_BUSY
+            dynamicKey = "#seatIds.![#performanceId + ':' + #this]"
     )
-    public void release(final Long performanceId, final String holdToken, final List<Long> seatIds) {
+    public void release(final Long performanceId, final String holdKey, final List<Long> seatIds) {
         final List<Long> normalizedSeatIds = seatIds.stream().distinct().sorted().toList();
         for (final Long seatId : normalizedSeatIds) {
             final RBucket<String> bucket = redissonClient.getBucket(SeatRedisKey.hold(performanceId, seatId), StringCodec.INSTANCE);
-            final String storedToken = bucket.get();
-            if (holdToken.equals(storedToken)) {
+            final String storedHoldKey = bucket.get();
+            if (holdKey.equals(storedHoldKey)) {
                 bucket.delete();
             }
         }
-        redissonClient.getBucket(SeatRedisKey.holdMeta(holdToken), StringCodec.INSTANCE).delete();
+        redissonClient.getBucket(SeatRedisKey.holdMeta(holdKey), StringCodec.INSTANCE).delete();
     }
 
     public Set<Long> getHoldingSeatIds(final Long performanceId) {
@@ -80,8 +76,8 @@ public class HoldManager {
     private void ensureSeatsNotHeld(final Long performanceId, final List<Long> seatIds) {
         for (final Long seatId : seatIds) {
             final RBucket<String> bucket = redissonClient.getBucket(SeatRedisKey.hold(performanceId, seatId), StringCodec.INSTANCE);
-            final String holdToken = bucket.get();
-            if (holdToken != null) {
+            final String storedHoldKey = bucket.get();
+            if (storedHoldKey != null) {
                 throw new CoreException(ErrorType.SEAT_ALREADY_HOLD);
             }
         }
@@ -92,11 +88,11 @@ public class HoldManager {
         try {
             for (final Long seatId : snapshot.seatIds()) {
                 final String key = SeatRedisKey.hold(snapshot.performanceId(), seatId);
-                redissonClient.getBucket(key, StringCodec.INSTANCE).set(snapshot.holdToken(), ttl);
+                redissonClient.getBucket(key, StringCodec.INSTANCE).set(snapshot.holdKey(), ttl);
                 createdKeys.add(key);
             }
             final String json = holdSnapshotCodec.encode(snapshot);
-            redissonClient.getBucket(SeatRedisKey.holdMeta(snapshot.holdToken()), StringCodec.INSTANCE).set(json, ttl);
+            redissonClient.getBucket(SeatRedisKey.holdMeta(snapshot.holdKey()), StringCodec.INSTANCE).set(json, ttl);
         } catch (final Exception e) {
             for (final String key : createdKeys) {
                 try {
@@ -106,9 +102,9 @@ public class HoldManager {
                 }
             }
             try {
-                redissonClient.getBucket(SeatRedisKey.holdMeta(snapshot.holdToken()), StringCodec.INSTANCE).delete();
+                redissonClient.getBucket(SeatRedisKey.holdMeta(snapshot.holdKey()), StringCodec.INSTANCE).delete();
             } catch (final Exception rollbackException) {
-                log.warn("hold 메타 롤백에 실패했습니다. holdToken={}", snapshot.holdToken(), rollbackException);
+                log.warn("hold 메타 롤백에 실패했습니다. holdKey={}", snapshot.holdKey(), rollbackException);
             }
             throw new IllegalStateException("hold Redis 저장에 실패했습니다.", e);
         }

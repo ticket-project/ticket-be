@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface HoldHistoryRepository extends JpaRepository<HoldHistory, Long> {
 
-    List<HoldHistory> findAllByHoldTokenOrderByIdAsc(String holdToken);
+    List<HoldHistory> findAllByHoldKeyOrderByIdAsc(String holdKey);
 }

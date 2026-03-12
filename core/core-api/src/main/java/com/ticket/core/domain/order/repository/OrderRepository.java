@@ -15,7 +15,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Optional<Order> findByMemberIdAndPerformanceIdAndStatus(Long memberId, Long performanceId, OrderState status);
 
-    Optional<Order> findByHoldToken(String holdToken);
+    Optional<Order> findByHoldKey(String holdKey);
 
     Slice<Order> findAllByStatusAndExpiresAtBefore(OrderState status, LocalDateTime expiresAt, Pageable pageable);
 }
