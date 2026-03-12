@@ -81,10 +81,6 @@ public class HoldRedisService {
         }
     }
 
-    public void releaseHold(final String holdToken) {
-        getHold(holdToken).ifPresent(snapshot -> releaseHold(snapshot.performanceId(), holdToken, snapshot.seatIds()));
-    }
-
     public void releaseHold(final Long performanceId, final String holdToken, final List<Long> seatIds) {
         final List<Long> normalizedSeatIds = seatIds.stream().distinct().sorted().toList();
         final RLock multiLock = createSeatLock(performanceId, normalizedSeatIds);

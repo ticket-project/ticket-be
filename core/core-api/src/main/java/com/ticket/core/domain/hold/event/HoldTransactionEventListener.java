@@ -29,7 +29,7 @@ public class HoldTransactionEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
     public void handleAfterRollback(final HoldCreatedEvent event) {
         final HoldSnapshot snapshot = event.snapshot();
-        holdReleaseApplicationService.releaseBySeatIds(
+        holdReleaseApplicationService.release(
                 snapshot.performanceId(),
                 snapshot.holdToken(),
                 snapshot.seatIds()

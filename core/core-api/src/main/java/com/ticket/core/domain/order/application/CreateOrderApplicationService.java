@@ -24,7 +24,7 @@ public class CreateOrderApplicationService {
     private final HoldHistoryRepository holdHistoryRepository;
 
     @Transactional
-    public Long createPendingOrder(
+    public Order createPendingOrder(
             final Long memberId,
             final Long performanceId,
             final String holdToken,
@@ -56,6 +56,6 @@ public class CreateOrderApplicationService {
                 .toList();
         holdHistoryRepository.saveAll(holdHistories);
 
-        return order.getId();
+        return order;
     }
 }

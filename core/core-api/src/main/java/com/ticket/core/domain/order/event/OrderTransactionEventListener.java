@@ -16,13 +16,13 @@ public class OrderTransactionEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(final OrderCancelledEvent event) {
-        holdReleaseApplicationService.releaseByHoldToken(event.holdToken());
+        holdReleaseApplicationService.release(event.performanceId(), event.holdToken(), event.seatIds());
         seatStatusPublishApplicationService.publishReleased(event.performanceId(), event.seatIds());
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(final OrderExpiredEvent event) {
-        holdReleaseApplicationService.releaseBySeatIds(event.performanceId(), event.holdToken(), event.seatIds());
+        holdReleaseApplicationService.release(event.performanceId(), event.holdToken(), event.seatIds());
         seatStatusPublishApplicationService.publishReleased(event.performanceId(), event.seatIds());
     }
 }

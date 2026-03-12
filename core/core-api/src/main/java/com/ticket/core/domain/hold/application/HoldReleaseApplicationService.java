@@ -12,11 +12,7 @@ public class HoldReleaseApplicationService {
 
     private final HoldRedisService holdRedisService;
 
-    public void releaseByHoldToken(final String holdToken) {
-        holdRedisService.releaseHold(holdToken);
-    }
-
-    public void releaseBySeatIds(final Long performanceId, final String holdToken, final List<Long> seatIds) {
+    public void release(final Long performanceId, final String holdToken, final List<Long> seatIds) {
         holdRedisService.releaseHold(performanceId, holdToken, seatIds);
     }
 }
