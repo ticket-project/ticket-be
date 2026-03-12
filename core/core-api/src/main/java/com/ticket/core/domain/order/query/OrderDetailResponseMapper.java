@@ -32,7 +32,7 @@ public final class OrderDetailResponseMapper {
             final Member member
     ) {
         if (performanceSeats.isEmpty()) {
-            throw new IllegalArgumentException("performanceSeats는 비어 있을 수 없습니다.");
+            throw new IllegalArgumentException("performanceSeats 는 비어 있을 수 없습니다.");
         }
 
         final Map<Long, PerformanceSeat> performanceSeatMap = performanceSeats.stream()
@@ -53,7 +53,7 @@ public final class OrderDetailResponseMapper {
                 : 0L;
 
         return new OrderDetailResponse(
-                order.getId(),
+                order.getOrderKey(),
                 order.getStatus(),
                 order.getExpiresAt(),
                 remainingSeconds,

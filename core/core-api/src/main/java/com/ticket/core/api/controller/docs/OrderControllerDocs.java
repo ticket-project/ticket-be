@@ -17,17 +17,17 @@ public interface OrderControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "본인 주문이 아님")
     })
     ApiResponse<GetOrderDetailUseCase.Output> getOrder(
-            @Parameter(description = "주문 ID", example = "1001", required = true) Long orderId,
+            @Parameter(description = "주문 키", example = "ORD-3f24c6bc355148f6bf941f0b2f2a6c2b", required = true) String orderKey,
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );
 
-    @Operation(summary = "주문 취소", description = "PENDING 주문과 연결된 HOLD 를 취소합니다.")
+    @Operation(summary = "주문 취소", description = "PENDING 주문과 연결된 HOLD를 취소합니다.")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "주문 취소 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "PENDING 주문이 아님")
     })
     ApiResponse<Void> cancelOrder(
-            @Parameter(description = "주문 ID", example = "1001", required = true) Long orderId,
+            @Parameter(description = "주문 키", example = "ORD-3f24c6bc355148f6bf941f0b2f2a6c2b", required = true) String orderKey,
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );
 }
