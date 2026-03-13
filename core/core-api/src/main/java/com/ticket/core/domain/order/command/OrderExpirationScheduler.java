@@ -40,7 +40,7 @@ public class OrderExpirationScheduler {
             int processedCount = 0;
             for (final Order order : expiredOrders.getContent()) {
                 try {
-                    terminateOrderUseCase.expire(order, now);
+                    terminateOrderUseCase.expireByOrderId(order.getId(), now);
                     processedCount++;
                 } catch (final RuntimeException e) {
                     log.error("주문 만료 처리 실패: orderKey={}, orderId={}", order.getOrderKey(), order.getId(), e);
