@@ -8,6 +8,7 @@ import com.ticket.core.domain.performanceseat.model.PerformanceSeat;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,9 +63,9 @@ public class CreateOrderApplicationService {
     private boolean isPendingOrderConstraintViolation(final DataIntegrityViolationException e) {
         Throwable cause = e;
         while (cause != null) {
-            final String message = cause.getMessage();
-            if (message != null && message.contains(PENDING_ORDER_CONSTRAINT_NAME)) {
-                return true;
+            if (cause instanceof ConstraintViolationException constraintViolationException) {
+                final String constraintName = constraintViolationException.getConstraintName();
+                return PENDING_ORDER_CONSTRAINT_NAME.equalsIgnoreCase(constraintName);
             }
             cause = cause.getCause();
         }
