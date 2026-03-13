@@ -31,8 +31,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Optional<Order> findByMemberIdAndPerformanceIdAndStatus(Long memberId, Long performanceId, OrderState status);
 
-    Optional<Order> findByHoldKey(String holdKey);
-
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
             select o
