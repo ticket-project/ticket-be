@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -19,7 +20,12 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "ORDERS")
+@Table(
+        name = "ORDERS",
+        indexes = {
+                @Index(name = "IDX_ORDERS_MEMBER_PERFORMANCE_STATUS", columnList = "member_id,performance_id,status")
+        }
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
 
