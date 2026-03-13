@@ -1,6 +1,7 @@
 package com.ticket.core.domain.performanceseat.query;
 
 import com.ticket.core.api.controller.response.SeatAvailabilityResponse;
+import com.ticket.core.enums.PerformanceSeatState;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class SeatAvailabilityCalculator {
             final GradeKey gradeKey = new GradeKey(row.gradeName(), row.sortOrder());
             availableSeatCounts.putIfAbsent(gradeKey, 0L);
 
-            if (!redisOccupiedSeatIds.contains(row.seatId())) {
+            if (row.state() == PerformanceSeatState.AVAILABLE && !redisOccupiedSeatIds.contains(row.seatId())) {
                 availableSeatCounts.computeIfPresent(gradeKey, (key, count) -> count + 1L);
             }
         }
@@ -42,7 +43,7 @@ public class SeatAvailabilityCalculator {
         return new SeatAvailabilityResponse(grades);
     }
 
-    public record AvailableSeatRow(Long seatId, String gradeName, int sortOrder) {
+    public record AvailableSeatRow(Long seatId, PerformanceSeatState state, String gradeName, int sortOrder) {
     }
 
     private record GradeKey(String gradeName, int sortOrder) {
