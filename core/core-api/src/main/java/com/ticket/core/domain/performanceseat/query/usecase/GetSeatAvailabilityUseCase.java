@@ -4,7 +4,6 @@ import com.ticket.core.api.controller.response.SeatAvailabilityResponse;
 import com.ticket.core.domain.hold.support.HoldManager;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
-import com.ticket.core.domain.performanceseat.command.SeatSelectionService;
 import com.ticket.core.domain.performanceseat.query.SeatAvailabilityCalculator;
 import com.ticket.core.domain.performanceseat.query.SeatAvailabilityQueryRepository;
 import com.ticket.core.support.exception.CoreException;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -23,7 +21,6 @@ public class GetSeatAvailabilityUseCase {
 
     private final PerformanceFinder performanceFinder;
     private final SeatAvailabilityQueryRepository seatAvailabilityQueryRepository;
-    private final SeatSelectionService seatSelectionService;
     private final HoldManager holdManager;
     private final SeatAvailabilityCalculator seatAvailabilityCalculator;
 
@@ -48,8 +45,6 @@ public class GetSeatAvailabilityUseCase {
     }
 
     private Set<Long> mergeRedisOccupiedIds(final Long performanceId) {
-        final Set<Long> seatIds = new HashSet<>(seatSelectionService.getSelectingSeatIds(performanceId));
-        seatIds.addAll(holdManager.getHoldingSeatIds(performanceId));
-        return seatIds;
+        return holdManager.getHoldingSeatIds(performanceId);
     }
 }

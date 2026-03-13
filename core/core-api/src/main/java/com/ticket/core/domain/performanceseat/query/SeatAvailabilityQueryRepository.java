@@ -2,7 +2,6 @@ package com.ticket.core.domain.performanceseat.query;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ticket.core.enums.PerformanceSeatState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -22,6 +21,7 @@ public class SeatAvailabilityQueryRepository {
         return queryFactory
                 .select(Projections.constructor(SeatAvailabilityCalculator.AvailableSeatRow.class,
                         performanceSeat.seat.id,
+                        performanceSeat.state,
                         showGrade.gradeName,
                         showGrade.sortOrder
                 ))
@@ -32,8 +32,7 @@ public class SeatAvailabilityQueryRepository {
                 )
                 .join(showGrade).on(showGrade.id.eq(showSeat.showGrade.id))
                 .where(
-                        performanceSeat.performance.id.eq(performanceId),
-                        performanceSeat.state.eq(PerformanceSeatState.AVAILABLE)
+                        performanceSeat.performance.id.eq(performanceId)
                 )
                 .orderBy(showGrade.sortOrder.asc(), performanceSeat.seat.id.asc())
                 .fetch();
