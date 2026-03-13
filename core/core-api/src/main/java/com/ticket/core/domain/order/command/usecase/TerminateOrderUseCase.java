@@ -10,8 +10,7 @@ import com.ticket.core.domain.order.finder.OrderSeatFinder;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
 import com.ticket.core.domain.order.repository.OrderRepository;
-import com.ticket.core.support.exception.CoreException;
-import com.ticket.core.support.exception.ErrorType;
+import com.ticket.core.enums.OrderState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,7 @@ public class TerminateOrderUseCase {
 
     @Transactional
     public void cancel(final String orderKey, final Long memberId, final LocalDateTime now) {
-        final Order order = orderFinder.findPendingOwnedByOrderKey(orderKey, memberId);
+        final Order order = orderFinder.findPendingOwnedByOrderKeyForUpdate(orderKey, memberId);
         final OrderTransitionContext context = loadTransitionContext(order);
         orderLifecycleDomainService.cancel(order, context.orderSeats(), context.holdHistories(), now);
         applicationEventPublisher.publishEvent(new OrderCancelledEvent(order.getPerformanceId(), order.getHoldKey(), context.seatIds()));
@@ -41,14 +40,17 @@ public class TerminateOrderUseCase {
 
     @Transactional
     public void expireByOrderId(final Long orderId, final LocalDateTime now) {
-        final Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA, "주문을 찾을 수 없습니다. id=" + orderId));
+        final Order order = orderRepository.findByIdAndStatusForUpdate(orderId, OrderState.PENDING)
+                .orElse(null);
+        if (order == null) {
+            return;
+        }
         expire(order, now);
     }
 
     @Transactional
     public void expireByHoldKey(final String holdKey, final LocalDateTime now) {
-        final Order order = orderRepository.findByHoldKey(holdKey)
+        final Order order = orderRepository.findByHoldKeyAndStatusForUpdate(holdKey, OrderState.PENDING)
                 .orElse(null);
         if (order == null) {
             return;

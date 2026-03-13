@@ -26,4 +26,13 @@ public class OrderFinder {
         }
         return order;
     }
+
+    public Order findPendingOwnedByOrderKeyForUpdate(final String orderKey, final Long memberId) {
+        final Order order = orderRepository.findByOrderKeyAndMemberIdForUpdate(orderKey, memberId)
+                .orElseThrow(() -> new CoreException(ErrorType.ORDER_NOT_OWNED));
+        if (order.getStatus() != OrderState.PENDING) {
+            throw new CoreException(ErrorType.ORDER_NOT_PENDING);
+        }
+        return order;
+    }
 }
