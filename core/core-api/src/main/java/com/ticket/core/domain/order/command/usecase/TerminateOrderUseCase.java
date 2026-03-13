@@ -10,6 +10,8 @@ import com.ticket.core.domain.order.finder.OrderSeatFinder;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
 import com.ticket.core.domain.order.repository.OrderRepository;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -38,14 +40,10 @@ public class TerminateOrderUseCase {
     }
 
     @Transactional
-    public void expire(final Order order, final LocalDateTime now) {
-        if (!order.isPending()) {
-            return;
-        }
-
-        final OrderTransitionContext context = loadTransitionContext(order);
-        orderLifecycleDomainService.expire(order, context.orderSeats(), context.holdHistories(), now);
-        applicationEventPublisher.publishEvent(new OrderExpiredEvent(order.getPerformanceId(), order.getHoldKey(), context.seatIds()));
+    public void expireByOrderId(final Long orderId, final LocalDateTime now) {
+        final Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA, "주문을 찾을 수 없습니다. id=" + orderId));
+        expire(order, now);
     }
 
     @Transactional
@@ -58,9 +56,19 @@ public class TerminateOrderUseCase {
         expire(order, now);
     }
 
+    private void expire(final Order order, final LocalDateTime now) {
+        if (!order.isPending()) {
+            return;
+        }
+
+        final OrderTransitionContext context = loadTransitionContext(order);
+        orderLifecycleDomainService.expire(order, context.orderSeats(), context.holdHistories(), now);
+        applicationEventPublisher.publishEvent(new OrderExpiredEvent(order.getPerformanceId(), order.getHoldKey(), context.seatIds()));
+    }
+
     private OrderTransitionContext loadTransitionContext(final Order order) {
         final List<OrderSeat> orderSeats = orderSeatFinder.getOrderSeatsByOrderId(order.getId());
-        final List<HoldHistory> holdHistories = holdHistoryFinder.findByHoldKey(order.getHoldKey());
+        final List<HoldHistory> holdHistories = holdHistoryFinder.findActiveByHoldKey(order.getHoldKey());
         final List<Long> seatIds = orderSeats.stream()
                 .map(OrderSeat::getSeatId)
                 .toList();
