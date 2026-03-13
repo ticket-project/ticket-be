@@ -6,6 +6,7 @@ import com.ticket.core.domain.hold.event.HoldCreatedEvent;
 import com.ticket.core.domain.hold.model.HoldSnapshot;
 import com.ticket.core.domain.hold.support.HoldManager;
 import com.ticket.core.domain.hold.support.HoldSeatAvailabilityValidator;
+import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.order.application.CreateOrderApplicationService;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.repository.OrderRepository;
@@ -28,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StartOrderUseCase {
 
+    private final MemberFinder memberFinder;
     private final PerformanceFinder performanceFinder;
     private final HoldSeatAvailabilityValidator holdSeatAvailabilityValidator;
     private final HoldManager holdManager;
@@ -49,6 +51,7 @@ public class StartOrderUseCase {
     )
     public Output execute(final Input input) {
         final List<Long> seatIds = normalizeSeatIds(input.seatIds());
+        memberFinder.findActiveMemberById(input.memberId());
         final Performance performance = performanceFinder.findValidPerformanceById(input.performanceId());
         validateSeatCount(performance, seatIds);
         ensureNoPendingOrder(input.memberId(), input.performanceId());

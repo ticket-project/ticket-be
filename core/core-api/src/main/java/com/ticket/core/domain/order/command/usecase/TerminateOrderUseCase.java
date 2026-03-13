@@ -2,6 +2,7 @@ package com.ticket.core.domain.order.command.usecase;
 
 import com.ticket.core.domain.hold.finder.HoldHistoryFinder;
 import com.ticket.core.domain.hold.model.HoldHistory;
+import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.order.domainservice.OrderLifecycleDomainService;
 import com.ticket.core.domain.order.event.OrderCancelledEvent;
 import com.ticket.core.domain.order.event.OrderExpiredEvent;
@@ -23,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TerminateOrderUseCase {
 
+    private final MemberFinder memberFinder;
     private final OrderFinder orderFinder;
     private final OrderRepository orderRepository;
     private final OrderSeatFinder orderSeatFinder;
@@ -32,6 +34,7 @@ public class TerminateOrderUseCase {
 
     @Transactional
     public void cancel(final String orderKey, final Long memberId, final LocalDateTime now) {
+        memberFinder.findActiveMemberById(memberId);
         final Order order = orderFinder.findPendingOwnedByOrderKeyForUpdate(orderKey, memberId);
         final OrderTransitionContext context = loadTransitionContext(order);
         orderLifecycleDomainService.cancel(order, context.orderSeats(), context.holdHistories(), now);
