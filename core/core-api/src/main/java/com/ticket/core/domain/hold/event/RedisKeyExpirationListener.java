@@ -27,26 +27,26 @@ public class RedisKeyExpirationListener implements MessageListener {
     public void onMessage(final Message message, final byte[] pattern) {
         final String expiredKey = new String(message.getBody(), StandardCharsets.UTF_8);
 
-        if (SeatRedisKey.isSelectKey(expiredKey)) {
-            handleSeatSelectionExpired(expiredKey);
+        final SeatRedisKey.SelectKey selectKey = SeatRedisKey.tryParseSelectKey(expiredKey).orElse(null);
+        if (selectKey != null) {
+            handleSeatSelectionExpired(selectKey);
             return;
         }
 
-        if (SeatRedisKey.isHoldMetaKey(expiredKey)) {
-            handleHoldExpired(expiredKey);
+        final SeatRedisKey.HoldMetaKey holdMetaKey = SeatRedisKey.tryParseHoldMetaKey(expiredKey).orElse(null);
+        if (holdMetaKey != null) {
+            handleHoldExpired(holdMetaKey);
         }
     }
 
-    private void handleSeatSelectionExpired(final String expiredKey) {
-        final Long performanceId = SeatRedisKey.extractPerformanceId(expiredKey);
-        final Long seatId = SeatRedisKey.extractSeatId(expiredKey);
-        seatEventPublisher.publish(SeatStatusMessage.of(performanceId, seatId, DESELECTED));
-        log.info("좌석 선택 만료 이벤트 처리: performanceId={}, seatId={}", performanceId, seatId);
+    private void handleSeatSelectionExpired(final SeatRedisKey.SelectKey selectKey) {
+        seatEventPublisher.publish(SeatStatusMessage.of(selectKey.performanceId(), selectKey.seatId(), DESELECTED));
+        log.info("좌석 선택 만료 이벤트 처리: performanceId={}, seatId={}",
+                selectKey.performanceId(), selectKey.seatId());
     }
 
-    private void handleHoldExpired(final String expiredKey) {
-        final String holdKey = SeatRedisKey.extractHoldKey(expiredKey);
-        terminateOrderUseCase.expireByHoldKey(holdKey, LocalDateTime.now());
-        log.info("홀드 만료 이벤트 처리: holdKey={}", holdKey);
+    private void handleHoldExpired(final SeatRedisKey.HoldMetaKey holdMetaKey) {
+        terminateOrderUseCase.expireByHoldKey(holdMetaKey.holdKey(), LocalDateTime.now());
+        log.info("홀드 만료 이벤트 처리: holdKey={}", holdMetaKey.holdKey());
     }
 }

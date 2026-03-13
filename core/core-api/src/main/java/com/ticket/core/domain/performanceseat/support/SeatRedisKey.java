@@ -1,5 +1,9 @@
 package com.ticket.core.domain.performanceseat.support;
 
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * 좌석 관련 Redis key 규칙을 한 곳에서 관리한다.
  */
@@ -11,6 +15,9 @@ public final class SeatRedisKey {
     private static final String HOLD_KEY = "seat:hold:{perf:%d}:%d";
     private static final String HOLD_PATTERN = "seat:hold:{perf:%d}:*";
     private static final String HOLD_META_KEY = "hold:key:%s";
+    private static final Pattern SELECT_KEY_PATTERN = Pattern.compile("^seat:select:\\{perf:(\\d+)}:(\\d+)$");
+    private static final Pattern HOLD_KEY_PATTERN = Pattern.compile("^seat:hold:\\{perf:(\\d+)}:(\\d+)$");
+    private static final Pattern HOLD_META_KEY_PATTERN = Pattern.compile("^hold:key:(.+)$");
 
     private SeatRedisKey() {}
 
@@ -20,10 +27,6 @@ public final class SeatRedisKey {
 
     public static String selectPattern(final Long perfId) {
         return String.format(SELECT_PATTERN, perfId);
-    }
-
-    public static boolean isSelectKey(final String key) {
-        return key != null && key.startsWith("seat:select:{perf:");
     }
 
     public static String hold(final Long perfId, final Long seatId) {
@@ -38,24 +41,53 @@ public final class SeatRedisKey {
         return String.format(HOLD_META_KEY, holdKey);
     }
 
-    public static boolean isHoldMetaKey(final String key) {
-        return key != null && key.startsWith("hold:key:");
+    public static Optional<SelectKey> tryParseSelectKey(final String key) {
+        return match(SELECT_KEY_PATTERN, key)
+                .map(matcher -> new SelectKey(
+                        Long.parseLong(matcher.group(1)),
+                        Long.parseLong(matcher.group(2))
+                ));
     }
 
-    public static Long extractPerformanceId(final String key) {
-        final int start = key.indexOf("{perf:");
-        final int end = key.indexOf('}', start);
-        if (start < 0 || end < 0) {
-            throw new IllegalArgumentException("performanceId를 추출할 수 없는 key 입니다. key=" + key);
+    public static SelectKey parseSelectKey(final String key) {
+        return tryParseSelectKey(key)
+                .orElseThrow(() -> new IllegalArgumentException("유효한 select key가 아닙니다. key=" + key));
+    }
+
+    public static Optional<HoldKey> tryParseHoldKey(final String key) {
+        return match(HOLD_KEY_PATTERN, key)
+                .map(matcher -> new HoldKey(
+                        Long.parseLong(matcher.group(1)),
+                        Long.parseLong(matcher.group(2))
+                ));
+    }
+
+    public static HoldKey parseHoldKey(final String key) {
+        return tryParseHoldKey(key)
+                .orElseThrow(() -> new IllegalArgumentException("유효한 hold key가 아닙니다. key=" + key));
+    }
+
+    public static Optional<HoldMetaKey> tryParseHoldMetaKey(final String key) {
+        return match(HOLD_META_KEY_PATTERN, key)
+                .map(matcher -> new HoldMetaKey(matcher.group(1)));
+    }
+
+    public static HoldMetaKey parseHoldMetaKey(final String key) {
+        return tryParseHoldMetaKey(key)
+                .orElseThrow(() -> new IllegalArgumentException("유효한 hold meta key가 아닙니다. key=" + key));
+    }
+
+    private static Optional<Matcher> match(final Pattern pattern, final String key) {
+        if (key == null) {
+            return Optional.empty();
         }
-        return Long.parseLong(key.substring(start + 6, end));
+        final Matcher matcher = pattern.matcher(key);
+        return matcher.matches() ? Optional.of(matcher) : Optional.empty();
     }
 
-    public static Long extractSeatId(final String key) {
-        return Long.parseLong(key.substring(key.lastIndexOf(':') + 1));
-    }
+    public record SelectKey(Long performanceId, Long seatId) {}
 
-    public static String extractHoldKey(final String key) {
-        return key.substring("hold:key:".length());
-    }
+    public record HoldKey(Long performanceId, Long seatId) {}
+
+    public record HoldMetaKey(String holdKey) {}
 }
