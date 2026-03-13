@@ -68,7 +68,7 @@ public class HoldManager {
     public Set<Long> getHoldingSeatIds(final Long performanceId) {
         final Set<Long> seatIds = new HashSet<>();
         for (final String key : redissonClient.getKeys().getKeysByPattern(SeatRedisKey.holdPattern(performanceId))) {
-            seatIds.add(SeatRedisKey.extractSeatId(key));
+            seatIds.add(SeatRedisKey.parseHoldKey(key).seatId());
         }
         return seatIds;
     }

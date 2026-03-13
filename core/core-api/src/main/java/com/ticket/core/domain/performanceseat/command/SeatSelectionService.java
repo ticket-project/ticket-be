@@ -70,7 +70,7 @@ public class SeatSelectionService {
             }
 
             bucket.delete();
-            final Long seatId = SeatRedisKey.extractSeatId(key);
+            final Long seatId = SeatRedisKey.parseSelectKey(key).seatId();
             deselectedSeatIds.add(seatId);
             log.info("seat bulk deselect success: performanceId={}, seatId={}, memberId={}", performanceId, seatId, memberId);
         }
@@ -82,29 +82,13 @@ public class SeatSelectionService {
         redissonClient.getBucket(SeatRedisKey.select(performanceId, seatId), StringCodec.INSTANCE).delete();
     }
 
-    public List<SeatSelectionInfo> getSelectedSeats(final Long performanceId) {
-        final String pattern = SeatRedisKey.selectPattern(performanceId);
-        final List<SeatSelectionInfo> selections = new ArrayList<>();
-
-        for (final String key : redissonClient.getKeys().getKeysByPattern(pattern)) {
-            final RBucket<String> bucket = redissonClient.getBucket(key, StringCodec.INSTANCE);
-            final String memberId = bucket.get();
-            if (memberId != null) {
-                selections.add(new SeatSelectionInfo(SeatRedisKey.extractSeatId(key), Long.parseLong(memberId)));
-            }
-        }
-
-        return selections;
-    }
-
     public Set<Long> getSelectingSeatIds(final Long performanceId) {
         final String pattern = SeatRedisKey.selectPattern(performanceId);
         final Set<Long> seatIds = new HashSet<>();
         for (final String key : redissonClient.getKeys().getKeysByPattern(pattern)) {
-            seatIds.add(SeatRedisKey.extractSeatId(key));
+            seatIds.add(SeatRedisKey.parseSelectKey(key).seatId());
         }
         return seatIds;
     }
 
-    public record SeatSelectionInfo(Long seatId, Long memberId) {}
 }
