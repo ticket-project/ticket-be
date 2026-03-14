@@ -7,6 +7,8 @@ import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -19,14 +21,7 @@ public class OrderFinder {
                 .orElseThrow(() -> new CoreException(ErrorType.ORDER_NOT_OWNED));
     }
 
-    public Order findPendingOwnedByOrderKey(final String orderKey, final Long memberId) {
-        final Order order = findOwnedByOrderKey(orderKey, memberId);
-        if (order.getStatus() != OrderState.PENDING) {
-            throw new CoreException(ErrorType.ORDER_NOT_PENDING);
-        }
-        return order;
-    }
-
+    @Transactional(propagation = Propagation.MANDATORY)
     public Order findPendingOwnedByOrderKeyForUpdate(final String orderKey, final Long memberId) {
         final Order order = orderRepository.findByOrderKeyAndMemberIdForUpdate(orderKey, memberId)
                 .orElseThrow(() -> new CoreException(ErrorType.ORDER_NOT_OWNED));
