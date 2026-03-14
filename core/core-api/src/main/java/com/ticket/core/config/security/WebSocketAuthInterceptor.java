@@ -50,13 +50,13 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                                     memberPrincipal.getAuthorities()
                             );
                     accessor.setUser(authentication);
-                    log.info("WebSocket 인증 성공: memberId={}", memberPrincipal.getMemberId());
+                    log.info("웹소켓 인증에 성공했습니다. memberId={}", memberPrincipal.getMemberId());
                 } catch (JwtException | IllegalArgumentException e) {
-                    log.warn("WebSocket JWT 인증 실패: {}", e.getMessage());
+                    log.warn("웹소켓 JWT 인증에 실패했습니다. message={}", e.getMessage());
                     throw new MessageDeliveryException("JWT 인증 실패");
                 }
             } else {
-                log.warn("WebSocket CONNECT: Authorization 헤더 없음 → 연결 차단");
+                log.warn("웹소켓 CONNECT 요청에 Authorization 헤더가 없어 연결을 차단합니다.");
                 throw new MessageDeliveryException("인증 정보가 없습니다");
             }
         }

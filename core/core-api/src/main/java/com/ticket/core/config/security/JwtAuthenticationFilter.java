@@ -48,13 +48,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (ExpiredJwtException e) {
-                log.debug("JWT 만료: {}", e.getMessage());
+                log.debug("토큰이 만료되었습니다. message={}", e.getMessage());
                 request.setAttribute(JWT_ERROR_ATTRIBUTE, "expired");
             } catch (SignatureException | MalformedJwtException e) {
-                log.warn("JWT 위조/변조 시도: {} from IP: {}", e.getMessage(), request.getRemoteAddr());
+                log.warn("토큰 위조 또는 변조가 감지되었습니다. message={}, ip={}", e.getMessage(), request.getRemoteAddr());
                 request.setAttribute(JWT_ERROR_ATTRIBUTE, "invalid");
             } catch (JwtException | IllegalArgumentException e) {
-                log.warn("JWT 인증 실패: {}", e.getMessage());
+                log.warn("토큰 인증에 실패했습니다. message={}", e.getMessage());
                 request.setAttribute(JWT_ERROR_ATTRIBUTE, "unknown");
             }
         }

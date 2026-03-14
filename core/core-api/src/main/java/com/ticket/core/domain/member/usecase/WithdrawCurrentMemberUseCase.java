@@ -30,7 +30,7 @@ public class WithdrawCurrentMemberUseCase {
             try {
                 kakaoUnlinkService.unlinkByUserId(socialId);
             } catch (Exception e) {
-                log.warn("Kakao unlink failed after withdrawal. socialId={}", socialId, e);
+                log.warn("회원 탈퇴 후 카카오 연동 해제에 실패했습니다. socialId={}", socialId, e);
             }
         });
     }

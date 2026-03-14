@@ -29,7 +29,7 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
             final HttpServletResponse response,
             final AuthenticationException exception
     ) throws IOException {
-        log.warn("OAuth2 authentication failed: {}", exception.getMessage(), exception);
+        log.warn("소셜 로그인 OAuth2 인증에 실패했습니다. 사유={}", exception.getMessage(), exception);
         final String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("error", DEFAULT_ERROR_CODE)
                 .encode()
