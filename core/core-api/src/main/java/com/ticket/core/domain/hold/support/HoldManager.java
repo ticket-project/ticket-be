@@ -38,12 +38,11 @@ public class HoldManager {
             final List<Long> seatIds,
             final Duration ttl
     ) {
-        final List<Long> normalizedSeatIds = seatIds.stream().distinct().sorted().toList();
         final String holdKey = UUID.randomUUID().toString();
         final LocalDateTime expiresAt = LocalDateTime.now().plus(ttl);
-        final HoldSnapshot snapshot = new HoldSnapshot(holdKey, memberId, performanceId, normalizedSeatIds, expiresAt);
+        final HoldSnapshot snapshot = new HoldSnapshot(holdKey, memberId, performanceId, seatIds, expiresAt);
 
-        ensureSeatsNotHeld(performanceId, normalizedSeatIds);
+        ensureSeatsNotHeld(performanceId, seatIds);
         saveHold(snapshot, ttl);
         return snapshot;
     }
