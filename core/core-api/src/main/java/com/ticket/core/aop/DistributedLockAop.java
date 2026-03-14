@@ -87,6 +87,8 @@ public class DistributedLockAop {
             lock.unlock();
         } catch (final IllegalMonitorStateException e) {
             log.debug("분산 락 해제 시점에 현재 스레드가 락을 소유하고 있지 않습니다. keys={}", keys, e);
+        } catch (final RuntimeException e) {
+            log.error("분산 락 해제 중 오류가 발생했습니다. keys={}", keys, e);
         }
     }
 }

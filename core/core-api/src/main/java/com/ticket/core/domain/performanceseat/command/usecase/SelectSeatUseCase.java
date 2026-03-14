@@ -1,5 +1,6 @@
 package com.ticket.core.domain.performanceseat.command.usecase;
 
+import com.ticket.core.aop.DistributedLock;
 import com.ticket.core.domain.performanceseat.command.SeatSelectionService;
 import com.ticket.core.domain.performanceseat.support.SeatEventPublisher;
 import com.ticket.core.domain.performanceseat.support.SeatSelectionAvailabilityValidator;
@@ -18,6 +19,10 @@ public class SelectSeatUseCase {
 
     public record Input(Long performanceId, Long seatId, Long memberId) {}
 
+    @DistributedLock(
+            prefix = "hold",
+            dynamicKey = "#input.performanceId() + ':' + #input.seatId()"
+    )
     public void execute(final Input input) {
         seatSelectionAvailabilityValidator.validate(input.performanceId(), input.seatId());
         seatSelectionService.select(input.performanceId(), input.seatId(), input.memberId());
