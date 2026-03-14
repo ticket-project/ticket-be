@@ -21,16 +21,16 @@ public class WithdrawCurrentMemberUseCase {
 
     public Output execute(final Input input) {
         final List<String> kakaoSocialIds = memberWithdrawalTxService.withdraw(input.memberId);
-        unlinkKakaoAccountsSafely(kakaoSocialIds);
+        unlinkKakaoAccountsSafely(input.memberId(), kakaoSocialIds);
         return new Output();
     }
 
-    private void unlinkKakaoAccountsSafely(final List<String> kakaoSocialIds) {
+    private void unlinkKakaoAccountsSafely(final Long memberId, final List<String> kakaoSocialIds) {
         kakaoSocialIds.forEach(socialId -> {
             try {
                 kakaoUnlinkService.unlinkByUserId(socialId);
             } catch (Exception e) {
-                log.warn("회원 탈퇴 후 카카오 연동 해제에 실패했습니다. socialId={}", socialId, e);
+                log.warn("회원 탈퇴 후 카카오 연동 해제에 실패했습니다. memberId={}, provider=kakao", memberId, e);
             }
         });
     }

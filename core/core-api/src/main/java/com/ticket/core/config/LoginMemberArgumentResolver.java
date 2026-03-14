@@ -1,6 +1,8 @@
 package com.ticket.core.config;
 
 import com.ticket.core.domain.member.MemberPrincipal;
+import com.ticket.core.support.exception.AuthException;
+import com.ticket.core.support.exception.ErrorType;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +21,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     public MemberPrincipal resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer, final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) throws Exception {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            return null;
+            throw new AuthException(ErrorType.AUTHENTICATION_ERROR);
         }
 
         final Object principal = authentication.getPrincipal();
@@ -27,6 +29,6 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
             return memberPrincipal;
         }
 
-        return null;
+        throw new AuthException(ErrorType.AUTHENTICATION_ERROR);
     }
 }
