@@ -1,5 +1,6 @@
 package com.ticket.core.domain.performanceseat.support;
 
+import com.ticket.core.domain.hold.support.HoldManager;
 import com.ticket.core.domain.performanceseat.finder.PerformanceSeatFinder;
 import com.ticket.core.domain.performanceseat.model.PerformanceSeat;
 import com.ticket.core.enums.PerformanceSeatState;
@@ -15,6 +16,7 @@ import java.util.List;
 public class SeatSelectionAvailabilityValidator {
 
     private final PerformanceSeatFinder performanceSeatFinder;
+    private final HoldManager holdManager;
 
     public void validate(final Long performanceId, final Long seatId) {
         final List<PerformanceSeat> performanceSeats = performanceSeatFinder.findByPerformanceIdAndSeatIdIn(
@@ -28,6 +30,9 @@ public class SeatSelectionAvailabilityValidator {
         final PerformanceSeat performanceSeat = performanceSeats.getFirst();
         if (performanceSeat.getState() != PerformanceSeatState.AVAILABLE) {
             throw new CoreException(ErrorType.NOT_EXIST_AVAILABLE_SEAT);
+        }
+        if (holdManager.isHeld(performanceId, seatId)) {
+            throw new CoreException(ErrorType.SEAT_ALREADY_HOLD);
         }
     }
 }
