@@ -31,48 +31,64 @@ public class SeatSelectionService {
 
         final boolean locked = bucket.setIfAbsent(memberId.toString(), SELECT_TTL);
         if (!locked) {
-            log.warn("seat select failed: performanceId={}, seatId={}, memberId={}", performanceId, seatId, memberId);
+            log.warn("좌석 선택에 실패했습니다. performanceId={}, seatId={}, memberId={}", performanceId, seatId, memberId);
             throw new CoreException(ErrorType.SEAT_ALREADY_SELECTED);
         }
 
-        log.info("seat select success: performanceId={}, seatId={}, memberId={}", performanceId, seatId, memberId);
+        log.info("좌석 선택에 성공했습니다. performanceId={}, seatId={}, memberId={}", performanceId, seatId, memberId);
     }
 
     public void deselect(final Long performanceId, final Long seatId, final Long memberId) {
         final String key = SeatRedisKey.select(performanceId, seatId);
         final RBucket<String> bucket = redissonClient.getBucket(key, StringCodec.INSTANCE);
+        final String memberKey = memberId.toString();
 
         final String holder = bucket.get();
         if (holder == null) {
-            log.info("seat deselect skipped: performanceId={}, seatId={}", performanceId, seatId);
+            log.info("좌석 선택 해제를 건너뜁니다. 이미 선택 정보가 없습니다. performanceId={}, seatId={}", performanceId, seatId);
             return;
         }
 
-        if (!memberId.toString().equals(holder)) {
-            log.warn("seat deselect denied: performanceId={}, seatId={}, requestMemberId={}, holderMemberId={}",
+        if (!memberKey.equals(holder)) {
+            log.warn("좌석 선택 해제 권한이 없습니다. performanceId={}, seatId={}, requestMemberId={}, holderMemberId={}",
                     performanceId, seatId, memberId, holder);
             throw new CoreException(ErrorType.SEAT_NOT_OWNED);
         }
 
-        bucket.delete();
-        log.info("seat deselect success: performanceId={}, seatId={}, memberId={}", performanceId, seatId, memberId);
+        final boolean released = bucket.compareAndSet(memberKey, null);
+        if (!released) {
+            final String currentHolder = bucket.get();
+            if (currentHolder == null) {
+                log.info("좌석 선택 해제 시점에 이미 만료되었거나 해제되었습니다. performanceId={}, seatId={}, memberId={}",
+                        performanceId, seatId, memberId);
+                return;
+            }
+
+            log.warn("좌석 선택 해제 권한이 없습니다. performanceId={}, seatId={}, requestMemberId={}, holderMemberId={}",
+                    performanceId, seatId, memberId, currentHolder);
+            throw new CoreException(ErrorType.SEAT_NOT_OWNED);
+        }
+        log.info("좌석 선택 해제에 성공했습니다. performanceId={}, seatId={}, memberId={}", performanceId, seatId, memberId);
     }
 
     public List<Long> deselectAll(final Long performanceId, final Long memberId) {
         final String pattern = SeatRedisKey.selectPattern(performanceId);
         final List<Long> deselectedSeatIds = new ArrayList<>();
+        final String memberKey = memberId.toString();
 
         for (final String key : redissonClient.getKeys().getKeysByPattern(pattern)) {
             final RBucket<String> bucket = redissonClient.getBucket(key, StringCodec.INSTANCE);
             final String holder = bucket.get();
-            if (!memberId.toString().equals(holder)) {
+            if (!memberKey.equals(holder)) {
                 continue;
             }
 
-            bucket.delete();
+            if (!bucket.compareAndSet(memberKey, null)) {
+                continue;
+            }
             final Long seatId = SeatRedisKey.parseSelectKey(key).seatId();
             deselectedSeatIds.add(seatId);
-            log.info("seat bulk deselect success: performanceId={}, seatId={}, memberId={}", performanceId, seatId, memberId);
+            log.info("좌석 일괄 선택 해제에 성공했습니다. performanceId={}, seatId={}, memberId={}", performanceId, seatId, memberId);
         }
 
         return deselectedSeatIds;
