@@ -38,12 +38,6 @@ public class RefreshTokenService {
         return parseMemberId(memberId);
     }
 
-    public Optional<Long> validateAndRevoke(final String tokenValue) {
-        final RBucket<String> bucket = redissonClient.getBucket(KEY_PREFIX + tokenValue);
-        final String memberId = bucket.getAndDelete();
-        return parseMemberId(memberId);
-    }
-
     /**
      * Refresh Token을 소비하지 않고 소유자 memberId만 검증합니다.
      */
@@ -57,6 +51,14 @@ public class RefreshTokenService {
      */
     public void revoke(final String tokenValue) {
         redissonClient.getBucket(KEY_PREFIX + tokenValue).delete();
+    }
+
+    /**
+     * Refresh Token의 소유자가 일치할 때만 원자적으로 삭제합니다.
+     */
+    public boolean revokeIfOwned(final String tokenValue, final Long memberId) {
+        final RBucket<String> bucket = redissonClient.getBucket(KEY_PREFIX + tokenValue);
+        return bucket.compareAndSet(String.valueOf(memberId), null);
     }
 
     /**
