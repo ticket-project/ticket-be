@@ -37,7 +37,7 @@ public class DistributedLockAop {
                 signature.getParameterNames(),
                 joinPoint.getArgs(),
                 distributedLock.dynamicKey()
-        ).stream().sorted().toList();
+        ).stream().distinct().sorted().toList();
         final RLock lock = generateLock(keys);
 
         try {
