@@ -83,7 +83,7 @@ public class AuthController implements AuthControllerDocs {
         if (refreshToken == null) {
             throw new AuthException(ErrorType.AUTHENTICATION_ERROR);
         }
-        final LogoutUseCase.Input input = new LogoutUseCase.Input(principal, refreshToken);
+        final LogoutUseCase.Input input = new LogoutUseCase.Input(principal.getMemberId(), refreshToken);
         return ApiResponse.success(logoutUseCase.execute(input, response));
     }
 }
