@@ -1,6 +1,7 @@
 package com.ticket.core.domain.hold.support;
 
 import com.ticket.core.aop.DistributedLock;
+import com.ticket.core.domain.hold.application.HoldKeyGenerator;
 import com.ticket.core.domain.hold.model.HoldSnapshot;
 import com.ticket.core.domain.performanceseat.support.SeatRedisKey;
 import com.ticket.core.support.exception.CoreException;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @Slf4j
 @Component
@@ -27,6 +27,7 @@ public class HoldManager {
 
     private final RedissonClient redissonClient;
     private final HoldSnapshotCodec holdSnapshotCodec;
+    private final HoldKeyGenerator holdKeyGenerator;
 
     @DistributedLock(
             prefix = "hold",
@@ -38,7 +39,7 @@ public class HoldManager {
             final List<Long> seatIds,
             final Duration ttl
     ) {
-        final String holdKey = UUID.randomUUID().toString();
+        final String holdKey = holdKeyGenerator.generate();
         final LocalDateTime expiresAt = LocalDateTime.now().plus(ttl);
         final HoldSnapshot snapshot = new HoldSnapshot(holdKey, memberId, performanceId, seatIds, expiresAt);
 
