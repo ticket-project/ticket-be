@@ -44,9 +44,9 @@ public class RedisExpirationListenerConfig {
                 }
 
                 connection.serverCommands().setConfig(NOTIFY_KEYSPACE_EVENTS, REQUIRED_NOTIFY_OPTIONS);
-                log.info("Redis keyspace notifications enabled: {}", REQUIRED_NOTIFY_OPTIONS);
+                log.info("레디스 키스페이스 알림을 활성화했습니다. 설정값={}", REQUIRED_NOTIFY_OPTIONS);
             } catch (final Exception e) {
-                log.warn("Redis keyspace notifications 설정에 실패했습니다. expired listener가 동작하지 않을 수 있습니다.", e);
+                log.warn("레디스 키스페이스 알림 설정에 실패했습니다. 만료 이벤트 리스너가 동작하지 않을 수 있습니다.", e);
             } finally {
                 if (connection != null) {
                     connection.close();

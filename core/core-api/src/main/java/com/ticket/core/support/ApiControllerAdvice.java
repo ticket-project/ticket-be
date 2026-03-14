@@ -20,7 +20,7 @@ public class ApiControllerAdvice {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleException(Exception e) {
-        log.error("Exception = {} ", e.getMessage(), e);
+        log.error("예외가 발생했습니다. message={} ", e.getMessage(), e);
         return ResponseEntity
                 .status(ErrorType.DEFAULT_ERROR.getStatus())
                 .body(ApiResponse.error(ErrorType.DEFAULT_ERROR));

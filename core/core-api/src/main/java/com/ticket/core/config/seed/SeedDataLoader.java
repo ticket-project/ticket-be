@@ -31,18 +31,18 @@ public class SeedDataLoader implements ApplicationRunner {
     @Override
     public void run(final ApplicationArguments args) {
         if (!shouldSeed()) {
-            log.info("Seed skipped: CATEGORIES already has data.");
+            log.info("시드 적재를 건너뜁니다. CATEGORIES 테이블에 이미 데이터가 있습니다.");
             return;
         }
 
         final List<String> statements = parseStatements();
         if (statements.isEmpty()) {
-            log.info("Seed skipped: no SQL statements found.");
+            log.info("시드 적재를 건너뜁니다. 실행할 SQL 문이 없습니다.");
             return;
         }
 
         transactionTemplate.executeWithoutResult(status -> executeInBatches(statements));
-        log.info("Seed completed: statements={}, batchSize={}", statements.size(), batchSize);
+        log.info("시드 적재를 완료했습니다. statements={}, batchSize={}", statements.size(), batchSize);
     }
 
     private boolean shouldSeed() {
@@ -50,7 +50,7 @@ public class SeedDataLoader implements ApplicationRunner {
             final Integer count = jdbcTemplate.queryForObject(SEED_CHECK_SQL, Integer.class);
             return count == null || count == 0;
         } catch (Exception e) {
-            log.warn("Seed pre-check failed. Seeding will continue. reason={}", e.getMessage());
+            log.warn("시드 사전 점검에 실패했지만 적재를 계속 진행합니다. 사유={}", e.getMessage());
             return true;
         }
     }
