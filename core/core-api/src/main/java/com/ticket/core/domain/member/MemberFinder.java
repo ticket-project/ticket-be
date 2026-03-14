@@ -16,8 +16,4 @@ public class MemberFinder {
                 .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND_DATA));
     }
 
-    public Member findActiveMemberByEmail(final String email) {
-        return memberRepository.findByEmail_EmailAndDeletedAtIsNull(email)
-                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND_DATA));
-    }
 }

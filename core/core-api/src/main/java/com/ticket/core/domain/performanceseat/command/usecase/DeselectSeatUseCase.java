@@ -1,6 +1,5 @@
 package com.ticket.core.domain.performanceseat.command.usecase;
 
-import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.performanceseat.command.SeatSelectionService;
 import com.ticket.core.domain.performanceseat.support.SeatEventPublisher;
 import com.ticket.core.domain.performanceseat.support.SeatStatusMessage;
@@ -12,14 +11,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DeselectSeatUseCase {
 
-    private final MemberFinder memberFinder;
     private final SeatSelectionService seatSelectionService;
     private final SeatEventPublisher seatEventPublisher;
 
     public record Input(Long performanceId, Long seatId, Long memberId) {}
 
     public void execute(final Input input) {
-        memberFinder.findActiveMemberById(input.memberId());
         seatSelectionService.deselect(input.performanceId(), input.seatId(), input.memberId());
         seatEventPublisher.publish(SeatStatusMessage.of(input.performanceId(), input.seatId(), SeatAction.DESELECTED));
     }
