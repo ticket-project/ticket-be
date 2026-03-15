@@ -1,0 +1,26 @@
+package com.ticket.core.domain.auth.usecase;
+
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+class GetSocialLoginUrlsUseCaseTest {
+
+    private final GetSocialLoginUrlsUseCase useCase = new GetSocialLoginUrlsUseCase();
+
+    @Test
+    void 마지막_슬래시를_정규화해_소셜_로그인_URL을_반환한다() {
+        GetSocialLoginUrlsUseCase.Output output = useCase.execute(new GetSocialLoginUrlsUseCase.Input("https://ticket.example.com/"));
+
+        assertThat(output.urls()).containsEntry("google", "https://ticket.example.com/api/v1/auth/oauth2/authorize/google");
+        assertThat(output.urls()).containsEntry("kakao", "https://ticket.example.com/api/v1/auth/oauth2/authorize/kakao");
+    }
+
+    @Test
+    void baseUrl이_비어있으면_예외를_던진다() {
+        assertThatThrownBy(() -> useCase.execute(new GetSocialLoginUrlsUseCase.Input(" ")))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("must not be blank");
+    }
+}
