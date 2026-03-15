@@ -32,8 +32,17 @@ class GetSaleStartApproachingShowsPageUseCaseTest {
     void 커서_페이지_응답을_그대로_전달한다() {
         SaleOpeningSoonSearchParam param = new SaleOpeningSoonSearchParam(null, null, null, null, null, null, null, null);
         ShowOpeningSoonDetailResponse show = new ShowOpeningSoonDetailResponse(
-                1L, "공연", "부제", "image", "장소", Region.SEOUL,
-                LocalDate.now(), LocalDate.now().plusDays(1), LocalDateTime.now(), LocalDateTime.now().plusDays(1), 100L
+                1L,
+                "공연",
+                "부제",
+                "image",
+                "장소",
+                Region.SEOUL,
+                LocalDate.now(),
+                LocalDate.now().plusDays(1),
+                LocalDateTime.now(),
+                LocalDateTime.now().plusDays(1),
+                100L
         );
         CursorSlice<ShowOpeningSoonDetailResponse> result =
                 new CursorSlice<>(new SliceImpl<>(List.of(show)), "next-cursor");
@@ -44,6 +53,20 @@ class GetSaleStartApproachingShowsPageUseCaseTest {
 
         assertThat(output.shows().getContent()).containsExactly(show);
         assertThat(output.nextCursor()).isEqualTo("next-cursor");
+        verify(showListQueryRepository).findSaleOpeningSoonPage(param, 10, "popular");
+    }
+
+    @Test
+    void 판매오픈임박_공연이_없으면_빈_슬라이스와_null_커서를_반환한다() {
+        SaleOpeningSoonSearchParam param = new SaleOpeningSoonSearchParam(null, null, null, null, null, null, null, null);
+        CursorSlice<ShowOpeningSoonDetailResponse> result = new CursorSlice<>(new SliceImpl<>(List.of()), null);
+        when(showListQueryRepository.findSaleOpeningSoonPage(param, 10, "popular")).thenReturn(result);
+
+        GetSaleStartApproachingShowsPageUseCase.Output output =
+                useCase.execute(new GetSaleStartApproachingShowsPageUseCase.Input(param, 10, "popular"));
+
+        assertThat(output.shows().getContent()).isEmpty();
+        assertThat(output.nextCursor()).isNull();
         verify(showListQueryRepository).findSaleOpeningSoonPage(param, 10, "popular");
     }
 }

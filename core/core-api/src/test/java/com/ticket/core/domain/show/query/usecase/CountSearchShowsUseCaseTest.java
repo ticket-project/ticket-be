@@ -31,4 +31,15 @@ class CountSearchShowsUseCaseTest {
         assertThat(output.response().count()).isEqualTo(42L);
         verify(showListQueryRepository).countSearchShows(request);
     }
+
+    @Test
+    void 검색결과가_없으면_0건을_반환한다() {
+        ShowSearchRequest request = new ShowSearchRequest("없는공연", null, null, null, null, null, null);
+        when(showListQueryRepository.countSearchShows(request)).thenReturn(0L);
+
+        CountSearchShowsUseCase.Output output = useCase.execute(new CountSearchShowsUseCase.Input(request));
+
+        assertThat(output.response().count()).isZero();
+        verify(showListQueryRepository).countSearchShows(request);
+    }
 }

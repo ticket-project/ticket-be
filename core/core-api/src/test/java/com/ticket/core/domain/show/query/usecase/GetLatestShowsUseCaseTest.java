@@ -37,4 +37,15 @@ class GetLatestShowsUseCaseTest {
         assertThat(output.shows()).isEqualTo(responses);
         verify(showListQueryRepository).findLatestShows("CONCERT", GetLatestShowsUseCase.LATEST_SHOWS_MAX_COUNT);
     }
+
+    @Test
+    void 최신_공연이_없으면_빈_목록을_반환한다() {
+        when(showListQueryRepository.findLatestShows("CONCERT", GetLatestShowsUseCase.LATEST_SHOWS_MAX_COUNT))
+                .thenReturn(List.of());
+
+        GetLatestShowsUseCase.Output output = useCase.execute(new GetLatestShowsUseCase.Input("CONCERT"));
+
+        assertThat(output.shows()).isEmpty();
+        verify(showListQueryRepository).findLatestShows("CONCERT", GetLatestShowsUseCase.LATEST_SHOWS_MAX_COUNT);
+    }
 }
