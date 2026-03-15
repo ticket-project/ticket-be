@@ -28,6 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
 class GetMyShowLikesUseCaseTest {
 
@@ -71,7 +72,7 @@ class GetMyShowLikesUseCaseTest {
     }
 
     @ParameterizedTest
-    @MethodSource("잘못된_입력")
+    @MethodSource("invalidInputs")
     void memberId_또는_size가_유효하지_않으면_예외를_던진다(final GetMyShowLikesUseCase.Input input) {
         assertThatThrownBy(() -> useCase.execute(input))
                 .isInstanceOf(CoreException.class)
@@ -94,7 +95,7 @@ class GetMyShowLikesUseCaseTest {
         verify(showLikeQueryRepository).findMyLikedShows(1L, null, 20);
     }
 
-    private static Stream<Arguments> 잘못된_입력() {
+    private static Stream<Arguments> invalidInputs() {
         return Stream.of(
                 Arguments.of((Object) null),
                 Arguments.of(new GetMyShowLikesUseCase.Input(null, null, 20)),

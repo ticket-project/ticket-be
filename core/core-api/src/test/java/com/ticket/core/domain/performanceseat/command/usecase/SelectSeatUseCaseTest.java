@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.inOrder;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("NonAsciiCharacters")
 class SelectSeatUseCaseTest {
 
     @Mock

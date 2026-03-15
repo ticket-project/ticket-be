@@ -64,6 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         ShowSortSupport.class,
         ShowCursorSupport.class
 })
+@SuppressWarnings("NonAsciiCharacters")
 class ShowListQueryRepositoryTest {
 
     @Autowired

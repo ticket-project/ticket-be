@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(SeatAvailabilityQueryRepository.class)
+@SuppressWarnings("NonAsciiCharacters")
 class SeatAvailabilityQueryRepositoryTest extends QueryRepositoryTestSupport {
 
     @Autowired

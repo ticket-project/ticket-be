@@ -1,0 +1,48 @@
+package com.ticket.core.domain.member;
+
+import com.ticket.core.domain.member.vo.Email;
+import com.ticket.core.domain.member.vo.EncodedPassword;
+import com.ticket.core.enums.Role;
+import com.ticket.core.support.exception.ErrorType;
+import com.ticket.core.support.exception.NotFoundException;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
+
+@SuppressWarnings("NonAsciiCharacters")
+@ExtendWith(MockitoExtension.class)
+class MemberFinderTest {
+
+    @Mock
+    private MemberRepository memberRepository;
+
+    @InjectMocks
+    private MemberFinder memberFinder;
+
+    @Test
+    void 활성회원이_있으면_그대로_반환한다() {
+        Member member = new Member(Email.create("user@example.com"), EncodedPassword.create("encoded"), "사용자", Role.MEMBER);
+        when(memberRepository.findByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.of(member));
+
+        Member result = memberFinder.findActiveMemberById(1L);
+
+        assertThat(result).isSameAs(member);
+    }
+
+    @Test
+    void 활성회원이_없으면_찾을수없음_예외를_던진다() {
+        when(memberRepository.findByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> memberFinder.findActiveMemberById(1L))
+                .isInstanceOf(NotFoundException.class)
+                .satisfies(thrown -> assertThat(((NotFoundException) thrown).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
+    }
+}

@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("NonAsciiCharacters")
 class GetSeatStatusUseCaseTest {
 
     @Mock

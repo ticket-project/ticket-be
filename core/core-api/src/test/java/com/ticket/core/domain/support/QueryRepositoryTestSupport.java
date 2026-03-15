@@ -66,6 +66,7 @@ import java.time.LocalDateTime;
         ShowSortSupport.class,
         ShowCursorSupport.class
 })
+@SuppressWarnings("NonAsciiCharacters")
 public abstract class QueryRepositoryTestSupport {
 
     @Autowired

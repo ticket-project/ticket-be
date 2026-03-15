@@ -1,0 +1,44 @@
+package com.ticket.core.domain.showlike;
+
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.vo.Email;
+import com.ticket.core.domain.member.vo.EncodedPassword;
+import com.ticket.core.domain.show.Show;
+import com.ticket.core.enums.Role;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+@SuppressWarnings("NonAsciiCharacters")
+class ShowLikeTest {
+
+    @Test
+    void 회원과_공연이_있으면_좋아요를_생성한다() {
+        Member member = new Member(Email.create("user@example.com"), EncodedPassword.create("encoded"), "사용자", Role.MEMBER);
+        Show show = org.mockito.Mockito.mock(Show.class);
+
+        ShowLike showLike = new ShowLike(member, show);
+
+        assertThat(showLike.getMember()).isSameAs(member);
+        assertThat(showLike.getShow()).isSameAs(show);
+    }
+
+    @Test
+    void 회원이_없으면_예외를_던진다() {
+        Show show = org.mockito.Mockito.mock(Show.class);
+
+        assertThatThrownBy(() -> new ShowLike(null, show))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("member");
+    }
+
+    @Test
+    void 공연이_없으면_예외를_던진다() {
+        Member member = new Member(Email.create("user@example.com"), EncodedPassword.create("encoded"), "사용자", Role.MEMBER);
+
+        assertThatThrownBy(() -> new ShowLike(member, null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("show");
+    }
+}

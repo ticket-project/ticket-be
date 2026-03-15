@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
 class AddShowLikeUseCaseTest {
 
@@ -77,7 +78,7 @@ class AddShowLikeUseCaseTest {
     }
 
     @ParameterizedTest
-    @MethodSource("잘못된_입력")
+    @MethodSource("invalidInputs")
     void memberId_또는_showId가_없으면_예외를_던진다(final AddShowLikeUseCase.Input input) {
         assertThatThrownBy(() -> useCase.execute(input))
                 .isInstanceOf(CoreException.class)
@@ -85,7 +86,7 @@ class AddShowLikeUseCaseTest {
                         .isEqualTo(ErrorType.INVALID_REQUEST));
     }
 
-    private static Stream<Arguments> 잘못된_입력() {
+    private static Stream<Arguments> invalidInputs() {
         return Stream.of(
                 Arguments.of((Object) null),
                 Arguments.of(new AddShowLikeUseCase.Input(null, 2L)),
