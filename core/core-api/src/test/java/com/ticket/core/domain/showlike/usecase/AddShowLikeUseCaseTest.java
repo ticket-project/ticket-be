@@ -1,0 +1,72 @@
+package com.ticket.core.domain.showlike.usecase;
+
+import com.ticket.core.domain.member.Member;
+import com.ticket.core.domain.member.MemberFinder;
+import com.ticket.core.domain.show.Show;
+import com.ticket.core.domain.show.query.ShowFinder;
+import com.ticket.core.domain.showlike.ShowLikeRepository;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class AddShowLikeUseCaseTest {
+
+    @Mock
+    private ShowLikeRepository showLikeRepository;
+    @Mock
+    private MemberFinder memberFinder;
+    @Mock
+    private ShowFinder showFinder;
+    @InjectMocks
+    private AddShowLikeUseCase useCase;
+
+    @Test
+    void 이미_찜한_공연이면_저장하지_않고_상태만_반환한다() {
+        when(showLikeRepository.existsByMember_IdAndShow_Id(1L, 2L)).thenReturn(true);
+        when(showLikeRepository.countByShow_Id(2L)).thenReturn(5L);
+        when(memberFinder.findActiveMemberById(1L)).thenReturn(mock(Member.class));
+
+        AddShowLikeUseCase.Output output = useCase.execute(new AddShowLikeUseCase.Input(1L, 2L));
+
+        assertThat(output.response().liked()).isTrue();
+        assertThat(output.response().likeCount()).isEqualTo(5L);
+    }
+
+    @Test
+    void 새로_찜하면_저장후_개수를_반환한다() {
+        when(showLikeRepository.existsByMember_IdAndShow_Id(1L, 2L)).thenReturn(false);
+        when(showLikeRepository.countByShow_Id(2L)).thenReturn(3L);
+        when(memberFinder.findActiveMemberById(1L)).thenReturn(mock(Member.class));
+        when(showFinder.findById(2L)).thenReturn(mock(Show.class));
+
+        AddShowLikeUseCase.Output output = useCase.execute(new AddShowLikeUseCase.Input(1L, 2L));
+
+        assertThat(output.response().liked()).isTrue();
+        verify(showLikeRepository).save(any());
+    }
+
+    @Test
+    void 저장중_중복제약이_발생하면_예외를_던진다() {
+        when(showLikeRepository.existsByMember_IdAndShow_Id(1L, 2L)).thenReturn(false);
+        when(memberFinder.findActiveMemberById(1L)).thenReturn(mock(Member.class));
+        when(showFinder.findById(2L)).thenReturn(mock(Show.class));
+        when(showLikeRepository.save(any())).thenThrow(new DataIntegrityViolationException("duplicate"));
+
+        assertThatThrownBy(() -> useCase.execute(new AddShowLikeUseCase.Input(1L, 2L)))
+                .isInstanceOf(CoreException.class)
+                .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.SHOW_LIKE_ALREADY_EXISTS));
+    }
+}
