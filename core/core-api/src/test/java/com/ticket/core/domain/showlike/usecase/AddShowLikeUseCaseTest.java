@@ -9,10 +9,15 @@ import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -67,6 +72,24 @@ class AddShowLikeUseCaseTest {
 
         assertThatThrownBy(() -> useCase.execute(new AddShowLikeUseCase.Input(1L, 2L)))
                 .isInstanceOf(CoreException.class)
-                .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.SHOW_LIKE_ALREADY_EXISTS));
+                .satisfies(exception -> assertThat(((CoreException) exception).getErrorType())
+                        .isEqualTo(ErrorType.SHOW_LIKE_ALREADY_EXISTS));
+    }
+
+    @ParameterizedTest
+    @MethodSource("잘못된_입력")
+    void memberId_또는_showId가_없으면_예외를_던진다(final AddShowLikeUseCase.Input input) {
+        assertThatThrownBy(() -> useCase.execute(input))
+                .isInstanceOf(CoreException.class)
+                .satisfies(exception -> assertThat(((CoreException) exception).getErrorType())
+                        .isEqualTo(ErrorType.INVALID_REQUEST));
+    }
+
+    private static Stream<Arguments> 잘못된_입력() {
+        return Stream.of(
+                Arguments.of((Object) null),
+                Arguments.of(new AddShowLikeUseCase.Input(null, 2L)),
+                Arguments.of(new AddShowLikeUseCase.Input(1L, null))
+        );
     }
 }
