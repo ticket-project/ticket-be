@@ -156,6 +156,17 @@ class ShowListQueryRepositoryTest {
                 .containsExactly("서울 인기 공연", "서울 보통 공연");
     }
 
+    @Test
+    void 조건에_맞는_공연이_없으면_빈_슬라이스를_반환한다() {
+        ShowParam param = new ShowParam(null, null, Region.JEOLLA, null);
+
+        CursorSlice<ShowResponse> result = showListQueryRepository.findAllBySearch(param, 10, "popular");
+
+        assertThat(result.slice().getContent()).isEmpty();
+        assertThat(result.slice().hasNext()).isFalse();
+        assertThat(result.nextCursor()).isNull();
+    }
+
     private Venue persistVenue(final String name, final Region region) throws Exception {
         Constructor<Venue> constructor = Venue.class.getDeclaredConstructor();
         constructor.setAccessible(true);

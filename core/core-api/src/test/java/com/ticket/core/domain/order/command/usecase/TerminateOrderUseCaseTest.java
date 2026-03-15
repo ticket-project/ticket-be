@@ -16,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -45,7 +46,7 @@ class TerminateOrderUseCaseTest {
     @Mock
     private OrderLifecycleDomainService orderLifecycleDomainService;
     @Mock
-    private org.springframework.context.ApplicationEventPublisher applicationEventPublisher;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private TerminateOrderUseCase useCase;
@@ -97,6 +98,17 @@ class TerminateOrderUseCaseTest {
         ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
         verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
         assertThat(eventCaptor.getValue().toString()).contains("hold-key").contains("42");
+    }
+
+    @Test
+    void 상태가_pending이_아닌_주문이면_만료처리를_건너뛴다() {
+        Order order = createOrder(10L, 100L, "hold-key");
+        order.cancel(LocalDateTime.of(2026, 3, 15, 9, 0));
+        when(orderRepository.findByHoldKeyAndStatusForUpdate("hold-key", OrderState.PENDING)).thenReturn(Optional.of(order));
+
+        useCase.expireByHoldKey("hold-key", LocalDateTime.of(2026, 3, 15, 10, 0));
+
+        verifyNoInteractions(orderSeatFinder, holdHistoryFinder, orderLifecycleDomainService, applicationEventPublisher);
     }
 
     private Order createOrder(final Long id, final Long performanceId, final String holdKey) {
