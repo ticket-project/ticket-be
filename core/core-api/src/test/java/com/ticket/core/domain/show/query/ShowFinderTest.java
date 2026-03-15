@@ -36,18 +36,24 @@ class ShowFinderTest {
 
     @Test
     void 공연이_있으면_findById가_그대로_반환한다() {
+        //given
         Show show = createShow();
         when(showJpaRepository.findById(1L)).thenReturn(Optional.of(show));
 
+        //when
         Show result = showFinder.findById(1L);
 
+        //then
         assertThat(result).isSameAs(show);
     }
 
     @Test
     void 공연이_없으면_findById가_NOT_FOUND_DATA_예외를_던진다() {
+        //given
         when(showJpaRepository.findById(1L)).thenReturn(Optional.empty());
 
+        //when
+        //then
         assertThatThrownBy(() -> showFinder.findById(1L))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
@@ -55,15 +61,21 @@ class ShowFinderTest {
 
     @Test
     void 공연이_존재하면_validateShowExists는_예외없이_통과한다() {
+        //given
         when(showJpaRepository.existsById(1L)).thenReturn(true);
 
+        //when
+        //then
         showFinder.validateShowExists(1L);
     }
 
     @Test
     void 공연이_없으면_validateShowExists가_NOT_FOUND_DATA_예외를_던진다() {
+        //given
         when(showJpaRepository.existsById(1L)).thenReturn(false);
 
+        //when
+        //then
         assertThatThrownBy(() -> showFinder.validateShowExists(1L))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
@@ -71,18 +83,24 @@ class ShowFinderTest {
 
     @Test
     void 공연상세가_있으면_findShowDetail이_반환한다() {
+        //given
         ShowDetailResponse response = createShowDetailResponse();
         when(showDetailQueryRepository.findShowDetail(1L)).thenReturn(Optional.of(response));
 
+        //when
         ShowDetailResponse result = showFinder.findShowDetail(1L);
 
+        //then
         assertThat(result).isSameAs(response);
     }
 
     @Test
     void 공연상세가_없으면_findShowDetail이_NOT_FOUND_DATA_예외를_던진다() {
+        //given
         when(showDetailQueryRepository.findShowDetail(1L)).thenReturn(Optional.empty());
 
+        //when
+        //then
         assertThatThrownBy(() -> showFinder.findShowDetail(1L))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
@@ -130,3 +148,4 @@ class ShowFinderTest {
         );
     }
 }
+

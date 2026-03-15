@@ -32,6 +32,7 @@ class GetPerformanceSummaryUseCaseTest {
 
     @Test
     void 공연_요약정보를_반환한다() {
+        //given
         Performance performance = mock(Performance.class);
         Show show = mock(Show.class);
         Venue venue = mock(Venue.class);
@@ -44,8 +45,10 @@ class GetPerformanceSummaryUseCaseTest {
         when(show.getVenue()).thenReturn(venue);
         when(venue.getRegion()).thenReturn(Region.CHUNGCHEONG);
 
+        //when
         GetPerformanceSummaryUseCase.Output output = useCase.execute(new GetPerformanceSummaryUseCase.Input(1L));
 
+        //then
         assertThat(output.summary().title()).isEqualTo("싱어게인");
         assertThat(output.summary().region()).isEqualTo("충청");
         assertThat(output.summary().startTime()).isEqualTo(startTime);
@@ -53,10 +56,13 @@ class GetPerformanceSummaryUseCaseTest {
 
     @Test
     void 공연과_연결되지_않은_회차면_예외를_던진다() {
+        //given
         Performance performance = mock(Performance.class);
         when(performanceFinder.findById(1L)).thenReturn(performance);
         when(performance.getShow()).thenReturn(null);
 
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(new GetPerformanceSummaryUseCase.Input(1L)))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
@@ -64,6 +70,7 @@ class GetPerformanceSummaryUseCaseTest {
 
     @Test
     void 공연장이_없어도_지역은_null로_반환한다() {
+        //given
         Performance performance = mock(Performance.class);
         Show show = mock(Show.class);
         LocalDateTime startTime = LocalDateTime.of(2026, 3, 20, 19, 30);
@@ -74,10 +81,13 @@ class GetPerformanceSummaryUseCaseTest {
         when(show.getTitle()).thenReturn("싱어게인");
         when(show.getVenue()).thenReturn(null);
 
+        //when
         GetPerformanceSummaryUseCase.Output output = useCase.execute(new GetPerformanceSummaryUseCase.Input(1L));
 
+        //then
         assertThat(output.summary().title()).isEqualTo("싱어게인");
         assertThat(output.summary().region()).isNull();
         assertThat(output.summary().startTime()).isEqualTo(startTime);
     }
 }
+

@@ -31,6 +31,7 @@ class GetShowsUseCaseTest {
 
     @Test
     void 공연_목록과_커서를_반환한다() {
+        //given
         ShowParam param = new ShowParam(null, null, null, null);
         ShowResponse show = new ShowResponse(
                 1L,
@@ -51,8 +52,10 @@ class GetShowsUseCaseTest {
         CursorSlice<ShowResponse> result = new CursorSlice<>(new SliceImpl<>(List.of(show)), "next");
         when(showListQueryRepository.findAllBySearch(param, 10, "popular")).thenReturn(result);
 
+        //when
         GetShowsUseCase.Output output = useCase.execute(new GetShowsUseCase.Input(param, 10, "popular"));
 
+        //then
         assertThat(output.shows().getContent()).containsExactly(show);
         assertThat(output.nextCursor()).isEqualTo("next");
         verify(showListQueryRepository).findAllBySearch(param, 10, "popular");
@@ -60,14 +63,18 @@ class GetShowsUseCaseTest {
 
     @Test
     void 공연이_없으면_빈_슬라이스와_null_커서를_반환한다() {
+        //given
         ShowParam param = new ShowParam(null, null, null, null);
         CursorSlice<ShowResponse> result = new CursorSlice<>(new SliceImpl<>(List.of()), null);
         when(showListQueryRepository.findAllBySearch(param, 10, "popular")).thenReturn(result);
 
+        //when
         GetShowsUseCase.Output output = useCase.execute(new GetShowsUseCase.Input(param, 10, "popular"));
 
+        //then
         assertThat(output.shows().getContent()).isEmpty();
         assertThat(output.nextCursor()).isNull();
         verify(showListQueryRepository).findAllBySearch(param, 10, "popular");
     }
 }
+

@@ -27,12 +27,16 @@ class PerformanceSeatServiceTest {
 
     @Test
     void 가용한_공연좌석만_조회한다() {
+        //given
         List<PerformanceSeat> seats = List.of(org.mockito.Mockito.mock(PerformanceSeat.class));
         when(performanceSeatRepository.findAllByStateEquals(PerformanceSeatState.AVAILABLE)).thenReturn(seats);
 
+        //when
         List<PerformanceSeat> result = performanceSeatService.getAllAvailableSeats();
 
+        //then
         assertThat(result).isEqualTo(seats);
         verify(performanceSeatRepository).findAllByStateEquals(PerformanceSeatState.AVAILABLE);
     }
 }
+

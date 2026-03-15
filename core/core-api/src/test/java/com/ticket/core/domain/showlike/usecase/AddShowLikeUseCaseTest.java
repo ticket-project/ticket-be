@@ -41,36 +41,45 @@ class AddShowLikeUseCaseTest {
 
     @Test
     void 이미_찜한_공연이면_저장하지_않고_상태만_반환한다() {
+        //given
         when(showLikeRepository.existsByMember_IdAndShow_Id(1L, 2L)).thenReturn(true);
         when(showLikeRepository.countByShow_Id(2L)).thenReturn(5L);
         when(memberFinder.findActiveMemberById(1L)).thenReturn(mock(Member.class));
 
+        //when
         AddShowLikeUseCase.Output output = useCase.execute(new AddShowLikeUseCase.Input(1L, 2L));
 
+        //then
         assertThat(output.response().liked()).isTrue();
         assertThat(output.response().likeCount()).isEqualTo(5L);
     }
 
     @Test
     void 새로_찜하면_저장후_개수를_반환한다() {
+        //given
         when(showLikeRepository.existsByMember_IdAndShow_Id(1L, 2L)).thenReturn(false);
         when(showLikeRepository.countByShow_Id(2L)).thenReturn(3L);
         when(memberFinder.findActiveMemberById(1L)).thenReturn(mock(Member.class));
         when(showFinder.findById(2L)).thenReturn(mock(Show.class));
 
+        //when
         AddShowLikeUseCase.Output output = useCase.execute(new AddShowLikeUseCase.Input(1L, 2L));
 
+        //then
         assertThat(output.response().liked()).isTrue();
         verify(showLikeRepository).save(any());
     }
 
     @Test
     void 저장중_중복제약이_발생하면_예외를_던진다() {
+        //given
         when(showLikeRepository.existsByMember_IdAndShow_Id(1L, 2L)).thenReturn(false);
         when(memberFinder.findActiveMemberById(1L)).thenReturn(mock(Member.class));
         when(showFinder.findById(2L)).thenReturn(mock(Show.class));
         when(showLikeRepository.save(any())).thenThrow(new DataIntegrityViolationException("duplicate"));
 
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(new AddShowLikeUseCase.Input(1L, 2L)))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType())
@@ -80,6 +89,9 @@ class AddShowLikeUseCaseTest {
     @ParameterizedTest
     @MethodSource("invalidInputs")
     void memberId_또는_showId가_없으면_예외를_던진다(final AddShowLikeUseCase.Input input) {
+        //given
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(input))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType())
@@ -94,3 +106,4 @@ class AddShowLikeUseCaseTest {
         );
     }
 }
+

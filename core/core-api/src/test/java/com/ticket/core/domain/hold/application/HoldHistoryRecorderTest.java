@@ -31,6 +31,7 @@ class HoldHistoryRecorderTest {
 
     @Test
     void 선택한_좌석마다_active_hold_history를_기록한다() {
+        //given
         PerformanceSeat first = createPerformanceSeat(100L, 10L);
         PerformanceSeat second = createPerformanceSeat(101L, 20L);
         LocalDateTime expiresAt = LocalDateTime.of(2026, 3, 15, 12, 30);
@@ -38,7 +39,9 @@ class HoldHistoryRecorderTest {
         holdHistoryRecorder.recordActiveHold(1L, 2L, "hold-key", expiresAt, List.of(first, second));
 
         @SuppressWarnings("unchecked")
+        //when
         ArgumentCaptor<List<HoldHistory>> captor = ArgumentCaptor.forClass(List.class);
+        //then
         verify(holdHistoryRepository).saveAll(captor.capture());
 
         List<HoldHistory> histories = captor.getValue();
@@ -62,3 +65,4 @@ class HoldHistoryRecorderTest {
         return performanceSeat;
     }
 }
+

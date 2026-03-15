@@ -39,6 +39,7 @@ class GetSeatStatusUseCaseTest {
 
     @Test
     void redis에서_점유중인_available_좌석은_occupied로_변환한다() {
+        //given
         Performance performance = mock(Performance.class);
         when(performanceFinder.findById(10L)).thenReturn(performance);
         when(performance.getId()).thenReturn(10L);
@@ -49,8 +50,10 @@ class GetSeatStatusUseCaseTest {
         when(seatSelectionService.getSelectingSeatIds(10L)).thenReturn(Set.of(1L));
         when(holdManager.getHoldingSeatIds(10L)).thenReturn(Set.of());
 
+        //when
         GetSeatStatusUseCase.Output output = useCase.execute(new GetSeatStatusUseCase.Input(10L));
 
+        //then
         assertThat(output.status().seats()).containsExactly(
                 new SeatStatusResponse.SeatState(1L, SeatStatus.OCCUPIED),
                 new SeatStatusResponse.SeatState(2L, SeatStatus.OCCUPIED)
@@ -59,6 +62,7 @@ class GetSeatStatusUseCaseTest {
 
     @Test
     void redis_점유좌석이_없으면_DB상태를_그대로_반환한다() {
+        //given
         Performance performance = mock(Performance.class);
         List<SeatStatusResponse.SeatState> dbStates = List.of(
                 new SeatStatusResponse.SeatState(1L, SeatStatus.AVAILABLE),
@@ -70,9 +74,12 @@ class GetSeatStatusUseCaseTest {
         when(seatSelectionService.getSelectingSeatIds(10L)).thenReturn(Set.of());
         when(holdManager.getHoldingSeatIds(10L)).thenReturn(Set.of());
 
+        //when
         GetSeatStatusUseCase.Output output = useCase.execute(new GetSeatStatusUseCase.Input(10L));
 
+        //then
         assertThat(output.status().seats()).containsExactlyElementsOf(dbStates);
         verify(seatMapQueryRepository).findSeatStatuses(10L);
     }
 }
+

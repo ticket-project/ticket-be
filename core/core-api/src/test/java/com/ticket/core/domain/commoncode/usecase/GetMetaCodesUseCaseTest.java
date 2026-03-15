@@ -28,6 +28,7 @@ class GetMetaCodesUseCaseTest {
 
     @Test
     void 카테고리_장르_및_enum_코드를_모아_반환한다() {
+        //given
         Category category = mock(Category.class);
         Genre genre = mock(Genre.class);
 
@@ -46,10 +47,13 @@ class GetMetaCodesUseCaseTest {
         GetMetaCodesUseCase useCase = new GetMetaCodesUseCase(categoryRepository, genreRepository);
         GetMetaCodesUseCase.Output output = useCase.execute();
 
+        //when
         MetaCodesResponse response = output.codes();
+        //then
         assertThat(response.categories()).containsExactly(new MetaCodesResponse.CategoryCodeItem(1L, "CONCERT", "콘서트"));
         assertThat(response.genres()).containsExactly(new MetaCodesResponse.GenreCodeItem(2L, "CONCERT", "KPOP", "케이팝"));
         assertThat(response.enums().bookingStatus()).isNotEmpty();
         assertThat(response.enums().showSortKey()).isNotEmpty();
     }
 }
+

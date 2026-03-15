@@ -27,19 +27,25 @@ class HoldSnapshotCodecTest {
 
     @Test
     void 스냅샷을_json으로_인코딩한다() throws Exception {
+        //given
         HoldSnapshot snapshot = createSnapshot();
         when(jsonMapper.writeValueAsString(snapshot)).thenReturn("{\"holdKey\":\"hold-key\"}");
 
+        //when
         String result = codec.encode(snapshot);
 
+        //then
         assertThat(result).isEqualTo("{\"holdKey\":\"hold-key\"}");
     }
 
     @Test
     void 인코딩에_실패하면_IllegalStateException을_던진다() throws Exception {
+        //given
         HoldSnapshot snapshot = createSnapshot();
         when(jsonMapper.writeValueAsString(snapshot)).thenThrow(new RuntimeException("boom"));
 
+        //when
+        //then
         assertThatThrownBy(() -> codec.encode(snapshot))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("encode failed");
@@ -47,18 +53,24 @@ class HoldSnapshotCodecTest {
 
     @Test
     void payload를_스냅샷으로_디코딩한다() throws Exception {
+        //given
         HoldSnapshot snapshot = createSnapshot();
         when(jsonMapper.readValue("{\"holdKey\":\"hold-key\"}", HoldSnapshot.class)).thenReturn(snapshot);
 
+        //when
         HoldSnapshot result = codec.decode("{\"holdKey\":\"hold-key\"}");
 
+        //then
         assertThat(result).isEqualTo(snapshot);
     }
 
     @Test
     void 디코딩에_실패하면_IllegalStateException을_던진다() throws Exception {
+        //given
         when(jsonMapper.readValue("broken", HoldSnapshot.class)).thenThrow(new RuntimeException("boom"));
 
+        //when
+        //then
         assertThatThrownBy(() -> codec.decode("broken"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("decode failed");
@@ -74,3 +86,4 @@ class HoldSnapshotCodecTest {
         );
     }
 }
+

@@ -40,6 +40,7 @@ class ExchangeOAuth2TokenUseCaseTest {
 
     @Test
     void 인증코드가_유효하면_회원을_조회하고_토큰을_발급한다() {
+        //given
         Member member = mock(Member.class);
         AuthLoginResponse response = new AuthLoginResponse("access", "Bearer", 1800L, 7L);
         MockHttpServletResponse servletResponse = new MockHttpServletResponse();
@@ -48,9 +49,11 @@ class ExchangeOAuth2TokenUseCaseTest {
         when(memberFinder.findActiveMemberById(7L)).thenReturn(member);
         when(authTokenApplicationService.issueTokens(member, servletResponse)).thenReturn(response);
 
+        //when
         ExchangeOAuth2TokenUseCase.Output output =
                 useCase.execute(new ExchangeOAuth2TokenUseCase.Input("oauth-code"), servletResponse);
 
+        //then
         assertThat(output.authLoginResponse()).isEqualTo(response);
         verify(oAuth2AuthCodeService).consumeCode("oauth-code");
         verify(memberFinder).findActiveMemberById(7L);
@@ -59,10 +62,14 @@ class ExchangeOAuth2TokenUseCaseTest {
 
     @Test
     void 인증코드가_유효하지_않으면_인증_예외를_던진다() {
+        //given
         when(oAuth2AuthCodeService.consumeCode("invalid")).thenReturn(Optional.empty());
 
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(new ExchangeOAuth2TokenUseCase.Input("invalid"), new MockHttpServletResponse()))
                 .isInstanceOf(AuthException.class)
                 .satisfies(exception -> assertThat(((AuthException) exception).getErrorType()).isEqualTo(ErrorType.AUTHENTICATION_ERROR));
     }
 }
+

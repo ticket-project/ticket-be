@@ -39,6 +39,7 @@ class QueueEntryUseCaseTest {
 
     @Test
     void 대기열이_비활성화된_공연은_즉시_입장시킨다() {
+        //given
         ResolvedQueuePolicy policy = new ResolvedQueuePolicy(
                 false,
                 QueueLevel.LEVEL_1,
@@ -51,8 +52,10 @@ class QueueEntryUseCaseTest {
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueRuntimeStore.admitNow(10L, Duration.ofMinutes(10), Duration.ofHours(1))).thenReturn(admitted);
 
+        //when
         QueueEntryUseCase.Output output = queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L));
 
+        //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.ADMITTED);
         assertThat(output.queueToken()).isEqualTo("qt-3");
         verify(queueRuntimeStore).admitNow(10L, Duration.ofMinutes(10), Duration.ofHours(1));
@@ -60,6 +63,7 @@ class QueueEntryUseCaseTest {
 
     @Test
     void active가_최대인원보다_적으면_즉시_입장시킨다() {
+        //given
         ResolvedQueuePolicy policy = createPolicy(300);
         QueueEntryRuntime admitted = createAdmitted("qe-1", "qt-1");
 
@@ -67,8 +71,10 @@ class QueueEntryUseCaseTest {
         when(queueRuntimeStore.countActive(10L)).thenReturn(10L);
         when(queueRuntimeStore.admitNow(10L, Duration.ofMinutes(10), Duration.ofHours(1))).thenReturn(admitted);
 
+        //when
         QueueEntryUseCase.Output output = queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L));
 
+        //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.ADMITTED);
         assertThat(output.queueEntryId()).isEqualTo("qe-1");
         assertThat(output.position()).isNull();
@@ -76,6 +82,7 @@ class QueueEntryUseCaseTest {
 
     @Test
     void 최대인원을_초과하면_대기열에_등록한다() {
+        //given
         ResolvedQueuePolicy policy = createPolicy(1);
         QueueEntryRuntime waiting = new QueueEntryRuntime(10L, "qe-2", QueueEntryStatus.WAITING, 2L, null, null);
 
@@ -85,8 +92,10 @@ class QueueEntryUseCaseTest {
         when(queueRuntimeStore.findWaitingPosition(10L, "qe-2")).thenReturn(Optional.of(2L));
         when(queueWaitTimeEstimator.estimateSeconds(2L, 1, Duration.ofMinutes(10))).thenReturn(600L);
 
+        //when
         QueueEntryUseCase.Output output = queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L));
 
+        //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.WAITING);
         assertThat(output.position()).isEqualTo(2L);
         assertThat(output.estimatedWaitSeconds()).isEqualTo(600L);
@@ -95,6 +104,7 @@ class QueueEntryUseCaseTest {
 
     @Test
     void 대기순번을_찾지_못하면_1번으로_처리한다() {
+        //given
         ResolvedQueuePolicy policy = createPolicy(1);
         QueueEntryRuntime waiting = new QueueEntryRuntime(10L, "qe-2", QueueEntryStatus.WAITING, 2L, null, null);
 
@@ -104,8 +114,10 @@ class QueueEntryUseCaseTest {
         when(queueRuntimeStore.findWaitingPosition(10L, "qe-2")).thenReturn(Optional.empty());
         when(queueWaitTimeEstimator.estimateSeconds(1L, 1, Duration.ofMinutes(10))).thenReturn(600L);
 
+        //when
         QueueEntryUseCase.Output output = queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L));
 
+        //then
         assertThat(output.position()).isEqualTo(1L);
         assertThat(output.estimatedWaitSeconds()).isEqualTo(600L);
     }
@@ -131,3 +143,4 @@ class QueueEntryUseCaseTest {
         );
     }
 }
+

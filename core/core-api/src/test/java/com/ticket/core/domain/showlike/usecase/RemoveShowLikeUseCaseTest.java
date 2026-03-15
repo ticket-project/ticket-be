@@ -41,12 +41,15 @@ class RemoveShowLikeUseCaseTest {
 
     @Test
     void 찜이_존재하면_삭제후_false를_반환한다() {
+        //given
         ShowLike showLike = mock(ShowLike.class);
         when(showLikeRepository.findByMember_IdAndShow_Id(1L, 2L)).thenReturn(Optional.of(showLike));
         when(showLikeRepository.countByShow_Id(2L)).thenReturn(4L);
 
+        //when
         RemoveShowLikeUseCase.Output output = useCase.execute(new RemoveShowLikeUseCase.Input(1L, 2L));
 
+        //then
         assertThat(output.response().liked()).isFalse();
         assertThat(output.response().likeCount()).isEqualTo(4L);
         verify(showLikeRepository).delete(showLike);
@@ -54,11 +57,14 @@ class RemoveShowLikeUseCaseTest {
 
     @Test
     void 찜이_없어도_삭제없이_false를_반환한다() {
+        //given
         when(showLikeRepository.findByMember_IdAndShow_Id(1L, 2L)).thenReturn(Optional.empty());
         when(showLikeRepository.countByShow_Id(2L)).thenReturn(0L);
 
+        //when
         RemoveShowLikeUseCase.Output output = useCase.execute(new RemoveShowLikeUseCase.Input(1L, 2L));
 
+        //then
         assertThat(output.response().liked()).isFalse();
         assertThat(output.response().likeCount()).isZero();
         verify(showLikeRepository, never()).delete(any());
@@ -67,6 +73,9 @@ class RemoveShowLikeUseCaseTest {
     @ParameterizedTest
     @MethodSource("invalidInputs")
     void memberId_또는_showId가_없으면_예외를_던진다(final RemoveShowLikeUseCase.Input input) {
+        //given
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(input))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType())
@@ -81,3 +90,4 @@ class RemoveShowLikeUseCaseTest {
         );
     }
 }
+

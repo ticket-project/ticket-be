@@ -49,10 +49,13 @@ class QueuePolicyResolverTest {
 
     @Test
     void 정책이_없으면_기본값으로_해결한다() {
+        //given
         when(performanceQueuePolicyRepository.findByPerformanceId(10L)).thenReturn(Optional.empty());
 
+        //when
         ResolvedQueuePolicy resolved = queuePolicyResolver.resolve(10L);
 
+        //then
         assertThat(resolved.enabled()).isTrue();
         assertThat(resolved.queueLevel()).isEqualTo(QueueLevel.LEVEL_1);
         assertThat(resolved.maxActiveUsers()).isEqualTo(300);
@@ -63,11 +66,14 @@ class QueuePolicyResolverTest {
 
     @Test
     void FORCE_OFF면_기본설정보다_우선해_비활성화한다() {
+        //given
         when(performanceQueuePolicyRepository.findByPerformanceId(10L))
                 .thenReturn(Optional.of(createPolicy(QueueMode.FORCE_OFF, QueueLevel.LEVEL_2, 500, 900)));
 
+        //when
         ResolvedQueuePolicy resolved = queuePolicyResolver.resolve(10L);
 
+        //then
         assertThat(resolved.enabled()).isFalse();
         assertThat(resolved.queueLevel()).isEqualTo(QueueLevel.LEVEL_2);
         assertThat(resolved.maxActiveUsers()).isEqualTo(500);
@@ -76,6 +82,7 @@ class QueuePolicyResolverTest {
 
     @Test
     void FORCE_ON이면_기본설정이_false여도_활성화한다() {
+        //given
         QueueProperties properties = new QueueProperties();
         properties.setEnabledByDefault(false);
         properties.setDefaultLevel(QueueLevel.LEVEL_1);
@@ -87,8 +94,10 @@ class QueuePolicyResolverTest {
         when(performanceQueuePolicyRepository.findByPerformanceId(10L))
                 .thenReturn(Optional.of(createPolicy(QueueMode.FORCE_ON, null, null, null)));
 
+        //when
         ResolvedQueuePolicy resolved = queuePolicyResolver.resolve(10L);
 
+        //then
         assertThat(resolved.enabled()).isTrue();
         assertThat(resolved.queueLevel()).isEqualTo(QueueLevel.LEVEL_1);
         assertThat(resolved.maxActiveUsers()).isEqualTo(300);
@@ -113,3 +122,4 @@ class QueuePolicyResolverTest {
         );
     }
 }
+

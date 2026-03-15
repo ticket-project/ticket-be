@@ -30,10 +30,13 @@ class HoldSeatAvailabilityValidatorTest {
 
     @Test
     void 좌석개수가_일치하지_않으면_SEAT_MISMATCH_IN_PERFORMANCE_예외를_던진다() {
+        //given
         PerformanceSeat availableSeat = mock(PerformanceSeat.class);
         when(performanceSeatFinder.findByPerformanceIdAndSeatIdIn(1L, List.of(10L, 20L)))
                 .thenReturn(List.of(availableSeat));
 
+        //when
+        //then
         assertThatThrownBy(() -> validator.validate(1L, List.of(10L, 20L)))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.SEAT_MISMATCH_IN_PERFORMANCE));
@@ -41,11 +44,14 @@ class HoldSeatAvailabilityValidatorTest {
 
     @Test
     void 사용불가_좌석이_포함되면_NOT_EXIST_AVAILABLE_SEAT_예외를_던진다() {
+        //given
         PerformanceSeat availableSeat = createPerformanceSeat(PerformanceSeatState.AVAILABLE);
         PerformanceSeat reservedSeat = createPerformanceSeat(PerformanceSeatState.RESERVED);
         when(performanceSeatFinder.findByPerformanceIdAndSeatIdIn(1L, List.of(10L, 20L)))
                 .thenReturn(List.of(availableSeat, reservedSeat));
 
+        //when
+        //then
         assertThatThrownBy(() -> validator.validate(1L, List.of(10L, 20L)))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.NOT_EXIST_AVAILABLE_SEAT));
@@ -53,14 +59,17 @@ class HoldSeatAvailabilityValidatorTest {
 
     @Test
     void 모두_예매가능_좌석이면_그대로_반환한다() {
+        //given
         List<PerformanceSeat> seats = List.of(
                 createPerformanceSeat(PerformanceSeatState.AVAILABLE),
                 createPerformanceSeat(PerformanceSeatState.AVAILABLE)
         );
         when(performanceSeatFinder.findByPerformanceIdAndSeatIdIn(1L, List.of(10L, 20L))).thenReturn(seats);
 
+        //when
         List<PerformanceSeat> result = validator.validate(1L, List.of(10L, 20L));
 
+        //then
         assertThat(result).containsExactlyElementsOf(seats);
     }
 
@@ -70,3 +79,4 @@ class HoldSeatAvailabilityValidatorTest {
         return performanceSeat;
     }
 }
+

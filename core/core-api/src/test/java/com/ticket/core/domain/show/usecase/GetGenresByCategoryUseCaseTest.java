@@ -26,33 +26,42 @@ class GetGenresByCategoryUseCaseTest {
 
     @Test
     void 카테고리코드가_비어있으면_전체_장르를_조회한다() {
+        //given
         Genre genre = createGenre(1L, "KPOP", "케이팝");
         when(genreRepository.findAllByOrderByCategory_IdAscNameAsc()).thenReturn(List.of(genre));
 
+        //when
         GetGenresByCategoryUseCase.Output output = useCase.execute(new GetGenresByCategoryUseCase.Input(" "));
 
+        //then
         assertThat(output.genres()).extracting("code").containsExactly("KPOP");
         verify(genreRepository).findAllByOrderByCategory_IdAscNameAsc();
     }
 
     @Test
     void 카테고리코드가_null이면_전체_장르를_조회한다() {
+        //given
         Genre genre = createGenre(1L, "KPOP", "케이팝");
         when(genreRepository.findAllByOrderByCategory_IdAscNameAsc()).thenReturn(List.of(genre));
 
+        //when
         GetGenresByCategoryUseCase.Output output = useCase.execute(new GetGenresByCategoryUseCase.Input(null));
 
+        //then
         assertThat(output.genres()).extracting("code").containsExactly("KPOP");
         verify(genreRepository).findAllByOrderByCategory_IdAscNameAsc();
     }
 
     @Test
     void 카테고리코드가_있으면_해당_장르만_조회한다() {
+        //given
         Genre genre = createGenre(1L, "KPOP", "케이팝");
         when(genreRepository.findAllByCategory_CodeOrderByName("CONCERT")).thenReturn(List.of(genre));
 
+        //when
         GetGenresByCategoryUseCase.Output output = useCase.execute(new GetGenresByCategoryUseCase.Input("CONCERT"));
 
+        //then
         assertThat(output.genres()).hasSize(1);
         verify(genreRepository).findAllByCategory_CodeOrderByName("CONCERT");
     }
@@ -65,3 +74,4 @@ class GetGenresByCategoryUseCaseTest {
         return genre;
     }
 }
+

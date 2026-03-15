@@ -38,14 +38,17 @@ class GetShowLikeStatusUseCaseTest {
 
     @Test
     void 찜_상태와_총_찜수를_반환한다() {
+        //given
         Member member = mock(Member.class);
         when(member.getId()).thenReturn(1L);
         when(memberFinder.findActiveMemberById(1L)).thenReturn(member);
         when(showLikeRepository.existsByMember_IdAndShow_Id(1L, 2L)).thenReturn(true);
         when(showLikeRepository.countByShow_Id(2L)).thenReturn(7L);
 
+        //when
         GetShowLikeStatusUseCase.Output output = useCase.execute(new GetShowLikeStatusUseCase.Input(1L, 2L));
 
+        //then
         assertThat(output.response().liked()).isTrue();
         assertThat(output.response().likeCount()).isEqualTo(7L);
         verify(showFinder).validateShowExists(2L);
@@ -54,6 +57,9 @@ class GetShowLikeStatusUseCaseTest {
     @ParameterizedTest
     @MethodSource("invalidInputs")
     void memberId_또는_showId가_없으면_예외를_던진다(final GetShowLikeStatusUseCase.Input input) {
+        //given
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(input))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType())
@@ -68,3 +74,4 @@ class GetShowLikeStatusUseCaseTest {
         );
     }
 }
+

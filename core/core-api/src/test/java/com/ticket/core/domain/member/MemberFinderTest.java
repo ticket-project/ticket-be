@@ -29,20 +29,27 @@ class MemberFinderTest {
 
     @Test
     void 활성회원이_있으면_그대로_반환한다() {
+        //given
         Member member = new Member(Email.create("user@example.com"), EncodedPassword.create("encoded"), "사용자", Role.MEMBER);
         when(memberRepository.findByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.of(member));
 
+        //when
         Member result = memberFinder.findActiveMemberById(1L);
 
+        //then
         assertThat(result).isSameAs(member);
     }
 
     @Test
     void 활성회원이_없으면_찾을수없음_예외를_던진다() {
+        //given
         when(memberRepository.findByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.empty());
 
+        //when
+        //then
         assertThatThrownBy(() -> memberFinder.findActiveMemberById(1L))
                 .isInstanceOf(NotFoundException.class)
                 .satisfies(thrown -> assertThat(((NotFoundException) thrown).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
     }
 }
+

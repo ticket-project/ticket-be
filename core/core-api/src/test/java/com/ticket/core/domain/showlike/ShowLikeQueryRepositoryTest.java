@@ -43,8 +43,11 @@ class ShowLikeQueryRepositoryTest extends QueryRepositoryTestSupport {
 
     @Test
     void 찜한_공연을_최신순으로_조회한다() {
+        //given
+        //when
         CursorSlice<ShowLikeSummaryResponse> result = showLikeQueryRepository.findMyLikedShows(memberId, null, 2);
 
+        //then
         assertThat(result.slice().getContent()).extracting("title")
                 .containsExactly("세번째 공연", "두번째 공연");
         assertThat(result.nextCursor()).isNotBlank();
@@ -53,19 +56,26 @@ class ShowLikeQueryRepositoryTest extends QueryRepositoryTestSupport {
 
     @Test
     void 커서_이후의_찜한_공연을_조회한다() {
+        //given
+        //when
         CursorSlice<ShowLikeSummaryResponse> firstPage = showLikeQueryRepository.findMyLikedShows(memberId, null, 1);
         CursorSlice<ShowLikeSummaryResponse> secondPage = showLikeQueryRepository.findMyLikedShows(memberId, Long.parseLong(firstPage.nextCursor()), 1);
 
+        //then
         assertThat(firstPage.slice().getContent()).extracting("title").containsExactly("세번째 공연");
         assertThat(secondPage.slice().getContent()).extracting("title").containsExactly("두번째 공연");
     }
 
     @Test
     void 찜한_공연이_없으면_빈_슬라이스를_반환한다() {
+        //given
+        //when
         CursorSlice<ShowLikeSummaryResponse> result = showLikeQueryRepository.findMyLikedShows(-1L, null, 10);
 
+        //then
         assertThat(result.slice().getContent()).isEmpty();
         assertThat(result.slice().hasNext()).isFalse();
         assertThat(result.nextCursor()).isNull();
     }
 }
+

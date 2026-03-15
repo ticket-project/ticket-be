@@ -49,10 +49,13 @@ class QueuePolicyAdminServiceTest {
 
     @Test
     void 설정이_없으면_기본값을_반환한다() {
+        //given
         when(performanceQueuePolicyRepository.findByPerformanceId(10L)).thenReturn(Optional.empty());
 
+        //when
         QueuePolicyAdminService.PolicyDetail detail = queuePolicyAdminService.get(10L);
 
+        //then
         assertThat(detail.queueMode()).isEqualTo(QueueMode.AUTO);
         assertThat(detail.queueLevel()).isEqualTo(QueueLevel.LEVEL_1);
         assertThat(detail.maxActiveUsers()).isEqualTo(300);
@@ -61,6 +64,7 @@ class QueuePolicyAdminServiceTest {
 
     @Test
     void 기존_설정이_있으면_저장된_정책을_반환한다() {
+        //given
         PerformanceQueuePolicy policy = createPolicy(
                 QueueMode.FORCE_ON,
                 QueueLevel.LEVEL_2,
@@ -72,8 +76,10 @@ class QueuePolicyAdminServiceTest {
         );
         when(performanceQueuePolicyRepository.findByPerformanceId(10L)).thenReturn(Optional.of(policy));
 
+        //when
         QueuePolicyAdminService.PolicyDetail detail = queuePolicyAdminService.get(10L);
 
+        //then
         assertThat(detail.queueMode()).isEqualTo(QueueMode.FORCE_ON);
         assertThat(detail.queueLevel()).isEqualTo(QueueLevel.LEVEL_2);
         assertThat(detail.maxActiveUsers()).isEqualTo(500);
@@ -83,6 +89,7 @@ class QueuePolicyAdminServiceTest {
 
     @Test
     void 설정이_없으면_새_정책을_생성한다() {
+        //given
         Performance performance = createPerformance();
         when(performanceFinder.findById(10L)).thenReturn(performance);
         when(performanceQueuePolicyRepository.findByPerformanceId(10L)).thenReturn(Optional.empty());
@@ -91,7 +98,9 @@ class QueuePolicyAdminServiceTest {
 
         QueuePolicyAdminService.PolicyDetail detail = queuePolicyAdminService.upsert(10L, createUpdateCommand());
 
+        //when
         ArgumentCaptor<PerformanceQueuePolicy> captor = ArgumentCaptor.forClass(PerformanceQueuePolicy.class);
+        //then
         verify(performanceQueuePolicyRepository).save(captor.capture());
         assertThat(captor.getValue().getPerformance()).isSameAs(performance);
         assertThat(detail.queueLevel()).isEqualTo(QueueLevel.LEVEL_2);
@@ -101,6 +110,7 @@ class QueuePolicyAdminServiceTest {
 
     @Test
     void 기존_정책이_있으면_업데이트한다() {
+        //given
         Performance performance = createPerformance();
         PerformanceQueuePolicy existing = createPolicy(
                 QueueMode.AUTO,
@@ -115,8 +125,10 @@ class QueuePolicyAdminServiceTest {
         when(performanceQueuePolicyRepository.findByPerformanceId(10L)).thenReturn(Optional.of(existing));
         when(performanceQueuePolicyRepository.save(existing)).thenReturn(existing);
 
+        //when
         QueuePolicyAdminService.PolicyDetail detail = queuePolicyAdminService.upsert(10L, createUpdateCommand());
 
+        //then
         assertThat(existing.getQueueMode()).isEqualTo(QueueMode.FORCE_ON);
         assertThat(existing.getQueueLevel()).isEqualTo(QueueLevel.LEVEL_2);
         assertThat(existing.getMaxActiveUsers()).isEqualTo(500);
@@ -170,3 +182,4 @@ class QueuePolicyAdminServiceTest {
         );
     }
 }
+

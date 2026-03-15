@@ -17,6 +17,9 @@ class ShowQueryHelperTest {
 
     @Test
     void 빈_문자열_필터는_null_조건을_반환한다() {
+        //given
+        //when
+        //then
         assertThat(showQueryHelper.categoryCodeEq(" ")).isNull();
         assertThat(showQueryHelper.genreEq(" ")).isNull();
         assertThat(showQueryHelper.titleContains(" ")).isNull();
@@ -25,6 +28,9 @@ class ShowQueryHelperTest {
 
     @Test
     void 유효한_문자열_필터는_조건식을_반환한다() {
+        //given
+        //when
+        //then
         assertThat(showQueryHelper.categoryCodeEq("CONCERT")).isNotNull();
         assertThat(showQueryHelper.genreEq("KPOP")).isNotNull();
         assertThat(showQueryHelper.titleContains("뮤지컬")).isNotNull();
@@ -33,6 +39,9 @@ class ShowQueryHelperTest {
 
     @Test
     void 지역과_날짜_필터는_null이면_null을_반환하고_값이_있으면_조건을_반환한다() {
+        //given
+        //when
+        //then
         assertThat(showQueryHelper.regionEq(null)).isNull();
         assertThat(showQueryHelper.saleStartDateGoe(null)).isNull();
         assertThat(showQueryHelper.saleStartDateLoe(null)).isNull();
@@ -52,15 +61,21 @@ class ShowQueryHelperTest {
 
     @Test
     void bookingStatus가_null이면_null을_반환한다() {
+        //given
+        //when
+        //then
         assertThat(showQueryHelper.bookingStatusCondition(null)).isNull();
     }
 
     @Test
     void bookingStatus별로_조건식을_반환한다() {
+        //given
+        //when
         BooleanExpression beforeOpen = showQueryHelper.bookingStatusCondition(BookingStatus.BEFORE_OPEN);
         BooleanExpression onSale = showQueryHelper.bookingStatusCondition(BookingStatus.ON_SALE);
         BooleanExpression closed = showQueryHelper.bookingStatusCondition(BookingStatus.CLOSED);
 
+        //then
         assertThat(beforeOpen).isNotNull();
         assertThat(onSale).isNotNull();
         assertThat(closed).isNotNull();
@@ -69,3 +84,4 @@ class ShowQueryHelperTest {
         assertThat(closed.toString()).contains("saleEndDate");
     }
 }
+
