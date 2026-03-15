@@ -28,6 +28,7 @@ class CustomOAuth2UserServiceTest {
 
     @Test
     void OAuth2_사용자정보를_회원에_연결하고_MemberPrincipal을_반환한다() {
+        //given
         OAuth2MemberProvisioningService provisioningService = Mockito.mock(OAuth2MemberProvisioningService.class);
         DefaultOAuth2UserService delegate = Mockito.mock(DefaultOAuth2UserService.class);
         CustomOAuth2UserService customOAuth2UserService = new CustomOAuth2UserService(provisioningService);
@@ -50,8 +51,10 @@ class CustomOAuth2UserServiceTest {
                         && "사용자".equals(userInfo.name())
         ))).thenReturn(member);
 
+        //when
         OAuth2User result = customOAuth2UserService.loadUser(userRequest);
 
+        //then
         assertThat(result).isInstanceOf(MemberPrincipal.class);
         MemberPrincipal principal = (MemberPrincipal) result;
         assertThat(principal.getMemberId()).isEqualTo(7L);
@@ -81,3 +84,4 @@ class CustomOAuth2UserServiceTest {
         return new OAuth2UserRequest(clientRegistration, accessToken);
     }
 }
+

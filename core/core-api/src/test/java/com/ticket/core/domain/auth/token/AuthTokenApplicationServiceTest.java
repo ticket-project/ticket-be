@@ -38,6 +38,7 @@ class AuthTokenApplicationServiceTest {
 
     @Test
     void 토큰_발급시_응답과_리프레시토큰_쿠키를_함께_반환한다() {
+        //given
         Member member = createMember(7L);
         MockHttpServletResponse response = new MockHttpServletResponse();
         when(jwtTokenService.createAccessToken(any())).thenReturn("access-token");
@@ -45,8 +46,10 @@ class AuthTokenApplicationServiceTest {
         when(jwtProperties.getRefreshTokenExpirationSeconds()).thenReturn(1209600L);
         when(refreshTokenService.createRefreshToken(7L, 1209600L)).thenReturn("refresh-token");
 
+        //when
         AuthLoginResponse result = authTokenApplicationService.issueTokens(member, response);
 
+        //then
         assertThat(result.accessToken()).isEqualTo("access-token");
         assertThat(result.tokenType()).isEqualTo("Bearer");
         assertThat(result.expiresIn()).isEqualTo(1800L);
@@ -64,6 +67,7 @@ class AuthTokenApplicationServiceTest {
 
     @Test
     void 토큰_재발급시_기존_리프레시토큰을_교체하고_새_쿠키를_내린다() {
+        //given
         Member member = createMember(7L);
         MockHttpServletResponse response = new MockHttpServletResponse();
         when(refreshTokenService.rotate("old-refresh", 7L, 1209600L)).thenReturn("new-refresh");
@@ -71,8 +75,10 @@ class AuthTokenApplicationServiceTest {
         when(jwtTokenService.createAccessToken(any())).thenReturn("new-access");
         when(jwtTokenService.getAccessTokenExpirationSeconds()).thenReturn(1800L);
 
+        //when
         AuthLoginResponse result = authTokenApplicationService.rotateTokens(member, "old-refresh", response);
 
+        //then
         verify(refreshTokenService).rotate("old-refresh", 7L, 1209600L);
         assertThat(result.accessToken()).isEqualTo("new-access");
         assertThat(result.memberId()).isEqualTo(7L);
@@ -85,10 +91,13 @@ class AuthTokenApplicationServiceTest {
 
     @Test
     void 리프레시토큰_쿠키_삭제시_만료시간_0으로_설정한다() {
+        //given
         MockHttpServletResponse response = new MockHttpServletResponse();
 
+        //when
         authTokenApplicationService.clearRefreshTokenCookie(response);
 
+        //then
         assertThat(response.getHeaders("Set-Cookie"))
                 .singleElement()
                 .asString()
@@ -102,3 +111,4 @@ class AuthTokenApplicationServiceTest {
         return member;
     }
 }
+

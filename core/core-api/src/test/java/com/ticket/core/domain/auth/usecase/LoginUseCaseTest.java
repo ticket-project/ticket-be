@@ -31,6 +31,7 @@ class LoginUseCaseTest {
 
     @Test
     void 로그인에_성공하면_토큰을_발급한다() {
+        //given
         Member member = mock(Member.class);
         AuthLoginResponse response = new AuthLoginResponse("access", "Bearer", 1800L, 1L);
         MockHttpServletResponse servletResponse = new MockHttpServletResponse();
@@ -38,10 +39,13 @@ class LoginUseCaseTest {
         when(authService.login("user@example.com", "password")).thenReturn(member);
         when(authTokenApplicationService.issueTokens(member, servletResponse)).thenReturn(response);
 
+        //when
         LoginUseCase.Output output = useCase.execute(new LoginUseCase.Input("user@example.com", "password"), servletResponse);
 
+        //then
         assertThat(output.authLoginResponse()).isEqualTo(response);
         verify(authService).login("user@example.com", "password");
         verify(authTokenApplicationService).issueTokens(member, servletResponse);
     }
 }
+

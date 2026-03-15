@@ -40,6 +40,7 @@ class RefreshAuthTokenUseCaseTest {
 
     @Test
     void 리프레시_토큰이_유효하면_토큰을_재발급한다() {
+        //given
         Member member = mock(Member.class);
         AuthLoginResponse response = new AuthLoginResponse("access", "Bearer", 1800L, 3L);
         MockHttpServletResponse servletResponse = new MockHttpServletResponse();
@@ -48,9 +49,11 @@ class RefreshAuthTokenUseCaseTest {
         when(memberFinder.findActiveMemberById(3L)).thenReturn(member);
         when(authTokenApplicationService.rotateTokens(member, "refresh-token", servletResponse)).thenReturn(response);
 
+        //when
         RefreshAuthTokenUseCase.Output output =
                 useCase.execute(new RefreshAuthTokenUseCase.Input("refresh-token"), servletResponse);
 
+        //then
         assertThat(output.authLoginResponse()).isEqualTo(response);
         verify(refreshTokenService).validate("refresh-token");
         verify(memberFinder).findActiveMemberById(3L);
@@ -59,10 +62,14 @@ class RefreshAuthTokenUseCaseTest {
 
     @Test
     void 리프레시_토큰이_유효하지_않으면_인증_예외를_던진다() {
+        //given
         when(refreshTokenService.validate("refresh-token")).thenReturn(Optional.empty());
 
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(new RefreshAuthTokenUseCase.Input("refresh-token"), new MockHttpServletResponse()))
                 .isInstanceOf(AuthException.class)
                 .satisfies(exception -> assertThat(((AuthException) exception).getErrorType()).isEqualTo(ErrorType.AUTHENTICATION_ERROR));
     }
 }
+

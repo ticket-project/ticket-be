@@ -31,8 +31,11 @@ class OrderDetailResponseMapperTest {
 
     @Test
     void 공연좌석목록이_비어있으면_예외를_던진다() {
+        //given
         Order order = createOrder();
 
+        //when
+        //then
         assertThatThrownBy(() -> OrderDetailResponseMapper.toResponse(order, List.of(), List.of(), createMember()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("performanceSeats");
@@ -40,6 +43,7 @@ class OrderDetailResponseMapperTest {
 
     @Test
     void 대기중인_주문은_남은시간과_좌석정보를_매핑한다() throws Exception {
+        //given
         Order order = createOrder();
         setField(order, "status", OrderState.PENDING);
         setField(order, "expiresAt", LocalDateTime.now().plusSeconds(120));
@@ -49,6 +53,7 @@ class OrderDetailResponseMapperTest {
         PerformanceSeat performanceSeat = createPerformanceSeat();
         Member member = createMember();
 
+        //when
         OrderDetailResponse response = OrderDetailResponseMapper.toResponse(
                 order,
                 List.of(orderSeat),
@@ -56,6 +61,7 @@ class OrderDetailResponseMapperTest {
                 member
         );
 
+        //then
         assertThat(response.orderKey()).isEqualTo("order-key");
         assertThat(response.remainingSeconds()).isBetween(0L, 120L);
         assertThat(response.tickets().count()).isEqualTo(1);
@@ -151,3 +157,4 @@ class OrderDetailResponseMapperTest {
         throw new NoSuchFieldException(fieldName);
     }
 }
+

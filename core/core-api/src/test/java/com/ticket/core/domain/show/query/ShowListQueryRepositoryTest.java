@@ -95,11 +95,14 @@ class ShowListQueryRepositoryTest {
 
     @Test
     void 지역으로_필터링하고_인기순으로_공연을_조회한다() {
+        //given
         ShowParam param = new ShowParam(null, null, Region.SEOUL, null);
 
         CursorSlice<ShowResponse> result = showListQueryRepository.findAllBySearch(param, 10, "popular");
 
+        //when
         Slice<ShowResponse> slice = result.slice();
+        //then
         assertThat(slice.getContent()).extracting(ShowResponse::title)
                 .containsExactly("서울 인기 공연", "서울 보통 공연", "판매 종료 공연");
         assertThat(slice.getContent()).extracting(ShowResponse::viewCount)
@@ -109,12 +112,15 @@ class ShowListQueryRepositoryTest {
 
     @Test
     void 인기순_커서를_전달하면_다음_페이지를_조회한다() {
+        //given
         ShowParam firstPageParam = new ShowParam(null, null, Region.SEOUL, null);
         CursorSlice<ShowResponse> firstPage = showListQueryRepository.findAllBySearch(firstPageParam, 1, "popular");
 
+        //when
         ShowParam secondPageParam = new ShowParam(null, null, Region.SEOUL, firstPage.nextCursor());
         CursorSlice<ShowResponse> secondPage = showListQueryRepository.findAllBySearch(secondPageParam, 1, "popular");
 
+        //then
         assertThat(firstPage.slice().getContent()).extracting(ShowResponse::title)
                 .containsExactly("서울 인기 공연");
         assertThat(firstPage.nextCursor()).isNotBlank();
@@ -124,6 +130,7 @@ class ShowListQueryRepositoryTest {
 
     @Test
     void 검색_조건에_맞는_공연_수만_집계한다() {
+        //given
         ShowSearchRequest request = new ShowSearchRequest(
                 "서울",
                 null,
@@ -134,13 +141,16 @@ class ShowListQueryRepositoryTest {
                 null
         );
 
+        //when
         long count = showListQueryRepository.countSearchShows(request);
 
+        //then
         assertThat(count).isEqualTo(2L);
     }
 
     @Test
     void 검색_API는_예매중인_서울_공연만_조회한다() {
+        //given
         ShowSearchRequest request = new ShowSearchRequest(
                 "서울",
                 null,
@@ -151,18 +161,23 @@ class ShowListQueryRepositoryTest {
                 null
         );
 
+        //when
         CursorSlice<ShowSearchResponse> result = showListQueryRepository.searchShows(request, 10, "popular");
 
+        //then
         assertThat(result.slice().getContent()).extracting(ShowSearchResponse::title)
                 .containsExactly("서울 인기 공연", "서울 보통 공연");
     }
 
     @Test
     void 조건에_맞는_공연이_없으면_빈_슬라이스를_반환한다() {
+        //given
         ShowParam param = new ShowParam(null, null, Region.JEOLLA, null);
 
+        //when
         CursorSlice<ShowResponse> result = showListQueryRepository.findAllBySearch(param, 10, "popular");
 
+        //then
         assertThat(result.slice().getContent()).isEmpty();
         assertThat(result.slice().hasNext()).isFalse();
         assertThat(result.nextCursor()).isNull();
@@ -233,3 +248,4 @@ class ShowListQueryRepositoryTest {
     static class TestApplication {
     }
 }
+

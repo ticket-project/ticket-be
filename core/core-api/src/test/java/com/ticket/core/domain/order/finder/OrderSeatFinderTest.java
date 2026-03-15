@@ -26,23 +26,30 @@ class OrderSeatFinderTest {
 
     @Test
     void 주문아이디로_좌석목록을_조회해_반환한다() {
+        //given
         OrderSeat first = org.mockito.Mockito.mock(OrderSeat.class);
         OrderSeat second = org.mockito.Mockito.mock(OrderSeat.class);
         when(orderSeatRepository.findAllByOrder_IdOrderByIdAsc(1L)).thenReturn(List.of(first, second));
 
+        //when
         List<OrderSeat> result = orderSeatFinder.getOrderSeatsByOrderId(1L);
 
+        //then
         assertThat(result).containsExactly(first, second);
         verify(orderSeatRepository).findAllByOrder_IdOrderByIdAsc(1L);
     }
 
     @Test
     void 주문좌석이_없으면_빈목록을_반환한다() {
+        //given
         when(orderSeatRepository.findAllByOrder_IdOrderByIdAsc(2L)).thenReturn(List.of());
 
+        //when
         List<OrderSeat> result = orderSeatFinder.getOrderSeatsByOrderId(2L);
 
+        //then
         assertThat(result).isEmpty();
         verify(orderSeatRepository).findAllByOrder_IdOrderByIdAsc(2L);
     }
 }
+

@@ -32,6 +32,7 @@ class MemberWithdrawalTxServiceTest {
 
     @Test
     void 카카오_소셜_ID만_반환하고_회원과_연동계정을_탈퇴처리한다() {
+        //given
         Member member = new Member(Email.create("user@example.com"), EncodedPassword.create("encoded"), "홍길동", Role.MEMBER);
         ReflectionTestUtils.setField(member, "id", 3L);
         MemberSocialAccount kakao = MemberSocialAccount.create(member, SocialProvider.KAKAO, "kakao-123");
@@ -41,8 +42,10 @@ class MemberWithdrawalTxServiceTest {
         when(memberFinder.findActiveMemberById(3L)).thenReturn(member);
         when(memberSocialAccountRepository.findAllByMemberAndDeletedAtIsNull(member)).thenReturn(List.of(kakao, google));
 
+        //when
         List<String> kakaoIds = memberWithdrawalTxService.withdraw(3L);
 
+        //then
         assertThat(kakaoIds).containsExactly("kakao-123");
         assertThat(member.isDeleted()).isTrue();
         assertThat(kakao.isDeleted()).isTrue();
@@ -51,3 +54,4 @@ class MemberWithdrawalTxServiceTest {
         verify(memberSocialAccountRepository).findAllByMemberAndDeletedAtIsNull(member);
     }
 }
+

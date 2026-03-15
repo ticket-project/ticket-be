@@ -50,6 +50,7 @@ class GetOrderDetailUseCaseTest {
 
     @Test
     void 주문_상세를_응답으로_매핑한다() throws Exception {
+        //given
         Venue venue = createVenue("올림픽홀");
         Show show = createShow(100L, "뮤지컬", venue);
         Performance performance = createPerformance(10L, show);
@@ -72,7 +73,9 @@ class GetOrderDetailUseCaseTest {
 
         GetOrderDetailUseCase.Output output = useCase.execute(new GetOrderDetailUseCase.Input("order-key", 1L));
 
+        //when
         OrderDetailResponse response = output.order();
+        //then
         assertThat(response.orderKey()).isEqualTo("order-key");
         assertThat(response.show().title()).isEqualTo("뮤지컬");
         assertThat(response.performance().venueName()).isEqualTo("올림픽홀");
@@ -106,3 +109,4 @@ class GetOrderDetailUseCaseTest {
         return performance;
     }
 }
+

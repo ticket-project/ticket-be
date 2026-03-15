@@ -28,8 +28,11 @@ class SelectSeatUseCaseTest {
 
     @Test
     void 좌석_선택시_검증후_선택하고_이벤트를_발행한다() {
+        //given
         SelectSeatUseCase.Input input = new SelectSeatUseCase.Input(10L, 20L, 1L);
 
+        //when
+        //then
         useCase.execute(input);
 
         InOrder inOrder = inOrder(seatSelectionAvailabilityValidator, seatSelectionService, seatEventPublisher);
@@ -38,3 +41,4 @@ class SelectSeatUseCaseTest {
         inOrder.verify(seatEventPublisher).publish(org.mockito.ArgumentMatchers.any());
     }
 }
+

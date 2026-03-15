@@ -40,19 +40,25 @@ class SeatSelectionServiceTest {
 
     @Test
     void 빈_좌석이면_선택한다() {
+        //given
         doReturn(bucket).when(redissonClient).getBucket(SeatRedisKey.select(10L, 20L), StringCodec.INSTANCE);
         when(bucket.setIfAbsent("3", Duration.ofMinutes(5))).thenReturn(true);
 
+        //when
         seatSelectionService.select(10L, 20L, 3L);
 
+        //then
         verify(bucket).setIfAbsent("3", Duration.ofMinutes(5));
     }
 
     @Test
     void 이미_선택된_좌석이면_예외를_던진다() {
+        //given
         doReturn(bucket).when(redissonClient).getBucket(SeatRedisKey.select(10L, 20L), StringCodec.INSTANCE);
         when(bucket.setIfAbsent("3", Duration.ofMinutes(5))).thenReturn(false);
 
+        //when
+        //then
         assertThatThrownBy(() -> seatSelectionService.select(10L, 20L, 3L))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.SEAT_ALREADY_SELECTED));
@@ -60,19 +66,25 @@ class SeatSelectionServiceTest {
 
     @Test
     void 선택한_정보가_없으면_해제를_건너뛴다() {
+        //given
         doReturn(bucket).when(redissonClient).getBucket(SeatRedisKey.select(10L, 20L), StringCodec.INSTANCE);
         when(bucket.get()).thenReturn(null);
 
+        //when
         seatSelectionService.deselect(10L, 20L, 3L);
 
+        //then
         verify(bucket, never()).compareAndSet("3", null);
     }
 
     @Test
     void 다른_회원이_선택한_좌석은_해제할_수_없다() {
+        //given
         doReturn(bucket).when(redissonClient).getBucket(SeatRedisKey.select(10L, 20L), StringCodec.INSTANCE);
         when(bucket.get()).thenReturn("4");
 
+        //when
+        //then
         assertThatThrownBy(() -> seatSelectionService.deselect(10L, 20L, 3L))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.SEAT_NOT_OWNED));
@@ -80,17 +92,22 @@ class SeatSelectionServiceTest {
 
     @Test
     void 본인이_선택한_좌석은_해제한다() {
+        //given
         doReturn(bucket).when(redissonClient).getBucket(SeatRedisKey.select(10L, 20L), StringCodec.INSTANCE);
         when(bucket.get()).thenReturn("3");
         when(bucket.compareAndSet("3", null)).thenReturn(true);
 
+        //when
         seatSelectionService.deselect(10L, 20L, 3L);
 
+        //then
         verify(bucket).compareAndSet("3", null);
     }
 
     @Test
     void 본인이_선택한_좌석만_일괄_해제한다() {
+        //given
+        //when
         when(redissonClient.getKeys()).thenReturn(rKeys);
         when(rKeys.getKeysByPattern(SeatRedisKey.selectPattern(10L))).thenReturn(List.of(
                 SeatRedisKey.select(10L, 20L),
@@ -103,6 +120,8 @@ class SeatSelectionServiceTest {
         when(bucket.compareAndSet("3", null)).thenReturn(true);
         when(otherBucket.get()).thenReturn("4");
 
+        //then
         assertThat(seatSelectionService.deselectAll(10L, 3L)).containsExactly(20L);
     }
 }
+

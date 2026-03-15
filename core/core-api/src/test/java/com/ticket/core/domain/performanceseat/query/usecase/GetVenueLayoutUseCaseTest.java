@@ -28,6 +28,7 @@ class GetVenueLayoutUseCaseTest {
 
     @Test
     void 공연장_레이아웃을_반환한다() {
+        //given
         Show show = mock(Show.class);
         Venue venue = mock(Venue.class);
         when(showFinder.findById(100L)).thenReturn(show);
@@ -37,20 +38,26 @@ class GetVenueLayoutUseCaseTest {
         when(venue.getViewBoxHeight()).thenReturn(800);
         when(venue.getSeatDiameter()).thenReturn(12.0);
 
+        //when
         GetVenueLayoutUseCase.Output output = useCase.execute(new GetVenueLayoutUseCase.Input(100L));
 
+        //then
         assertThat(output.layout().name()).isEqualTo("올림픽홀");
         assertThat(output.layout().viewBoxWidth()).isEqualTo(1000);
     }
 
     @Test
     void 공연장_정보가_없으면_예외를_던진다() {
+        //given
         Show show = mock(Show.class);
         when(showFinder.findById(100L)).thenReturn(show);
         when(show.getVenue()).thenReturn(null);
 
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(new GetVenueLayoutUseCase.Input(100L)))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
     }
 }
+

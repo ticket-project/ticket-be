@@ -22,13 +22,16 @@ class OrderLifecycleDomainServiceTest {
 
     @Test
     void 취소시_주문과_좌석과_홀드이력을_함께_취소한다() {
+        //given
         LocalDateTime now = LocalDateTime.of(2026, 3, 15, 12, 0);
         Order order = new Order(1L, 10L, "order-key", "hold-key", BigDecimal.TEN, now.plusMinutes(5));
         OrderSeat orderSeat = new OrderSeat(order, 100L, 200L, BigDecimal.TEN);
         HoldHistory holdHistory = new HoldHistory("hold-key", 1L, 10L, 100L, 200L, now.plusMinutes(5));
 
+        //when
         orderLifecycleDomainService.cancel(order, List.of(orderSeat), List.of(holdHistory), now);
 
+        //then
         assertThat(order.getStatus()).isEqualTo(OrderState.CANCELED);
         assertThat(orderSeat.getStatus()).isEqualTo(OrderSeatState.CANCELED);
         assertThat(holdHistory.getStatus()).isEqualTo(HoldState.CANCELED);
@@ -38,13 +41,16 @@ class OrderLifecycleDomainServiceTest {
 
     @Test
     void 만료시_주문과_좌석과_홀드이력을_함께_만료한다() {
+        //given
         LocalDateTime now = LocalDateTime.of(2026, 3, 15, 12, 0);
         Order order = new Order(1L, 10L, "order-key", "hold-key", BigDecimal.TEN, now.plusMinutes(5));
         OrderSeat orderSeat = new OrderSeat(order, 100L, 200L, BigDecimal.TEN);
         HoldHistory holdHistory = new HoldHistory("hold-key", 1L, 10L, 100L, 200L, now.plusMinutes(5));
 
+        //when
         orderLifecycleDomainService.expire(order, List.of(orderSeat), List.of(holdHistory), now);
 
+        //then
         assertThat(order.getStatus()).isEqualTo(OrderState.EXPIRED);
         assertThat(orderSeat.getStatus()).isEqualTo(OrderSeatState.EXPIRED);
         assertThat(holdHistory.getStatus()).isEqualTo(HoldState.EXPIRED);
@@ -52,3 +58,4 @@ class OrderLifecycleDomainServiceTest {
         assertThat(holdHistory.getReleasedAt()).isEqualTo(now);
     }
 }
+

@@ -29,6 +29,7 @@ class GetShowDetailUseCaseTest {
 
     @Test
     void 공연_상세를_그대로_반환한다() {
+        //given
         ShowDetailResponse response = new ShowDetailResponse(
                 1L, "공연", "부제", "info", LocalDate.now(), LocalDate.now().plusDays(1), 120, 100L, 10L,
                 BookingStatus.ON_SALE, SaleType.GENERAL, LocalDateTime.now(), LocalDateTime.now().plusDays(1), "image",
@@ -36,9 +37,12 @@ class GetShowDetailUseCaseTest {
         );
         when(showFinder.findShowDetail(1L)).thenReturn(response);
 
+        //when
         GetShowDetailUseCase.Output output = useCase.execute(new GetShowDetailUseCase.Input(1L));
 
+        //then
         assertThat(output.show()).isEqualTo(response);
         verify(showFinder).findShowDetail(1L);
     }
 }
+

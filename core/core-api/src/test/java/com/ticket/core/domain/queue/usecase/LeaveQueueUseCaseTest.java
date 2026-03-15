@@ -32,17 +32,21 @@ class LeaveQueueUseCaseTest {
 
     @Test
     void 대기중_엔트리는_대기열에서_제거한다() {
+        //given
         when(queueRuntimeStore.findEntry("qe-wait")).thenReturn(Optional.of(
                 new QueueEntryRuntime(10L, "qe-wait", QueueEntryStatus.WAITING, 1L, null, null)
         ));
 
+        //when
         leaveQueueUseCase.execute(new LeaveQueueUseCase.Input(10L, "qe-wait"));
 
+        //then
         verify(queueRuntimeStore).leaveWaiting(10L, "qe-wait");
     }
 
     @Test
     void 입장된_엔트리는_토큰을_회수하고_다음_대기자를_입장시킨다() {
+        //given
         when(queueRuntimeStore.findEntry("qe-admit")).thenReturn(Optional.of(
                 new QueueEntryRuntime(
                         10L,
@@ -54,43 +58,55 @@ class LeaveQueueUseCaseTest {
                 )
         ));
 
+        //when
         leaveQueueUseCase.execute(new LeaveQueueUseCase.Input(10L, "qe-admit"));
 
+        //then
         verify(queueRuntimeStore).leaveAdmitted(10L, "qe-admit", "qt-admit");
         verify(queueAdvanceProcessor).advance(10L);
     }
 
     @Test
     void 엔트리가_없으면_아무_작업도_하지_않는다() {
+        //given
         when(queueRuntimeStore.findEntry("missing")).thenReturn(Optional.empty());
 
+        //when
         leaveQueueUseCase.execute(new LeaveQueueUseCase.Input(10L, "missing"));
 
+        //then
         verify(queueRuntimeStore, never()).leaveWaiting(10L, "missing");
         verify(queueAdvanceProcessor, never()).advance(10L);
     }
 
     @Test
     void 다른_공연의_엔트리면_아무_작업도_하지_않는다() {
+        //given
         when(queueRuntimeStore.findEntry("qe-other")).thenReturn(Optional.of(
                 new QueueEntryRuntime(99L, "qe-other", QueueEntryStatus.WAITING, 1L, null, null)
         ));
 
+        //when
         leaveQueueUseCase.execute(new LeaveQueueUseCase.Input(10L, "qe-other"));
 
+        //then
         verify(queueRuntimeStore, never()).leaveWaiting(10L, "qe-other");
         verify(queueAdvanceProcessor, never()).advance(10L);
     }
 
     @Test
     void 입장상태여도_토큰이_없으면_아무_작업도_하지_않는다() {
+        //given
         when(queueRuntimeStore.findEntry("qe-no-token")).thenReturn(Optional.of(
                 new QueueEntryRuntime(10L, "qe-no-token", QueueEntryStatus.ADMITTED, null, null, null)
         ));
 
+        //when
         leaveQueueUseCase.execute(new LeaveQueueUseCase.Input(10L, "qe-no-token"));
 
+        //then
         verify(queueRuntimeStore, never()).leaveAdmitted(10L, "qe-no-token", null);
         verify(queueAdvanceProcessor, never()).advance(10L);
     }
 }
+

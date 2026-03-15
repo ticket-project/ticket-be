@@ -32,6 +32,7 @@ class GetShowSeatsUseCaseTest {
 
     @Test
     void 공연_좌석정보를_조회한다() {
+        //given
         Show show = mock(Show.class);
         List<ShowSeatResponse.SeatInfo> seats = List.of(
                 new ShowSeatResponse.SeatInfo(1L, 1, "A", "10", "7", 10.0, 20.0, "VIP", "VIP", BigDecimal.TEN)
@@ -40,22 +41,28 @@ class GetShowSeatsUseCaseTest {
         when(show.getId()).thenReturn(100L);
         when(seatMapQueryRepository.findShowSeats(100L)).thenReturn(seats);
 
+        //when
         GetShowSeatsUseCase.Output output = useCase.execute(new GetShowSeatsUseCase.Input(100L));
 
+        //then
         assertThat(output.seatInfo().seats()).isEqualTo(seats);
         verify(seatMapQueryRepository).findShowSeats(100L);
     }
 
     @Test
     void 공연_좌석이_없으면_빈_목록을_반환한다() {
+        //given
         Show show = mock(Show.class);
         when(showFinder.findById(100L)).thenReturn(show);
         when(show.getId()).thenReturn(100L);
         when(seatMapQueryRepository.findShowSeats(100L)).thenReturn(List.of());
 
+        //when
         GetShowSeatsUseCase.Output output = useCase.execute(new GetShowSeatsUseCase.Input(100L));
 
+        //then
         assertThat(output.seatInfo().seats()).isEmpty();
         verify(seatMapQueryRepository).findShowSeats(100L);
     }
 }
+

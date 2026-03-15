@@ -13,8 +13,10 @@ class PerformanceQueuePolicyTest {
 
     @Test
     void 정책을_생성하면_입력값을_보관한다() {
+        //given
         LocalDateTime preopen = LocalDateTime.of(2026, 3, 15, 19, 50);
 
+        //when
         PerformanceQueuePolicy policy = new PerformanceQueuePolicy(
                 mock(Performance.class),
                 QueueMode.AUTO,
@@ -26,6 +28,7 @@ class PerformanceQueuePolicyTest {
                 "초기 정책"
         );
 
+        //then
         assertThat(policy.getQueueMode()).isEqualTo(QueueMode.AUTO);
         assertThat(policy.getQueueLevel()).isEqualTo(QueueLevel.LEVEL_1);
         assertThat(policy.getMaxActiveUsers()).isEqualTo(300);
@@ -37,6 +40,7 @@ class PerformanceQueuePolicyTest {
 
     @Test
     void update는_정책값을_덮어쓴다() {
+        //given
         PerformanceQueuePolicy policy = new PerformanceQueuePolicy(
                 mock(Performance.class),
                 QueueMode.AUTO,
@@ -49,6 +53,7 @@ class PerformanceQueuePolicyTest {
         );
         LocalDateTime preopen = LocalDateTime.of(2026, 3, 15, 19, 50);
 
+        //when
         policy.update(
                 QueueMode.FORCE_ON,
                 QueueLevel.LEVEL_2,
@@ -59,6 +64,7 @@ class PerformanceQueuePolicyTest {
                 "수동 변경"
         );
 
+        //then
         assertThat(policy.getQueueMode()).isEqualTo(QueueMode.FORCE_ON);
         assertThat(policy.getQueueLevel()).isEqualTo(QueueLevel.LEVEL_2);
         assertThat(policy.getMaxActiveUsers()).isEqualTo(500);
@@ -68,3 +74,4 @@ class PerformanceQueuePolicyTest {
         assertThat(policy.getReason()).isEqualTo("수동 변경");
     }
 }
+

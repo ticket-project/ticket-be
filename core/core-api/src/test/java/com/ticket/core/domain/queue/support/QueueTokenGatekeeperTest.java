@@ -25,6 +25,9 @@ class QueueTokenGatekeeperTest {
 
     @Test
     void 토큰이_null이면_QUEUE_TOKEN_REQUIRED_예외를_던진다() {
+        //given
+        //when
+        //then
         assertThatThrownBy(() -> queueTokenGatekeeper.assertAccessible(10L, null))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.QUEUE_TOKEN_REQUIRED));
@@ -32,6 +35,9 @@ class QueueTokenGatekeeperTest {
 
     @Test
     void 토큰이_blank이면_QUEUE_TOKEN_REQUIRED_예외를_던진다() {
+        //given
+        //when
+        //then
         assertThatThrownBy(() -> queueTokenGatekeeper.assertAccessible(10L, " "))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.QUEUE_TOKEN_REQUIRED));
@@ -39,8 +45,11 @@ class QueueTokenGatekeeperTest {
 
     @Test
     void 유효하지_않은_토큰이면_QUEUE_TOKEN_INVALID_예외를_던진다() {
+        //given
         when(queueRuntimeStore.isValidToken(10L, "qt-invalid")).thenReturn(false);
 
+        //when
+        //then
         assertThatThrownBy(() -> queueTokenGatekeeper.assertAccessible(10L, "qt-invalid"))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.QUEUE_TOKEN_INVALID));
@@ -48,8 +57,12 @@ class QueueTokenGatekeeperTest {
 
     @Test
     void 유효한_토큰이면_통과한다() {
+        //given
         when(queueRuntimeStore.isValidToken(10L, "qt-valid")).thenReturn(true);
 
+        //when
+        //then
         queueTokenGatekeeper.assertAccessible(10L, "qt-valid");
     }
 }
+

@@ -41,6 +41,7 @@ class GetMyShowLikesUseCaseTest {
 
     @Test
     void 찜한_공연_목록을_커서와_함께_조회한다() {
+        //given
         Member member = mock(Member.class);
         ShowLikeSummaryResponse summary = new ShowLikeSummaryResponse(
                 2L,
@@ -56,8 +57,10 @@ class GetMyShowLikesUseCaseTest {
         when(showLikeQueryRepository.findMyLikedShows(1L, 10L, 20))
                 .thenReturn(new CursorSlice<>(new SliceImpl<>(List.of(summary)), "9"));
 
+        //when
         GetMyShowLikesUseCase.Output output = useCase.execute(new GetMyShowLikesUseCase.Input(1L, "10", 20));
 
+        //then
         assertThat(output.shows().getContent()).containsExactly(summary);
         assertThat(output.nextCursor()).isEqualTo("9");
         verify(showLikeQueryRepository).findMyLikedShows(1L, 10L, 20);
@@ -65,6 +68,9 @@ class GetMyShowLikesUseCaseTest {
 
     @Test
     void cursor가_숫자가_아니면_예외를_던진다() {
+        //given
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(new GetMyShowLikesUseCase.Input(1L, "abc", 20)))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType())
@@ -74,6 +80,9 @@ class GetMyShowLikesUseCaseTest {
     @ParameterizedTest
     @MethodSource("invalidInputs")
     void memberId_또는_size가_유효하지_않으면_예외를_던진다(final GetMyShowLikesUseCase.Input input) {
+        //given
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(input))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType())
@@ -82,14 +91,17 @@ class GetMyShowLikesUseCaseTest {
 
     @Test
     void cursor가_비어있으면_첫_페이지를_조회한다() {
+        //given
         Member member = mock(Member.class);
         when(member.getId()).thenReturn(1L);
         when(memberFinder.findActiveMemberById(1L)).thenReturn(member);
         when(showLikeQueryRepository.findMyLikedShows(1L, null, 20))
                 .thenReturn(new CursorSlice<>(new SliceImpl<>(List.of()), null));
 
+        //when
         GetMyShowLikesUseCase.Output output = useCase.execute(new GetMyShowLikesUseCase.Input(1L, " ", 20));
 
+        //then
         assertThat(output.shows().getContent()).isEmpty();
         assertThat(output.nextCursor()).isNull();
         verify(showLikeQueryRepository).findMyLikedShows(1L, null, 20);
@@ -104,3 +116,4 @@ class GetMyShowLikesUseCaseTest {
         );
     }
 }
+
