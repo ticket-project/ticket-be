@@ -27,7 +27,7 @@ class PerformanceFinderTest {
     private PerformanceFinder performanceFinder;
 
     @Test
-    void 예약오픈_공연이면_그대로_반환한다() {
+    void 예약중인_공연이면_그대로_반환한다() {
         Performance performance = createPerformance(
                 LocalDateTime.now().minusMinutes(10),
                 LocalDateTime.now().plusMinutes(10)
@@ -40,7 +40,7 @@ class PerformanceFinderTest {
     }
 
     @Test
-    void 예약오픈이_아니면_찾을수없음_예외를_던진다() {
+    void 예약중이_아니면_찾을수없음_예외를_던진다() {
         Performance performance = createPerformance(
                 LocalDateTime.now().plusMinutes(10),
                 LocalDateTime.now().plusMinutes(20)
@@ -53,7 +53,7 @@ class PerformanceFinderTest {
     }
 
     @Test
-    void 공연이_없으면_findById는_찾을수없음_예외를_던진다() {
+    void 공연이_없으면_findById가_찾을수없음_예외를_던진다() {
         when(performanceRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> performanceFinder.findById(1L))
@@ -62,7 +62,7 @@ class PerformanceFinderTest {
     }
 
     @Test
-    void 예매오픈전_공연은_아직예매시간아님_예외를_던진다() {
+    void 예매중이지만_아직_예매시간_전이면_예외를_던진다() {
         Performance performance = createPerformance(
                 LocalDateTime.now().plusMinutes(10),
                 LocalDateTime.now().plusMinutes(20)
@@ -75,10 +75,36 @@ class PerformanceFinderTest {
     }
 
     @Test
-    void 예매마감후_공연은_종료예외를_던진다() {
+    void 예매시작시간이_null이면_아직_예매시간_전_예외를_던진다() {
+        Performance performance = createPerformance(
+                null,
+                LocalDateTime.now().plusMinutes(20)
+        );
+        when(performanceRepository.findById(1L)).thenReturn(Optional.of(performance));
+
+        assertThatThrownBy(() -> performanceFinder.findValidPerformanceById(1L))
+                .isInstanceOf(CoreException.class)
+                .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.NOT_YET_RESERVE_TIME));
+    }
+
+    @Test
+    void 예매마감된_공연은_종료_예외를_던진다() {
         Performance performance = createPerformance(
                 LocalDateTime.now().minusMinutes(20),
                 LocalDateTime.now().minusMinutes(10)
+        );
+        when(performanceRepository.findById(1L)).thenReturn(Optional.of(performance));
+
+        assertThatThrownBy(() -> performanceFinder.findValidPerformanceById(1L))
+                .isInstanceOf(CoreException.class)
+                .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.PERFORMANCE_IS_PAST));
+    }
+
+    @Test
+    void 예매마감시간이_null이면_종료_예외를_던진다() {
+        Performance performance = createPerformance(
+                LocalDateTime.now().minusMinutes(20),
+                null
         );
         when(performanceRepository.findById(1L)).thenReturn(Optional.of(performance));
 
@@ -101,6 +127,15 @@ class PerformanceFinderTest {
     }
 
     private Performance createPerformance(final LocalDateTime orderOpenTime, final LocalDateTime orderCloseTime) {
-        return new Performance(null, 1L, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(1).plusHours(2), orderOpenTime, orderCloseTime, 4, 300);
+        return new Performance(
+                null,
+                1L,
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(1).plusHours(2),
+                orderOpenTime,
+                orderCloseTime,
+                4,
+                300
+        );
     }
 }
