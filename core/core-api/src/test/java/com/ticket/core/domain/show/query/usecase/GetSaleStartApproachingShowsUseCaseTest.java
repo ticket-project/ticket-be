@@ -26,25 +26,32 @@ class GetSaleStartApproachingShowsUseCaseTest {
 
     @Test
     void 판매오픈임박_공연_목록을_반환한다() {
+        //given
         List<ShowOpeningSoonSummaryResponse> shows = List.of(
                 new ShowOpeningSoonSummaryResponse(1L, "공연", "image", "장소", LocalDateTime.now())
         );
         when(showListQueryRepository.findShowsSaleOpeningSoon("CONCERT", 5)).thenReturn(shows);
 
+        //when
         GetSaleStartApproachingShowsUseCase.Output output = useCase.execute(new GetSaleStartApproachingShowsUseCase.Input("CONCERT", 5));
 
+        //then
         assertThat(output.shows()).isEqualTo(shows);
         verify(showListQueryRepository).findShowsSaleOpeningSoon("CONCERT", 5);
     }
 
     @Test
     void 판매오픈임박_공연이_없으면_빈_목록을_반환한다() {
+        //given
         when(showListQueryRepository.findShowsSaleOpeningSoon("CONCERT", 5)).thenReturn(List.of());
 
+        //when
         GetSaleStartApproachingShowsUseCase.Output output =
                 useCase.execute(new GetSaleStartApproachingShowsUseCase.Input("CONCERT", 5));
 
+        //then
         assertThat(output.shows()).isEmpty();
         verify(showListQueryRepository).findShowsSaleOpeningSoon("CONCERT", 5);
     }
 }
+

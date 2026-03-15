@@ -31,6 +31,7 @@ class GetSaleStartApproachingShowsPageUseCaseTest {
 
     @Test
     void 커서_페이지_응답을_그대로_전달한다() {
+        //given
         SaleOpeningSoonSearchParam param = new SaleOpeningSoonSearchParam(null, null, null, null, null, null, null, null);
         ShowOpeningSoonDetailResponse show = new ShowOpeningSoonDetailResponse(
                 1L,
@@ -49,9 +50,11 @@ class GetSaleStartApproachingShowsPageUseCaseTest {
                 new CursorSlice<>(new SliceImpl<>(List.of(show)), "next-cursor");
         when(showListQueryRepository.findSaleOpeningSoonPage(param, 10, "popular")).thenReturn(result);
 
+        //when
         GetSaleStartApproachingShowsPageUseCase.Output output =
                 useCase.execute(new GetSaleStartApproachingShowsPageUseCase.Input(param, 10, "popular"));
 
+        //then
         assertThat(output.shows().getContent()).containsExactly(show);
         assertThat(output.nextCursor()).isEqualTo("next-cursor");
         verify(showListQueryRepository).findSaleOpeningSoonPage(param, 10, "popular");
@@ -59,15 +62,19 @@ class GetSaleStartApproachingShowsPageUseCaseTest {
 
     @Test
     void 판매오픈임박_공연이_없으면_빈_슬라이스와_null_커서를_반환한다() {
+        //given
         SaleOpeningSoonSearchParam param = new SaleOpeningSoonSearchParam(null, null, null, null, null, null, null, null);
         CursorSlice<ShowOpeningSoonDetailResponse> result = new CursorSlice<>(new SliceImpl<>(List.of()), null);
         when(showListQueryRepository.findSaleOpeningSoonPage(param, 10, "popular")).thenReturn(result);
 
+        //when
         GetSaleStartApproachingShowsPageUseCase.Output output =
                 useCase.execute(new GetSaleStartApproachingShowsPageUseCase.Input(param, 10, "popular"));
 
+        //then
         assertThat(output.shows().getContent()).isEmpty();
         assertThat(output.nextCursor()).isNull();
         verify(showListQueryRepository).findSaleOpeningSoonPage(param, 10, "popular");
     }
 }
+

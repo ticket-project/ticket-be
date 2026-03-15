@@ -31,11 +31,14 @@ class OAuth2AuthCodeServiceTest {
 
     @Test
     void 일회용_인증코드를_생성하고_memberId를_저장한다() {
+        //given
         doReturn(bucket).when(redissonClient).getBucket(org.mockito.ArgumentMatchers.anyString());
 
         String code = oauth2AuthCodeService.createCode(7L);
 
+        //when
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
+        //then
         verify(redissonClient).getBucket(keyCaptor.capture());
         verify(bucket).set("7", Duration.ofSeconds(30));
         assertThat(keyCaptor.getValue()).startsWith("oauth2_auth_code:");
@@ -44,17 +47,24 @@ class OAuth2AuthCodeServiceTest {
 
     @Test
     void consumeCode는_인증코드를_소비하고_memberId를_반환한다() {
+        //given
+        //when
         doReturn(bucket).when(redissonClient).getBucket("oauth2_auth_code:code");
         when(bucket.getAndDelete()).thenReturn("7");
 
+        //then
         assertThat(oauth2AuthCodeService.consumeCode("code")).contains(7L);
     }
 
     @Test
     void consumeCode는_저장값이_없거나_숫자가_아니면_empty를_반환한다() {
+        //given
+        //when
         doReturn(bucket).when(redissonClient).getBucket("oauth2_auth_code:code");
         when(bucket.getAndDelete()).thenReturn("not-a-number");
 
+        //then
         assertThat(oauth2AuthCodeService.consumeCode("code")).isEmpty();
     }
 }
+

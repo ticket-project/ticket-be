@@ -27,21 +27,28 @@ class OrderTransactionEventListenerTest {
 
     @Test
     void 주문취소_이벤트를_받으면_hold를_해제하고_좌석상태를_발행한다() {
+        //given
         OrderCancelledEvent event = new OrderCancelledEvent(1L, "hold-key", List.of(10L, 20L));
 
+        //when
         listener.handle(event);
 
+        //then
         verify(holdManager).release(1L, "hold-key", List.of(10L, 20L));
         verify(seatStatusPublishApplicationService).publishReleased(1L, List.of(10L, 20L));
     }
 
     @Test
     void 주문만료_이벤트를_받으면_hold를_해제하고_좌석상태를_발행한다() {
+        //given
         OrderExpiredEvent event = new OrderExpiredEvent(1L, "hold-key", List.of(10L, 20L));
 
+        //when
         listener.handle(event);
 
+        //then
         verify(holdManager).release(1L, "hold-key", List.of(10L, 20L));
         verify(seatStatusPublishApplicationService).publishReleased(1L, List.of(10L, 20L));
     }
 }
+

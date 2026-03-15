@@ -53,8 +53,11 @@ class SeatMapQueryRepositoryTest extends QueryRepositoryTestSupport {
 
     @Test
     void 공연_좌석정보를_정렬해서_조회한다() {
+        //given
+        //when
         List<ShowSeatResponse.SeatInfo> result = seatMapQueryRepository.findShowSeats(showId);
 
+        //then
         assertThat(result).extracting("seatId").hasSize(2);
         assertThat(result).extracting("gradeCode").containsExactly("VIP", "R");
         assertThat(result).extracting("col").containsExactly("01", "02");
@@ -62,11 +65,15 @@ class SeatMapQueryRepositoryTest extends QueryRepositoryTestSupport {
 
     @Test
     void 회차별_좌석상태를_API_상태로_변환한다() {
+        //given
+        //when
         List<SeatStatusResponse.SeatState> result = seatMapQueryRepository.findSeatStatuses(performanceId);
 
+        //then
         assertThat(result).containsExactly(
                 new SeatStatusResponse.SeatState(result.get(0).seatId(), SeatStatus.OCCUPIED),
                 new SeatStatusResponse.SeatState(result.get(1).seatId(), SeatStatus.AVAILABLE)
         );
     }
 }
+

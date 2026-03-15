@@ -72,8 +72,11 @@ class StartOrderUseCaseTest {
 
     @Test
     void 중복된_좌석_ID가_있으면_예외를_던진다() {
+        //given
         StartOrderUseCase.Input input = new StartOrderUseCase.Input(10L, List.of(3L, 1L, 3L), 20L);
 
+        //when
+        //then
         assertThatThrownBy(() -> startOrderUseCase.execute(input))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
@@ -83,8 +86,11 @@ class StartOrderUseCaseTest {
 
     @Test
     void 좌석_ID가_비어있으면_예외를_던진다() {
+        //given
         StartOrderUseCase.Input input = new StartOrderUseCase.Input(10L, List.of(), 20L);
 
+        //when
+        //then
         assertThatThrownBy(() -> startOrderUseCase.execute(input))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
@@ -94,11 +100,14 @@ class StartOrderUseCaseTest {
 
     @Test
     void 최대_선점_가능_수량을_초과하면_예외를_던진다() {
+        //given
         StartOrderUseCase.Input input = new StartOrderUseCase.Input(10L, List.of(1L, 2L, 3L), 20L);
         Performance performance = createPerformance(2, 300);
 
         when(performanceFinder.findValidPerformanceById(10L)).thenReturn(performance);
 
+        //when
+        //then
         assertThatThrownBy(() -> startOrderUseCase.execute(input))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.EXCEED_HOLD_LIMIT));
@@ -110,6 +119,7 @@ class StartOrderUseCaseTest {
 
     @Test
     void 보류중인_주문이_이미_존재하면_예외를_던진다() {
+        //given
         StartOrderUseCase.Input input = new StartOrderUseCase.Input(10L, List.of(2L, 1L), 20L);
         Performance performance = createPerformance(3, 300);
 
@@ -117,6 +127,8 @@ class StartOrderUseCaseTest {
         when(orderRepository.findByMemberIdAndPerformanceIdAndStatus(20L, 10L, OrderState.PENDING))
                 .thenReturn(Optional.of(mock(Order.class)));
 
+        //when
+        //then
         assertThatThrownBy(() -> startOrderUseCase.execute(input))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.PENDING_ORDER_ALREADY_EXISTS));
@@ -129,6 +141,7 @@ class StartOrderUseCaseTest {
 
     @Test
     void 유효한_요청이면_보류와_주문을_생성한다() {
+        //given
         StartOrderUseCase.Input input = new StartOrderUseCase.Input(10L, List.of(7L, 3L), 20L);
         Performance performance = createPerformance(5, 420);
         List<Long> normalizedSeatIds = List.of(3L, 7L);
@@ -151,8 +164,10 @@ class StartOrderUseCaseTest {
         when(createOrderApplicationService.createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats))
                 .thenReturn(order);
 
+        //when
         StartOrderUseCase.Output output = startOrderUseCase.execute(input);
 
+        //then
         assertThat(output.orderKey()).isEqualTo("order-key");
         verify(memberFinder).findActiveMemberById(20L);
         verify(performanceFinder).findValidPerformanceById(10L);
@@ -185,3 +200,4 @@ class StartOrderUseCaseTest {
         );
     }
 }
+

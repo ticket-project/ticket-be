@@ -24,23 +24,30 @@ class CountSearchShowsUseCaseTest {
 
     @Test
     void 검색_개수를_응답으로_감싼다() {
+        //given
         ShowSearchRequest request = new ShowSearchRequest("뮤지컬", null, null, null, null, null, null);
         when(showListQueryRepository.countSearchShows(request)).thenReturn(42L);
 
+        //when
         CountSearchShowsUseCase.Output output = useCase.execute(new CountSearchShowsUseCase.Input(request));
 
+        //then
         assertThat(output.response().count()).isEqualTo(42L);
         verify(showListQueryRepository).countSearchShows(request);
     }
 
     @Test
     void 검색결과가_없으면_0건을_반환한다() {
+        //given
         ShowSearchRequest request = new ShowSearchRequest("없는공연", null, null, null, null, null, null);
         when(showListQueryRepository.countSearchShows(request)).thenReturn(0L);
 
+        //when
         CountSearchShowsUseCase.Output output = useCase.execute(new CountSearchShowsUseCase.Input(request));
 
+        //then
         assertThat(output.response().count()).isZero();
         verify(showListQueryRepository).countSearchShows(request);
     }
 }
+

@@ -46,10 +46,13 @@ class HoldManagerTest {
 
     @Test
     void 이미_hold된_좌석이_있으면_SEAT_ALREADY_HOLD_예외를_던진다() {
+        //given
         RBucket<Object> seatBucket = bucketReturning("other-hold");
         when(holdKeyGenerator.generate()).thenReturn("hold-key");
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 10L), StringCodec.INSTANCE)).thenReturn(seatBucket);
 
+        //when
+        //then
         assertThatThrownBy(() -> holdManager.createHold(1L, 1L, List.of(10L), Duration.ofMinutes(5)))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.SEAT_ALREADY_HOLD));
@@ -57,6 +60,7 @@ class HoldManagerTest {
 
     @Test
     void hold를_생성하면_좌석키와_메타키를_저장하고_snapshot을_반환한다() {
+        //given
         Duration ttl = Duration.ofMinutes(5);
         RBucket<Object> seat10 = bucketReturning(null);
         RBucket<Object> seat20 = bucketReturning(null);
@@ -68,8 +72,10 @@ class HoldManagerTest {
         when(redissonClient.getBucket(SeatRedisKey.holdMeta("hold-key"), StringCodec.INSTANCE)).thenReturn(meta);
         when(holdSnapshotCodec.encode(any(HoldSnapshot.class))).thenReturn("payload");
 
+        //when
         HoldSnapshot snapshot = holdManager.createHold(7L, 1L, List.of(10L, 20L), ttl);
 
+        //then
         assertThat(snapshot.holdKey()).isEqualTo("hold-key");
         assertThat(snapshot.memberId()).isEqualTo(7L);
         assertThat(snapshot.performanceId()).isEqualTo(1L);
@@ -81,6 +87,7 @@ class HoldManagerTest {
 
     @Test
     void hold저장_중_예외가_나면_생성한_좌석키를_롤백하고_IllegalStateException을_던진다() {
+        //given
         Duration ttl = Duration.ofMinutes(5);
         RBucket<Object> seat10 = bucketReturning(null);
         RBucket<Object> seat20 = bucketReturning(null);
@@ -92,6 +99,8 @@ class HoldManagerTest {
         when(redissonClient.getBucket(SeatRedisKey.holdMeta("hold-key"), StringCodec.INSTANCE)).thenReturn(meta);
         doThrow(new RuntimeException("boom")).when(seat20).set("hold-key", ttl);
 
+        //when
+        //then
         assertThatThrownBy(() -> holdManager.createHold(7L, 1L, List.of(10L, 20L), ttl))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("hold Redis");
@@ -102,6 +111,7 @@ class HoldManagerTest {
 
     @Test
     void release는_중복좌석을_정렬해_같은_holdKey만_삭제한다() {
+        //given
         RBucket<Object> seat10 = bucketReturning("hold-key");
         RBucket<Object> seat20 = bucketReturning("other-hold");
         RBucket<Object> meta = mock(RBucket.class);
@@ -110,14 +120,17 @@ class HoldManagerTest {
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 20L), StringCodec.INSTANCE)).thenReturn(seat20);
         when(redissonClient.getBucket(SeatRedisKey.holdMeta("hold-key"), StringCodec.INSTANCE)).thenReturn(meta);
 
+        //when
         holdManager.release(1L, "hold-key", List.of(20L, 10L, 10L));
 
+        //then
         verify(seat10).delete();
         verify(meta).delete();
     }
 
     @Test
     void 현재_hold중인_좌석아이디들을_조회한다() {
+        //given
         RKeys keys = mock(RKeys.class);
         when(redissonClient.getKeys()).thenReturn(keys);
         when(keys.getKeysByPattern(SeatRedisKey.holdPattern(1L)))
@@ -126,18 +139,23 @@ class HoldManagerTest {
                         SeatRedisKey.hold(1L, 10L)
                 ));
 
+        //when
         Set<Long> result = holdManager.getHoldingSeatIds(1L);
 
+        //then
         assertThat(result).containsExactlyInAnyOrder(10L, 30L);
     }
 
     @Test
     void isHeld는_bucket값_존재여부를_반환한다() {
+        //given
         RBucket<Object> seatBucket = bucketReturning("hold-key");
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 10L), StringCodec.INSTANCE)).thenReturn(seatBucket);
 
+        //when
         boolean result = holdManager.isHeld(1L, 10L);
 
+        //then
         assertThat(result).isTrue();
     }
 
@@ -148,3 +166,4 @@ class HoldManagerTest {
         return bucket;
     }
 }
+

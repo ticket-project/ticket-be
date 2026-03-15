@@ -34,20 +34,26 @@ class LogoutUseCaseTest {
 
     @Test
     void 본인_토큰이면_쿠키를_정리한다() {
+        //given
         MockHttpServletResponse response = new MockHttpServletResponse();
         when(refreshTokenService.revokeIfOwned("refresh-token", 1L)).thenReturn(true);
 
+        //when
         useCase.execute(new LogoutUseCase.Input(1L, "refresh-token"), response);
 
+        //then
         verify(refreshTokenService).revokeIfOwned("refresh-token", 1L);
         verify(authTokenApplicationService).clearRefreshTokenCookie(response);
     }
 
     @Test
     void 다른_회원의_토큰이면_인가_예외를_던진다() {
+        //given
         when(refreshTokenService.revokeIfOwned("refresh-token", 1L)).thenReturn(false);
         when(refreshTokenService.validateWithoutConsume("refresh-token")).thenReturn(Optional.of(2L));
 
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(new LogoutUseCase.Input(1L, "refresh-token"), new MockHttpServletResponse()))
                 .isInstanceOf(AuthException.class)
                 .satisfies(exception -> assertThat(((AuthException) exception).getErrorType()).isEqualTo(ErrorType.AUTHORIZATION_ERROR));
@@ -57,11 +63,15 @@ class LogoutUseCaseTest {
 
     @Test
     void 토큰_소유자를_확인할_수_없으면_인증_예외를_던진다() {
+        //given
         when(refreshTokenService.revokeIfOwned("refresh-token", 1L)).thenReturn(false);
         when(refreshTokenService.validateWithoutConsume("refresh-token")).thenReturn(Optional.empty());
 
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(new LogoutUseCase.Input(1L, "refresh-token"), new MockHttpServletResponse()))
                 .isInstanceOf(AuthException.class)
                 .satisfies(exception -> assertThat(((AuthException) exception).getErrorType()).isEqualTo(ErrorType.AUTHENTICATION_ERROR));
     }
 }
+

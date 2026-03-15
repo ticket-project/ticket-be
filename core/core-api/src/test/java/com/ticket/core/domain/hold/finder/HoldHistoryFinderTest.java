@@ -28,24 +28,30 @@ class HoldHistoryFinderTest {
 
     @Test
     void 활성_hold_history만_조회해_반환한다() {
+        //given
         HoldHistory first = createHoldHistory(100L);
         HoldHistory second = createHoldHistory(101L);
         when(holdHistoryRepository.findAllByHoldKeyAndStatusOrderByIdAsc("hold-key", HoldState.ACTIVE))
                 .thenReturn(List.of(first, second));
 
+        //when
         List<HoldHistory> result = holdHistoryFinder.findActiveByHoldKey("hold-key");
 
+        //then
         assertThat(result).containsExactly(first, second);
         verify(holdHistoryRepository).findAllByHoldKeyAndStatusOrderByIdAsc("hold-key", HoldState.ACTIVE);
     }
 
     @Test
     void 활성_hold_history가_없으면_빈_목록을_반환한다() {
+        //given
         when(holdHistoryRepository.findAllByHoldKeyAndStatusOrderByIdAsc("missing", HoldState.ACTIVE))
                 .thenReturn(List.of());
 
+        //when
         List<HoldHistory> result = holdHistoryFinder.findActiveByHoldKey("missing");
 
+        //then
         assertThat(result).isEmpty();
         verify(holdHistoryRepository).findAllByHoldKeyAndStatusOrderByIdAsc("missing", HoldState.ACTIVE);
     }
@@ -61,3 +67,4 @@ class HoldHistoryFinderTest {
         );
     }
 }
+

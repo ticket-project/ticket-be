@@ -31,18 +31,24 @@ class OrderFinderTest {
 
     @Test
     void 주문키와_회원으로_소유한_주문을_찾아_반환한다() {
+        //given
         Order order = createOrder();
         when(orderRepository.findByOrderKeyAndMemberId("order-key", 1L)).thenReturn(Optional.of(order));
 
+        //when
         Order result = orderFinder.findOwnedByOrderKey("order-key", 1L);
 
+        //then
         assertThat(result).isSameAs(order);
     }
 
     @Test
     void 소유한_주문이_없으면_ORDER_NOT_OWNED_예외를_던진다() {
+        //given
         when(orderRepository.findByOrderKeyAndMemberId("missing", 1L)).thenReturn(Optional.empty());
 
+        //when
+        //then
         assertThatThrownBy(() -> orderFinder.findOwnedByOrderKey("missing", 1L))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.ORDER_NOT_OWNED));
@@ -50,18 +56,24 @@ class OrderFinderTest {
 
     @Test
     void 대기중인_소유_주문을_잠금조회로_찾아_반환한다() {
+        //given
         Order order = createOrder();
         when(orderRepository.findByOrderKeyAndMemberIdForUpdate("order-key", 1L)).thenReturn(Optional.of(order));
 
+        //when
         Order result = orderFinder.findPendingOwnedByOrderKeyForUpdate("order-key", 1L);
 
+        //then
         assertThat(result).isSameAs(order);
     }
 
     @Test
     void 잠금조회한_주문이_없으면_ORDER_NOT_OWNED_예외를_던진다() {
+        //given
         when(orderRepository.findByOrderKeyAndMemberIdForUpdate("missing", 1L)).thenReturn(Optional.empty());
 
+        //when
+        //then
         assertThatThrownBy(() -> orderFinder.findPendingOwnedByOrderKeyForUpdate("missing", 1L))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.ORDER_NOT_OWNED));
@@ -69,10 +81,13 @@ class OrderFinderTest {
 
     @Test
     void 잠금조회한_주문이_pending이_아니면_ORDER_NOT_PENDING_예외를_던진다() {
+        //given
         Order order = createOrder();
         order.confirm(LocalDateTime.of(2026, 3, 15, 12, 0));
         when(orderRepository.findByOrderKeyAndMemberIdForUpdate("order-key", 1L)).thenReturn(Optional.of(order));
 
+        //when
+        //then
         assertThatThrownBy(() -> orderFinder.findPendingOwnedByOrderKeyForUpdate("order-key", 1L))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.ORDER_NOT_PENDING));
@@ -89,3 +104,4 @@ class OrderFinderTest {
         );
     }
 }
+

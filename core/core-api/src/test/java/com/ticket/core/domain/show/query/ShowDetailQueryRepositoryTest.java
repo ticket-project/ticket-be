@@ -49,8 +49,11 @@ class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
 
     @Test
     void 공연_상세정보를_조합해_조회한다() {
+        //given
+        //when
         Optional<ShowDetailResponse> result = showDetailQueryRepository.findShowDetail(showId);
 
+        //then
         assertThat(result).isPresent();
         ShowDetailResponse detail = result.orElseThrow();
         assertThat(detail.title()).isEqualTo("대표 공연");
@@ -65,6 +68,10 @@ class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
 
     @Test
     void 존재하지_않는_공연이면_empty를_반환한다() {
+        //given
+        //when
+        //then
         assertThat(showDetailQueryRepository.findShowDetail(999999L)).isEmpty();
     }
 }
+

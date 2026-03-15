@@ -9,6 +9,9 @@ class QueueRedisKeyTest {
 
     @Test
     void waiting_active_sequence_entry_key를_생성한다() {
+        //given
+        //when
+        //then
         assertThat(QueueRedisKey.waiting(10L)).isEqualTo("queue:performance:10:waiting");
         assertThat(QueueRedisKey.active(10L)).isEqualTo("queue:performance:10:active");
         assertThat(QueueRedisKey.sequence(10L)).isEqualTo("queue:performance:10:seq");
@@ -17,9 +20,12 @@ class QueueRedisKeyTest {
 
     @Test
     void 토큰과_스토리지키를_생성하고_파싱한다() {
+        //given
+        //when
         String token = QueueRedisKey.createToken(10L, "qe-10");
         String storageKey = QueueRedisKey.tokenStorageKey(token);
 
+        //then
         assertThat(token).startsWith("10:qe-10:");
         assertThat(storageKey).startsWith("queue:token:");
         assertThat(QueueRedisKey.tryParseToken(token)).isPresent();
@@ -30,9 +36,13 @@ class QueueRedisKeyTest {
 
     @Test
     void 잘못된_토큰은_파싱하지_않는다() {
+        //given
+        //when
+        //then
         assertThat(QueueRedisKey.tryParseToken(null)).isEmpty();
         assertThat(QueueRedisKey.tryParseToken(" ")).isEmpty();
         assertThat(QueueRedisKey.tryParseToken("broken-token")).isEmpty();
         assertThat(QueueRedisKey.tryParseTokenStorageKey("broken-key")).isEmpty();
     }
 }
+

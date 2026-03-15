@@ -25,8 +25,11 @@ class DeselectSeatUseCaseTest {
 
     @Test
     void 좌석_해제시_서비스와_이벤트를_순서대로_호출한다() {
+        //given
         DeselectSeatUseCase.Input input = new DeselectSeatUseCase.Input(10L, 20L, 1L);
 
+        //when
+        //then
         useCase.execute(input);
 
         InOrder inOrder = inOrder(seatSelectionService, seatEventPublisher);
@@ -34,3 +37,4 @@ class DeselectSeatUseCaseTest {
         inOrder.verify(seatEventPublisher).publish(org.mockito.ArgumentMatchers.any());
     }
 }
+

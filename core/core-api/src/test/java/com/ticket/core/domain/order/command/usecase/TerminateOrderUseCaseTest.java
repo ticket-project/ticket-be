@@ -54,6 +54,7 @@ class TerminateOrderUseCaseTest {
 
     @Test
     void 취소시_주문상태를_전이하고_이벤트를_발행한다() {
+        //given
         Order order = createOrder(10L, 100L, "hold-key");
         OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
         HoldHistory holdHistory = mock(HoldHistory.class);
@@ -63,8 +64,10 @@ class TerminateOrderUseCaseTest {
         when(orderSeatFinder.getOrderSeatsByOrderId(10L)).thenReturn(List.of(orderSeat));
         when(holdHistoryFinder.findActiveByHoldKey("hold-key")).thenReturn(List.of(holdHistory));
 
+        //when
         useCase.cancel("order-key", 1L, now);
 
+        //then
         verify(memberFinder).findActiveMemberById(1L);
         verify(orderLifecycleDomainService).cancel(order, List.of(orderSeat), List.of(holdHistory), now);
         ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
@@ -74,16 +77,20 @@ class TerminateOrderUseCaseTest {
 
     @Test
     void 만료대상_주문이_없으면_noop이다() {
+        //given
         when(orderRepository.findByIdAndStatusForUpdate(10L, OrderState.PENDING)).thenReturn(Optional.empty());
 
+        //when
         useCase.expireByOrderId(10L, LocalDateTime.now());
 
+        //then
         verify(orderRepository).findByIdAndStatusForUpdate(10L, OrderState.PENDING);
         verifyNoInteractions(orderLifecycleDomainService, applicationEventPublisher);
     }
 
     @Test
     void holdKey로_조회한_주문이_pending이면_만료처리한다() {
+        //given
         Order order = createOrder(10L, 100L, "hold-key");
         OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
         HoldHistory holdHistory = mock(HoldHistory.class);
@@ -93,8 +100,10 @@ class TerminateOrderUseCaseTest {
         when(orderSeatFinder.getOrderSeatsByOrderId(10L)).thenReturn(List.of(orderSeat));
         when(holdHistoryFinder.findActiveByHoldKey("hold-key")).thenReturn(List.of(holdHistory));
 
+        //when
         useCase.expireByHoldKey("hold-key", now);
 
+        //then
         verify(orderLifecycleDomainService).expire(order, List.of(orderSeat), List.of(holdHistory), now);
         ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
         verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
@@ -103,12 +112,15 @@ class TerminateOrderUseCaseTest {
 
     @Test
     void 상태가_pending이_아닌_주문이면_만료처리를_건너뛴다() {
+        //given
         Order order = createOrder(10L, 100L, "hold-key");
         order.cancel(LocalDateTime.of(2026, 3, 15, 9, 0));
         when(orderRepository.findByHoldKeyAndStatusForUpdate("hold-key", OrderState.PENDING)).thenReturn(Optional.of(order));
 
+        //when
         useCase.expireByHoldKey("hold-key", LocalDateTime.of(2026, 3, 15, 10, 0));
 
+        //then
         verifyNoInteractions(orderSeatFinder, holdHistoryFinder, orderLifecycleDomainService, applicationEventPublisher);
     }
 
@@ -118,3 +130,4 @@ class TerminateOrderUseCaseTest {
         return order;
     }
 }
+

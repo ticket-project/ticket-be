@@ -35,6 +35,7 @@ class GetPerformanceScheduleListUseCaseTest {
 
     @Test
     void 같은_공연의_회차_목록을_반환한다() {
+        //given
         Show show = mock(Show.class);
         Performance selected = mock(Performance.class);
         Performance another = mock(Performance.class);
@@ -52,8 +53,10 @@ class GetPerformanceScheduleListUseCaseTest {
         when(performanceFinder.findById(10L)).thenReturn(selected);
         when(performanceRepository.findAllByShowIdOrderByStartTimeAscPerformanceNoAsc(100L)).thenReturn(List.of(selected, another));
 
+        //when
         GetPerformanceScheduleListUseCase.Output output = useCase.execute(new GetPerformanceScheduleListUseCase.Input(10L));
 
+        //then
         assertThat(output.schedules().showId()).isEqualTo(100L);
         assertThat(output.schedules().selectedPerformanceId()).isEqualTo(10L);
         assertThat(output.schedules().schedules()).hasSize(2);
@@ -61,10 +64,13 @@ class GetPerformanceScheduleListUseCaseTest {
 
     @Test
     void 공연이_연결되지_않은_회차면_예외를_던진다() {
+        //given
         Performance performance = mock(Performance.class);
         when(performance.getShow()).thenReturn(null);
         when(performanceFinder.findById(10L)).thenReturn(performance);
 
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(new GetPerformanceScheduleListUseCase.Input(10L)))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
@@ -72,6 +78,7 @@ class GetPerformanceScheduleListUseCaseTest {
 
     @Test
     void 같은_공연의_회차가_없으면_빈_목록을_반환한다() {
+        //given
         Show show = mock(Show.class);
         Performance selected = mock(Performance.class);
         when(show.getId()).thenReturn(100L);
@@ -80,10 +87,13 @@ class GetPerformanceScheduleListUseCaseTest {
         when(performanceFinder.findById(10L)).thenReturn(selected);
         when(performanceRepository.findAllByShowIdOrderByStartTimeAscPerformanceNoAsc(100L)).thenReturn(List.of());
 
+        //when
         GetPerformanceScheduleListUseCase.Output output = useCase.execute(new GetPerformanceScheduleListUseCase.Input(10L));
 
+        //then
         assertThat(output.schedules().showId()).isEqualTo(100L);
         assertThat(output.schedules().selectedPerformanceId()).isEqualTo(10L);
         assertThat(output.schedules().schedules()).isEmpty();
     }
 }
+

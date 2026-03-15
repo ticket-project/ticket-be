@@ -46,6 +46,7 @@ class GetSeatAvailabilityUseCaseTest {
 
     @Test
     void DB와_redis_점유좌석을_합쳐_잔여석을_계산한다() {
+        //given
         Performance performance = mock(Performance.class);
         Show show = mock(Show.class);
         List<SeatAvailabilityCalculator.AvailableSeatRow> rows =
@@ -61,20 +62,26 @@ class GetSeatAvailabilityUseCaseTest {
         when(holdManager.getHoldingSeatIds(10L)).thenReturn(Set.of(2L));
         when(seatAvailabilityCalculator.calculate(rows, Set.of(1L, 2L))).thenReturn(response);
 
+        //when
         GetSeatAvailabilityUseCase.Output output = useCase.execute(new GetSeatAvailabilityUseCase.Input(10L));
 
+        //then
         assertThat(output.availability()).isEqualTo(response);
         verify(seatAvailabilityCalculator).calculate(rows, Set.of(1L, 2L));
     }
 
     @Test
     void 공연이_연결되지_않은_회차면_예외를_던진다() {
+        //given
         Performance performance = mock(Performance.class);
         when(performanceFinder.findById(10L)).thenReturn(performance);
         when(performance.getShow()).thenReturn(null);
 
+        //when
+        //then
         assertThatThrownBy(() -> useCase.execute(new GetSeatAvailabilityUseCase.Input(10L)))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
     }
 }
+

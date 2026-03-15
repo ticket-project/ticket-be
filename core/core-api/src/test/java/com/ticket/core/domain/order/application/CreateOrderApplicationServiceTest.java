@@ -47,6 +47,7 @@ class CreateOrderApplicationServiceTest {
 
     @Test
     void 좌석가격_합계로_pending_주문과_orderSeat를_생성한다() {
+        //given
         PerformanceSeat firstSeat = createPerformanceSeat(101L, 201L, BigDecimal.TEN);
         PerformanceSeat secondSeat = createPerformanceSeat(102L, 202L, BigDecimal.valueOf(20));
         when(orderKeyGenerator.generate()).thenReturn("ORDER-KEY");
@@ -56,6 +57,7 @@ class CreateOrderApplicationServiceTest {
             return order;
         });
 
+        //when
         Order order = createOrderApplicationService.createPendingOrder(
                 1L,
                 10L,
@@ -64,6 +66,7 @@ class CreateOrderApplicationServiceTest {
                 List.of(firstSeat, secondSeat)
         );
 
+        //then
         assertThat(order.getOrderKey()).isEqualTo("ORDER-KEY");
         assertThat(order.getTotalAmount()).isEqualByComparingTo("30");
         ArgumentCaptor<List<OrderSeat>> orderSeatCaptor = ArgumentCaptor.forClass(List.class);
@@ -74,6 +77,7 @@ class CreateOrderApplicationServiceTest {
 
     @Test
     void pending_주문_유니크_제약위반이면_도메인_예외로_변환한다() {
+        //given
         when(orderKeyGenerator.generate()).thenReturn("ORDER-KEY");
         DataIntegrityViolationException exception = new DataIntegrityViolationException(
                 "duplicate",
@@ -81,6 +85,8 @@ class CreateOrderApplicationServiceTest {
         );
         when(orderRepository.save(any(Order.class))).thenThrow(exception);
 
+        //when
+        //then
         assertThatThrownBy(() -> createOrderApplicationService.createPendingOrder(
                 1L,
                 10L,
@@ -94,9 +100,12 @@ class CreateOrderApplicationServiceTest {
 
     @Test
     void 다른_데이터무결성_예외는_그대로_전파한다() {
+        //given
         when(orderKeyGenerator.generate()).thenReturn("ORDER-KEY");
         when(orderRepository.save(any(Order.class))).thenThrow(new DataIntegrityViolationException("other"));
 
+        //when
+        //then
         assertThatThrownBy(() -> createOrderApplicationService.createPendingOrder(
                 1L,
                 10L,
@@ -122,3 +131,4 @@ class CreateOrderApplicationServiceTest {
         return performanceSeat;
     }
 }
+

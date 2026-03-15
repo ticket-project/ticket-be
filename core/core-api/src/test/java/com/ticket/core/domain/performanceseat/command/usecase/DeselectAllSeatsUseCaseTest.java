@@ -31,12 +31,16 @@ class DeselectAllSeatsUseCaseTest {
 
     @Test
     void 전체_좌석_해제시_모든_좌석에_대한_이벤트를_발행한다() {
+        //given
         when(seatSelectionService.deselectAll(10L, 1L)).thenReturn(List.of(20L, 21L));
 
+        //when
         useCase.execute(new DeselectAllSeatsUseCase.Input(10L, 1L));
 
+        //then
         verify(memberFinder).findActiveMemberById(1L);
         verify(seatSelectionService).deselectAll(10L, 1L);
         verify(seatEventPublisher, times(2)).publish(org.mockito.ArgumentMatchers.any());
     }
 }
+

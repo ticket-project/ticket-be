@@ -237,3 +237,4 @@ public abstract class QueryRepositoryTestSupport {
     static class TestApplication {
     }
 }
+

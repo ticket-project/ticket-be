@@ -29,9 +29,12 @@ class SeatStatusPublishApplicationServiceTest {
 
     @Test
     void 좌석_선점상태는_좌석별_HELD_이벤트로_발행한다() {
+        //given
         seatStatusPublishApplicationService.publishHeld(10L, List.of(1L, 2L));
 
+        //when
         ArgumentCaptor<SeatStatusMessage> captor = ArgumentCaptor.forClass(SeatStatusMessage.class);
+        //then
         verify(seatEventPublisher, times(2)).publish(captor.capture());
         assertThat(captor.getAllValues())
                 .extracting(SeatStatusMessage::performanceId, SeatStatusMessage::seatId, SeatStatusMessage::action)
@@ -43,9 +46,12 @@ class SeatStatusPublishApplicationServiceTest {
 
     @Test
     void 좌석_해제상태는_좌석별_RELEASED_이벤트로_발행한다() {
+        //given
         seatStatusPublishApplicationService.publishReleased(10L, List.of(3L, 4L));
 
+        //when
         ArgumentCaptor<SeatStatusMessage> captor = ArgumentCaptor.forClass(SeatStatusMessage.class);
+        //then
         verify(seatEventPublisher, times(2)).publish(captor.capture());
         assertThat(captor.getAllValues())
                 .extracting(SeatStatusMessage::performanceId, SeatStatusMessage::seatId, SeatStatusMessage::action)
@@ -55,3 +61,4 @@ class SeatStatusPublishApplicationServiceTest {
                 );
     }
 }
+

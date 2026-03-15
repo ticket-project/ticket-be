@@ -50,9 +50,13 @@ class SeatAvailabilityQueryRepositoryTest extends QueryRepositoryTestSupport {
 
     @Test
     void 등급정렬과_좌석ID순으로_가용좌석_원본행을_조회한다() {
+        //given
+        //when
         List<SeatAvailabilityCalculator.AvailableSeatRow> result = seatAvailabilityQueryRepository.findAvailableSeatRows(performanceId, showId);
 
+        //then
         assertThat(result).extracting("gradeName").containsExactly("VIP석", "R석");
         assertThat(result).extracting("state").containsExactly(PerformanceSeatState.AVAILABLE, PerformanceSeatState.RESERVED);
     }
 }
+
