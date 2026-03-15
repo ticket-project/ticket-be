@@ -1,5 +1,6 @@
 package com.ticket.core.domain.order.query;
 
+import com.ticket.core.api.controller.response.OrderDetailResponse;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.EncodedPassword;
@@ -48,7 +49,7 @@ class OrderDetailResponseMapperTest {
         PerformanceSeat performanceSeat = createPerformanceSeat();
         Member member = createMember();
 
-        var response = OrderDetailResponseMapper.toResponse(
+        OrderDetailResponse response = OrderDetailResponseMapper.toResponse(
                 order,
                 List.of(orderSeat),
                 List.of(performanceSeat),

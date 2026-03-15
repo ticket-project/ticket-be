@@ -17,6 +17,7 @@ import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -163,7 +164,7 @@ class StartOrderUseCaseTest {
         verify(holdHistoryRecorder).recordActiveHold(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);
         verify(applicationEventPublisher, never()).publishEvent(eq("hold-key"));
 
-        var inOrder = inOrder(holdManager, applicationEventPublisher, createOrderApplicationService, holdHistoryRecorder);
+        InOrder inOrder = inOrder(holdManager, applicationEventPublisher, createOrderApplicationService, holdHistoryRecorder);
         inOrder.verify(holdManager).createHold(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(420));
         inOrder.verify(applicationEventPublisher).publishEvent(any(HoldCreatedEvent.class));
         inOrder.verify(createOrderApplicationService).createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);

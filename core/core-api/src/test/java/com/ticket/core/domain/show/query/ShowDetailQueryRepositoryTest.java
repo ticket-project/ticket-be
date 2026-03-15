@@ -1,6 +1,12 @@
 package com.ticket.core.domain.show.query;
 
+import com.ticket.core.api.controller.response.ShowDetailResponse;
+import com.ticket.core.domain.show.Show;
+import com.ticket.core.domain.show.category.Category;
+import com.ticket.core.domain.show.genre.Genre;
 import com.ticket.core.domain.show.meta.Region;
+import com.ticket.core.domain.show.performer.Performer;
+import com.ticket.core.domain.show.venue.Venue;
 import com.ticket.core.domain.support.QueryRepositoryTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +16,7 @@ import org.springframework.context.annotation.Import;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,11 +31,11 @@ class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
 
     @BeforeEach
     void setUp() throws Exception {
-        var venue = persistVenue("예술의전당", Region.SEOUL);
-        var performer = persistPerformer("홍길동");
-        var category = persistCategory("CONCERT", "콘서트");
-        var genre = persistGenre("KPOP", "케이팝", category);
-        var show = persistShow("대표 공연", venue, performer, 321L, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(10));
+        Venue venue = persistVenue("예술의전당", Region.SEOUL);
+        Performer performer = persistPerformer("홍길동");
+        Category category = persistCategory("CONCERT", "콘서트");
+        Genre genre = persistGenre("KPOP", "케이팝", category);
+        Show show = persistShow("대표 공연", venue, performer, 321L, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(10));
         showId = show.getId();
         persistShowGenre(show, genre);
         persistShowGrade(show, "VIP", "VIP석", BigDecimal.valueOf(150000), 1);
@@ -42,10 +49,10 @@ class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
 
     @Test
     void 공연_상세정보를_조합해_조회한다() {
-        var result = showDetailQueryRepository.findShowDetail(showId);
+        Optional<ShowDetailResponse> result = showDetailQueryRepository.findShowDetail(showId);
 
         assertThat(result).isPresent();
-        var detail = result.orElseThrow();
+        ShowDetailResponse detail = result.orElseThrow();
         assertThat(detail.title()).isEqualTo("대표 공연");
         assertThat(detail.likeCount()).isEqualTo(2L);
         assertThat(detail.genreNames()).contains("케이팝");
