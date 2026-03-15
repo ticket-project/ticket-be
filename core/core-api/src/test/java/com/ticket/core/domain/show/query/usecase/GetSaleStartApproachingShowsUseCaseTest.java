@@ -35,4 +35,15 @@ class GetSaleStartApproachingShowsUseCaseTest {
         assertThat(output.shows()).isEqualTo(shows);
         verify(showListQueryRepository).findShowsSaleOpeningSoon("CONCERT", 5);
     }
+
+    @Test
+    void 판매오픈임박_공연이_없으면_빈_목록을_반환한다() {
+        when(showListQueryRepository.findShowsSaleOpeningSoon("CONCERT", 5)).thenReturn(List.of());
+
+        GetSaleStartApproachingShowsUseCase.Output output =
+                useCase.execute(new GetSaleStartApproachingShowsUseCase.Input("CONCERT", 5));
+
+        assertThat(output.shows()).isEmpty();
+        verify(showListQueryRepository).findShowsSaleOpeningSoon("CONCERT", 5);
+    }
 }
