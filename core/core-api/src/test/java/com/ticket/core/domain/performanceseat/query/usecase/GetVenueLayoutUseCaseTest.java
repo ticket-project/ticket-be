@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("NonAsciiCharacters")
 class GetVenueLayoutUseCaseTest {
 
     @Mock
