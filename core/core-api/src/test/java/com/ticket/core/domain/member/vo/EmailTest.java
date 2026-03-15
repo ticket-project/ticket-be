@@ -1,27 +1,42 @@
-//package com.ticket.core.domain.member.vo;
-//
-//import com.ticket.core.support.exception.CoreException;
-//import org.junit.jupiter.params.ParameterizedTest;
-//import org.junit.jupiter.params.provider.NullAndEmptySource;
-//import org.junit.jupiter.params.provider.ValueSource;
-//
-//import static org.assertj.core.api.Assertions.assertThatCode;
-//import static org.assertj.core.api.Assertions.assertThatThrownBy;
-//
-//@SuppressWarnings("NonAsciiCharacters")
-//class EmailTest {
-//
-//    @ParameterizedTest
-//    @NullAndEmptySource
-//    @ValueSource(strings = {" ", "test", "test@test", "test@test."})
-//    void 올바르지_않은_이메일이면_Email_생성에_실패한다(final String email) {
-//        //then
-//        assertThatThrownBy(() -> Email.create(email)).isInstanceOf(CoreException.class);
-//    }
-//
-//    @ParameterizedTest
-//    @ValueSource(strings = {"user@test.com", "user.name+tag@sub.domain.co"})
-//    void 올바른_이메일이면_Email_생성에_성공한다(final String email) {
-//        assertThatCode(() -> Email.create(email)).doesNotThrowAnyException();
-//    }
-//}
+package com.ticket.core.domain.member.vo;
+
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SuppressWarnings("NonAsciiCharacters")
+class EmailTest {
+
+    @Test
+    void null이면_빈문자열로_정규화한다() {
+        //given
+        //when
+        Email email = Email.create(null);
+
+        //then
+        assertThat(email.getEmail()).isEmpty();
+    }
+
+    @Test
+    void 앞뒤_공백을_제거한다() {
+        //given
+        //when
+        Email email = Email.create("  user@example.com  ");
+
+        //then
+        assertThat(email.getEmail()).isEqualTo("user@example.com");
+    }
+
+    @Test
+    void 같은_이메일값이면_동등하다() {
+        //given
+        //when
+        Email first = Email.create("user@example.com");
+        Email second = Email.create("user@example.com");
+
+        //then
+        assertThat(first).isEqualTo(second);
+        assertThat(first.hashCode()).isEqualTo(second.hashCode());
+    }
+}
+

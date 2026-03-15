@@ -1,28 +1,42 @@
-//package com.ticket.core.domain.member.vo;
-//
-//import com.ticket.core.support.exception.CoreException;
-//import org.assertj.core.api.Assertions;
-//import org.junit.jupiter.params.ParameterizedTest;
-//import org.junit.jupiter.params.provider.NullAndEmptySource;
-//import org.junit.jupiter.params.provider.ValueSource;
-//
-//import static org.assertj.core.api.Assertions.assertThatCode;
-//
-//@SuppressWarnings("NonAsciiCharacters")
-//class RawPasswordTest {
-//
-//    @ParameterizedTest
-//    @NullAndEmptySource
-//    @ValueSource(strings = {" ", "123", "abc", "1234", "abcd", "short1!", "onlyletters!", "12345678!", "noSpecial1a"})
-//    void 유효하지_않은_비밀번호면_생성에_실패한다(final String value) {
-//        //then
-//        Assertions.assertThatThrownBy(() -> RawPassword.create(value)).isInstanceOf(CoreException.class);
-//    }
-//
-//    @ParameterizedTest
-//    @ValueSource(strings = {"Pa$$w0rd", "Test123!@", "MyP@ssw0rd"})
-//    void 유효한_비밀번호면_Password_생성에_성공한다(final String value) {
-//        assertThatCode(() -> RawPassword.create(value)).doesNotThrowAnyException();
-//    }
-//}
-//
+package com.ticket.core.domain.member.vo;
+
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SuppressWarnings("NonAsciiCharacters")
+class RawPasswordTest {
+
+    @Test
+    void 입력한_원문_비밀번호를_그대로_보관한다() {
+        //given
+        //when
+        RawPassword rawPassword = RawPassword.create("password123!");
+
+        //then
+        assertThat(rawPassword.getPassword()).isEqualTo("password123!");
+    }
+
+    @Test
+    void null도_그대로_보관한다() {
+        //given
+        //when
+        RawPassword rawPassword = RawPassword.create(null);
+
+        //then
+        assertThat(rawPassword.getPassword()).isNull();
+    }
+
+    @Test
+    void 같은_비밀번호값이면_동등하다() {
+        //given
+        //when
+        RawPassword first = RawPassword.create("password123!");
+        RawPassword second = RawPassword.create("password123!");
+
+        //then
+        assertThat(first).isEqualTo(second);
+        assertThat(first.hashCode()).isEqualTo(second.hashCode());
+    }
+}
+
