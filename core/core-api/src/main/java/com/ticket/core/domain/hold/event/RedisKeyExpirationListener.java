@@ -1,6 +1,8 @@
 package com.ticket.core.domain.hold.event;
 
 import com.ticket.core.domain.order.command.usecase.TerminateOrderUseCase;
+import com.ticket.core.domain.queue.command.QueueAdvanceProcessor;
+import com.ticket.core.domain.queue.runtime.QueueRedisKey;
 import com.ticket.core.domain.performanceseat.support.SeatEventPublisher;
 import com.ticket.core.domain.performanceseat.support.SeatRedisKey;
 import com.ticket.core.domain.performanceseat.support.SeatStatusMessage;
@@ -22,6 +24,7 @@ public class RedisKeyExpirationListener implements MessageListener {
 
     private final SeatEventPublisher seatEventPublisher;
     private final TerminateOrderUseCase terminateOrderUseCase;
+    private final QueueAdvanceProcessor queueAdvanceProcessor;
 
     @Override
     public void onMessage(final Message message, final byte[] pattern) {
@@ -36,6 +39,12 @@ public class RedisKeyExpirationListener implements MessageListener {
         final SeatRedisKey.HoldMetaKey holdMetaKey = SeatRedisKey.tryParseHoldMetaKey(expiredKey).orElse(null);
         if (holdMetaKey != null) {
             handleHoldExpired(holdMetaKey);
+            return;
+        }
+
+        final QueueRedisKey.TokenKey tokenKey = QueueRedisKey.tryParseTokenStorageKey(expiredKey).orElse(null);
+        if (tokenKey != null) {
+            handleQueueTokenExpired(tokenKey);
         }
     }
 
@@ -48,5 +57,12 @@ public class RedisKeyExpirationListener implements MessageListener {
     private void handleHoldExpired(final SeatRedisKey.HoldMetaKey holdMetaKey) {
         terminateOrderUseCase.expireByHoldKey(holdMetaKey.holdKey(), LocalDateTime.now());
         log.info("홀드 만료 이벤트 처리: holdKey={}", holdMetaKey.holdKey());
+    }
+
+    private void handleQueueTokenExpired(final QueueRedisKey.TokenKey tokenKey) {
+        final String queueToken = tokenKey.performanceId() + ":" + tokenKey.queueEntryId() + ":" + tokenKey.tokenId();
+        queueAdvanceProcessor.handleTokenExpired(tokenKey.performanceId(), tokenKey.queueEntryId(), queueToken);
+        log.info("대기열 토큰 만료 이벤트 처리: performanceId={}, queueEntryId={}",
+                tokenKey.performanceId(), tokenKey.queueEntryId());
     }
 }

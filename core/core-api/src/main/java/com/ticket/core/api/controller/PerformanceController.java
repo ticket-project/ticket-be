@@ -5,6 +5,7 @@ import com.ticket.core.api.controller.response.PerformanceScheduleListResponse;
 import com.ticket.core.api.controller.response.PerformanceSummaryResponse;
 import com.ticket.core.api.controller.response.SeatAvailabilityResponse;
 import com.ticket.core.api.controller.response.SeatStatusResponse;
+import com.ticket.core.domain.queue.support.QueueTokenGatekeeper;
 import com.ticket.core.domain.performance.usecase.GetPerformanceScheduleListUseCase;
 import com.ticket.core.domain.performance.usecase.GetPerformanceSummaryUseCase;
 import com.ticket.core.domain.performanceseat.query.usecase.GetSeatAvailabilityUseCase;
@@ -22,6 +23,7 @@ public class PerformanceController implements PerformanceControllerDocs {
     private final GetSeatStatusUseCase getSeatStatusUseCase;
     private final GetPerformanceSummaryUseCase getPerformanceSummaryUseCase;
     private final GetPerformanceScheduleListUseCase getPerformanceScheduleListUseCase;
+    private final QueueTokenGatekeeper queueTokenGatekeeper;
 
     @Override
     @GetMapping("/{performanceId}/summary")
@@ -46,8 +48,10 @@ public class PerformanceController implements PerformanceControllerDocs {
     @Override
     @GetMapping("/{performanceId}/seats/availability")
     public ApiResponse<SeatAvailabilityResponse> getSeatAvailability(
-            @PathVariable final Long performanceId
+            @PathVariable final Long performanceId,
+            @RequestHeader(value = "X-Queue-Token", required = false) final String queueToken
     ) {
+        queueTokenGatekeeper.assertAccessible(performanceId, queueToken);
         final GetSeatAvailabilityUseCase.Input input = new GetSeatAvailabilityUseCase.Input(performanceId);
         final GetSeatAvailabilityUseCase.Output output = getSeatAvailabilityUseCase.execute(input);
         return ApiResponse.success(output.availability());
@@ -56,8 +60,10 @@ public class PerformanceController implements PerformanceControllerDocs {
     @Override
     @GetMapping("/{performanceId}/seats/status")
     public ApiResponse<SeatStatusResponse> getSeatStatus(
-            @PathVariable final Long performanceId
+            @PathVariable final Long performanceId,
+            @RequestHeader(value = "X-Queue-Token", required = false) final String queueToken
     ) {
+        queueTokenGatekeeper.assertAccessible(performanceId, queueToken);
         final GetSeatStatusUseCase.Input input = new GetSeatStatusUseCase.Input(performanceId);
         final GetSeatStatusUseCase.Output output = getSeatStatusUseCase.execute(input);
         return ApiResponse.success(output.status());
