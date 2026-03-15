@@ -79,3 +79,9 @@ app:
     oauth2-failure-redirect-uri: ${OAUTH2_FAILURE_REDIRECT_URI}
     kakao:
       admin-key: ${KAKAO_ADMIN_KEY}
+  queue:
+    enabled-by-default: true
+    default-level: LEVEL_1
+    default-max-active-users: 300
+    default-entry-token-ttl: 10m
+    entry-retention: 1h
