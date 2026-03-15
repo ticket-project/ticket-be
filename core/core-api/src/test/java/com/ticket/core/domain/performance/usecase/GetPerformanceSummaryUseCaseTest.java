@@ -20,8 +20,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
+@ExtendWith(MockitoExtension.class)
 class GetPerformanceSummaryUseCaseTest {
 
     @Mock
@@ -31,7 +31,7 @@ class GetPerformanceSummaryUseCaseTest {
     private GetPerformanceSummaryUseCase useCase;
 
     @Test
-    void 회차_요약정보를_반환한다() {
+    void 공연_요약정보를_반환한다() {
         Performance performance = mock(Performance.class);
         Show show = mock(Show.class);
         Venue venue = mock(Venue.class);
@@ -52,7 +52,7 @@ class GetPerformanceSummaryUseCaseTest {
     }
 
     @Test
-    void 공연이_연결되지_않은_회차면_예외를_던진다() {
+    void 공연과_연결되지_않은_회차면_예외를_던진다() {
         Performance performance = mock(Performance.class);
         when(performanceFinder.findById(1L)).thenReturn(performance);
         when(performance.getShow()).thenReturn(null);
@@ -60,5 +60,24 @@ class GetPerformanceSummaryUseCaseTest {
         assertThatThrownBy(() -> useCase.execute(new GetPerformanceSummaryUseCase.Input(1L)))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
+    }
+
+    @Test
+    void 공연장이_없어도_지역은_null로_반환한다() {
+        Performance performance = mock(Performance.class);
+        Show show = mock(Show.class);
+        LocalDateTime startTime = LocalDateTime.of(2026, 3, 20, 19, 30);
+
+        when(performanceFinder.findById(1L)).thenReturn(performance);
+        when(performance.getShow()).thenReturn(show);
+        when(performance.getStartTime()).thenReturn(startTime);
+        when(show.getTitle()).thenReturn("싱어게인");
+        when(show.getVenue()).thenReturn(null);
+
+        GetPerformanceSummaryUseCase.Output output = useCase.execute(new GetPerformanceSummaryUseCase.Input(1L));
+
+        assertThat(output.summary().title()).isEqualTo("싱어게인");
+        assertThat(output.summary().region()).isNull();
+        assertThat(output.summary().startTime()).isEqualTo(startTime);
     }
 }
