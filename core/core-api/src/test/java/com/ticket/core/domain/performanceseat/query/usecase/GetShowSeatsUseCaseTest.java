@@ -44,4 +44,17 @@ class GetShowSeatsUseCaseTest {
         assertThat(output.seatInfo().seats()).isEqualTo(seats);
         verify(seatMapQueryRepository).findShowSeats(100L);
     }
+
+    @Test
+    void 공연_좌석이_없으면_빈_목록을_반환한다() {
+        Show show = mock(Show.class);
+        when(showFinder.findById(100L)).thenReturn(show);
+        when(show.getId()).thenReturn(100L);
+        when(seatMapQueryRepository.findShowSeats(100L)).thenReturn(List.of());
+
+        GetShowSeatsUseCase.Output output = useCase.execute(new GetShowSeatsUseCase.Input(100L));
+
+        assertThat(output.seatInfo().seats()).isEmpty();
+        verify(seatMapQueryRepository).findShowSeats(100L);
+    }
 }

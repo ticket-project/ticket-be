@@ -68,4 +68,21 @@ class GetPerformanceScheduleListUseCaseTest {
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
     }
+
+    @Test
+    void 같은_공연의_회차가_없으면_빈_목록을_반환한다() {
+        Show show = mock(Show.class);
+        Performance selected = mock(Performance.class);
+        when(show.getId()).thenReturn(100L);
+        when(selected.getId()).thenReturn(10L);
+        when(selected.getShow()).thenReturn(show);
+        when(performanceFinder.findById(10L)).thenReturn(selected);
+        when(performanceRepository.findAllByShowIdOrderByStartTimeAscPerformanceNoAsc(100L)).thenReturn(List.of());
+
+        GetPerformanceScheduleListUseCase.Output output = useCase.execute(new GetPerformanceScheduleListUseCase.Input(10L));
+
+        assertThat(output.schedules().showId()).isEqualTo(100L);
+        assertThat(output.schedules().selectedPerformanceId()).isEqualTo(10L);
+        assertThat(output.schedules().schedules()).isEmpty();
+    }
 }
