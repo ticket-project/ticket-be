@@ -10,7 +10,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,5 +48,15 @@ class WithdrawCurrentMemberUseCaseTest {
 
         verify(kakaoUnlinkService).unlinkByUserId("100");
         verify(kakaoUnlinkService).unlinkByUserId("200");
+    }
+
+    @Test
+    void 연동해제할_카카오계정이_없으면_unlink를_호출하지_않는다() {
+        when(memberWithdrawalTxService.withdraw(5L)).thenReturn(List.of());
+
+        useCase.execute(new WithdrawCurrentMemberUseCase.Input(5L));
+
+        verify(memberWithdrawalTxService).withdraw(5L);
+        verify(kakaoUnlinkService, never()).unlinkByUserId(anyString());
     }
 }

@@ -18,6 +18,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,5 +54,24 @@ class GetSeatStatusUseCaseTest {
                 new SeatStatusResponse.SeatState(1L, SeatStatus.OCCUPIED),
                 new SeatStatusResponse.SeatState(2L, SeatStatus.OCCUPIED)
         );
+    }
+
+    @Test
+    void redis_점유좌석이_없으면_DB상태를_그대로_반환한다() {
+        Performance performance = mock(Performance.class);
+        List<SeatStatusResponse.SeatState> dbStates = List.of(
+                new SeatStatusResponse.SeatState(1L, SeatStatus.AVAILABLE),
+                new SeatStatusResponse.SeatState(2L, SeatStatus.OCCUPIED)
+        );
+        when(performanceFinder.findById(10L)).thenReturn(performance);
+        when(performance.getId()).thenReturn(10L);
+        when(seatMapQueryRepository.findSeatStatuses(10L)).thenReturn(dbStates);
+        when(seatSelectionService.getSelectingSeatIds(10L)).thenReturn(Set.of());
+        when(holdManager.getHoldingSeatIds(10L)).thenReturn(Set.of());
+
+        GetSeatStatusUseCase.Output output = useCase.execute(new GetSeatStatusUseCase.Input(10L));
+
+        assertThat(output.status().seats()).containsExactlyElementsOf(dbStates);
+        verify(seatMapQueryRepository).findSeatStatuses(10L);
     }
 }
