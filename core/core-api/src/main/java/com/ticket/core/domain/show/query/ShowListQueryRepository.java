@@ -11,7 +11,6 @@ import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.api.controller.response.ShowSearchResponse;
 import com.ticket.core.api.controller.response.ShowSummaryResponse;
 import com.ticket.core.domain.show.Show;
-import com.ticket.core.domain.show.meta.ShowSortKey;
 import com.ticket.core.domain.show.query.ShowSortSupport.SortOrder;
 import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
 import com.ticket.core.domain.show.query.model.ShowParam;
@@ -22,9 +21,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,29 +43,29 @@ public class ShowListQueryRepository {
 
     private final JPAQueryFactory queryFactory;
     private final ShowQueryHelper queryHelper;
+    private final ShowConditionFactory showConditionFactory;
     private final ShowSortSupport sortSupport;
-    private final ShowCursorSupport cursorSupport;
-    private final Clock clock;
+    private final ShowCursorPolicy showCursorPolicy;
 
     public ShowListQueryRepository(
             final JPAQueryFactory queryFactory,
             final ShowQueryHelper queryHelper,
+            final ShowConditionFactory showConditionFactory,
             final ShowSortSupport sortSupport,
-            final ShowCursorSupport cursorSupport,
-            final Clock clock
+            final ShowCursorPolicy showCursorPolicy
     ) {
         this.queryFactory = queryFactory;
         this.queryHelper = queryHelper;
+        this.showConditionFactory = showConditionFactory;
         this.sortSupport = sortSupport;
-        this.cursorSupport = cursorSupport;
-        this.clock = clock;
+        this.showCursorPolicy = showCursorPolicy;
     }
 
     // ========== 메인 페이지 API ==========
 
     public CursorSlice<ShowResponse> findAllBySearch(final ShowParam param, final int size, final String sort) {
         final SortOrder sortOrder = sortSupport.resolveSortOrder(sort);
-        final BooleanBuilder where = buildMainListCondition(param, sortOrder);
+        final BooleanBuilder where = showConditionFactory.buildMainListCondition(param, sortOrder);
 
         return findCursorPage(
                 size,
@@ -107,7 +103,7 @@ public class ShowListQueryRepository {
                 .leftJoin(showGenre).on(showGenre.show.eq(show))
                 .leftJoin(genre).on(showGenre.genre.eq(genre))
                 .leftJoin(category).on(genre.category.eq(category))
-                .where(queryHelper.categoryCodeEq(categoryCode), queryHelper.saleStartDateGoe(LocalDateTime.now(clock)))
+                .where(showConditionFactory.buildSaleOpeningSoonSummaryCondition(categoryCode))
                 .orderBy(show.saleStartDate.asc())
                 .limit(limit)
                 .fetch();
@@ -119,7 +115,7 @@ public class ShowListQueryRepository {
             final String sort
     ) {
         final SortOrder sortOrder = sortSupport.resolveSortOrder(sort);
-        final BooleanBuilder where = buildSaleOpeningCondition(param);
+        final BooleanBuilder where = showConditionFactory.buildSaleOpeningCondition(param);
 
         return findCursorPage(
                 size,
@@ -139,7 +135,7 @@ public class ShowListQueryRepository {
             final String sort
     ) {
         final SortOrder sortOrder = sortSupport.resolveSortOrder(sort);
-        final BooleanBuilder where = buildSearchCondition(request, sortOrder);
+        final BooleanBuilder where = showConditionFactory.buildSearchCondition(request, sortOrder);
 
         return findCursorPage(
                 size,
@@ -152,7 +148,7 @@ public class ShowListQueryRepository {
     }
 
     public long countSearchShows(final ShowSearchRequest request) {
-        final BooleanBuilder where = buildSearchCondition(request, null);
+        final BooleanBuilder where = showConditionFactory.buildSearchCondition(request, null);
         final Long count = queryFactory
                 .select(show.id.countDistinct())
                 .from(show)
@@ -162,48 +158,6 @@ public class ShowListQueryRepository {
                 .where(where)
                 .fetchOne();
         return count != null ? count : 0L;
-    }
-
-    // ========== 조건 조립 ==========
-
-    private BooleanBuilder buildMainListCondition(final ShowParam param, final SortOrder sortOrder) {
-        final BooleanBuilder where = new BooleanBuilder();
-        where.and(queryHelper.categoryCodeEq(param.getCategory()));
-        where.and(queryHelper.regionEq(param.getRegion()));
-        where.and(queryHelper.genreEq(param.getGenre()));
-        appendShowStartApproachingCondition(where, sortOrder);
-        return where;
-    }
-
-    private BooleanBuilder buildSaleOpeningCondition(final SaleOpeningSoonSearchParam param) {
-        final BooleanBuilder where = new BooleanBuilder();
-        where.and(show.saleStartDate.goe(LocalDateTime.now(clock)));
-        where.and(queryHelper.categoryCodeEq(param.getCategory()));
-        where.and(queryHelper.regionEq(param.getRegion()));
-        where.and(queryHelper.titleContains(param.getTitle()));
-        where.and(queryHelper.saleStartDateGoe(param.getSaleStartDateFrom()));
-        where.and(queryHelper.saleStartDateLoe(param.getSaleStartDateTo()));
-        where.and(queryHelper.saleEndDateGoe(param.getSaleEndDateFrom()));
-        where.and(queryHelper.saleEndDateLoe(param.getSaleEndDateTo()));
-        return where;
-    }
-
-    private BooleanBuilder buildSearchCondition(final ShowSearchRequest request, final SortOrder sortOrder) {
-        final BooleanBuilder where = new BooleanBuilder();
-        where.and(queryHelper.keywordContains(request.getKeyword()));
-        where.and(queryHelper.categoryCodeEq(request.getCategory()));
-        where.and(queryHelper.regionEq(request.getRegion()));
-        where.and(queryHelper.startDateGoe(request.getStartDateFrom()));
-        where.and(queryHelper.startDateLoe(request.getStartDateTo()));
-        where.and(queryHelper.bookingStatusCondition(request.getBookingStatus()));
-        appendShowStartApproachingCondition(where, sortOrder);
-        return where;
-    }
-
-    private void appendShowStartApproachingCondition(final BooleanBuilder where, final SortOrder sortOrder) {
-        if (sortOrder != null && ShowSortKey.SHOW_START_APPROACHING.equals(sortOrder.key())) {
-            where.and(show.startDate.goe(LocalDate.now()));
-        }
     }
 
     // ========== 공통 페이지 조회 ==========
@@ -216,7 +170,7 @@ public class ShowListQueryRepository {
             final Function<QueryPageContext, List<Tuple>> rowFetcher,
             final BiFunction<QueryPageContext, List<Long>, List<T>> resultFetcher
     ) {
-        cursorSupport.applyCursor(where, cursor, sortOrder);
+        showCursorPolicy.applyCursor(where, cursor, sortOrder);
 
         final QueryPageContext context = new QueryPageContext(
                 size,
@@ -240,7 +194,7 @@ public class ShowListQueryRepository {
 
         final Slice<T> slice = new SliceImpl<>(results, PageRequest.of(0, size), hasNext);
         final String nextCursor = hasNext
-                ? buildNextCursor(rows, size, sortOrder)
+                ? showCursorPolicy.buildNextCursor(rows, size, sortOrder)
                 : null;
 
         return new CursorSlice<>(slice, nextCursor);
@@ -325,22 +279,6 @@ public class ShowListQueryRepository {
 
     private <T> CursorSlice<T> emptyCursorSlice(final int size) {
         return new CursorSlice<>(new SliceImpl<>(List.of(), PageRequest.of(0, size), false), null);
-    }
-
-    private String buildNextCursor(final List<Tuple> rows, final int size, final SortOrder sortOrder) {
-        final Tuple lastRow = rows.get(size - 1);
-        final Long lastId = lastRow.get(show.id);
-        final String lastValue = resolveLastValue(lastRow, sortOrder);
-        return cursorSupport.buildNextCursor(lastId, sortOrder.key(), sortOrder.direction(), lastValue);
-    }
-
-    private String resolveLastValue(final Tuple lastRow, final SortOrder sortOrder) {
-        return switch (sortOrder.key()) {
-            case POPULAR -> String.valueOf(lastRow.get(show.viewCount));
-            case LATEST -> lastRow.get(show.createdAt).toString();
-            case SHOW_START_APPROACHING -> lastRow.get(show.startDate).toString();
-            case SALE_START_APPROACHING -> lastRow.get(show.saleStartDate).toString();
-        };
     }
 
     private Map<Long, List<String>> fetchGenreMap(final List<Long> ids) {

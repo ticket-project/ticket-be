@@ -6,7 +6,6 @@ import com.ticket.core.enums.BookingStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -18,10 +17,7 @@ import static com.ticket.core.domain.show.QShow.show;
  * Show 쿼리에서 공통으로 사용되는 WHERE 조건 유틸리티
  */
 @Component
-@lombok.RequiredArgsConstructor
 public class ShowQueryHelper {
-
-    private final Clock clock;
 
     public BooleanExpression categoryCodeEq(final String categoryCode) {
         return StringUtils.hasText(categoryCode) ? category.code.eq(categoryCode) : null;
@@ -65,18 +61,5 @@ public class ShowQueryHelper {
 
     public BooleanExpression startDateLoe(final LocalDate to) {
         return to != null ? show.startDate.loe(to) : null;
-    }
-
-    public BooleanExpression bookingStatusCondition(final BookingStatus bookingStatus) {
-        if (bookingStatus == null) {
-            return null;
-        }
-
-        final LocalDateTime now = LocalDateTime.now(clock);
-        return switch (bookingStatus) {
-            case BEFORE_OPEN -> show.saleStartDate.gt(now);
-            case ON_SALE -> show.saleStartDate.loe(now).and(show.saleEndDate.goe(now));
-            case CLOSED -> show.saleEndDate.lt(now);
-        };
     }
 }

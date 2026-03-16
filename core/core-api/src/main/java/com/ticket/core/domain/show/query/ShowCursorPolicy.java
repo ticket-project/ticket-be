@@ -1,10 +1,11 @@
 package com.ticket.core.domain.show.query;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.ticket.core.domain.show.meta.ShowSortKey;
-import com.ticket.core.domain.show.query.model.ShowCursor;
 import com.ticket.core.domain.show.query.ShowSortSupport.SortOrder;
+import com.ticket.core.domain.show.query.model.ShowCursor;
 import com.ticket.core.support.cursor.CursorCodec;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
@@ -16,12 +17,13 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 import static com.ticket.core.domain.show.QShow.show;
 
 @Component
 @RequiredArgsConstructor
-public class ShowCursorSupport {
+public class ShowCursorPolicy {
 
     private final CursorCodec cursorCodec;
 
@@ -37,13 +39,11 @@ public class ShowCursorSupport {
         }
     }
 
-    public String buildNextCursor(
-            final Long id,
-            final ShowSortKey key,
-            final Sort.Direction direction,
-            final String lastValue
-    ) {
-        final ShowCursor next = new ShowCursor(key, direction.name(), lastValue, id);
+    public String buildNextCursor(final List<Tuple> rows, final int size, final SortOrder sortOrder) {
+        final Tuple lastRow = rows.get(size - 1);
+        final Long lastId = lastRow.get(show.id);
+        final String lastValue = resolveLastValue(lastRow, sortOrder);
+        final ShowCursor next = new ShowCursor(sortOrder.key(), sortOrder.direction().name(), lastValue, lastId);
         return cursorCodec.encode(next);
     }
 
@@ -81,6 +81,15 @@ public class ShowCursorSupport {
                 final LocalDateTime last = LocalDateTime.parse(cursor.lastValue());
                 yield show.saleStartDate.gt(last).or(show.saleStartDate.eq(last).and(show.id.gt(lastId)));
             }
+        };
+    }
+
+    private String resolveLastValue(final Tuple lastRow, final SortOrder sortOrder) {
+        return switch (sortOrder.key()) {
+            case POPULAR -> String.valueOf(lastRow.get(show.viewCount));
+            case LATEST -> lastRow.get(show.createdAt).toString();
+            case SHOW_START_APPROACHING -> lastRow.get(show.startDate).toString();
+            case SALE_START_APPROACHING -> lastRow.get(show.saleStartDate).toString();
         };
     }
 }
