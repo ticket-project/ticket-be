@@ -1,8 +1,6 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.QueueControllerDocs;
-import com.ticket.core.api.controller.response.QueueEntryResponse;
-import com.ticket.core.api.controller.response.QueueStatusResponse;
 import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
 import com.ticket.core.domain.queue.usecase.LeaveQueueUseCase;
 import com.ticket.core.domain.queue.usecase.QueueEntryUseCase;
@@ -21,21 +19,19 @@ public class QueueController implements QueueControllerDocs {
 
     @Override
     @PostMapping("/{performanceId}/enter")
-    public ApiResponse<QueueEntryResponse> enter(@PathVariable final Long performanceId) {
-        final QueueEntryUseCase.Output output = queueEntryUseCase.execute(new QueueEntryUseCase.Input(performanceId));
-        return ApiResponse.success(QueueEntryResponse.from(output));
+    public ApiResponse<QueueEntryUseCase.Output> enter(@PathVariable final Long performanceId) {
+        return ApiResponse.success(queueEntryUseCase.execute(new QueueEntryUseCase.Input(performanceId)));
     }
 
     @Override
     @GetMapping("/{performanceId}/status")
-    public ApiResponse<QueueStatusResponse> getStatus(
+    public ApiResponse<GetQueueStatusUseCase.Output> getStatus(
             @PathVariable final Long performanceId,
             @RequestParam final String queueEntryId
     ) {
-        final GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(
+        return ApiResponse.success(getQueueStatusUseCase.execute(
                 new GetQueueStatusUseCase.Input(performanceId, queueEntryId)
-        );
-        return ApiResponse.success(QueueStatusResponse.from(output));
+        ));
     }
 
     @Override

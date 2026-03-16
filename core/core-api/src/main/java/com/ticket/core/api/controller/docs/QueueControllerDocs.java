@@ -1,7 +1,7 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.api.controller.response.QueueEntryResponse;
-import com.ticket.core.api.controller.response.QueueStatusResponse;
+import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
+import com.ticket.core.domain.queue.usecase.QueueEntryUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,7 +21,7 @@ public interface QueueControllerDocs {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "진입 처리 성공")
     })
-    ApiResponse<QueueEntryResponse> enter(
+    ApiResponse<QueueEntryUseCase.Output> enter(
             @Parameter(description = "회차 ID", example = "1", required = true) Long performanceId
     );
 
@@ -32,7 +32,7 @@ public interface QueueControllerDocs {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상태 조회 성공")
     })
-    ApiResponse<QueueStatusResponse> getStatus(
+    ApiResponse<GetQueueStatusUseCase.Output> getStatus(
             @Parameter(description = "회차 ID", example = "1", required = true) Long performanceId,
             @Parameter(description = "대기열 엔트리 ID", example = "qe_1234", required = true) String queueEntryId
     );
