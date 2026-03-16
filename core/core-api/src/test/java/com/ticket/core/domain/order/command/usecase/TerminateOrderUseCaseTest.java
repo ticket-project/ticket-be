@@ -3,6 +3,7 @@ package com.ticket.core.domain.order.command.usecase;
 import com.ticket.core.domain.hold.finder.HoldHistoryFinder;
 import com.ticket.core.domain.hold.model.HoldHistory;
 import com.ticket.core.domain.member.MemberFinder;
+import com.ticket.core.domain.order.domainservice.OrderTerminationDomainService;
 import com.ticket.core.domain.order.domainservice.OrderLifecycleDomainService;
 import com.ticket.core.domain.order.finder.OrderFinder;
 import com.ticket.core.domain.order.finder.OrderSeatFinder;
@@ -41,11 +42,7 @@ class TerminateOrderUseCaseTest {
     @Mock
     private OrderRepository orderRepository;
     @Mock
-    private OrderSeatFinder orderSeatFinder;
-    @Mock
-    private HoldHistoryFinder holdHistoryFinder;
-    @Mock
-    private OrderLifecycleDomainService orderLifecycleDomainService;
+    private OrderTerminationDomainService orderTerminationDomainService;
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
@@ -56,20 +53,18 @@ class TerminateOrderUseCaseTest {
     void 취소시_주문상태를_전이하고_이벤트를_발행한다() {
         //given
         Order order = createOrder(10L, 100L, "hold-key");
-        OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
-        HoldHistory holdHistory = mock(HoldHistory.class);
         LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
 
         when(orderFinder.findPendingOwnedByOrderKeyForUpdate("order-key", 1L)).thenReturn(order);
-        when(orderSeatFinder.getOrderSeatsByOrderId(10L)).thenReturn(List.of(orderSeat));
-        when(holdHistoryFinder.findActiveByHoldKey("hold-key")).thenReturn(List.of(holdHistory));
+        when(orderTerminationDomainService.cancel(order, now))
+                .thenReturn(new OrderTerminationDomainService.OrderTerminationResult(100L, "hold-key", List.of(42L)));
 
         //when
         useCase.cancel("order-key", 1L, now);
 
         //then
         verify(memberFinder).findActiveMemberById(1L);
-        verify(orderLifecycleDomainService).cancel(order, List.of(orderSeat), List.of(holdHistory), now);
+        verify(orderTerminationDomainService).cancel(order, now);
         ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
         verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
         assertThat(eventCaptor.getValue().toString()).contains("hold-key").contains("42");
@@ -85,26 +80,24 @@ class TerminateOrderUseCaseTest {
 
         //then
         verify(orderRepository).findByIdAndStatusForUpdate(10L, OrderState.PENDING);
-        verifyNoInteractions(orderLifecycleDomainService, applicationEventPublisher);
+        verifyNoInteractions(orderTerminationDomainService, applicationEventPublisher);
     }
 
     @Test
     void holdKey로_조회한_주문이_pending이면_만료처리한다() {
         //given
         Order order = createOrder(10L, 100L, "hold-key");
-        OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
-        HoldHistory holdHistory = mock(HoldHistory.class);
         LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
 
         when(orderRepository.findByHoldKeyAndStatusForUpdate("hold-key", OrderState.PENDING)).thenReturn(Optional.of(order));
-        when(orderSeatFinder.getOrderSeatsByOrderId(10L)).thenReturn(List.of(orderSeat));
-        when(holdHistoryFinder.findActiveByHoldKey("hold-key")).thenReturn(List.of(holdHistory));
+        when(orderTerminationDomainService.expire(order, now))
+                .thenReturn(Optional.of(new OrderTerminationDomainService.OrderTerminationResult(100L, "hold-key", List.of(42L))));
 
         //when
         useCase.expireByHoldKey("hold-key", now);
 
         //then
-        verify(orderLifecycleDomainService).expire(order, List.of(orderSeat), List.of(holdHistory), now);
+        verify(orderTerminationDomainService).expire(order, now);
         ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
         verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
         assertThat(eventCaptor.getValue().toString()).contains("hold-key").contains("42");
@@ -116,12 +109,14 @@ class TerminateOrderUseCaseTest {
         Order order = createOrder(10L, 100L, "hold-key");
         order.cancel(LocalDateTime.of(2026, 3, 15, 9, 0));
         when(orderRepository.findByHoldKeyAndStatusForUpdate("hold-key", OrderState.PENDING)).thenReturn(Optional.of(order));
+        when(orderTerminationDomainService.expire(order, LocalDateTime.of(2026, 3, 15, 10, 0))).thenReturn(Optional.empty());
 
         //when
         useCase.expireByHoldKey("hold-key", LocalDateTime.of(2026, 3, 15, 10, 0));
 
         //then
-        verifyNoInteractions(orderSeatFinder, holdHistoryFinder, orderLifecycleDomainService, applicationEventPublisher);
+        verify(orderTerminationDomainService).expire(order, LocalDateTime.of(2026, 3, 15, 10, 0));
+        verifyNoInteractions(applicationEventPublisher);
     }
 
     private Order createOrder(final Long id, final Long performanceId, final String holdKey) {

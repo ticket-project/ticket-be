@@ -1,15 +1,11 @@
 package com.ticket.core.domain.order.command.usecase;
 
-import com.ticket.core.domain.hold.finder.HoldHistoryFinder;
-import com.ticket.core.domain.hold.model.HoldHistory;
 import com.ticket.core.domain.member.MemberFinder;
-import com.ticket.core.domain.order.domainservice.OrderLifecycleDomainService;
+import com.ticket.core.domain.order.domainservice.OrderTerminationDomainService;
 import com.ticket.core.domain.order.event.OrderCancelledEvent;
 import com.ticket.core.domain.order.event.OrderExpiredEvent;
 import com.ticket.core.domain.order.finder.OrderFinder;
-import com.ticket.core.domain.order.finder.OrderSeatFinder;
 import com.ticket.core.domain.order.model.Order;
-import com.ticket.core.domain.order.model.OrderSeat;
 import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.enums.OrderState;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +23,7 @@ public class TerminateOrderUseCase {
     private final MemberFinder memberFinder;
     private final OrderFinder orderFinder;
     private final OrderRepository orderRepository;
-    private final OrderSeatFinder orderSeatFinder;
-    private final HoldHistoryFinder holdHistoryFinder;
-    private final OrderLifecycleDomainService orderLifecycleDomainService;
+    private final OrderTerminationDomainService orderTerminationDomainService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public record Input(String orderKey, Long memberId) {}
@@ -38,9 +32,8 @@ public class TerminateOrderUseCase {
     public void cancel(final Input input) {
         memberFinder.findActiveMemberById(input.memberId());
         final Order order = orderFinder.findPendingOwnedByOrderKeyForUpdate(input.orderKey(), input.memberId());
-        final OrderTransitionContext context = loadTransitionContext(order);
-        orderLifecycleDomainService.cancel(order, context.orderSeats(), context.holdHistories(), LocalDateTime.now());
-        applicationEventPublisher.publishEvent(new OrderCancelledEvent(order.getPerformanceId(), order.getHoldKey(), context.seatIds()));
+        final OrderTerminationDomainService.OrderTerminationResult result = orderTerminationDomainService.cancel(order, LocalDateTime.now());
+        applicationEventPublisher.publishEvent(new OrderCancelledEvent(result.performanceId(), result.holdKey(), result.seatIds()));
     }
 
     @Transactional
@@ -64,28 +57,9 @@ public class TerminateOrderUseCase {
     }
 
     private void expire(final Order order, final LocalDateTime now) {
-        if (!order.isPending()) {
-            return;
-        }
-
-        final OrderTransitionContext context = loadTransitionContext(order);
-        orderLifecycleDomainService.expire(order, context.orderSeats(), context.holdHistories(), now);
-        applicationEventPublisher.publishEvent(new OrderExpiredEvent(order.getPerformanceId(), order.getHoldKey(), context.seatIds()));
-    }
-
-    private OrderTransitionContext loadTransitionContext(final Order order) {
-        final List<OrderSeat> orderSeats = orderSeatFinder.getOrderSeatsByOrderId(order.getId());
-        final List<HoldHistory> holdHistories = holdHistoryFinder.findActiveByHoldKey(order.getHoldKey());
-        final List<Long> seatIds = orderSeats.stream()
-                .map(OrderSeat::getSeatId)
-                .toList();
-        return new OrderTransitionContext(orderSeats, holdHistories, seatIds);
-    }
-
-    private record OrderTransitionContext(
-            List<OrderSeat> orderSeats,
-            List<HoldHistory> holdHistories,
-            List<Long> seatIds
-    ) {
+        final Optional<OrderTerminationDomainService.OrderTerminationResult> result = orderTerminationDomainService.expire(order, now);
+        result.ifPresent(value ->
+                applicationEventPublisher.publishEvent(new OrderExpiredEvent(value.performanceId(), value.holdKey(), value.seatIds()))
+        );
     }
 }

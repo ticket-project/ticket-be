@@ -3,15 +3,12 @@ package com.ticket.core.domain.order.command.usecase;
 import com.ticket.core.domain.hold.application.HoldHistoryRecorder;
 import com.ticket.core.domain.hold.event.HoldCreatedEvent;
 import com.ticket.core.domain.hold.model.HoldSnapshot;
-import com.ticket.core.domain.hold.support.HoldManager;
-import com.ticket.core.domain.hold.support.HoldSeatAvailabilityValidator;
 import com.ticket.core.domain.member.MemberFinder;
-import com.ticket.core.domain.order.application.CreateOrderApplicationService;
+import com.ticket.core.domain.order.domainservice.OrderStartDomainService;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
-import com.ticket.core.domain.performanceseat.model.PerformanceSeat;
 import com.ticket.core.enums.OrderState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
@@ -23,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -50,22 +46,13 @@ class StartOrderUseCaseTest {
     private PerformanceFinder performanceFinder;
 
     @Mock
-    private HoldSeatAvailabilityValidator holdSeatAvailabilityValidator;
-
-    @Mock
-    private HoldManager holdManager;
-
-    @Mock
-    private HoldHistoryRecorder holdHistoryRecorder;
-
-    @Mock
-    private CreateOrderApplicationService createOrderApplicationService;
-
-    @Mock
     private OrderRepository orderRepository;
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Mock
+    private OrderStartDomainService orderStartDomainService;
 
     @InjectMocks
     private StartOrderUseCase startOrderUseCase;
@@ -81,7 +68,7 @@ class StartOrderUseCaseTest {
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
 
-        verifyNoInteractions(memberFinder, performanceFinder, holdSeatAvailabilityValidator, holdManager);
+        verifyNoInteractions(memberFinder, performanceFinder, orderStartDomainService);
     }
 
     @Test
@@ -95,7 +82,7 @@ class StartOrderUseCaseTest {
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
 
-        verifyNoInteractions(memberFinder, performanceFinder, holdSeatAvailabilityValidator, holdManager);
+        verifyNoInteractions(memberFinder, performanceFinder, orderStartDomainService);
     }
 
     @Test
@@ -114,7 +101,7 @@ class StartOrderUseCaseTest {
 
         verify(memberFinder).findActiveMemberById(20L);
         verify(performanceFinder).findValidPerformanceById(10L);
-        verifyNoInteractions(holdSeatAvailabilityValidator, holdManager, createOrderApplicationService);
+        verifyNoInteractions(orderStartDomainService);
     }
 
     @Test
@@ -136,7 +123,7 @@ class StartOrderUseCaseTest {
         verify(memberFinder).findActiveMemberById(20L);
         verify(performanceFinder).findValidPerformanceById(10L);
         verify(orderRepository).findByMemberIdAndPerformanceIdAndStatus(20L, 10L, OrderState.PENDING);
-        verifyNoInteractions(holdSeatAvailabilityValidator, holdManager, createOrderApplicationService);
+        verifyNoInteractions(orderStartDomainService);
     }
 
     @Test
@@ -145,7 +132,6 @@ class StartOrderUseCaseTest {
         StartOrderUseCase.Input input = new StartOrderUseCase.Input(10L, List.of(7L, 3L), 20L);
         Performance performance = createPerformance(5, 420);
         List<Long> normalizedSeatIds = List.of(3L, 7L);
-        List<PerformanceSeat> performanceSeats = List.of(mock(PerformanceSeat.class), mock(PerformanceSeat.class));
         HoldSnapshot snapshot = new HoldSnapshot(
                 "hold-key",
                 20L,
@@ -153,16 +139,12 @@ class StartOrderUseCaseTest {
                 normalizedSeatIds,
                 LocalDateTime.of(2026, 3, 15, 12, 0)
         );
-        Order order = new Order(20L, 10L, "order-key", "hold-key", BigDecimal.valueOf(120000), snapshot.expiresAt());
 
         when(performanceFinder.findValidPerformanceById(10L)).thenReturn(performance);
         when(orderRepository.findByMemberIdAndPerformanceIdAndStatus(20L, 10L, OrderState.PENDING))
                 .thenReturn(Optional.empty());
-        when(holdSeatAvailabilityValidator.validate(10L, normalizedSeatIds)).thenReturn(performanceSeats);
-        when(holdManager.createHold(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(420)))
-                .thenReturn(snapshot);
-        when(createOrderApplicationService.createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats))
-                .thenReturn(order);
+        when(orderStartDomainService.start(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(420)))
+                .thenReturn(new OrderStartDomainService.OrderStartResult("order-key", snapshot));
 
         //when
         StartOrderUseCase.Output output = startOrderUseCase.execute(input);
@@ -172,18 +154,13 @@ class StartOrderUseCaseTest {
         verify(memberFinder).findActiveMemberById(20L);
         verify(performanceFinder).findValidPerformanceById(10L);
         verify(orderRepository).findByMemberIdAndPerformanceIdAndStatus(20L, 10L, OrderState.PENDING);
-        verify(holdSeatAvailabilityValidator).validate(10L, normalizedSeatIds);
-        verify(holdManager).createHold(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(420));
+        verify(orderStartDomainService).start(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(420));
         verify(applicationEventPublisher).publishEvent(any(HoldCreatedEvent.class));
-        verify(createOrderApplicationService).createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);
-        verify(holdHistoryRecorder).recordActiveHold(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);
         verify(applicationEventPublisher, never()).publishEvent(eq("hold-key"));
 
-        InOrder inOrder = inOrder(holdManager, applicationEventPublisher, createOrderApplicationService, holdHistoryRecorder);
-        inOrder.verify(holdManager).createHold(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(420));
+        InOrder inOrder = inOrder(orderStartDomainService, applicationEventPublisher);
+        inOrder.verify(orderStartDomainService).start(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(420));
         inOrder.verify(applicationEventPublisher).publishEvent(any(HoldCreatedEvent.class));
-        inOrder.verify(createOrderApplicationService).createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);
-        inOrder.verify(holdHistoryRecorder).recordActiveHold(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);
     }
 
     private Performance createPerformance(final int maxCanHoldCount, final int holdTimeSeconds) {
