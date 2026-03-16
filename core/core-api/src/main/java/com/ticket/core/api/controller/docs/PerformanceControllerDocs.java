@@ -52,8 +52,7 @@ public interface PerformanceControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     })
     ApiResponse<GetSeatAvailabilityUseCase.Output> getSeatAvailability(
-            @Parameter(description = "공연 회차 ID", example = "1", required = true) Long performanceId,
-            @Parameter(description = "대기열 입장 토큰", example = "1:cbe11150-0b4d-4cad-b826-a290863739e6:0950c326-e01e-40a8-a8cf-41181c9c1944", required = true) String queueToken
+            @Parameter(description = "공연 회차 ID", example = "1", required = true) Long performanceId
     );
 
     @Operation(
@@ -67,7 +66,6 @@ public interface PerformanceControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     })
     ApiResponse<GetSeatStatusUseCase.Output> getSeatStatus(
-            @Parameter(description = "공연 회차 ID", example = "1", required = true) Long performanceId,
-            @Parameter(description = "대기열 입장 토큰", example = "1:cbe11150-0b4d-4cad-b826-a290863739e6:0950c326-e01e-40a8-a8cf-41181c9c1944", required = true) String queueToken
+            @Parameter(description = "공연 회차 ID", example = "1", required = true) Long performanceId
     );
 }
