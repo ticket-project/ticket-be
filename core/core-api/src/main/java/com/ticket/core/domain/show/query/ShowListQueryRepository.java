@@ -22,6 +22,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -48,17 +49,20 @@ public class ShowListQueryRepository {
     private final ShowQueryHelper queryHelper;
     private final ShowSortSupport sortSupport;
     private final ShowCursorSupport cursorSupport;
+    private final Clock clock;
 
     public ShowListQueryRepository(
             final JPAQueryFactory queryFactory,
             final ShowQueryHelper queryHelper,
             final ShowSortSupport sortSupport,
-            final ShowCursorSupport cursorSupport
+            final ShowCursorSupport cursorSupport,
+            final Clock clock
     ) {
         this.queryFactory = queryFactory;
         this.queryHelper = queryHelper;
         this.sortSupport = sortSupport;
         this.cursorSupport = cursorSupport;
+        this.clock = clock;
     }
 
     // ========== 메인 페이지 API ==========
@@ -103,7 +107,7 @@ public class ShowListQueryRepository {
                 .leftJoin(showGenre).on(showGenre.show.eq(show))
                 .leftJoin(genre).on(showGenre.genre.eq(genre))
                 .leftJoin(category).on(genre.category.eq(category))
-                .where(queryHelper.categoryCodeEq(categoryCode), queryHelper.saleStartDateGoe(LocalDateTime.now()))
+                .where(queryHelper.categoryCodeEq(categoryCode), queryHelper.saleStartDateGoe(LocalDateTime.now(clock)))
                 .orderBy(show.saleStartDate.asc())
                 .limit(limit)
                 .fetch();
@@ -173,7 +177,7 @@ public class ShowListQueryRepository {
 
     private BooleanBuilder buildSaleOpeningCondition(final SaleOpeningSoonSearchParam param) {
         final BooleanBuilder where = new BooleanBuilder();
-        where.and(show.saleStartDate.goe(LocalDateTime.now()));
+        where.and(show.saleStartDate.goe(LocalDateTime.now(clock)));
         where.and(queryHelper.categoryCodeEq(param.getCategory()));
         where.and(queryHelper.regionEq(param.getRegion()));
         where.and(queryHelper.titleContains(param.getTitle()));

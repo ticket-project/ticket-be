@@ -6,6 +6,7 @@ import com.ticket.core.support.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Component
@@ -13,10 +14,11 @@ import java.time.LocalDateTime;
 public class PerformanceFinder {
 
     private final PerformanceRepository performanceRepository;
+    private final Clock clock;
 
     public Performance findOpenPerformance(final Long performanceId) {
         final Performance performance = findById(performanceId);
-        if (!performance.isBookingOpen(LocalDateTime.now())) {
+        if (!performance.isBookingOpen(LocalDateTime.now(clock))) {
             throw new NotFoundException(ErrorType.NOT_FOUND_DATA);
         }
         return performance;
@@ -35,7 +37,7 @@ public class PerformanceFinder {
     }
 
     private void validatePerformance(final Performance performance) {
-        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime now = LocalDateTime.now(clock);
         if (performance.getOrderOpenTime() == null || now.isBefore(performance.getOrderOpenTime())) {
             throw new CoreException(ErrorType.NOT_YET_RESERVE_TIME);
         }

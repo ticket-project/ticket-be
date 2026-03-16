@@ -11,6 +11,7 @@ import com.ticket.core.domain.show.Show;
 import com.ticket.core.domain.show.venue.Venue;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,7 +30,8 @@ public final class OrderDetailResponseMapper {
             final Order order,
             final List<OrderSeat> orderSeats,
             final List<PerformanceSeat> performanceSeats,
-            final Member member
+            final Member member,
+            final Clock clock
     ) {
         if (performanceSeats.isEmpty()) {
             throw new IllegalArgumentException("performanceSeats 는 비어 있을 수 없습니다.");
@@ -49,7 +51,7 @@ public final class OrderDetailResponseMapper {
                 .map(OrderSeat::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         final long remainingSeconds = order.isPending()
-                ? Math.max(0L, Duration.between(LocalDateTime.now(), order.getExpiresAt()).getSeconds())
+                ? Math.max(0L, Duration.between(LocalDateTime.now(clock), order.getExpiresAt()).getSeconds())
                 : 0L;
 
         return new OrderDetailResponse(

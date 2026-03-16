@@ -22,16 +22,17 @@ class QueueRedisKeyTest {
     void 토큰과_스토리지키를_생성하고_파싱한다() {
         //given
         //when
-        String token = QueueRedisKey.createToken(10L, "qe-10");
+        String token = QueueRedisKey.createToken(10L, "qe-10", "token-123");
         String storageKey = QueueRedisKey.tokenStorageKey(token);
 
         //then
-        assertThat(token).startsWith("10:qe-10:");
-        assertThat(storageKey).startsWith("queue:token:");
+        assertThat(token).isEqualTo("10:qe-10:token-123");
+        assertThat(storageKey).isEqualTo("queue:token:10:qe-10:token-123");
         assertThat(QueueRedisKey.tryParseToken(token)).isPresent();
         assertThat(QueueRedisKey.tryParseTokenStorageKey(storageKey)).isPresent();
         assertThat(QueueRedisKey.tryParseToken(token).get().performanceId()).isEqualTo(10L);
         assertThat(QueueRedisKey.tryParseToken(token).get().queueEntryId()).isEqualTo("qe-10");
+        assertThat(QueueRedisKey.tryParseToken(token).get().tokenId()).isEqualTo("token-123");
     }
 
     @Test

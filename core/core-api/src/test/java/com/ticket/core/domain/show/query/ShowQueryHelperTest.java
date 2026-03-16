@@ -5,15 +5,19 @@ import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.enums.BookingStatus;
 import org.junit.jupiter.api.Test;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
 class ShowQueryHelperTest {
 
-    private final ShowQueryHelper showQueryHelper = new ShowQueryHelper();
+    private final ShowQueryHelper showQueryHelper =
+            new ShowQueryHelper(Clock.fixed(Instant.parse("2026-03-15T10:00:00Z"), ZoneId.of("Asia/Seoul")));
 
     @Test
     void 빈_문자열_필터는_null_조건을_반환한다() {
@@ -79,9 +83,9 @@ class ShowQueryHelperTest {
         assertThat(beforeOpen).isNotNull();
         assertThat(onSale).isNotNull();
         assertThat(closed).isNotNull();
-        assertThat(beforeOpen.toString()).contains("saleStartDate");
-        assertThat(onSale.toString()).contains("saleStartDate").contains("saleEndDate");
-        assertThat(closed.toString()).contains("saleEndDate");
+        assertThat(beforeOpen.toString()).contains("2026-03-15T19:00");
+        assertThat(onSale.toString()).contains("2026-03-15T19:00");
+        assertThat(closed.toString()).contains("2026-03-15T19:00");
     }
 }
 

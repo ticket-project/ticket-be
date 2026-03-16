@@ -1,7 +1,6 @@
 package com.ticket.core.domain.queue.runtime;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public final class QueueRedisKey {
 
@@ -31,8 +30,8 @@ public final class QueueRedisKey {
         return ENTRY_PREFIX + queueEntryId;
     }
 
-    public static String createToken(final Long performanceId, final String queueEntryId) {
-        return performanceId + ":" + queueEntryId + ":" + UUID.randomUUID();
+    public static String createToken(final Long performanceId, final String queueEntryId, final String tokenId) {
+        return performanceId + ":" + queueEntryId + ":" + tokenId;
     }
 
     public static String tokenStorageKey(final String queueToken) {

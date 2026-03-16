@@ -13,6 +13,7 @@ import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class HoldManager {
     private final RedissonClient redissonClient;
     private final HoldSnapshotCodec holdSnapshotCodec;
     private final HoldKeyGenerator holdKeyGenerator;
+    private final Clock clock;
 
     @DistributedLock(
             prefix = "hold",
@@ -40,7 +42,7 @@ public class HoldManager {
             final Duration ttl
     ) {
         final String holdKey = holdKeyGenerator.generate();
-        final LocalDateTime expiresAt = LocalDateTime.now().plus(ttl);
+        final LocalDateTime expiresAt = LocalDateTime.now(clock).plus(ttl);
         final HoldSnapshot snapshot = new HoldSnapshot(holdKey, memberId, performanceId, seatIds, expiresAt);
 
         ensureSeatsNotHeld(performanceId, seatIds);

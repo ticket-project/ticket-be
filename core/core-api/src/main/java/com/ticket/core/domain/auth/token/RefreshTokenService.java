@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Optional;
-import java.util.UUID;
+
+import com.ticket.core.support.random.UuidSupplier;
 
 /**
  * Redis 기반 Refresh Token 관리 서비스.
@@ -18,12 +19,13 @@ public class RefreshTokenService {
 
     private static final String KEY_PREFIX = "refresh_token:";
     private final RedissonClient redissonClient;
+    private final UuidSupplier uuidSupplier;
 
     /**
      * 새 Refresh Token을 생성하고 Redis에 저장합니다.
      */
     public String createRefreshToken(final Long memberId, final long expirationSeconds) {
-        final String tokenValue = UUID.randomUUID().toString();
+        final String tokenValue = uuidSupplier.get().toString();
         final RBucket<String> bucket = redissonClient.getBucket(KEY_PREFIX + tokenValue);
         bucket.set(String.valueOf(memberId), Duration.ofSeconds(expirationSeconds));
         return tokenValue;

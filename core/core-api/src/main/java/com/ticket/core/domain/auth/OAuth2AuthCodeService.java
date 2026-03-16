@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Optional;
-import java.util.UUID;
+
+import com.ticket.core.support.random.UuidSupplier;
 
 /**
  * OAuth2 인증 이후 토큰을 URL에 직접 노출하지 않기 위한
@@ -26,12 +27,13 @@ public class OAuth2AuthCodeService {
     private static final Duration CODE_TTL = Duration.ofSeconds(30);
 
     private final RedissonClient redissonClient;
+    private final UuidSupplier uuidSupplier;
 
     /**
      * 1회용 인증 코드를 생성하고 Redis에 memberId를 저장합니다.
      */
     public String createCode(final Long memberId) {
-        final String code = UUID.randomUUID().toString();
+        final String code = uuidSupplier.get().toString();
         final RBucket<String> bucket = redissonClient.getBucket(KEY_PREFIX + code);
         bucket.set(String.valueOf(memberId), CODE_TTL);
         return code;
