@@ -1,18 +1,12 @@
 package com.ticket.core.domain.order.command.usecase;
 
 import com.ticket.core.aop.DistributedLock;
-import com.ticket.core.domain.hold.application.HoldHistoryRecorder;
 import com.ticket.core.domain.hold.event.HoldCreatedEvent;
-import com.ticket.core.domain.hold.model.HoldSnapshot;
-import com.ticket.core.domain.hold.support.HoldManager;
-import com.ticket.core.domain.hold.support.HoldSeatAvailabilityValidator;
 import com.ticket.core.domain.member.MemberFinder;
-import com.ticket.core.domain.order.application.CreateOrderApplicationService;
-import com.ticket.core.domain.order.model.Order;
+import com.ticket.core.domain.order.domainservice.OrderStartDomainService;
 import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
-import com.ticket.core.domain.performanceseat.model.PerformanceSeat;
 import com.ticket.core.enums.OrderState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
@@ -31,10 +25,7 @@ public class StartOrderUseCase {
 
     private final MemberFinder memberFinder;
     private final PerformanceFinder performanceFinder;
-    private final HoldSeatAvailabilityValidator holdSeatAvailabilityValidator;
-    private final HoldManager holdManager;
-    private final HoldHistoryRecorder holdHistoryRecorder;
-    private final CreateOrderApplicationService createOrderApplicationService;
+    private final OrderStartDomainService orderStartDomainService;
     private final OrderRepository orderRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -56,31 +47,14 @@ public class StartOrderUseCase {
         validateSeatCount(performance, seatIds);
         ensureNoPendingOrder(input.memberId(), input.performanceId());
 
-        final List<PerformanceSeat> performanceSeats = holdSeatAvailabilityValidator.validate(input.performanceId(), seatIds);
-        final HoldSnapshot snapshot = holdManager.createHold(
+        final OrderStartDomainService.OrderStartResult result = orderStartDomainService.start(
                 input.memberId(),
                 input.performanceId(),
                 seatIds,
                 Duration.ofSeconds(performance.getHoldTime())
         );
-        applicationEventPublisher.publishEvent(new HoldCreatedEvent(snapshot));
-
-        final Order order = createOrderApplicationService.createPendingOrder(
-                input.memberId(),
-                input.performanceId(),
-                snapshot.holdKey(),
-                snapshot.expiresAt(),
-                performanceSeats
-        );
-        holdHistoryRecorder.recordActiveHold(
-                input.memberId(),
-                input.performanceId(),
-                snapshot.holdKey(),
-                snapshot.expiresAt(),
-                performanceSeats
-        );
-
-        return new Output(order.getOrderKey());
+        applicationEventPublisher.publishEvent(new HoldCreatedEvent(result.snapshot()));
+        return new Output(result.orderKey());
     }
 
     private List<Long> normalizeSeatIds(final List<Long> requestedSeatIds) {
