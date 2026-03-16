@@ -5,9 +5,9 @@ import com.ticket.core.domain.hold.model.HoldSnapshot;
 import com.ticket.core.domain.performanceseat.support.SeatRedisKey;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.redisson.api.RBucket;
@@ -15,7 +15,11 @@ import org.redisson.api.RKeys;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
 
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +36,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class HoldManagerTest {
 
+    private static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse("2026-03-15T10:00:00Z"), ZoneId.of("Asia/Seoul"));
+
     @Mock
     private RedissonClient redissonClient;
 
@@ -41,8 +47,12 @@ class HoldManagerTest {
     @Mock
     private HoldKeyGenerator holdKeyGenerator;
 
-    @InjectMocks
     private HoldManager holdManager;
+
+    @BeforeEach
+    void setUp() {
+        this.holdManager = new HoldManager(redissonClient, holdSnapshotCodec, holdKeyGenerator, FIXED_CLOCK);
+    }
 
     @Test
     void 이미_hold된_좌석이_있으면_SEAT_ALREADY_HOLD_예외를_던진다() {
@@ -80,6 +90,7 @@ class HoldManagerTest {
         assertThat(snapshot.memberId()).isEqualTo(7L);
         assertThat(snapshot.performanceId()).isEqualTo(1L);
         assertThat(snapshot.seatIds()).containsExactly(10L, 20L);
+        assertThat(snapshot.expiresAt()).isEqualTo(LocalDateTime.of(2026, 3, 15, 19, 5));
         verify(seat10).set("hold-key", ttl);
         verify(seat20).set("hold-key", ttl);
         verify(meta).set("payload", ttl);

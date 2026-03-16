@@ -16,11 +16,13 @@ import com.ticket.core.enums.OrderState;
 import com.ticket.core.enums.Role;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Constructor;
+import java.time.Clock;
+import java.time.Instant;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +31,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SuppressWarnings("NonAsciiCharacters")
 class OrderDetailResponseMapperTest {
 
+    private static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse("2026-03-15T10:00:00Z"), ZoneId.of("Asia/Seoul"));
+
     @Test
     void 공연좌석목록이_비어있으면_예외를_던진다() {
         //given
@@ -36,7 +40,7 @@ class OrderDetailResponseMapperTest {
 
         //when
         //then
-        assertThatThrownBy(() -> OrderDetailResponseMapper.toResponse(order, List.of(), List.of(), createMember()))
+        assertThatThrownBy(() -> OrderDetailResponseMapper.toResponse(order, List.of(), List.of(), createMember(), FIXED_CLOCK))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("performanceSeats");
     }
@@ -46,7 +50,7 @@ class OrderDetailResponseMapperTest {
         //given
         Order order = createOrder();
         setField(order, "status", OrderState.PENDING);
-        setField(order, "expiresAt", LocalDateTime.now().plusSeconds(120));
+        setField(order, "expiresAt", LocalDateTime.of(2026, 3, 15, 19, 2));
         setField(order, "orderKey", "order-key");
 
         OrderSeat orderSeat = createOrderSeat();
@@ -58,12 +62,13 @@ class OrderDetailResponseMapperTest {
                 order,
                 List.of(orderSeat),
                 List.of(performanceSeat),
-                member
+                member,
+                FIXED_CLOCK
         );
 
         //then
         assertThat(response.orderKey()).isEqualTo("order-key");
-        assertThat(response.remainingSeconds()).isBetween(0L, 120L);
+        assertThat(response.remainingSeconds()).isEqualTo(120L);
         assertThat(response.tickets().count()).isEqualTo(1);
         assertThat(response.tickets().seats()).hasSize(1);
         assertThat(response.tickets().seats().getFirst().label()).contains("1F").contains("A").contains("3열").contains("5번");
@@ -76,7 +81,7 @@ class OrderDetailResponseMapperTest {
                 "order-key",
                 "hold-key",
                 BigDecimal.valueOf(15000),
-                LocalDateTime.now().plusMinutes(5)
+                LocalDateTime.of(2026, 3, 15, 19, 5)
         );
     }
 
@@ -95,8 +100,8 @@ class OrderDetailResponseMapperTest {
                 LocalDate.of(2026, 3, 31),
                 0L,
                 SaleType.GENERAL,
-                LocalDateTime.now().minusDays(1),
-                LocalDateTime.now().plusDays(1),
+                LocalDateTime.of(2026, 3, 14, 19, 0),
+                LocalDateTime.of(2026, 3, 16, 19, 0),
                 "image",
                 createVenue(),
                 null,
@@ -109,8 +114,8 @@ class OrderDetailResponseMapperTest {
                 1L,
                 LocalDateTime.of(2026, 3, 15, 19, 30),
                 LocalDateTime.of(2026, 3, 15, 22, 0),
-                LocalDateTime.now().minusDays(1),
-                LocalDateTime.now().plusDays(1),
+                LocalDateTime.of(2026, 3, 14, 19, 0),
+                LocalDateTime.of(2026, 3, 16, 19, 0),
                 4,
                 300
         );

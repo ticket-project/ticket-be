@@ -10,6 +10,7 @@ import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 
 import java.time.Duration;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
@@ -26,6 +27,9 @@ class RefreshTokenServiceTest {
     @Mock
     private RBucket<String> bucket;
 
+    @Mock
+    private com.ticket.core.support.random.UuidSupplier uuidSupplier;
+
     @InjectMocks
     private RefreshTokenService refreshTokenService;
 
@@ -33,6 +37,7 @@ class RefreshTokenServiceTest {
     void 리프레시토큰을_생성하고_memberId를_저장한다() {
         //given
         doReturn(bucket).when(redissonClient).getBucket(org.mockito.ArgumentMatchers.anyString());
+        when(uuidSupplier.get()).thenReturn(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
 
         String token = refreshTokenService.createRefreshToken(3L, 120L);
 
@@ -41,8 +46,8 @@ class RefreshTokenServiceTest {
         //then
         verify(redissonClient).getBucket(keyCaptor.capture());
         verify(bucket).set("3", Duration.ofSeconds(120L));
-        assertThat(keyCaptor.getValue()).startsWith("refresh_token:");
-        assertThat(token).isNotBlank();
+        assertThat(keyCaptor.getValue()).isEqualTo("refresh_token:123e4567-e89b-12d3-a456-426614174000");
+        assertThat(token).isEqualTo("123e4567-e89b-12d3-a456-426614174000");
     }
 
     @Test

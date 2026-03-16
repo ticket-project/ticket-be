@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -207,6 +208,11 @@ public abstract class QueryRepositoryTestSupport {
         @Bean
         CursorCodec cursorCodec() {
             return new CursorCodec(JsonMapper.builder().build());
+        }
+
+        @Bean
+        Clock clock() {
+            return Clock.systemDefaultZone();
         }
     }
 

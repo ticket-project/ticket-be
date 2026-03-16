@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class GetOrderDetailUseCase {
     private final OrderSeatFinder orderSeatFinder;
     private final PerformanceSeatFinder performanceSeatFinder;
     private final MemberFinder memberFinder;
+    private final Clock clock;
 
     public record Input(String orderKey, Long memberId) {}
     public record Output(

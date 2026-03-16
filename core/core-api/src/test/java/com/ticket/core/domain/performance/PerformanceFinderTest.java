@@ -3,13 +3,16 @@ package com.ticket.core.domain.performance;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.exception.NotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,18 +23,24 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PerformanceFinderTest {
 
+    private static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse("2026-03-15T10:00:00Z"), ZoneId.of("Asia/Seoul"));
+
     @Mock
     private PerformanceRepository performanceRepository;
 
-    @InjectMocks
     private PerformanceFinder performanceFinder;
+
+    @BeforeEach
+    void setUp() {
+        this.performanceFinder = new PerformanceFinder(performanceRepository, FIXED_CLOCK);
+    }
 
     @Test
     void 예약중인_공연이면_그대로_반환한다() {
         //given
         Performance performance = createPerformance(
-                LocalDateTime.now().minusMinutes(10),
-                LocalDateTime.now().plusMinutes(10)
+                LocalDateTime.of(2026, 3, 15, 18, 50),
+                LocalDateTime.of(2026, 3, 15, 19, 10)
         );
         when(performanceRepository.findById(1L)).thenReturn(Optional.of(performance));
 
@@ -46,8 +55,8 @@ class PerformanceFinderTest {
     void 예약중이_아니면_찾을수없음_예외를_던진다() {
         //given
         Performance performance = createPerformance(
-                LocalDateTime.now().plusMinutes(10),
-                LocalDateTime.now().plusMinutes(20)
+                LocalDateTime.of(2026, 3, 15, 19, 10),
+                LocalDateTime.of(2026, 3, 15, 19, 20)
         );
         when(performanceRepository.findById(1L)).thenReturn(Optional.of(performance));
 
@@ -74,8 +83,8 @@ class PerformanceFinderTest {
     void 예매중이지만_아직_예매시간_전이면_예외를_던진다() {
         //given
         Performance performance = createPerformance(
-                LocalDateTime.now().plusMinutes(10),
-                LocalDateTime.now().plusMinutes(20)
+                LocalDateTime.of(2026, 3, 15, 19, 10),
+                LocalDateTime.of(2026, 3, 15, 19, 20)
         );
         when(performanceRepository.findById(1L)).thenReturn(Optional.of(performance));
 
@@ -91,7 +100,7 @@ class PerformanceFinderTest {
         //given
         Performance performance = createPerformance(
                 null,
-                LocalDateTime.now().plusMinutes(20)
+                LocalDateTime.of(2026, 3, 15, 19, 20)
         );
         when(performanceRepository.findById(1L)).thenReturn(Optional.of(performance));
 
@@ -106,8 +115,8 @@ class PerformanceFinderTest {
     void 예매마감된_공연은_종료_예외를_던진다() {
         //given
         Performance performance = createPerformance(
-                LocalDateTime.now().minusMinutes(20),
-                LocalDateTime.now().minusMinutes(10)
+                LocalDateTime.of(2026, 3, 15, 18, 40),
+                LocalDateTime.of(2026, 3, 15, 18, 50)
         );
         when(performanceRepository.findById(1L)).thenReturn(Optional.of(performance));
 
@@ -122,7 +131,7 @@ class PerformanceFinderTest {
     void 예매마감시간이_null이면_종료_예외를_던진다() {
         //given
         Performance performance = createPerformance(
-                LocalDateTime.now().minusMinutes(20),
+                LocalDateTime.of(2026, 3, 15, 18, 40),
                 null
         );
         when(performanceRepository.findById(1L)).thenReturn(Optional.of(performance));
@@ -138,8 +147,8 @@ class PerformanceFinderTest {
     void 예매가능한_공연이면_findValidPerformanceById가_반환한다() {
         //given
         Performance performance = createPerformance(
-                LocalDateTime.now().minusMinutes(10),
-                LocalDateTime.now().plusMinutes(10)
+                LocalDateTime.of(2026, 3, 15, 18, 50),
+                LocalDateTime.of(2026, 3, 15, 19, 10)
         );
         when(performanceRepository.findById(1L)).thenReturn(Optional.of(performance));
 
@@ -154,8 +163,8 @@ class PerformanceFinderTest {
         return new Performance(
                 null,
                 1L,
-                LocalDateTime.now().plusDays(1),
-                LocalDateTime.now().plusDays(1).plusHours(2),
+                LocalDateTime.of(2026, 3, 16, 19, 0),
+                LocalDateTime.of(2026, 3, 16, 21, 0),
                 orderOpenTime,
                 orderCloseTime,
                 4,

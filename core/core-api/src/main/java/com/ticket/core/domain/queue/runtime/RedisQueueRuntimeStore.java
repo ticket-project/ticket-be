@@ -1,16 +1,17 @@
 package com.ticket.core.domain.queue.runtime;
 
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
+import com.ticket.core.support.random.UuidSupplier;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.*;
 import org.redisson.client.codec.StringCodec;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +24,8 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
     private static final String FIELD_EXPIRES_AT = "expiresAt";
 
     private final RedissonClient redissonClient;
+    private final Clock clock;
+    private final UuidSupplier uuidSupplier;
 
     @Override
     public long countActive(final Long performanceId) {
@@ -31,12 +34,12 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
 
     @Override
     public QueueEntryRuntime admitNow(final Long performanceId, final Duration entryTokenTtl, final Duration entryRetention) {
-        return admit(performanceId, UUID.randomUUID().toString(), null, entryTokenTtl, entryRetention);
+        return admit(performanceId, uuidSupplier.get().toString(), null, entryTokenTtl, entryRetention);
     }
 
     @Override
     public QueueEntryRuntime enqueue(final Long performanceId, final Duration entryRetention) {
-        final String queueEntryId = UUID.randomUUID().toString();
+        final String queueEntryId = uuidSupplier.get().toString();
         final long sequence = sequence(performanceId).incrementAndGet();
 
         waitingSet(performanceId).add(sequence, queueEntryId);
@@ -124,8 +127,8 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
             final Duration entryTokenTtl,
             final Duration entryRetention
     ) {
-        final String queueToken = QueueRedisKey.createToken(performanceId, queueEntryId);
-        final LocalDateTime expiresAt = LocalDateTime.now().plus(entryTokenTtl);
+        final String queueToken = QueueRedisKey.createToken(performanceId, queueEntryId, uuidSupplier.get().toString());
+        final LocalDateTime expiresAt = LocalDateTime.now(clock).plus(entryTokenTtl);
 
         tokenBucket(queueToken).set(queueEntryId, entryTokenTtl);
         activeSet(performanceId).add(queueToken);
