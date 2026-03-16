@@ -60,8 +60,10 @@ import static org.assertj.core.api.Assertions.assertThat;
         ShowListQueryRepositoryTest.TestConfig.class,
         ShowListQueryRepository.class,
         ShowQueryHelper.class,
+        BookingStatusWindowPolicy.class,
+        ShowConditionFactory.class,
         ShowSortSupport.class,
-        ShowCursorSupport.class
+        ShowCursorPolicy.class
 })
 @SuppressWarnings("NonAsciiCharacters")
 class ShowListQueryRepositoryTest {

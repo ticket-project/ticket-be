@@ -16,7 +16,9 @@ import com.ticket.core.domain.show.mapping.ShowSeat;
 import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.domain.show.meta.SaleType;
 import com.ticket.core.domain.show.performer.Performer;
-import com.ticket.core.domain.show.query.ShowCursorSupport;
+import com.ticket.core.domain.show.query.BookingStatusWindowPolicy;
+import com.ticket.core.domain.show.query.ShowConditionFactory;
+import com.ticket.core.domain.show.query.ShowCursorPolicy;
 import com.ticket.core.domain.show.query.ShowQueryHelper;
 import com.ticket.core.domain.show.query.ShowSortSupport;
 import com.ticket.core.domain.show.venue.Venue;
@@ -62,8 +64,10 @@ import java.time.LocalDateTime;
         QuerydslConfig.class,
         QueryRepositoryTestSupport.TestConfig.class,
         ShowQueryHelper.class,
+        BookingStatusWindowPolicy.class,
+        ShowConditionFactory.class,
         ShowSortSupport.class,
-        ShowCursorSupport.class
+        ShowCursorPolicy.class
 })
 @SuppressWarnings("NonAsciiCharacters")
 public abstract class QueryRepositoryTestSupport {
