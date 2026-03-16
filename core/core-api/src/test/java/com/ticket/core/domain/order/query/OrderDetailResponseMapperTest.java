@@ -125,11 +125,23 @@ class OrderDetailResponseMapperTest {
     }
 
     private Venue createVenue() throws Exception {
-        Constructor<Venue> constructor = Venue.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        Venue venue = constructor.newInstance();
+        Venue venue = Venue.create(
+                "공연장",
+                "주소",
+                com.ticket.core.domain.show.meta.Region.SEOUL,
+                "상세",
+                "12345",
+                BigDecimal.valueOf(37.5),
+                BigDecimal.valueOf(127.0),
+                "02-0000-0000",
+                "https://example.com/venue.png",
+                1000,
+                800,
+                10.0,
+                2.0,
+                2.0
+        );
         setField(venue, "id", 31L);
-        setField(venue, "name", "공연장");
         return venue;
     }
 

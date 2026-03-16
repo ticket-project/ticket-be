@@ -35,4 +35,28 @@ public class ShowGrade extends BaseEntity {
     @Column(nullable = false)
     private Integer sortOrder;
 
+    private ShowGrade(
+            final Show show,
+            final String gradeCode,
+            final String gradeName,
+            final BigDecimal price,
+            final Integer sortOrder
+    ) {
+        this.show = show;
+        this.gradeCode = gradeCode;
+        this.gradeName = gradeName;
+        this.price = price;
+        this.sortOrder = sortOrder;
+    }
+
+    public static ShowGrade link(
+            final Show show,
+            final String gradeCode,
+            final String gradeName,
+            final BigDecimal price,
+            final Integer sortOrder
+    ) {
+        return new ShowGrade(show, gradeCode, gradeName, price, sortOrder);
+    }
+
 }

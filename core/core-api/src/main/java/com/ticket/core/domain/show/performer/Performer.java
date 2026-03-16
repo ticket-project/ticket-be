@@ -20,4 +20,13 @@ public class Performer extends BaseEntity {
 
     private String profileImageUrl;
 
+    private Performer(final String name, final String profileImageUrl) {
+        this.name = name;
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public static Performer create(final String name, final String profileImageUrl) {
+        return new Performer(name, profileImageUrl);
+    }
+
 }
