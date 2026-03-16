@@ -84,14 +84,23 @@ class GetOrderDetailUseCaseTest {
     }
 
     private Venue createVenue(final String name) throws Exception {
-        java.lang.reflect.Constructor<Venue> constructor = Venue.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        Venue venue = constructor.newInstance();
+        Venue venue = Venue.create(
+                name,
+                "주소",
+                com.ticket.core.domain.show.meta.Region.SEOUL,
+                "상세",
+                "12345",
+                BigDecimal.valueOf(37.5),
+                BigDecimal.valueOf(127.0),
+                "02-0000-0000",
+                "https://example.com/venue.png",
+                1000,
+                800,
+                10.0,
+                2.0,
+                2.0
+        );
         ReflectionTestUtils.setField(venue, "id", 1L);
-        ReflectionTestUtils.setField(venue, "name", name);
-        ReflectionTestUtils.setField(venue, "viewBoxWidth", 1000);
-        ReflectionTestUtils.setField(venue, "viewBoxHeight", 800);
-        ReflectionTestUtils.setField(venue, "seatDiameter", 10.0);
         return venue;
     }
 

@@ -33,11 +33,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -73,37 +71,34 @@ public abstract class QueryRepositoryTestSupport {
     protected EntityManager entityManager;
 
     protected Venue persistVenue(final String name, final Region region) throws Exception {
-        Venue venue = instantiate(Venue.class);
-        ReflectionTestUtils.setField(venue, "name", name);
-        ReflectionTestUtils.setField(venue, "address", name + " 주소");
-        ReflectionTestUtils.setField(venue, "region", region);
-        ReflectionTestUtils.setField(venue, "addressDetail", "상세");
-        ReflectionTestUtils.setField(venue, "zipCode", "12345");
-        ReflectionTestUtils.setField(venue, "latitude", BigDecimal.valueOf(37.5));
-        ReflectionTestUtils.setField(venue, "longitude", BigDecimal.valueOf(127.0));
-        ReflectionTestUtils.setField(venue, "phone", "02-0000-0000");
-        ReflectionTestUtils.setField(venue, "imageUrl", "https://example.com/venue.png");
-        ReflectionTestUtils.setField(venue, "viewBoxWidth", 1000);
-        ReflectionTestUtils.setField(venue, "viewBoxHeight", 800);
-        ReflectionTestUtils.setField(venue, "seatDiameter", 12.0);
-        ReflectionTestUtils.setField(venue, "gapX", 2.0);
-        ReflectionTestUtils.setField(venue, "gapY", 2.0);
+        Venue venue = Venue.create(
+                name,
+                name + " 주소",
+                region,
+                "상세",
+                "12345",
+                BigDecimal.valueOf(37.5),
+                BigDecimal.valueOf(127.0),
+                "02-0000-0000",
+                "https://example.com/venue.png",
+                1000,
+                800,
+                12.0,
+                2.0,
+                2.0
+        );
         entityManager.persist(venue);
         return venue;
     }
 
     protected Performer persistPerformer(final String name) throws Exception {
-        Performer performer = instantiate(Performer.class);
-        ReflectionTestUtils.setField(performer, "name", name);
-        ReflectionTestUtils.setField(performer, "profileImageUrl", "https://example.com/performer.png");
+        Performer performer = Performer.create(name, "https://example.com/performer.png");
         entityManager.persist(performer);
         return performer;
     }
 
     protected Category persistCategory(final String code, final String name) throws Exception {
-        Category category = instantiate(Category.class);
-        ReflectionTestUtils.setField(category, "code", code);
-        ReflectionTestUtils.setField(category, "name", name);
+        Category category = Category.of(code, name);
         entityManager.persist(category);
         return category;
     }
@@ -149,12 +144,7 @@ public abstract class QueryRepositoryTestSupport {
 
     protected ShowGrade persistShowGrade(final Show show, final String gradeCode, final String gradeName, final BigDecimal price, final int sortOrder)
             throws Exception {
-        ShowGrade showGrade = instantiate(ShowGrade.class);
-        ReflectionTestUtils.setField(showGrade, "show", show);
-        ReflectionTestUtils.setField(showGrade, "gradeCode", gradeCode);
-        ReflectionTestUtils.setField(showGrade, "gradeName", gradeName);
-        ReflectionTestUtils.setField(showGrade, "price", price);
-        ReflectionTestUtils.setField(showGrade, "sortOrder", sortOrder);
+        ShowGrade showGrade = ShowGrade.link(show, gradeCode, gradeName, price, sortOrder);
         entityManager.persist(showGrade);
         return showGrade;
     }
@@ -166,10 +156,7 @@ public abstract class QueryRepositoryTestSupport {
     }
 
     protected ShowSeat persistShowSeat(final Show show, final Seat seat, final ShowGrade showGrade) throws Exception {
-        ShowSeat showSeat = instantiate(ShowSeat.class);
-        ReflectionTestUtils.setField(showSeat, "show", show);
-        ReflectionTestUtils.setField(showSeat, "seat", seat);
-        ReflectionTestUtils.setField(showSeat, "showGrade", showGrade);
+        ShowSeat showSeat = ShowSeat.link(show, seat, showGrade);
         entityManager.persist(showSeat);
         return showSeat;
     }
@@ -216,13 +203,6 @@ public abstract class QueryRepositoryTestSupport {
         entityManager.flush();
         entityManager.clear();
     }
-
-    private <T> T instantiate(final Class<T> type) throws Exception {
-        Constructor<T> constructor = type.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        return constructor.newInstance();
-    }
-
     static class TestConfig {
         @Bean
         CursorCodec cursorCodec() {

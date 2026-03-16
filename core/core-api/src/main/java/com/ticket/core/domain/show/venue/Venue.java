@@ -44,4 +44,70 @@ public class Venue extends BaseEntity {
     private double gapX;
     @Column(name = "GAP_Y")
     private double gapY;
+
+    private Venue(
+            final String name,
+            final String address,
+            final Region region,
+            final String addressDetail,
+            final String zipCode,
+            final BigDecimal latitude,
+            final BigDecimal longitude,
+            final String phone,
+            final String imageUrl,
+            final int viewBoxWidth,
+            final int viewBoxHeight,
+            final double seatDiameter,
+            final double gapX,
+            final double gapY
+    ) {
+        this.name = name;
+        this.address = address;
+        this.region = region;
+        this.addressDetail = addressDetail;
+        this.zipCode = zipCode;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.phone = phone;
+        this.imageUrl = imageUrl;
+        this.viewBoxWidth = viewBoxWidth;
+        this.viewBoxHeight = viewBoxHeight;
+        this.seatDiameter = seatDiameter;
+        this.gapX = gapX;
+        this.gapY = gapY;
+    }
+
+    public static Venue create(
+            final String name,
+            final String address,
+            final Region region,
+            final String addressDetail,
+            final String zipCode,
+            final BigDecimal latitude,
+            final BigDecimal longitude,
+            final String phone,
+            final String imageUrl,
+            final int viewBoxWidth,
+            final int viewBoxHeight,
+            final double seatDiameter,
+            final double gapX,
+            final double gapY
+    ) {
+        return new Venue(
+                name,
+                address,
+                region,
+                addressDetail,
+                zipCode,
+                latitude,
+                longitude,
+                phone,
+                imageUrl,
+                viewBoxWidth,
+                viewBoxHeight,
+                seatDiameter,
+                gapX,
+                gapY
+        );
+    }
 }

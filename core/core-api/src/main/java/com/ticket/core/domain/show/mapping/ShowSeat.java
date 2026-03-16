@@ -30,4 +30,14 @@ public class ShowSeat extends BaseEntity {
     @JoinColumn(name = "show_grade_id", nullable = false)
     private ShowGrade showGrade;
 
+    private ShowSeat(final Show show, final Seat seat, final ShowGrade showGrade) {
+        this.show = show;
+        this.seat = seat;
+        this.showGrade = showGrade;
+    }
+
+    public static ShowSeat link(final Show show, final Seat seat, final ShowGrade showGrade) {
+        return new ShowSeat(show, seat, showGrade);
+    }
+
 }

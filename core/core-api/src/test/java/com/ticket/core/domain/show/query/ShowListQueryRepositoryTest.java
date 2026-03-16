@@ -27,11 +27,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -184,23 +182,22 @@ class ShowListQueryRepositoryTest {
     }
 
     private Venue persistVenue(final String name, final Region region) throws Exception {
-        Constructor<Venue> constructor = Venue.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        Venue venue = constructor.newInstance();
-        ReflectionTestUtils.setField(venue, "name", name);
-        ReflectionTestUtils.setField(venue, "address", name + " 주소");
-        ReflectionTestUtils.setField(venue, "region", region);
-        ReflectionTestUtils.setField(venue, "addressDetail", "상세 주소");
-        ReflectionTestUtils.setField(venue, "zipCode", "12345");
-        ReflectionTestUtils.setField(venue, "latitude", BigDecimal.valueOf(37.0));
-        ReflectionTestUtils.setField(venue, "longitude", BigDecimal.valueOf(127.0));
-        ReflectionTestUtils.setField(venue, "phone", "010-0000-0000");
-        ReflectionTestUtils.setField(venue, "imageUrl", "https://example.com/venue.png");
-        ReflectionTestUtils.setField(venue, "viewBoxWidth", 1000);
-        ReflectionTestUtils.setField(venue, "viewBoxHeight", 800);
-        ReflectionTestUtils.setField(venue, "seatDiameter", 10.0);
-        ReflectionTestUtils.setField(venue, "gapX", 2.0);
-        ReflectionTestUtils.setField(venue, "gapY", 2.0);
+        Venue venue = Venue.create(
+                name,
+                name + " 주소",
+                region,
+                "상세 주소",
+                "12345",
+                BigDecimal.valueOf(37.0),
+                BigDecimal.valueOf(127.0),
+                "010-0000-0000",
+                "https://example.com/venue.png",
+                1000,
+                800,
+                10.0,
+                2.0,
+                2.0
+        );
         entityManager.persist(venue);
         return venue;
     }
