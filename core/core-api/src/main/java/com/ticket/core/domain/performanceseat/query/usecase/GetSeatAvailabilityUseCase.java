@@ -9,11 +9,13 @@ import com.ticket.core.domain.performanceseat.query.SeatAvailabilityCalculator;
 import com.ticket.core.domain.performanceseat.query.SeatAvailabilityQueryRepository;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -29,7 +31,9 @@ public class GetSeatAvailabilityUseCase {
 
     public record Input(Long performanceId) {}
 
-    public record Output(SeatAvailabilityResponse availability) {}
+    public record Output(
+            @Schema(description = "등급별 잔여석 목록") List<SeatAvailabilityResponse.GradeAvailability> grades
+    ) {}
 
     public Output execute(Input input) {
         final Performance performance = performanceFinder.findById(input.performanceId());
@@ -39,12 +43,12 @@ public class GetSeatAvailabilityUseCase {
                     "회차와 연결된 공연을 찾을 수 없습니다. id=" + input.performanceId());
         }
 
-        final SeatAvailabilityResponse response = seatAvailabilityCalculator.calculate(
+        final SeatAvailabilityResponse result = seatAvailabilityCalculator.calculate(
                 seatAvailabilityQueryRepository.findAvailableSeatRows(performance.getId(), performance.getShow().getId()),
                 mergeRedisOccupiedIds(performance.getId())
         );
 
-        return new Output(response);
+        return new Output(result.grades());
     }
 
     private Set<Long> mergeRedisOccupiedIds(final Long performanceId) {
