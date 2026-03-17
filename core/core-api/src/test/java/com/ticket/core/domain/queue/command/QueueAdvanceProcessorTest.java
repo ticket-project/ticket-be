@@ -108,6 +108,7 @@ class QueueAdvanceProcessorTest {
     private QueueEntryRuntime createAdmitted(final Long performanceId, final String entryId, final String token) {
         return new QueueEntryRuntime(
                 performanceId,
+                100L,
                 entryId,
                 QueueEntryStatus.ADMITTED,
                 null,

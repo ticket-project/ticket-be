@@ -1,6 +1,7 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.QueueControllerDocs;
+import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
 import com.ticket.core.domain.queue.usecase.LeaveQueueUseCase;
 import com.ticket.core.domain.queue.usecase.QueueEntryUseCase;
@@ -19,18 +20,24 @@ public class QueueController implements QueueControllerDocs {
 
     @Override
     @PostMapping("/{performanceId}/enter")
-    public ApiResponse<QueueEntryUseCase.Output> enter(@PathVariable final Long performanceId) {
-        return ApiResponse.success(queueEntryUseCase.execute(new QueueEntryUseCase.Input(performanceId)));
+    public ApiResponse<QueueEntryUseCase.Output> enter(
+            @PathVariable final Long performanceId,
+            final MemberPrincipal memberPrincipal
+    ) {
+        return ApiResponse.success(queueEntryUseCase.execute(
+                new QueueEntryUseCase.Input(performanceId, memberPrincipal.getMemberId())
+        ));
     }
 
     @Override
     @GetMapping("/{performanceId}/status")
     public ApiResponse<GetQueueStatusUseCase.Output> getStatus(
             @PathVariable final Long performanceId,
-            @RequestParam final String queueEntryId
+            @RequestParam final String queueEntryId,
+            final MemberPrincipal memberPrincipal
     ) {
         return ApiResponse.success(getQueueStatusUseCase.execute(
-                new GetQueueStatusUseCase.Input(performanceId, queueEntryId)
+                new GetQueueStatusUseCase.Input(performanceId, memberPrincipal.getMemberId(), queueEntryId)
         ));
     }
 
@@ -38,9 +45,14 @@ public class QueueController implements QueueControllerDocs {
     @PostMapping("/{performanceId}/leave")
     public ApiResponse<Void> leave(
             @PathVariable final Long performanceId,
-            @RequestParam final String queueEntryId
+            @RequestParam final String queueEntryId,
+            final MemberPrincipal memberPrincipal
     ) {
-        leaveQueueUseCase.execute(new LeaveQueueUseCase.Input(performanceId, queueEntryId));
+        leaveQueueUseCase.execute(new LeaveQueueUseCase.Input(
+                performanceId,
+                memberPrincipal.getMemberId(),
+                queueEntryId
+        ));
         return ApiResponse.success();
     }
 }

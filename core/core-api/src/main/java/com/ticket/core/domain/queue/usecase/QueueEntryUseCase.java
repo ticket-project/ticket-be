@@ -3,9 +3,9 @@ package com.ticket.core.domain.queue.usecase;
 import com.ticket.core.aop.DistributedLock;
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.runtime.QueueEntryRuntime;
+import com.ticket.core.domain.queue.runtime.QueueEntryLifecycleService;
 import com.ticket.core.domain.queue.runtime.QueueRuntimeStore;
 import com.ticket.core.domain.queue.support.QueuePolicyResolver;
-import com.ticket.core.domain.queue.support.QueueWaitTimeEstimator;
 import com.ticket.core.domain.queue.support.ResolvedQueuePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,9 +18,9 @@ public class QueueEntryUseCase {
 
     private final QueuePolicyResolver queuePolicyResolver;
     private final QueueRuntimeStore queueRuntimeStore;
-    private final QueueWaitTimeEstimator queueWaitTimeEstimator;
+    private final QueueEntryLifecycleService queueEntryLifecycleService;
 
-    public record Input(Long performanceId) {}
+    public record Input(Long performanceId, Long memberId) {}
 
     public record Output(
             QueueEntryStatus status,
@@ -39,10 +39,12 @@ public class QueueEntryUseCase {
     )
     public Output execute(final Input input) {
         final ResolvedQueuePolicy policy = queuePolicyResolver.resolve(input.performanceId());
+        queueEntryLifecycleService.cleanupForReentry(input.performanceId(), input.memberId());
 
-        if (!policy.enabled() || queueRuntimeStore.countActive(input.performanceId()) < policy.maxActiveUsers()) {
+        if (policy.shouldAdmitImmediately(queueRuntimeStore.countActive(input.performanceId()))) {
             final QueueEntryRuntime admitted = queueRuntimeStore.admitNow(
                     input.performanceId(),
+                    input.memberId(),
                     policy.entryTokenTtl(),
                     policy.entryRetention()
             );
@@ -56,14 +58,14 @@ public class QueueEntryUseCase {
             );
         }
 
-        final QueueEntryRuntime waiting = queueRuntimeStore.enqueue(input.performanceId(), policy.entryRetention());
+        final QueueEntryRuntime waiting = queueRuntimeStore.enqueue(
+                input.performanceId(),
+                input.memberId(),
+                policy.entryRetention()
+        );
         final long position = queueRuntimeStore.findWaitingPosition(input.performanceId(), waiting.queueEntryId())
                 .orElse(1L);
-        final long estimatedWaitSeconds = queueWaitTimeEstimator.estimateSeconds(
-                position,
-                policy.maxActiveUsers(),
-                policy.entryTokenTtl()
-        );
+        final long estimatedWaitSeconds = policy.estimateWaitSeconds(position);
         return new Output(
                 waiting.status(),
                 waiting.queueEntryId(),

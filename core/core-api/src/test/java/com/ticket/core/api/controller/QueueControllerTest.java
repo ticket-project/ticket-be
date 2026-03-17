@@ -1,5 +1,7 @@
 package com.ticket.core.api.controller;
 
+import com.ticket.core.domain.member.MemberPrincipal;
+import com.ticket.core.enums.Role;
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
 import com.ticket.core.domain.queue.usecase.LeaveQueueUseCase;
@@ -20,6 +22,8 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
 class QueueControllerTest {
+
+    private static final MemberPrincipal MEMBER = new MemberPrincipal(100L, Role.MEMBER);
 
     @Mock
     private QueueEntryUseCase queueEntryUseCase;
@@ -44,10 +48,10 @@ class QueueControllerTest {
                 null,
                 null
         );
-        when(queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L))).thenReturn(output);
+        when(queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L, 100L))).thenReturn(output);
 
         // when
-        final ApiResponse<QueueEntryUseCase.Output> response = queueController.enter(10L);
+        final ApiResponse<QueueEntryUseCase.Output> response = queueController.enter(10L, MEMBER);
 
         // then
         assertThat(response.getData()).isSameAs(output);
@@ -65,10 +69,10 @@ class QueueControllerTest {
                 "token-1",
                 snapshot.expiresAt
         );
-        when(getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(20L, "qe-2"))).thenReturn(output);
+        when(getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(20L, 100L, "qe-2"))).thenReturn(output);
 
         // when
-        final ApiResponse<GetQueueStatusUseCase.Output> response = queueController.getStatus(20L, "qe-2");
+        final ApiResponse<GetQueueStatusUseCase.Output> response = queueController.getStatus(20L, "qe-2", MEMBER);
 
         // then
         assertThat(response.getData()).isSameAs(output);
@@ -77,10 +81,10 @@ class QueueControllerTest {
     @Test
     void 대기열_이탈시_usecase를_호출하고_성공응답을_반환한다() {
         // when
-        final ApiResponse<Void> response = queueController.leave(30L, "qe-3");
+        final ApiResponse<Void> response = queueController.leave(30L, "qe-3", MEMBER);
 
         // then
-        verify(leaveQueueUseCase).execute(new LeaveQueueUseCase.Input(30L, "qe-3"));
+        verify(leaveQueueUseCase).execute(new LeaveQueueUseCase.Input(30L, 100L, "qe-3"));
         assertThat(response.getData()).isNull();
     }
 
