@@ -1,7 +1,9 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
 import com.ticket.core.domain.member.MemberPrincipal;
+import com.ticket.core.domain.showlike.usecase.AddShowLikeUseCase;
+import com.ticket.core.domain.showlike.usecase.GetShowLikeStatusUseCase;
+import com.ticket.core.domain.showlike.usecase.RemoveShowLikeUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,7 +22,7 @@ public interface ShowLikeControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "공연 없음")
     })
-    ApiResponse<ShowLikeStatusResponse> likeShow(
+    ApiResponse<AddShowLikeUseCase.Output> likeShow(
             @Parameter(hidden = true) MemberPrincipal memberPrincipal,
             @Parameter(description = "공연 ID", example = "1", required = true) Long showId
     );
@@ -34,7 +36,7 @@ public interface ShowLikeControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "공연 없음")
     })
-    ApiResponse<ShowLikeStatusResponse> unlikeShow(
+    ApiResponse<RemoveShowLikeUseCase.Output> unlikeShow(
             @Parameter(hidden = true) MemberPrincipal memberPrincipal,
             @Parameter(description = "공연 ID", example = "1", required = true) Long showId
     );
@@ -48,7 +50,7 @@ public interface ShowLikeControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "공연 없음")
     })
-    ApiResponse<ShowLikeStatusResponse> getLikeStatus(
+    ApiResponse<GetShowLikeStatusUseCase.Output> getLikeStatus(
             @Parameter(hidden = true) MemberPrincipal memberPrincipal,
             @Parameter(description = "공연 ID", example = "1", required = true) Long showId
     );

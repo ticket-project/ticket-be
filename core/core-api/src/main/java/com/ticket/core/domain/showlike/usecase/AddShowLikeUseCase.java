@@ -1,6 +1,5 @@
 package com.ticket.core.domain.showlike.usecase;
 
-import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.show.Show;
@@ -9,6 +8,7 @@ import com.ticket.core.domain.showlike.ShowLike;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,10 @@ public class AddShowLikeUseCase {
     public record Input(Long memberId, Long showId) {
     }
 
-    public record Output(ShowLikeStatusResponse response) {
+    public record Output(
+            @Schema(description = "공연 ID", example = "20") Long showId,
+            @Schema(description = "찜 여부", example = "true") boolean liked,
+            @Schema(description = "공연 전체 찜 개수", example = "128") long likeCount) {
     }
 
     public Output execute(final Input input) {
@@ -35,7 +38,7 @@ public class AddShowLikeUseCase {
         final Member member = memberFinder.findActiveMemberById(input.memberId());
 
         if (showLikeRepository.existsByMember_IdAndShow_Id(input.memberId(), input.showId())) {
-            return new Output(new ShowLikeStatusResponse(input.showId(), true, countLikes(input.showId())));
+            return new Output(input.showId(), true, countLikes(input.showId()));
         }
 
         final Show show = showFinder.findById(input.showId());
@@ -47,7 +50,7 @@ public class AddShowLikeUseCase {
                     "이미 찜한 공연입니다. memberId=" + input.memberId() + ", showId=" + input.showId());
         }
 
-        return new Output(new ShowLikeStatusResponse(input.showId(), true, countLikes(input.showId())));
+        return new Output(input.showId(), true, countLikes(input.showId()));
     }
 
     private void validateInput(final Input input) {

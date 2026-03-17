@@ -1,12 +1,12 @@
 package com.ticket.core.domain.showlike.usecase;
 
-import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.show.query.ShowFinder;
 import com.ticket.core.domain.showlike.ShowLikeRepository;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +23,9 @@ public class GetShowLikeStatusUseCase {
     public record Input(Long memberId, Long showId) {
     }
 
-    public record Output(ShowLikeStatusResponse response) {
+    public record Output(@Schema(description = "공연 ID", example = "20") Long showId,
+                         @Schema(description = "찜 여부", example = "true") boolean liked,
+                         @Schema(description = "공연 전체 찜 개수", example = "128") long likeCount) {
     }
 
     public Output execute(final Input input) {
@@ -33,7 +35,7 @@ public class GetShowLikeStatusUseCase {
 
         final boolean liked = showLikeRepository.existsByMember_IdAndShow_Id(member.getId(), input.showId());
         final long likeCount = showLikeRepository.countByShow_Id(input.showId());
-        return new Output(new ShowLikeStatusResponse(input.showId(), liked, likeCount));
+        return new Output(input.showId(), liked, likeCount);
     }
 
     private void validateInput(final Input input) {
