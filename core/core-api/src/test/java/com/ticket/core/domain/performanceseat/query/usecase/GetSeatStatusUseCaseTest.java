@@ -6,7 +6,7 @@ import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.domain.performanceseat.command.SeatSelectionService;
 import com.ticket.core.domain.performanceseat.query.SeatMapQueryRepository;
-import com.ticket.core.enums.SeatStatus;
+import com.ticket.core.domain.performanceseat.query.model.SeatStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

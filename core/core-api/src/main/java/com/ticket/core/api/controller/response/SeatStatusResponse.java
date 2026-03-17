@@ -1,6 +1,6 @@
 package com.ticket.core.api.controller.response;
 
-import com.ticket.core.enums.SeatStatus;
+import com.ticket.core.domain.performanceseat.query.model.SeatStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;

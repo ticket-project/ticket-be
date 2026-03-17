@@ -5,7 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.response.SeatStatusResponse;
 import com.ticket.core.api.controller.response.ShowSeatResponse;
 import com.ticket.core.enums.PerformanceSeatState;
-import com.ticket.core.enums.SeatStatus;
+import com.ticket.core.domain.performanceseat.query.model.SeatStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
