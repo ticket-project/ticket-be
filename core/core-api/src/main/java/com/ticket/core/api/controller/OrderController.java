@@ -8,8 +8,6 @@ import com.ticket.core.support.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
@@ -31,11 +29,11 @@ public class OrderController implements OrderControllerDocs {
 
     @Override
     @DeleteMapping("/{orderKey}")
-    public ApiResponse<Void> cancelOrder(
+    public ApiResponse<TerminateOrderUseCase.Output> cancelOrder(
             @PathVariable final String orderKey,
             final MemberPrincipal memberPrincipal
     ) {
-        terminateOrderUseCase.cancel(orderKey, memberPrincipal.getMemberId(), LocalDateTime.now());
-        return ApiResponse.success();
+        final TerminateOrderUseCase.Input input = new TerminateOrderUseCase.Input(orderKey, memberPrincipal.getMemberId());
+        return ApiResponse.success(terminateOrderUseCase.cancel(input));
     }
 }
