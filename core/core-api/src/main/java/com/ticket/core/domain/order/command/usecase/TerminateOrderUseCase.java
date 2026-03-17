@@ -33,16 +33,14 @@ public class TerminateOrderUseCase {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public record Input(String orderKey, Long memberId) {}
-    public record Output() {}
 
     @Transactional
-    public Output cancel(final Input input) {
+    public void cancel(final Input input) {
         memberFinder.findActiveMemberById(input.memberId());
         final Order order = orderFinder.findPendingOwnedByOrderKeyForUpdate(input.orderKey(), input.memberId());
         final OrderTransitionContext context = loadTransitionContext(order);
         orderLifecycleDomainService.cancel(order, context.orderSeats(), context.holdHistories(), LocalDateTime.now());
         applicationEventPublisher.publishEvent(new OrderCancelledEvent(order.getPerformanceId(), order.getHoldKey(), context.seatIds()));
-        return new Output();
     }
 
     @Transactional
