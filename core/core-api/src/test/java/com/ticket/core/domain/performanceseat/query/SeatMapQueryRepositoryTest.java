@@ -10,7 +10,7 @@ import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.domain.show.venue.Venue;
 import com.ticket.core.domain.support.QueryRepositoryTestSupport;
 import com.ticket.core.enums.PerformanceSeatState;
-import com.ticket.core.enums.SeatStatus;
+import com.ticket.core.domain.performanceseat.query.model.SeatStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
