@@ -4,7 +4,6 @@ import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.runtime.QueueEntryRuntime;
 import com.ticket.core.domain.queue.runtime.QueueRuntimeStore;
 import com.ticket.core.domain.queue.support.QueuePolicyResolver;
-import com.ticket.core.domain.queue.support.QueueWaitTimeEstimator;
 import com.ticket.core.domain.queue.support.ResolvedQueuePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,9 +16,8 @@ public class GetQueueStatusUseCase {
 
     private final QueuePolicyResolver queuePolicyResolver;
     private final QueueRuntimeStore queueRuntimeStore;
-    private final QueueWaitTimeEstimator queueWaitTimeEstimator;
 
-    public record Input(Long performanceId, String queueEntryId) {}
+    public record Input(Long performanceId, Long memberId, String queueEntryId) {}
 
     public record Output(
             QueueEntryStatus status,
@@ -38,19 +36,17 @@ public class GetQueueStatusUseCase {
             return new Output(QueueEntryStatus.EXPIRED, input.queueEntryId(), null, null, null, null);
         }
 
-        if (entry.status() == QueueEntryStatus.WAITING) {
+        entry.assertOwnedBy(input.performanceId(), input.memberId());
+
+        if (entry.isWaiting()) {
             final long position = queueRuntimeStore.findWaitingPosition(input.performanceId(), input.queueEntryId())
                     .orElse(0L);
-            final long estimatedWaitSeconds = queueWaitTimeEstimator.estimateSeconds(
-                    position,
-                    policy.maxActiveUsers(),
-                    policy.entryTokenTtl()
-            );
+            final long estimatedWaitSeconds = policy.estimateWaitSeconds(position);
             return new Output(entry.status(), entry.queueEntryId(), position, estimatedWaitSeconds, null, null);
         }
 
-        if (entry.status() == QueueEntryStatus.ADMITTED) {
-            final boolean validToken = entry.queueToken() != null
+        if (entry.requiresTokenValidation()) {
+            final boolean validToken = entry.hasQueueToken()
                     && queueRuntimeStore.isValidToken(input.performanceId(), entry.queueToken());
             if (!validToken) {
                 return new Output(QueueEntryStatus.EXPIRED, entry.queueEntryId(), null, null, null, null);

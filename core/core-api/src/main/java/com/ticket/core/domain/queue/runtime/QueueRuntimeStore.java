@@ -7,9 +7,13 @@ public interface QueueRuntimeStore {
 
     long countActive(Long performanceId);
 
-    QueueEntryRuntime admitNow(Long performanceId, Duration entryTokenTtl, Duration entryRetention);
+    QueueEntryRuntime admitNow(Long performanceId, Long memberId, Duration entryTokenTtl, Duration entryRetention);
 
-    QueueEntryRuntime enqueue(Long performanceId, Duration entryRetention);
+    QueueEntryRuntime enqueue(Long performanceId, Long memberId, Duration entryRetention);
+
+    Optional<String> findMemberEntryId(Long performanceId, Long memberId);
+
+    void clearMemberEntry(Long performanceId, Long memberId);
 
     Optional<Long> findWaitingPosition(Long performanceId, String queueEntryId);
 

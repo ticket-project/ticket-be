@@ -85,6 +85,7 @@ class RedisQueueRuntimeStoreTest {
         when(redissonClient.getMap(QueueRedisKey.entry("qe-10"), StringCodec.INSTANCE)).thenReturn(entryMap);
         when(entryMap.readAllMap()).thenReturn(Map.of(
                 "performanceId", "10",
+                "memberId", "100",
                 "status", QueueEntryStatus.ADMITTED.name(),
                 "sequence", "5",
                 "queueToken", "10:qe-10:token",
@@ -96,6 +97,7 @@ class RedisQueueRuntimeStoreTest {
 
         //then
         assertThat(result.performanceId()).isEqualTo(10L);
+        assertThat(result.memberId()).isEqualTo(100L);
         assertThat(result.queueEntryId()).isEqualTo("qe-10");
         assertThat(result.status()).isEqualTo(QueueEntryStatus.ADMITTED);
         assertThat(result.sequence()).isEqualTo(5L);
@@ -146,23 +148,44 @@ class RedisQueueRuntimeStoreTest {
         RSet<Object> activeSet = mock(RSet.class);
         @SuppressWarnings("unchecked")
         RMap<Object, Object> entryMap = mock(RMap.class);
+        @SuppressWarnings("unchecked")
+        RBucket<Object> memberEntryBucket = mock(RBucket.class);
         when(uuidSupplier.get())
                 .thenReturn(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
                 .thenReturn(UUID.fromString("123e4567-e89b-12d3-a456-426614174001"));
         when(redissonClient.getBucket("queue:token:10:123e4567-e89b-12d3-a456-426614174000:123e4567-e89b-12d3-a456-426614174001", StringCodec.INSTANCE))
                 .thenReturn(tokenBucket);
+        when(redissonClient.getBucket("queue:performance:10:member:200", StringCodec.INSTANCE))
+                .thenReturn(memberEntryBucket);
         when(redissonClient.getSet(QueueRedisKey.active(10L), StringCodec.INSTANCE)).thenReturn(activeSet);
         when(redissonClient.getMap(QueueRedisKey.entry("123e4567-e89b-12d3-a456-426614174000"), StringCodec.INSTANCE)).thenReturn(entryMap);
 
         //when
-        QueueEntryRuntime result = redisQueueRuntimeStore.admitNow(10L, Duration.ofMinutes(3), Duration.ofMinutes(10));
+        QueueEntryRuntime result = redisQueueRuntimeStore.admitNow(10L, 200L, Duration.ofMinutes(3), Duration.ofMinutes(10));
 
         //then
+        assertThat(result.memberId()).isEqualTo(200L);
         assertThat(result.queueEntryId()).isEqualTo("123e4567-e89b-12d3-a456-426614174000");
         assertThat(result.queueToken()).isEqualTo("10:123e4567-e89b-12d3-a456-426614174000:123e4567-e89b-12d3-a456-426614174001");
         assertThat(result.expiresAt()).isEqualTo(LocalDateTime.of(2026, 3, 15, 19, 3));
         verify(tokenBucket).set("123e4567-e89b-12d3-a456-426614174000", Duration.ofMinutes(3));
         verify(activeSet).add("10:123e4567-e89b-12d3-a456-426614174000:123e4567-e89b-12d3-a456-426614174001");
+        verify(memberEntryBucket).set("123e4567-e89b-12d3-a456-426614174000", Duration.ofMinutes(10));
+    }
+
+    @Test
+    void 회원과_공연으로_현재_엔트리를_조회한다() {
+        //given
+        @SuppressWarnings("unchecked")
+        RBucket<Object> memberEntryBucket = mock(RBucket.class);
+        when(redissonClient.getBucket("queue:performance:10:member:200", StringCodec.INSTANCE)).thenReturn(memberEntryBucket);
+        when(memberEntryBucket.get()).thenReturn("qe-200");
+
+        //when
+        Optional<String> result = redisQueueRuntimeStore.findMemberEntryId(10L, 200L);
+
+        //then
+        assertThat(result).contains("qe-200");
     }
 }
 

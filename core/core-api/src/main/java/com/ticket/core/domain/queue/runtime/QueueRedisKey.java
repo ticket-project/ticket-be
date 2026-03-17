@@ -8,6 +8,7 @@ public final class QueueRedisKey {
     private static final String WAITING_SUFFIX = ":waiting";
     private static final String ACTIVE_SUFFIX = ":active";
     private static final String SEQ_SUFFIX = ":seq";
+    private static final String MEMBER_PREFIX = ":member:";
     private static final String ENTRY_PREFIX = "queue:entry:";
     private static final String TOKEN_PREFIX = "queue:token:";
 
@@ -24,6 +25,10 @@ public final class QueueRedisKey {
 
     public static String sequence(final Long performanceId) {
         return WAITING_PREFIX + performanceId + SEQ_SUFFIX;
+    }
+
+    public static String memberEntry(final Long performanceId, final Long memberId) {
+        return WAITING_PREFIX + performanceId + MEMBER_PREFIX + memberId;
     }
 
     public static String entry(final String queueEntryId) {

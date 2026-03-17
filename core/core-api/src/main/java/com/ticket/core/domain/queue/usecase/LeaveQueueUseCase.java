@@ -1,9 +1,8 @@
 package com.ticket.core.domain.queue.usecase;
 
 import com.ticket.core.aop.DistributedLock;
-import com.ticket.core.domain.queue.command.QueueAdvanceProcessor;
-import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.runtime.QueueEntryRuntime;
+import com.ticket.core.domain.queue.runtime.QueueEntryLifecycleService;
 import com.ticket.core.domain.queue.runtime.QueueRuntimeStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,9 +12,9 @@ import org.springframework.stereotype.Service;
 public class LeaveQueueUseCase {
 
     private final QueueRuntimeStore queueRuntimeStore;
-    private final QueueAdvanceProcessor queueAdvanceProcessor;
+    private final QueueEntryLifecycleService queueEntryLifecycleService;
 
-    public record Input(Long performanceId, String queueEntryId) {}
+    public record Input(Long performanceId, Long memberId, String queueEntryId) {}
 
     @DistributedLock(
             prefix = "queue-leave",
@@ -28,15 +27,6 @@ public class LeaveQueueUseCase {
         if (entry == null || !input.performanceId().equals(entry.performanceId())) {
             return;
         }
-
-        if (entry.status() == QueueEntryStatus.WAITING) {
-            queueRuntimeStore.leaveWaiting(input.performanceId(), input.queueEntryId());
-            return;
-        }
-
-        if (entry.status() == QueueEntryStatus.ADMITTED && entry.queueToken() != null) {
-            queueRuntimeStore.leaveAdmitted(input.performanceId(), input.queueEntryId(), entry.queueToken());
-            queueAdvanceProcessor.advance(input.performanceId());
-        }
+        queueEntryLifecycleService.leave(input.performanceId(), input.memberId(), entry);
     }
 }
