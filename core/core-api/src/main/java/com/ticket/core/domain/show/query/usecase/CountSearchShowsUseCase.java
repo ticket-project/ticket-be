@@ -1,8 +1,8 @@
 package com.ticket.core.domain.show.query.usecase;
 
-import com.ticket.core.api.controller.response.ShowSearchCountResponse;
 import com.ticket.core.domain.show.query.ShowListQueryRepository;
 import com.ticket.core.domain.show.query.model.ShowSearchRequest;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +20,10 @@ public class CountSearchShowsUseCase {
     public record Input(ShowSearchRequest request) {
     }
 
-    public record Output(ShowSearchCountResponse response) {
+    public record Output(@Schema(description = "검색 결과 개수", example = "42") long count) {
     }
 
     public Output execute(final Input input) {
-        long count = showListQueryRepository.countSearchShows(input.request);
-        return new Output(new ShowSearchCountResponse(count));
+        return new Output(showListQueryRepository.countSearchShows(input.request));
     }
 }

@@ -1,15 +1,11 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.api.controller.response.ShowDetailResponse;
-import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
-import com.ticket.core.api.controller.response.ShowResponse;
-import com.ticket.core.api.controller.response.ShowSearchCountResponse;
-import com.ticket.core.api.controller.response.ShowSearchResponse;
-import com.ticket.core.api.controller.response.ShowSeatResponse;
-import com.ticket.core.api.controller.response.VenueLayoutResponse;
+import com.ticket.core.api.controller.response.*;
+import com.ticket.core.domain.performanceseat.query.usecase.GetVenueLayoutUseCase;
 import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
 import com.ticket.core.domain.show.query.model.ShowParam;
 import com.ticket.core.domain.show.query.model.ShowSearchRequest;
+import com.ticket.core.domain.show.query.usecase.CountSearchShowsUseCase;
 import com.ticket.core.domain.show.query.usecase.GetLatestShowsUseCase;
 import com.ticket.core.domain.show.query.usecase.GetSaleStartApproachingShowsUseCase;
 import com.ticket.core.support.response.ApiResponse;
@@ -41,7 +37,7 @@ public interface ShowControllerDocs {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ApiResponse<VenueLayoutResponse> getVenueLayout(
+    ApiResponse<GetVenueLayoutUseCase.Output> getVenueLayout(
             @Parameter(description = "공연 ID", example = "1", required = true) Long showId
     );
 
@@ -372,7 +368,7 @@ public interface ShowControllerDocs {
                     )
             )
     })
-    ApiResponse<ShowSearchCountResponse> countSearchShows(
+    ApiResponse<CountSearchShowsUseCase.Output> countSearchShows(
             @ParameterObject ShowSearchRequest request
     );
 }
