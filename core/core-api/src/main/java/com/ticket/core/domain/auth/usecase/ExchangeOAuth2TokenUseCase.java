@@ -26,12 +26,16 @@ public class ExchangeOAuth2TokenUseCase {
             @NotBlank
             String code
     ) {}
-    public record Output(AuthLoginResponse authLoginResponse) {}
+    public record Output(@Schema(description = "액세스 토큰(JWT)") String accessToken,
+                         @Schema(description = "토큰 타입", example = "Bearer") String tokenType,
+                         @Schema(description = "액세스 토큰 만료 시간(초)", example = "1800") long expiresIn,
+                         @Schema(description = "회원 ID", example = "1") Long memberId) {}
 
     public Output execute(final Input input, final HttpServletResponse response) {
         final Long memberId = oAuth2AuthCodeService.consumeCode(input.code())
                 .orElseThrow(() -> new AuthException(ErrorType.AUTHENTICATION_ERROR, "유효하지 않거나 만료된 인증 코드입니다."));
         final Member member = memberFinder.findActiveMemberById(memberId);
-        return new Output(authTokenApplicationService.issueTokens(member, response));
+        final AuthLoginResponse result = authTokenApplicationService.issueTokens(member, response);
+        return new Output(result.accessToken(), result.tokenType(), result.expiresIn(), result.memberId());
     }
 }
