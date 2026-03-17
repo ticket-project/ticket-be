@@ -29,11 +29,11 @@ public class OrderController implements OrderControllerDocs {
 
     @Override
     @DeleteMapping("/{orderKey}")
-    public ApiResponse<TerminateOrderUseCase.Output> cancelOrder(
+    public ApiResponse<Void> cancelOrder(
             @PathVariable final String orderKey,
             final MemberPrincipal memberPrincipal
     ) {
-        final TerminateOrderUseCase.Input input = new TerminateOrderUseCase.Input(orderKey, memberPrincipal.getMemberId());
-        return ApiResponse.success(terminateOrderUseCase.cancel(input));
+        terminateOrderUseCase.cancel(new TerminateOrderUseCase.Input(orderKey, memberPrincipal.getMemberId()));
+        return ApiResponse.success();
     }
 }

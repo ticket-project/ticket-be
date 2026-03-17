@@ -1,7 +1,6 @@
 package com.ticket.core.api.controller.docs;
 
 import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.order.command.usecase.TerminateOrderUseCase;
 import com.ticket.core.domain.order.query.usecase.GetOrderDetailUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +26,7 @@ public interface OrderControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "주문 취소 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "PENDING 주문이 아님")
     })
-    ApiResponse<TerminateOrderUseCase.Output> cancelOrder(
+    ApiResponse<Void> cancelOrder(
             @Parameter(description = "주문 키", example = "ORD-3f24c6bc355148f6bf941f0b2f2a6c2b", required = true) String orderKey,
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );
