@@ -7,6 +7,7 @@ import com.ticket.core.domain.performance.PerformanceFinder;
 import com.ticket.core.domain.performanceseat.command.SeatSelectionService;
 import com.ticket.core.domain.performanceseat.query.SeatMapQueryRepository;
 import com.ticket.core.enums.SeatStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,10 @@ public class GetSeatStatusUseCase {
     private final HoldManager holdManager;
 
     public record Input(Long performanceId) {}
-    public record Output(SeatStatusResponse status) {}
+
+    public record Output(
+            @Schema(description = "좌석 상태 목록") List<SeatStatusResponse.SeatState> seats
+    ) {}
 
     public Output execute(Input input) {
         final Performance performance = performanceFinder.findById(input.performanceId());
@@ -41,7 +45,7 @@ public class GetSeatStatusUseCase {
 
         final Set<Long> redisOccupiedIds = mergeRedisOccupiedIds(perfId);
         if (redisOccupiedIds.isEmpty()) {
-            return new Output(new SeatStatusResponse(dbStates));
+            return new Output(dbStates);
         }
 
         final List<SeatStatusResponse.SeatState> merged = dbStates.stream()
@@ -50,7 +54,7 @@ public class GetSeatStatusUseCase {
                         : seat)
                 .toList();
 
-        return new Output(new SeatStatusResponse(merged));
+        return new Output(merged);
     }
 
     private Set<Long> mergeRedisOccupiedIds(final Long performanceId) {

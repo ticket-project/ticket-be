@@ -1,9 +1,9 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.api.controller.response.PerformanceScheduleListResponse;
-import com.ticket.core.api.controller.response.PerformanceSummaryResponse;
-import com.ticket.core.api.controller.response.SeatAvailabilityResponse;
-import com.ticket.core.api.controller.response.SeatStatusResponse;
+import com.ticket.core.domain.performance.usecase.GetPerformanceScheduleListUseCase;
+import com.ticket.core.domain.performance.usecase.GetPerformanceSummaryUseCase;
+import com.ticket.core.domain.performanceseat.query.usecase.GetSeatAvailabilityUseCase;
+import com.ticket.core.domain.performanceseat.query.usecase.GetSeatStatusUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,7 +23,7 @@ public interface PerformanceControllerDocs {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ApiResponse<PerformanceSummaryResponse> getPerformanceSummary(
+    ApiResponse<GetPerformanceSummaryUseCase.Output> getPerformanceSummary(
             @Parameter(description = "공연 회차 ID", example = "1", required = true) Long performanceId
     );
 
@@ -37,7 +37,7 @@ public interface PerformanceControllerDocs {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ApiResponse<PerformanceScheduleListResponse> getPerformanceSchedules(
+    ApiResponse<GetPerformanceScheduleListUseCase.Output> getPerformanceSchedules(
             @Parameter(description = "공연 회차 ID", example = "1", required = true) Long performanceId
     );
 
@@ -51,7 +51,7 @@ public interface PerformanceControllerDocs {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ApiResponse<SeatAvailabilityResponse> getSeatAvailability(
+    ApiResponse<GetSeatAvailabilityUseCase.Output> getSeatAvailability(
             @Parameter(description = "공연 회차 ID", example = "1", required = true) Long performanceId
     );
 
@@ -65,7 +65,7 @@ public interface PerformanceControllerDocs {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ApiResponse<SeatStatusResponse> getSeatStatus(
+    ApiResponse<GetSeatStatusUseCase.Output> getSeatStatus(
             @Parameter(description = "공연 회차 ID", example = "1", required = true) Long performanceId
     );
 }

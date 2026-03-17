@@ -1,6 +1,5 @@
 package com.ticket.core.domain.performance.usecase;
 
-import com.ticket.core.api.controller.response.PerformanceScheduleListResponse;
 import com.ticket.core.api.controller.response.PerformanceScheduleListResponse.PerformanceScheduleItem;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
@@ -8,6 +7,7 @@ import com.ticket.core.domain.performance.PerformanceRepository;
 import com.ticket.core.domain.show.Show;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,11 +22,13 @@ public class GetPerformanceScheduleListUseCase {
     private final PerformanceFinder performanceFinder;
     private final PerformanceRepository performanceRepository;
 
-    public record Input(Long performanceId) {
-    }
+    public record Input(Long performanceId) {}
 
-    public record Output(PerformanceScheduleListResponse schedules) {
-    }
+    public record Output(
+            @Schema(description = "공연 ID", example = "1") Long showId,
+            @Schema(description = "현재 선택된 회차 ID", example = "101") Long selectedPerformanceId,
+            @Schema(description = "같은 공연의 회차 목록") List<PerformanceScheduleItem> schedules
+    ) {}
 
     public Output execute(final Input input) {
         final Performance findPerformance = performanceFinder.findById(input.performanceId());
@@ -49,11 +51,6 @@ public class GetPerformanceScheduleListUseCase {
                 ))
                 .toList();
 
-        final PerformanceScheduleListResponse response = new PerformanceScheduleListResponse(
-                show.getId(),
-                findPerformance.getId(),
-                scheduleItems
-        );
-        return new Output(response);
+        return new Output(show.getId(), findPerformance.getId(), scheduleItems);
     }
 }
