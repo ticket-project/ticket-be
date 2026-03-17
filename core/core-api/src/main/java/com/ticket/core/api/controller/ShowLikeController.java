@@ -1,7 +1,6 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.ShowLikeControllerDocs;
-import com.ticket.core.api.controller.response.ShowLikeStatusResponse;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.showlike.usecase.AddShowLikeUseCase;
 import com.ticket.core.domain.showlike.usecase.GetShowLikeStatusUseCase;
@@ -23,38 +22,35 @@ public class ShowLikeController implements ShowLikeControllerDocs {
 
     @Override
     @PostMapping("/shows/{showId}")
-    public ApiResponse<ShowLikeStatusResponse> likeShow(
+    public ApiResponse<AddShowLikeUseCase.Output> likeShow(
             final MemberPrincipal memberPrincipal,
             @PathVariable final Long showId
     ) {
         final Long memberId = requireMemberId(memberPrincipal);
         final AddShowLikeUseCase.Input input = new AddShowLikeUseCase.Input(memberId, showId);
-        final AddShowLikeUseCase.Output output = addShowLikeUseCase.execute(input);
-        return ApiResponse.success(output.response());
+        return ApiResponse.success(addShowLikeUseCase.execute(input));
     }
 
     @Override
     @DeleteMapping("/shows/{showId}")
-    public ApiResponse<ShowLikeStatusResponse> unlikeShow(
+    public ApiResponse<RemoveShowLikeUseCase.Output> unlikeShow(
             final MemberPrincipal memberPrincipal,
             @PathVariable final Long showId
     ) {
         final Long memberId = requireMemberId(memberPrincipal);
         final RemoveShowLikeUseCase.Input input = new RemoveShowLikeUseCase.Input(memberId, showId);
-        final RemoveShowLikeUseCase.Output output = removeShowLikeUseCase.execute(input);
-        return ApiResponse.success(output.response());
+        return ApiResponse.success(removeShowLikeUseCase.execute(input));
     }
 
     @Override
     @GetMapping("/shows/{showId}")
-    public ApiResponse<ShowLikeStatusResponse> getLikeStatus(
+    public ApiResponse<GetShowLikeStatusUseCase.Output> getLikeStatus(
             final MemberPrincipal memberPrincipal,
             @PathVariable final Long showId
     ) {
         final Long memberId = requireMemberId(memberPrincipal);
         final GetShowLikeStatusUseCase.Input input = new GetShowLikeStatusUseCase.Input(memberId, showId);
-        final GetShowLikeStatusUseCase.Output output = getShowLikeStatusUseCase.execute(input);
-        return ApiResponse.success(output.response());
+        return ApiResponse.success(getShowLikeStatusUseCase.execute(input));
     }
 
     private Long requireMemberId(final MemberPrincipal memberPrincipal) {
