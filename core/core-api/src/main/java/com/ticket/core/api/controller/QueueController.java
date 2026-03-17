@@ -4,7 +4,7 @@ import com.ticket.core.api.controller.docs.QueueControllerDocs;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
 import com.ticket.core.domain.queue.usecase.LeaveQueueUseCase;
-import com.ticket.core.domain.queue.usecase.QueueEntryUseCase;
+import com.ticket.core.domain.queue.usecase.EnterQueueEntryUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class QueueController implements QueueControllerDocs {
 
-    private final QueueEntryUseCase queueEntryUseCase;
+    private final EnterQueueEntryUseCase enterQueueEntryUseCase;
     private final GetQueueStatusUseCase getQueueStatusUseCase;
     private final LeaveQueueUseCase leaveQueueUseCase;
 
     @Override
     @PostMapping("/{performanceId}/enter")
-    public ApiResponse<QueueEntryUseCase.Output> enter(
+    public ApiResponse<EnterQueueEntryUseCase.Output> enter(
             @PathVariable final Long performanceId,
             final MemberPrincipal memberPrincipal
     ) {
-        return ApiResponse.success(queueEntryUseCase.execute(
-                new QueueEntryUseCase.Input(performanceId, memberPrincipal.getMemberId())
+        return ApiResponse.success(enterQueueEntryUseCase.execute(
+                new EnterQueueEntryUseCase.Input(performanceId, memberPrincipal.getMemberId())
         ));
     }
 

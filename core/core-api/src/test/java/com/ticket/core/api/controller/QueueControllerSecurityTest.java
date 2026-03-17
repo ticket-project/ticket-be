@@ -4,7 +4,7 @@ import com.ticket.core.config.LoginMemberArgumentResolver;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
 import com.ticket.core.domain.queue.usecase.LeaveQueueUseCase;
-import com.ticket.core.domain.queue.usecase.QueueEntryUseCase;
+import com.ticket.core.domain.queue.usecase.EnterQueueEntryUseCase;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.ApiControllerAdvice;
 import org.junit.jupiter.api.AfterEach;
@@ -29,7 +29,7 @@ class QueueControllerSecurityTest {
     @BeforeEach
     void setUp() {
         QueueController controller = new QueueController(
-                Mockito.mock(QueueEntryUseCase.class),
+                Mockito.mock(EnterQueueEntryUseCase.class),
                 Mockito.mock(GetQueueStatusUseCase.class),
                 Mockito.mock(LeaveQueueUseCase.class)
         );

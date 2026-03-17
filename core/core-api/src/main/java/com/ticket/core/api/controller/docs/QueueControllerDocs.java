@@ -2,7 +2,7 @@ package com.ticket.core.api.controller.docs;
 
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
-import com.ticket.core.domain.queue.usecase.QueueEntryUseCase;
+import com.ticket.core.domain.queue.usecase.EnterQueueEntryUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +22,7 @@ public interface QueueControllerDocs {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "진입 처리 성공")
     })
-    ApiResponse<QueueEntryUseCase.Output> enter(
+    ApiResponse<EnterQueueEntryUseCase.Output> enter(
             @Parameter(description = "회차 ID", example = "1", required = true) Long performanceId,
             MemberPrincipal memberPrincipal
     );
