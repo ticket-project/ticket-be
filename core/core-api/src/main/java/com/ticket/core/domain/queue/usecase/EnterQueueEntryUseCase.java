@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class QueueEntryUseCase {
+public class EnterQueueEntryUseCase {
 
     private final QueuePolicyResolver queuePolicyResolver;
     private final QueueRuntimeStore queueRuntimeStore;
@@ -26,7 +26,6 @@ public class QueueEntryUseCase {
             QueueEntryStatus status,
             String queueEntryId,
             Long position,
-            Long estimatedWaitSeconds,
             String queueToken,
             LocalDateTime expiresAt
     ) {}
@@ -52,7 +51,6 @@ public class QueueEntryUseCase {
                     admitted.status(),
                     admitted.queueEntryId(),
                     null,
-                    null,
                     admitted.queueToken(),
                     admitted.expiresAt()
             );
@@ -65,12 +63,10 @@ public class QueueEntryUseCase {
         );
         final long position = queueRuntimeStore.findWaitingPosition(input.performanceId(), waiting.queueEntryId())
                 .orElse(1L);
-        final long estimatedWaitSeconds = policy.estimateWaitSeconds(position);
         return new Output(
                 waiting.status(),
                 waiting.queueEntryId(),
                 position,
-                estimatedWaitSeconds,
                 null,
                 null
         );

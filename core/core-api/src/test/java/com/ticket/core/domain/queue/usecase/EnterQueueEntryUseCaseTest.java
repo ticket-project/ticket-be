@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
-class QueueEntryUseCaseTest {
+class EnterQueueEntryUseCaseTest {
 
     @Mock
     private QueuePolicyResolver queuePolicyResolver;
@@ -35,7 +35,7 @@ class QueueEntryUseCaseTest {
     private QueueEntryLifecycleService queueEntryLifecycleService;
 
     @InjectMocks
-    private QueueEntryUseCase queueEntryUseCase;
+    private EnterQueueEntryUseCase enterQueueEntryUseCase;
 
     @Test
     void 대기열이_비활성화된_공연은_즉시_입장시킨다() {
@@ -53,7 +53,7 @@ class QueueEntryUseCaseTest {
         when(queueRuntimeStore.admitNow(10L, 101L, Duration.ofMinutes(10), Duration.ofHours(1))).thenReturn(admitted);
 
         //when
-        QueueEntryUseCase.Output output = queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L, 101L));
+        EnterQueueEntryUseCase.Output output = enterQueueEntryUseCase.execute(new EnterQueueEntryUseCase.Input(10L, 101L));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.ADMITTED);
@@ -72,7 +72,7 @@ class QueueEntryUseCaseTest {
         when(queueRuntimeStore.admitNow(10L, 101L, Duration.ofMinutes(10), Duration.ofHours(1))).thenReturn(admitted);
 
         //when
-        QueueEntryUseCase.Output output = queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L, 101L));
+        EnterQueueEntryUseCase.Output output = enterQueueEntryUseCase.execute(new EnterQueueEntryUseCase.Input(10L, 101L));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.ADMITTED);
@@ -92,12 +92,11 @@ class QueueEntryUseCaseTest {
         when(queueRuntimeStore.findWaitingPosition(10L, "qe-2")).thenReturn(Optional.of(2L));
 
         //when
-        QueueEntryUseCase.Output output = queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L, 101L));
+        EnterQueueEntryUseCase.Output output = enterQueueEntryUseCase.execute(new EnterQueueEntryUseCase.Input(10L, 101L));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.WAITING);
         assertThat(output.position()).isEqualTo(2L);
-        assertThat(output.estimatedWaitSeconds()).isEqualTo(1200L);
         assertThat(output.queueToken()).isNull();
     }
 
@@ -113,11 +112,10 @@ class QueueEntryUseCaseTest {
         when(queueRuntimeStore.findWaitingPosition(10L, "qe-2")).thenReturn(Optional.empty());
 
         //when
-        QueueEntryUseCase.Output output = queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L, 101L));
+        EnterQueueEntryUseCase.Output output = enterQueueEntryUseCase.execute(new EnterQueueEntryUseCase.Input(10L, 101L));
 
         //then
         assertThat(output.position()).isEqualTo(1L);
-        assertThat(output.estimatedWaitSeconds()).isEqualTo(600L);
     }
 
     @Test
@@ -133,7 +131,7 @@ class QueueEntryUseCaseTest {
         when(queueRuntimeStore.findWaitingPosition(10L, "qe-new")).thenReturn(Optional.of(2L));
 
         //when
-        QueueEntryUseCase.Output output = queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L, 101L));
+        EnterQueueEntryUseCase.Output output = enterQueueEntryUseCase.execute(new EnterQueueEntryUseCase.Input(10L, 101L));
 
         //then
         verify(queueEntryLifecycleService).cleanupForReentry(10L, 101L);
@@ -152,7 +150,7 @@ class QueueEntryUseCaseTest {
         when(queueRuntimeStore.findWaitingPosition(10L, "qe-new")).thenReturn(Optional.of(4L));
 
         //when
-        QueueEntryUseCase.Output output = queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L, 101L));
+        EnterQueueEntryUseCase.Output output = enterQueueEntryUseCase.execute(new EnterQueueEntryUseCase.Input(10L, 101L));
 
         //then
         verify(queueEntryLifecycleService).cleanupForReentry(10L, 101L);
@@ -182,4 +180,3 @@ class QueueEntryUseCaseTest {
         );
     }
 }
-
