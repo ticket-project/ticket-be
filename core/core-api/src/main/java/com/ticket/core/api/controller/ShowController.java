@@ -1,25 +1,13 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.ShowControllerDocs;
-import com.ticket.core.api.controller.response.ShowDetailResponse;
-import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
-import com.ticket.core.api.controller.response.ShowResponse;
-import com.ticket.core.api.controller.response.ShowSearchCountResponse;
-import com.ticket.core.api.controller.response.ShowSearchResponse;
-import com.ticket.core.api.controller.response.ShowSeatResponse;
-import com.ticket.core.api.controller.response.VenueLayoutResponse;
+import com.ticket.core.api.controller.response.*;
 import com.ticket.core.domain.performanceseat.query.usecase.GetShowSeatsUseCase;
 import com.ticket.core.domain.performanceseat.query.usecase.GetVenueLayoutUseCase;
 import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
 import com.ticket.core.domain.show.query.model.ShowParam;
 import com.ticket.core.domain.show.query.model.ShowSearchRequest;
-import com.ticket.core.domain.show.query.usecase.CountSearchShowsUseCase;
-import com.ticket.core.domain.show.query.usecase.GetLatestShowsUseCase;
-import com.ticket.core.domain.show.query.usecase.GetSaleStartApproachingShowsPageUseCase;
-import com.ticket.core.domain.show.query.usecase.GetSaleStartApproachingShowsUseCase;
-import com.ticket.core.domain.show.query.usecase.GetShowDetailUseCase;
-import com.ticket.core.domain.show.query.usecase.GetShowsUseCase;
-import com.ticket.core.domain.show.query.usecase.SearchShowsUseCase;
+import com.ticket.core.domain.show.query.usecase.*;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
 import lombok.RequiredArgsConstructor;
@@ -45,10 +33,9 @@ public class ShowController implements ShowControllerDocs {
 
     @Override
     @GetMapping("/{showId}/venue-layout")
-    public ApiResponse<VenueLayoutResponse> getVenueLayout(@PathVariable final Long showId) {
+    public ApiResponse<GetVenueLayoutUseCase.Output> getVenueLayout(@PathVariable final Long showId) {
         final GetVenueLayoutUseCase.Input input = new GetVenueLayoutUseCase.Input(showId);
-        final GetVenueLayoutUseCase.Output output = getVenueLayoutUseCase.execute(input);
-        return ApiResponse.success(output.layout());
+        return ApiResponse.success(getVenueLayoutUseCase.execute(input));
     }
 
     @Override
@@ -124,11 +111,10 @@ public class ShowController implements ShowControllerDocs {
 
     @Override
     @GetMapping("/search/count")
-    public ApiResponse<ShowSearchCountResponse> countSearchShows(
+    public ApiResponse<CountSearchShowsUseCase.Output> countSearchShows(
             @ParameterObject final ShowSearchRequest request
     ) {
         final CountSearchShowsUseCase.Input input = new CountSearchShowsUseCase.Input(request);
-        final CountSearchShowsUseCase.Output output = countSearchShowsUseCase.execute(input);
-        return ApiResponse.success(output.response());
+        return ApiResponse.success(countSearchShowsUseCase.execute(input));
     }
 }
