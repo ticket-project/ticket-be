@@ -3,8 +3,6 @@ package com.ticket.core.domain.queue.usecase;
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.runtime.QueueEntryRuntime;
 import com.ticket.core.domain.queue.runtime.QueueRuntimeStore;
-import com.ticket.core.domain.queue.support.QueuePolicyResolver;
-import com.ticket.core.domain.queue.support.ResolvedQueuePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +12,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class GetQueueStatusUseCase {
 
-    private final QueuePolicyResolver queuePolicyResolver;
     private final QueueRuntimeStore queueRuntimeStore;
 
     public record Input(Long performanceId, Long memberId, String queueEntryId) {}
@@ -23,17 +20,15 @@ public class GetQueueStatusUseCase {
             QueueEntryStatus status,
             String queueEntryId,
             Long position,
-            Long estimatedWaitSeconds,
             String queueToken,
             LocalDateTime expiresAt
     ) {}
 
     public Output execute(final Input input) {
-        final ResolvedQueuePolicy policy = queuePolicyResolver.resolve(input.performanceId());
         final QueueEntryRuntime entry = queueRuntimeStore.findEntry(input.queueEntryId()).orElse(null);
 
         if (entry == null) {
-            return new Output(QueueEntryStatus.EXPIRED, input.queueEntryId(), null, null, null, null);
+            return new Output(QueueEntryStatus.EXPIRED, input.queueEntryId(), null, null, null);
         }
 
         entry.assertOwnedBy(input.performanceId(), input.memberId());
@@ -41,22 +36,20 @@ public class GetQueueStatusUseCase {
         if (entry.isWaiting()) {
             final long position = queueRuntimeStore.findWaitingPosition(input.performanceId(), input.queueEntryId())
                     .orElse(0L);
-            final long estimatedWaitSeconds = policy.estimateWaitSeconds(position);
-            return new Output(entry.status(), entry.queueEntryId(), position, estimatedWaitSeconds, null, null);
+            return new Output(entry.status(), entry.queueEntryId(), position, null, null);
         }
 
         if (entry.requiresTokenValidation()) {
             final boolean validToken = entry.hasQueueToken()
                     && queueRuntimeStore.isValidToken(input.performanceId(), entry.queueToken());
             if (!validToken) {
-                return new Output(QueueEntryStatus.EXPIRED, entry.queueEntryId(), null, null, null, null);
+                return new Output(QueueEntryStatus.EXPIRED, entry.queueEntryId(), null, null, null);
             }
         }
 
         return new Output(
                 entry.status(),
                 entry.queueEntryId(),
-                null,
                 null,
                 entry.queueToken(),
                 entry.expiresAt()

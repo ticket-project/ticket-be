@@ -62,7 +62,6 @@ class GetQueueStatusUseCaseTest {
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.WAITING);
         assertThat(output.position()).isEqualTo(5L);
-        assertThat(output.estimatedWaitSeconds()).isEqualTo(600L);
     }
 
     @Test
@@ -78,7 +77,6 @@ class GetQueueStatusUseCaseTest {
 
         //then
         assertThat(output.position()).isEqualTo(0L);
-        assertThat(output.estimatedWaitSeconds()).isEqualTo(0L);
     }
 
     @Test

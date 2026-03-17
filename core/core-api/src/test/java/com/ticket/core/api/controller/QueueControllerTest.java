@@ -5,7 +5,7 @@ import com.ticket.core.enums.Role;
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
 import com.ticket.core.domain.queue.usecase.LeaveQueueUseCase;
-import com.ticket.core.domain.queue.usecase.QueueEntryUseCase;
+import com.ticket.core.domain.queue.usecase.EnterQueueEntryUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +26,7 @@ class QueueControllerTest {
     private static final MemberPrincipal MEMBER = new MemberPrincipal(100L, Role.MEMBER);
 
     @Mock
-    private QueueEntryUseCase queueEntryUseCase;
+    private EnterQueueEntryUseCase enterQueueEntryUseCase;
 
     @Mock
     private GetQueueStatusUseCase getQueueStatusUseCase;
@@ -40,18 +40,17 @@ class QueueControllerTest {
     @Test
     void 대기열_진입시_usecase_output을_그대로_반환한다() {
         // given
-        final QueueEntryUseCase.Output output = new QueueEntryUseCase.Output(
+        final EnterQueueEntryUseCase.Output output = new EnterQueueEntryUseCase.Output(
                 QueueEntryStatus.WAITING,
                 "qe-1",
                 3L,
-                120L,
                 null,
                 null
         );
-        when(queueEntryUseCase.execute(new QueueEntryUseCase.Input(10L, 100L))).thenReturn(output);
+        when(enterQueueEntryUseCase.execute(new EnterQueueEntryUseCase.Input(10L, 100L))).thenReturn(output);
 
         // when
-        final ApiResponse<QueueEntryUseCase.Output> response = queueController.enter(10L, MEMBER);
+        final ApiResponse<EnterQueueEntryUseCase.Output> response = queueController.enter(10L, MEMBER);
 
         // then
         assertThat(response.getData()).isSameAs(output);
@@ -64,7 +63,6 @@ class QueueControllerTest {
         final GetQueueStatusUseCase.Output output = new GetQueueStatusUseCase.Output(
                 QueueEntryStatus.ADMITTED,
                 "qe-2",
-                null,
                 null,
                 "token-1",
                 snapshot.expiresAt
