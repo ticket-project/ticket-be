@@ -4,6 +4,8 @@ import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.runtime.QueueEntryLifecycleService;
 import com.ticket.core.domain.queue.runtime.QueueEntryRuntime;
 import com.ticket.core.domain.queue.runtime.QueueRuntimeStore;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -97,21 +101,10 @@ class LeaveQueueUseCaseTest {
     }
 
     @Test
-    void 입장상태여도_토큰이_없으면_아무_작업도_하지_않는다() {
-        //given
-        when(queueRuntimeStore.findEntry("qe-no-token")).thenReturn(Optional.of(
-                new QueueEntryRuntime(10L, 100L, "qe-no-token", QueueEntryStatus.ADMITTED, null, null, null)
-        ));
-
-        //when
-        leaveQueueUseCase.execute(new LeaveQueueUseCase.Input(10L, 100L, "qe-no-token"));
-
-        //then
-        verify(queueEntryLifecycleService).leave(
-                10L,
-                100L,
-                new QueueEntryRuntime(10L, 100L, "qe-no-token", QueueEntryStatus.ADMITTED, null, null, null)
-        );
+    void 입장상태는_유효한_토큰과_만료시간이_함께_전달된다() {
+        assertThatThrownBy(() -> new QueueEntryRuntime(10L, 100L, "qe-no-token", QueueEntryStatus.ADMITTED, null, null, null))
+                .isInstanceOf(CoreException.class)
+                .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
     }
 
 }
