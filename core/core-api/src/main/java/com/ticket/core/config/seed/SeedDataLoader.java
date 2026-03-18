@@ -10,8 +10,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Component
@@ -21,6 +27,14 @@ public class SeedDataLoader implements ApplicationRunner {
 
     private static final int DEFAULT_BATCH_SIZE = 500;
     private static final String SEED_CHECK_SQL = "SELECT COUNT(*) FROM CATEGORIES";
+    private static final Pattern SHOW_INSERT_PATTERN = Pattern.compile(
+        "INSERT INTO SHOWS .*?VALUES \\((\\d+), .*?, '([0-9]{4}-[0-9]{2}-[0-9]{2})', '([0-9]{4}-[0-9]{2}-[0-9]{2})',",
+        Pattern.DOTALL
+    );
+    private static final Pattern PERFORMANCE_INSERT_PATTERN = Pattern.compile(
+        "INSERT INTO PERFORMANCES .*?VALUES \\((\\d+), (\\d+), (\\d+), '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})'(.*)",
+        Pattern.DOTALL
+    );
 
     private final JdbcTemplate jdbcTemplate;
     private final TransactionTemplate transactionTemplate;
@@ -76,7 +90,120 @@ public class SeedDataLoader implements ApplicationRunner {
             statements.add(current.toString().trim());
         }
 
-        return statements;
+        return diversifyPerformanceDates(statements);
+    }
+
+    private List<String> diversifyPerformanceDates(final List<String> statements) {
+        final List<String> diversifiedStatements = new ArrayList<>(statements);
+        final Map<Long, ShowSeed> shows = extractShows(statements);
+        final Map<Long, List<PerformanceSeed>> performancesByShow = extractPerformances(statements);
+
+        for (Map.Entry<Long, List<PerformanceSeed>> entry : performancesByShow.entrySet()) {
+            final List<PerformanceSeed> performanceSeeds = entry.getValue().stream()
+                .sorted(Comparator.comparingInt(PerformanceSeed::performanceNo))
+                .toList();
+
+            if (performanceSeeds.size() < 2 || hasMultipleDates(performanceSeeds)) {
+                continue;
+            }
+
+            final ShowSeed showSeed = shows.get(entry.getKey());
+            final LocalDate firstDate = showSeed == null ? performanceSeeds.get(0).startDate() : showSeed.startDate();
+            final int dateBucketCount = Math.min(3, performanceSeeds.size());
+            LocalDate lastAssignedDate = firstDate;
+
+            for (int index = 0; index < performanceSeeds.size(); index++) {
+                final PerformanceSeed performanceSeed = performanceSeeds.get(index);
+                final LocalDate assignedDate = firstDate.plusDays((long) index * dateBucketCount / performanceSeeds.size());
+                diversifiedStatements.set(performanceSeed.statementIndex(), rewritePerformanceStatement(performanceSeed.statement(), assignedDate));
+                lastAssignedDate = assignedDate;
+            }
+
+            if (showSeed != null && lastAssignedDate.isAfter(showSeed.endDate())) {
+                diversifiedStatements.set(
+                    showSeed.statementIndex(),
+                    rewriteShowStatement(showSeed.statement(), showSeed.endDate(), lastAssignedDate)
+                );
+            }
+        }
+
+        return diversifiedStatements;
+    }
+
+    private Map<Long, ShowSeed> extractShows(final List<String> statements) {
+        final Map<Long, ShowSeed> shows = new HashMap<>();
+
+        for (int index = 0; index < statements.size(); index++) {
+            final String statement = statements.get(index);
+            final Matcher matcher = SHOW_INSERT_PATTERN.matcher(statement);
+            if (!matcher.find()) {
+                continue;
+            }
+
+            final long showId = Long.parseLong(matcher.group(1));
+            shows.put(showId, new ShowSeed(
+                index,
+                statement,
+                LocalDate.parse(matcher.group(2)),
+                LocalDate.parse(matcher.group(3))
+            ));
+        }
+
+        return shows;
+    }
+
+    private Map<Long, List<PerformanceSeed>> extractPerformances(final List<String> statements) {
+        final Map<Long, List<PerformanceSeed>> performancesByShow = new HashMap<>();
+
+        for (int index = 0; index < statements.size(); index++) {
+            final String statement = statements.get(index);
+            final Matcher matcher = PERFORMANCE_INSERT_PATTERN.matcher(statement);
+            if (!matcher.find()) {
+                continue;
+            }
+
+            final long showId = Long.parseLong(matcher.group(2));
+            final int performanceNo = Integer.parseInt(matcher.group(3));
+            final LocalDate startDate = LocalDate.parse(matcher.group(4));
+            performancesByShow.computeIfAbsent(showId, ignored -> new ArrayList<>())
+                .add(new PerformanceSeed(index, statement, performanceNo, startDate));
+        }
+
+        return performancesByShow;
+    }
+
+    private boolean hasMultipleDates(final List<PerformanceSeed> performanceSeeds) {
+        final LocalDate firstDate = performanceSeeds.get(0).startDate();
+        return performanceSeeds.stream().anyMatch(performanceSeed -> !performanceSeed.startDate().equals(firstDate));
+    }
+
+    private String rewriteShowStatement(final String statement, final LocalDate currentEndDate, final LocalDate newEndDate) {
+        final Matcher matcher = SHOW_INSERT_PATTERN.matcher(statement);
+        if (!matcher.find()) {
+            return statement;
+        }
+
+        return statement.substring(0, matcher.start(3))
+            + newEndDate
+            + statement.substring(matcher.end(3));
+    }
+
+    private String rewritePerformanceStatement(final String statement, final LocalDate assignedDate) {
+        final Matcher matcher = PERFORMANCE_INSERT_PATTERN.matcher(statement);
+        if (!matcher.find()) {
+            return statement;
+        }
+
+        final String suffix = matcher.group(12);
+        return "INSERT INTO PERFORMANCES (id, show_id, performance_no, start_time, end_time, order_open_time, order_close_time, max_can_hold_count, hold_time, created_at, created_by) VALUES ("
+            + matcher.group(1) + ", "
+            + matcher.group(2) + ", "
+            + matcher.group(3) + ", '"
+            + assignedDate + " " + matcher.group(5) + "', '"
+            + assignedDate + " " + matcher.group(7) + "', '"
+            + matcher.group(8) + " " + matcher.group(9) + "', '"
+            + assignedDate + " " + matcher.group(11) + "'"
+            + suffix;
     }
 
     private void executeInBatches(final List<String> statements) {
@@ -87,6 +214,12 @@ public class SeedDataLoader implements ApplicationRunner {
             final String[] sqlBatch = statements.subList(i, end).toArray(String[]::new);
             jdbcTemplate.batchUpdate(sqlBatch);
         }
+    }
+
+    private record ShowSeed(int statementIndex, String statement, LocalDate startDate, LocalDate endDate) {
+    }
+
+    private record PerformanceSeed(int statementIndex, String statement, int performanceNo, LocalDate startDate) {
     }
 
     private static final class SeedSqlLines {
@@ -1525,7 +1658,16 @@ public class SeedDataLoader implements ApplicationRunner {
             "-- 회차-좌석 매핑 (INSERT...SELECT)",
             "-- ============================================================",
             "INSERT INTO PERFORMANCE_SEATS (performance_id, seat_id, state, price, created_at, created_by)",
-            "SELECT p.id, st.id, 'AVAILABLE',",
+            "SELECT p.id, st.id,",
+            "    CASE",
+            "        WHEN MOD(",
+            "            CAST(st.seat_no AS INTEGER) - 1",
+            "            - MOD(p.id + ASCII(SUBSTR(st.section, 1, 1)) + ASCII(SUBSTR(st.row_no, 1, 1)), 4)",
+            "            + MOD(p.id + ASCII(SUBSTR(st.section, 1, 1)) + ASCII(SUBSTR(st.row_no, 1, 1)), 3) + 5,",
+            "            MOD(p.id + ASCII(SUBSTR(st.section, 1, 1)) + ASCII(SUBSTR(st.row_no, 1, 1)), 3) + 5",
+            "        ) < MOD(p.id + ASCII(SUBSTR(st.section, 1, 1)) + ASCII(SUBSTR(st.row_no, 1, 1)), 3) + 2 THEN 'RESERVED'",
+            "        ELSE 'AVAILABLE'",
+            "    END,",
             "    (SELECT sg.price FROM SHOW_GRADES sg WHERE sg.show_id = p.show_id AND sg.grade_code = CASE WHEN st.section = '나' THEN 'VIP' WHEN st.section IN ('가', '다') THEN 'R' WHEN st.section IN ('라', '바') THEN 'S' ELSE 'A' END),",
             "    '2026-01-01 10:00:00', '시드'",
             "FROM PERFORMANCES p CROSS JOIN SEATS st;",
