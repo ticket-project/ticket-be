@@ -19,7 +19,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -64,5 +67,45 @@ class OrderStartDomainServiceTest {
         verify(holdManager).createHold(20L, 10L, seatIds, Duration.ofSeconds(420));
         verify(createOrderApplicationService).createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);
         verify(holdHistoryRecorder).recordActiveHold(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);
+    }
+
+    @Test
+    void 주문생성에_실패하면_생성한_hold를_보상해제한다() {
+        List<Long> seatIds = List.of(3L, 7L);
+        List<PerformanceSeat> performanceSeats = List.of(org.mockito.Mockito.mock(PerformanceSeat.class));
+        HoldSnapshot snapshot = new HoldSnapshot("hold-key", 20L, 10L, seatIds, LocalDateTime.of(2026, 3, 15, 12, 0));
+
+        when(holdSeatAvailabilityValidator.validate(10L, seatIds)).thenReturn(performanceSeats);
+        when(holdManager.createHold(20L, 10L, seatIds, Duration.ofSeconds(420))).thenReturn(snapshot);
+        when(createOrderApplicationService.createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats))
+                .thenThrow(new RuntimeException("order failed"));
+
+        assertThatThrownBy(() -> orderStartDomainService.start(20L, 10L, seatIds, Duration.ofSeconds(420)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("order failed");
+
+        verify(holdManager).release(10L, "hold-key", seatIds);
+        verify(holdHistoryRecorder, never()).recordActiveHold(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);
+    }
+
+    @Test
+    void 이력기록에_실패하면_생성한_hold를_보상해제한다() {
+        List<Long> seatIds = List.of(3L, 7L);
+        List<PerformanceSeat> performanceSeats = List.of(org.mockito.Mockito.mock(PerformanceSeat.class));
+        HoldSnapshot snapshot = new HoldSnapshot("hold-key", 20L, 10L, seatIds, LocalDateTime.of(2026, 3, 15, 12, 0));
+        Order order = new Order(20L, 10L, "order-key", "hold-key", BigDecimal.valueOf(120000), snapshot.expiresAt());
+
+        when(holdSeatAvailabilityValidator.validate(10L, seatIds)).thenReturn(performanceSeats);
+        when(holdManager.createHold(20L, 10L, seatIds, Duration.ofSeconds(420))).thenReturn(snapshot);
+        when(createOrderApplicationService.createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats))
+                .thenReturn(order);
+        doThrow(new RuntimeException("history failed"))
+                .when(holdHistoryRecorder).recordActiveHold(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);
+
+        assertThatThrownBy(() -> orderStartDomainService.start(20L, 10L, seatIds, Duration.ofSeconds(420)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("history failed");
+
+        verify(holdManager).release(10L, "hold-key", seatIds);
     }
 }
