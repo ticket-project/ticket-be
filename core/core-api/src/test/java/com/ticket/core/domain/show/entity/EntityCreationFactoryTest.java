@@ -9,6 +9,8 @@ import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.domain.show.meta.SaleType;
 import com.ticket.core.domain.show.performer.Performer;
 import com.ticket.core.domain.show.venue.Venue;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -16,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings("NonAsciiCharacters")
 class EntityCreationFactoryTest {
@@ -101,5 +104,61 @@ class EntityCreationFactoryTest {
         assertThat(showSeat.getShow()).isSameAs(show);
         assertThat(showSeat.getSeat()).isSameAs(seat);
         assertThat(showSeat.getShowGrade()).isSameAs(showGrade);
+    }
+
+    @Test
+    void 공연좌석_연결시_공연과_등급의_공연이_다르면_예외를_던진다() {
+        Venue venue = Venue.create(
+                "공연장",
+                "주소",
+                Region.SEOUL,
+                "상세",
+                "12345",
+                BigDecimal.valueOf(37.5),
+                BigDecimal.valueOf(127.0),
+                "02-0000-0000",
+                "https://example.com/venue.png",
+                1000,
+                800,
+                12.0,
+                2.0,
+                2.0
+        );
+        Show show = new Show(
+                "공연",
+                "부제",
+                "소개",
+                LocalDate.of(2026, 3, 20),
+                LocalDate.of(2026, 4, 20),
+                10L,
+                SaleType.GENERAL,
+                LocalDateTime.of(2026, 3, 1, 10, 0),
+                LocalDateTime.of(2026, 3, 19, 23, 59),
+                "image",
+                venue,
+                null,
+                120
+        );
+        Show otherShow = new Show(
+                "다른공연",
+                "부제",
+                "소개",
+                LocalDate.of(2026, 3, 21),
+                LocalDate.of(2026, 4, 21),
+                20L,
+                SaleType.GENERAL,
+                LocalDateTime.of(2026, 3, 2, 10, 0),
+                LocalDateTime.of(2026, 3, 20, 23, 59),
+                "image2",
+                venue,
+                null,
+                120
+        );
+        Seat seat = new Seat("A", "3", "5", 1, 10.0, 20.0);
+        ShowGrade otherShowGrade = ShowGrade.link(otherShow, "VIP", "VIP석", BigDecimal.valueOf(150000), 1);
+
+        assertThatThrownBy(() -> ShowSeat.link(show, seat, otherShowGrade))
+                .isInstanceOf(CoreException.class)
+                .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
     }
 }
