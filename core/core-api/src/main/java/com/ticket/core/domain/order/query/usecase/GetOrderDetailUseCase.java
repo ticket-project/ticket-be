@@ -50,7 +50,7 @@ public class GetOrderDetailUseCase {
         final List<PerformanceSeat> performanceSeats = performanceSeatFinder.findAllByOrderSeats(orderSeats);
         final Member member = memberFinder.findActiveMemberById(input.memberId());
 
-        final OrderDetailResponse result = OrderDetailResponseMapper.toResponse(order, orderSeats, performanceSeats, member);
+        final OrderDetailResponse result = OrderDetailResponseMapper.toResponse(order, orderSeats, performanceSeats, member, clock);
         return new Output(
                 result.orderKey(), result.status(), result.expiresAt(), result.remainingSeconds(),
                 result.show(), result.performance(), result.booker(), result.price(), result.tickets()
