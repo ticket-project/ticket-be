@@ -54,7 +54,7 @@ class GetSeatStatusUseCaseTest {
         GetSeatStatusUseCase.Output output = useCase.execute(new GetSeatStatusUseCase.Input(10L));
 
         //then
-        assertThat(output.status().seats()).containsExactly(
+        assertThat(output.seats()).containsExactly(
                 new SeatStatusResponse.SeatState(1L, SeatStatus.OCCUPIED),
                 new SeatStatusResponse.SeatState(2L, SeatStatus.OCCUPIED)
         );
@@ -78,8 +78,7 @@ class GetSeatStatusUseCaseTest {
         GetSeatStatusUseCase.Output output = useCase.execute(new GetSeatStatusUseCase.Input(10L));
 
         //then
-        assertThat(output.status().seats()).containsExactlyElementsOf(dbStates);
+        assertThat(output.seats()).containsExactlyElementsOf(dbStates);
         verify(seatMapQueryRepository).findSeatStatuses(10L);
     }
 }
-

@@ -54,7 +54,10 @@ class RefreshAuthTokenUseCaseTest {
                 useCase.execute(new RefreshAuthTokenUseCase.Input("refresh-token"), servletResponse);
 
         //then
-        assertThat(output.authLoginResponse()).isEqualTo(response);
+        assertThat(output.accessToken()).isEqualTo(response.accessToken());
+        assertThat(output.tokenType()).isEqualTo(response.tokenType());
+        assertThat(output.expiresIn()).isEqualTo(response.expiresIn());
+        assertThat(output.memberId()).isEqualTo(response.memberId());
         verify(refreshTokenService).validate("refresh-token");
         verify(memberFinder).findActiveMemberById(3L);
         verify(authTokenApplicationService).rotateTokens(member, "refresh-token", servletResponse);

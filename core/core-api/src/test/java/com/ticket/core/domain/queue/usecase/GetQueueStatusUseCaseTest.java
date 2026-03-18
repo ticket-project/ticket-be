@@ -1,11 +1,8 @@
 package com.ticket.core.domain.queue.usecase;
 
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
-import com.ticket.core.domain.queue.model.QueueLevel;
 import com.ticket.core.domain.queue.runtime.QueueEntryRuntime;
 import com.ticket.core.domain.queue.runtime.QueueRuntimeStore;
-import com.ticket.core.domain.queue.support.QueuePolicyResolver;
-import com.ticket.core.domain.queue.support.ResolvedQueuePolicy;
 import com.ticket.core.support.exception.AuthException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -26,9 +22,6 @@ import static org.mockito.Mockito.when;
 class GetQueueStatusUseCaseTest {
 
     @Mock
-    private QueuePolicyResolver queuePolicyResolver;
-
-    @Mock
     private QueueRuntimeStore queueRuntimeStore;
 
     @InjectMocks
@@ -37,7 +30,6 @@ class GetQueueStatusUseCaseTest {
     @Test
     void 엔트리가_없으면_EXPIRED를_반환한다() {
         //given
-        when(queuePolicyResolver.resolve(10L)).thenReturn(createPolicy());
         when(queueRuntimeStore.findEntry("qe-10")).thenReturn(Optional.empty());
 
         //when
@@ -52,7 +44,6 @@ class GetQueueStatusUseCaseTest {
     void 대기중_엔트리는_현재_순번과_예상대기시간을_반환한다() {
         //given
         QueueEntryRuntime waiting = new QueueEntryRuntime(10L, 100L, "qe-10", QueueEntryStatus.WAITING, 5L, null, null);
-        when(queuePolicyResolver.resolve(10L)).thenReturn(createPolicy());
         when(queueRuntimeStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
         when(queueRuntimeStore.findWaitingPosition(10L, "qe-10")).thenReturn(Optional.of(5L));
 
@@ -68,7 +59,6 @@ class GetQueueStatusUseCaseTest {
     void 대기순번을_찾지_못하면_0초기값으로_계산한다() {
         //given
         QueueEntryRuntime waiting = new QueueEntryRuntime(10L, 100L, "qe-10", QueueEntryStatus.WAITING, 5L, null, null);
-        when(queuePolicyResolver.resolve(10L)).thenReturn(createPolicy());
         when(queueRuntimeStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
         when(queueRuntimeStore.findWaitingPosition(10L, "qe-10")).thenReturn(Optional.empty());
 
@@ -91,7 +81,6 @@ class GetQueueStatusUseCaseTest {
                 "qt-11",
                 LocalDateTime.of(2026, 3, 15, 20, 20)
         );
-        when(queuePolicyResolver.resolve(10L)).thenReturn(createPolicy());
         when(queueRuntimeStore.findEntry("qe-11")).thenReturn(Optional.of(admitted));
         when(queueRuntimeStore.isValidToken(10L, "qt-11")).thenReturn(false);
 
@@ -115,7 +104,6 @@ class GetQueueStatusUseCaseTest {
                 "qt-11",
                 LocalDateTime.of(2026, 3, 15, 20, 20)
         );
-        when(queuePolicyResolver.resolve(10L)).thenReturn(createPolicy());
         when(queueRuntimeStore.findEntry("qe-11")).thenReturn(Optional.of(admitted));
         when(queueRuntimeStore.isValidToken(10L, "qt-11")).thenReturn(true);
 
@@ -132,7 +120,6 @@ class GetQueueStatusUseCaseTest {
     void LEFT_상태_엔트리는_그대로_반환한다() {
         //given
         QueueEntryRuntime left = new QueueEntryRuntime(10L, 100L, "qe-12", QueueEntryStatus.LEFT, 1L, null, null);
-        when(queuePolicyResolver.resolve(10L)).thenReturn(createPolicy());
         when(queueRuntimeStore.findEntry("qe-12")).thenReturn(Optional.of(left));
 
         //when
@@ -146,7 +133,6 @@ class GetQueueStatusUseCaseTest {
     void 다른_회원의_엔트리를_조회하면_예외가_발생한다() {
         //given
         QueueEntryRuntime waiting = new QueueEntryRuntime(10L, 999L, "qe-10", QueueEntryStatus.WAITING, 5L, null, null);
-        when(queuePolicyResolver.resolve(10L)).thenReturn(createPolicy());
         when(queueRuntimeStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
 
         //when //then
@@ -154,14 +140,5 @@ class GetQueueStatusUseCaseTest {
                 .isInstanceOf(AuthException.class);
     }
 
-    private ResolvedQueuePolicy createPolicy() {
-        return new ResolvedQueuePolicy(
-                true,
-                QueueLevel.LEVEL_1,
-                300,
-                Duration.ofMinutes(10),
-                Duration.ofHours(1)
-        );
-    }
 }
 

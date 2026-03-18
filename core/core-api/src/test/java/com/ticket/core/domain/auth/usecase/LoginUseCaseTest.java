@@ -43,7 +43,10 @@ class LoginUseCaseTest {
         LoginUseCase.Output output = useCase.execute(new LoginUseCase.Input("user@example.com", "password"), servletResponse);
 
         //then
-        assertThat(output.authLoginResponse()).isEqualTo(response);
+        assertThat(output.accessToken()).isEqualTo(response.accessToken());
+        assertThat(output.tokenType()).isEqualTo(response.tokenType());
+        assertThat(output.expiresIn()).isEqualTo(response.expiresIn());
+        assertThat(output.memberId()).isEqualTo(response.memberId());
         verify(authService).login("user@example.com", "password");
         verify(authTokenApplicationService).issueTokens(member, servletResponse);
     }

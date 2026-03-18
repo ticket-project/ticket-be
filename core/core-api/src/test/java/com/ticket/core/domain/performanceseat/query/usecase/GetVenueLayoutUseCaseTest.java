@@ -42,8 +42,8 @@ class GetVenueLayoutUseCaseTest {
         GetVenueLayoutUseCase.Output output = useCase.execute(new GetVenueLayoutUseCase.Input(100L));
 
         //then
-        assertThat(output.layout().name()).isEqualTo("올림픽홀");
-        assertThat(output.layout().viewBoxWidth()).isEqualTo(1000);
+        assertThat(output.name()).isEqualTo("올림픽홀");
+        assertThat(output.viewBoxWidth()).isEqualTo(1000);
     }
 
     @Test
@@ -60,4 +60,3 @@ class GetVenueLayoutUseCaseTest {
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
     }
 }
-

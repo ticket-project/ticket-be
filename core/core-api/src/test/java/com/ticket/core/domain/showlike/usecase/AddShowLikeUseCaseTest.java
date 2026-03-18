@@ -50,8 +50,8 @@ class AddShowLikeUseCaseTest {
         AddShowLikeUseCase.Output output = useCase.execute(new AddShowLikeUseCase.Input(1L, 2L));
 
         //then
-        assertThat(output.response().liked()).isTrue();
-        assertThat(output.response().likeCount()).isEqualTo(5L);
+        assertThat(output.liked()).isTrue();
+        assertThat(output.likeCount()).isEqualTo(5L);
     }
 
     @Test
@@ -66,7 +66,7 @@ class AddShowLikeUseCaseTest {
         AddShowLikeUseCase.Output output = useCase.execute(new AddShowLikeUseCase.Input(1L, 2L));
 
         //then
-        assertThat(output.response().liked()).isTrue();
+        assertThat(output.liked()).isTrue();
         verify(showLikeRepository).save(any());
     }
 
@@ -106,4 +106,3 @@ class AddShowLikeUseCaseTest {
         );
     }
 }
-

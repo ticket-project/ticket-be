@@ -32,7 +32,7 @@ class CountSearchShowsUseCaseTest {
         CountSearchShowsUseCase.Output output = useCase.execute(new CountSearchShowsUseCase.Input(request));
 
         //then
-        assertThat(output.response().count()).isEqualTo(42L);
+        assertThat(output.count()).isEqualTo(42L);
         verify(showListQueryRepository).countSearchShows(request);
     }
 
@@ -46,8 +46,7 @@ class CountSearchShowsUseCaseTest {
         CountSearchShowsUseCase.Output output = useCase.execute(new CountSearchShowsUseCase.Input(request));
 
         //then
-        assertThat(output.response().count()).isZero();
+        assertThat(output.count()).isZero();
         verify(showListQueryRepository).countSearchShows(request);
     }
 }
-

@@ -54,7 +54,10 @@ class ExchangeOAuth2TokenUseCaseTest {
                 useCase.execute(new ExchangeOAuth2TokenUseCase.Input("oauth-code"), servletResponse);
 
         //then
-        assertThat(output.authLoginResponse()).isEqualTo(response);
+        assertThat(output.accessToken()).isEqualTo(response.accessToken());
+        assertThat(output.tokenType()).isEqualTo(response.tokenType());
+        assertThat(output.expiresIn()).isEqualTo(response.expiresIn());
+        assertThat(output.memberId()).isEqualTo(response.memberId());
         verify(oAuth2AuthCodeService).consumeCode("oauth-code");
         verify(memberFinder).findActiveMemberById(7L);
         verify(authTokenApplicationService).issueTokens(member, servletResponse);
