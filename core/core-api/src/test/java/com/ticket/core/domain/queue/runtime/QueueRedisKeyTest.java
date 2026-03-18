@@ -3,6 +3,7 @@ package com.ticket.core.domain.queue.runtime;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings("NonAsciiCharacters")
 class QueueRedisKeyTest {
@@ -44,6 +45,22 @@ class QueueRedisKeyTest {
         assertThat(QueueRedisKey.tryParseToken(" ")).isEmpty();
         assertThat(QueueRedisKey.tryParseToken("broken-token")).isEmpty();
         assertThat(QueueRedisKey.tryParseTokenStorageKey("broken-key")).isEmpty();
+    }
+
+    @Test
+    void 키_생성시_null_또는_blank_입력은_실패한다() {
+        assertThatThrownBy(() -> QueueRedisKey.waiting(null)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> QueueRedisKey.active(null)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> QueueRedisKey.sequence(null)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> QueueRedisKey.memberEntry(10L, null)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> QueueRedisKey.entry(null)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> QueueRedisKey.createToken(10L, null, "token-123")).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> QueueRedisKey.createToken(10L, "qe-10", null)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> QueueRedisKey.tokenStorageKey(null)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> QueueRedisKey.entry(" ")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> QueueRedisKey.createToken(10L, " ", "token-123")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> QueueRedisKey.createToken(10L, "qe-10", " ")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> QueueRedisKey.tokenStorageKey(" ")).isInstanceOf(IllegalArgumentException.class);
     }
 }
 

@@ -1,5 +1,6 @@
 package com.ticket.core.domain.queue.runtime;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public final class QueueRedisKey {
@@ -16,31 +17,35 @@ public final class QueueRedisKey {
     }
 
     public static String waiting(final Long performanceId) {
-        return WAITING_PREFIX + performanceId + WAITING_SUFFIX;
+        return WAITING_PREFIX + requirePerformanceId(performanceId) + WAITING_SUFFIX;
     }
 
     public static String active(final Long performanceId) {
-        return WAITING_PREFIX + performanceId + ACTIVE_SUFFIX;
+        return WAITING_PREFIX + requirePerformanceId(performanceId) + ACTIVE_SUFFIX;
     }
 
     public static String sequence(final Long performanceId) {
-        return WAITING_PREFIX + performanceId + SEQ_SUFFIX;
+        return WAITING_PREFIX + requirePerformanceId(performanceId) + SEQ_SUFFIX;
     }
 
     public static String memberEntry(final Long performanceId, final Long memberId) {
-        return WAITING_PREFIX + performanceId + MEMBER_PREFIX + memberId;
+        return WAITING_PREFIX + requirePerformanceId(performanceId) + MEMBER_PREFIX + requireMemberId(memberId);
     }
 
     public static String entry(final String queueEntryId) {
-        return ENTRY_PREFIX + queueEntryId;
+        return ENTRY_PREFIX + requireText(queueEntryId, "queueEntryId");
     }
 
     public static String createToken(final Long performanceId, final String queueEntryId, final String tokenId) {
-        return performanceId + ":" + queueEntryId + ":" + tokenId;
+        return requirePerformanceId(performanceId)
+                + ":"
+                + requireText(queueEntryId, "queueEntryId")
+                + ":"
+                + requireText(tokenId, "tokenId");
     }
 
     public static String tokenStorageKey(final String queueToken) {
-        return TOKEN_PREFIX + queueToken;
+        return TOKEN_PREFIX + requireText(queueToken, "queueToken");
     }
 
     public static Optional<TokenKey> tryParseTokenStorageKey(final String key) {
@@ -59,7 +64,9 @@ public final class QueueRedisKey {
         if (parts.length != 3) {
             return Optional.empty();
         }
-
+        if (parts[1].isBlank() || parts[2].isBlank()) {
+            return Optional.empty();
+        }
         try {
             return Optional.of(new TokenKey(Long.parseLong(parts[0]), parts[1], parts[2]));
         } catch (final NumberFormatException ignored) {
@@ -68,5 +75,21 @@ public final class QueueRedisKey {
     }
 
     public record TokenKey(Long performanceId, String queueEntryId, String tokenId) {
+    }
+
+    private static Long requirePerformanceId(final Long performanceId) {
+        return Objects.requireNonNull(performanceId, "performanceId는 null일 수 없습니다.");
+    }
+
+    private static Long requireMemberId(final Long memberId) {
+        return Objects.requireNonNull(memberId, "memberId는 null일 수 없습니다.");
+    }
+
+    private static String requireText(final String value, final String fieldName) {
+        Objects.requireNonNull(value, fieldName + "는 null일 수 없습니다.");
+        if (value.isBlank()) {
+            throw new IllegalArgumentException(fieldName + "는 blank일 수 없습니다.");
+        }
+        return value;
     }
 }

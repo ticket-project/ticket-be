@@ -2,6 +2,8 @@ package com.ticket.core.domain.queue.runtime;
 
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.support.exception.AuthException;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -69,6 +71,31 @@ class QueueEntryRuntimeTest {
         //when //then
         assertThat(waiting.planLeave(10L, 100L).type()).isEqualTo(QueueEntryActionType.LEAVE_WAITING);
         assertThat(admitted.planLeave(10L, 100L).type()).isEqualTo(QueueEntryActionType.LEAVE_ADMITTED_AND_ADVANCE);
+    }
+
+    @Test
+    void 입장상태는_토큰과_만료시간이_반드시_있어야_한다() {
+        assertThatThrownBy(() -> new QueueEntryRuntime(
+                10L,
+                100L,
+                "qe-1",
+                QueueEntryStatus.ADMITTED,
+                1L,
+                null,
+                LocalDateTime.of(2026, 3, 17, 10, 0)
+        )).isInstanceOf(CoreException.class)
+                .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
+
+        assertThatThrownBy(() -> new QueueEntryRuntime(
+                10L,
+                100L,
+                "qe-1",
+                QueueEntryStatus.ADMITTED,
+                1L,
+                "qt-1",
+                null
+        )).isInstanceOf(CoreException.class)
+                .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
     }
 
     private QueueEntryRuntime createWaitingEntry() {
