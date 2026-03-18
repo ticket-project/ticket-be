@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -186,6 +187,32 @@ class RedisQueueRuntimeStoreTest {
 
         //then
         assertThat(result).contains("qe-200");
+    }
+
+    @Test
+    void admitNextWaiting은_현재_대기열_크기만큼만_오염엔트리를_정리하고_종료한다() {
+        @SuppressWarnings("unchecked")
+        RScoredSortedSet<Object> waitingSet = mock(RScoredSortedSet.class);
+        @SuppressWarnings("unchecked")
+        RMap<Object, Object> entryMap1 = mock(RMap.class);
+        @SuppressWarnings("unchecked")
+        RMap<Object, Object> entryMap2 = mock(RMap.class);
+
+        when(redissonClient.getScoredSortedSet(QueueRedisKey.waiting(10L), StringCodec.INSTANCE)).thenReturn(waitingSet);
+        when(waitingSet.size()).thenReturn(2);
+        when(waitingSet.first()).thenReturn("qe-1", "qe-2");
+        when(redissonClient.getMap(QueueRedisKey.entry("qe-1"), StringCodec.INSTANCE)).thenReturn(entryMap1);
+        when(redissonClient.getMap(QueueRedisKey.entry("qe-2"), StringCodec.INSTANCE)).thenReturn(entryMap2);
+        when(entryMap1.readAllMap()).thenReturn(Map.of());
+        when(entryMap2.readAllMap()).thenReturn(Map.of());
+
+        Optional<QueueEntryRuntime> result = redisQueueRuntimeStore.admitNextWaiting(10L, Duration.ofMinutes(3), Duration.ofMinutes(10));
+
+        assertThat(result).isEmpty();
+        verify(waitingSet).size();
+        verify(waitingSet, times(2)).first();
+        verify(waitingSet).remove("qe-1");
+        verify(waitingSet).remove("qe-2");
     }
 }
 
