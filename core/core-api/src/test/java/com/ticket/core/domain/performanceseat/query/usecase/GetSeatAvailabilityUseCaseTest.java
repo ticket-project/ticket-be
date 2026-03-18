@@ -66,7 +66,7 @@ class GetSeatAvailabilityUseCaseTest {
         GetSeatAvailabilityUseCase.Output output = useCase.execute(new GetSeatAvailabilityUseCase.Input(10L));
 
         //then
-        assertThat(output.availability()).isEqualTo(response);
+        assertThat(output.grades()).isEqualTo(response.grades());
         verify(seatAvailabilityCalculator).calculate(rows, Set.of(1L, 2L));
     }
 

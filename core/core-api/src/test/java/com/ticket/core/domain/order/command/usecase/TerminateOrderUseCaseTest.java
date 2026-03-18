@@ -53,18 +53,16 @@ class TerminateOrderUseCaseTest {
     void 취소시_주문상태를_전이하고_이벤트를_발행한다() {
         //given
         Order order = createOrder(10L, 100L, "hold-key");
-        LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
-
         when(orderFinder.findPendingOwnedByOrderKeyForUpdate("order-key", 1L)).thenReturn(order);
-        when(orderTerminationDomainService.cancel(order, now))
+        when(orderTerminationDomainService.cancel(org.mockito.Mockito.eq(order), org.mockito.ArgumentMatchers.any(LocalDateTime.class)))
                 .thenReturn(new OrderTerminationDomainService.OrderTerminationResult(100L, "hold-key", List.of(42L)));
 
         //when
-        useCase.cancel("order-key", 1L, now);
+        useCase.cancel(new TerminateOrderUseCase.Input("order-key", 1L));
 
         //then
         verify(memberFinder).findActiveMemberById(1L);
-        verify(orderTerminationDomainService).cancel(order, now);
+        verify(orderTerminationDomainService).cancel(org.mockito.Mockito.eq(order), org.mockito.ArgumentMatchers.any(LocalDateTime.class));
         ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
         verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
         assertThat(eventCaptor.getValue().toString()).contains("hold-key").contains("42");

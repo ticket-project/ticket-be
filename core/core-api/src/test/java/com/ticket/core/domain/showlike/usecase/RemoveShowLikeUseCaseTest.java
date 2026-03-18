@@ -50,8 +50,8 @@ class RemoveShowLikeUseCaseTest {
         RemoveShowLikeUseCase.Output output = useCase.execute(new RemoveShowLikeUseCase.Input(1L, 2L));
 
         //then
-        assertThat(output.response().liked()).isFalse();
-        assertThat(output.response().likeCount()).isEqualTo(4L);
+        assertThat(output.liked()).isFalse();
+        assertThat(output.likeCount()).isEqualTo(4L);
         verify(showLikeRepository).delete(showLike);
     }
 
@@ -65,8 +65,8 @@ class RemoveShowLikeUseCaseTest {
         RemoveShowLikeUseCase.Output output = useCase.execute(new RemoveShowLikeUseCase.Input(1L, 2L));
 
         //then
-        assertThat(output.response().liked()).isFalse();
-        assertThat(output.response().likeCount()).isZero();
+        assertThat(output.liked()).isFalse();
+        assertThat(output.likeCount()).isZero();
         verify(showLikeRepository, never()).delete(any());
     }
 
@@ -90,4 +90,3 @@ class RemoveShowLikeUseCaseTest {
         );
     }
 }
-

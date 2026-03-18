@@ -49,8 +49,8 @@ class GetShowLikeStatusUseCaseTest {
         GetShowLikeStatusUseCase.Output output = useCase.execute(new GetShowLikeStatusUseCase.Input(1L, 2L));
 
         //then
-        assertThat(output.response().liked()).isTrue();
-        assertThat(output.response().likeCount()).isEqualTo(7L);
+        assertThat(output.liked()).isTrue();
+        assertThat(output.likeCount()).isEqualTo(7L);
         verify(showFinder).validateShowExists(2L);
     }
 
@@ -74,4 +74,3 @@ class GetShowLikeStatusUseCaseTest {
         );
     }
 }
-

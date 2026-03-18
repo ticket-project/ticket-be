@@ -57,9 +57,9 @@ class GetPerformanceScheduleListUseCaseTest {
         GetPerformanceScheduleListUseCase.Output output = useCase.execute(new GetPerformanceScheduleListUseCase.Input(10L));
 
         //then
-        assertThat(output.schedules().showId()).isEqualTo(100L);
-        assertThat(output.schedules().selectedPerformanceId()).isEqualTo(10L);
-        assertThat(output.schedules().schedules()).hasSize(2);
+        assertThat(output.showId()).isEqualTo(100L);
+        assertThat(output.selectedPerformanceId()).isEqualTo(10L);
+        assertThat(output.schedules()).hasSize(2);
     }
 
     @Test
@@ -91,9 +91,8 @@ class GetPerformanceScheduleListUseCaseTest {
         GetPerformanceScheduleListUseCase.Output output = useCase.execute(new GetPerformanceScheduleListUseCase.Input(10L));
 
         //then
-        assertThat(output.schedules().showId()).isEqualTo(100L);
-        assertThat(output.schedules().selectedPerformanceId()).isEqualTo(10L);
-        assertThat(output.schedules().schedules()).isEmpty();
+        assertThat(output.showId()).isEqualTo(100L);
+        assertThat(output.selectedPerformanceId()).isEqualTo(10L);
+        assertThat(output.schedules()).isEmpty();
     }
 }
-

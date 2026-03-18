@@ -1,6 +1,5 @@
 package com.ticket.core.domain.order.query.usecase;
 
-import com.ticket.core.api.controller.response.OrderDetailResponse;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.member.vo.Email;
@@ -82,14 +81,12 @@ class GetOrderDetailUseCaseTest {
 
         GetOrderDetailUseCase.Output output = useCase.execute(new GetOrderDetailUseCase.Input("order-key", 1L));
 
-        //when
-        OrderDetailResponse response = output.order();
         //then
-        assertThat(response.orderKey()).isEqualTo("order-key");
-        assertThat(response.show().title()).isEqualTo("뮤지컬");
-        assertThat(response.performance().venueName()).isEqualTo("올림픽홀");
-        assertThat(response.booker().email()).isEqualTo("user@example.com");
-        assertThat(response.tickets().count()).isEqualTo(1);
+        assertThat(output.orderKey()).isEqualTo("order-key");
+        assertThat(output.show().title()).isEqualTo("뮤지컬");
+        assertThat(output.performance().venueName()).isEqualTo("올림픽홀");
+        assertThat(output.booker().email()).isEqualTo("user@example.com");
+        assertThat(output.tickets().count()).isEqualTo(1);
     }
 
     private Venue createVenue(final String name) throws Exception {
@@ -127,4 +124,3 @@ class GetOrderDetailUseCaseTest {
         return performance;
     }
 }
-

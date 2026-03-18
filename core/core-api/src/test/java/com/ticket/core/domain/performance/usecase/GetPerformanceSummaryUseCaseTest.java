@@ -49,9 +49,9 @@ class GetPerformanceSummaryUseCaseTest {
         GetPerformanceSummaryUseCase.Output output = useCase.execute(new GetPerformanceSummaryUseCase.Input(1L));
 
         //then
-        assertThat(output.summary().title()).isEqualTo("싱어게인");
-        assertThat(output.summary().region()).isEqualTo("충청");
-        assertThat(output.summary().startTime()).isEqualTo(startTime);
+        assertThat(output.title()).isEqualTo("싱어게인");
+        assertThat(output.region()).isEqualTo("충청");
+        assertThat(output.startTime()).isEqualTo(startTime);
     }
 
     @Test
@@ -85,9 +85,8 @@ class GetPerformanceSummaryUseCaseTest {
         GetPerformanceSummaryUseCase.Output output = useCase.execute(new GetPerformanceSummaryUseCase.Input(1L));
 
         //then
-        assertThat(output.summary().title()).isEqualTo("싱어게인");
-        assertThat(output.summary().region()).isNull();
-        assertThat(output.summary().startTime()).isEqualTo(startTime);
+        assertThat(output.title()).isEqualTo("싱어게인");
+        assertThat(output.region()).isNull();
+        assertThat(output.startTime()).isEqualTo(startTime);
     }
 }
-
