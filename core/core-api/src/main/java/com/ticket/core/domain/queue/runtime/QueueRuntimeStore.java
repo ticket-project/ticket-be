@@ -7,6 +7,8 @@ public interface QueueRuntimeStore {
 
     long countActive(Long performanceId);
 
+    long countWaiting(Long performanceId);
+
     QueueEntryRuntime admitNow(Long performanceId, Long memberId, Duration entryTokenTtl, Duration entryRetention);
 
     QueueEntryRuntime enqueue(Long performanceId, Long memberId, Duration entryRetention);

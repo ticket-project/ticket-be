@@ -15,12 +15,27 @@ public class QueueAdvanceProcessor {
     private final QueueRuntimeStore queueRuntimeStore;
 
     @DistributedLock(
-            prefix = "queue-advance",
+            prefix = "queue-enter",
             dynamicKey = "#performanceId",
             leaseTime = 5000L,
             message = "대기열 승격 처리 중입니다. 잠시 후 다시 시도해 주세요."
     )
     public void advance(final Long performanceId) {
+        advanceWithinLock(performanceId);
+    }
+
+    @DistributedLock(
+            prefix = "queue-enter",
+            dynamicKey = "#performanceId",
+            leaseTime = 5000L,
+            message = "대기열 만료 처리 중입니다. 잠시 후 다시 시도해 주세요."
+    )
+    public void handleTokenExpired(final Long performanceId, final String queueEntryId, final String queueToken) {
+        queueRuntimeStore.expireAdmitted(performanceId, queueEntryId, queueToken);
+        advanceWithinLock(performanceId);
+    }
+
+    private void advanceWithinLock(final Long performanceId) {
         final ResolvedQueuePolicy policy = queuePolicyResolver.resolve(performanceId);
 
         while (queueRuntimeStore.countActive(performanceId) < policy.maxActiveUsers()) {
@@ -33,16 +48,5 @@ public class QueueAdvanceProcessor {
                 return;
             }
         }
-    }
-
-    @DistributedLock(
-            prefix = "queue-expire",
-            dynamicKey = "#performanceId",
-            leaseTime = 5000L,
-            message = "대기열 만료 처리 중입니다. 잠시 후 다시 시도해 주세요."
-    )
-    public void handleTokenExpired(final Long performanceId, final String queueEntryId, final String queueToken) {
-        queueRuntimeStore.expireAdmitted(performanceId, queueEntryId, queueToken);
-        advance(performanceId);
     }
 }

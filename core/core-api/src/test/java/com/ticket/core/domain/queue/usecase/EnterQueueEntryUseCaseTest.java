@@ -50,6 +50,7 @@ class EnterQueueEntryUseCaseTest {
         QueueEntryRuntime admitted = createAdmitted("qe-3", "qt-3");
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
+        when(queueRuntimeStore.countWaiting(10L)).thenReturn(0L);
         when(queueRuntimeStore.admitNow(10L, 101L, Duration.ofMinutes(10), Duration.ofHours(1))).thenReturn(admitted);
 
         //when
@@ -69,6 +70,7 @@ class EnterQueueEntryUseCaseTest {
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueRuntimeStore.countActive(10L)).thenReturn(10L);
+        when(queueRuntimeStore.countWaiting(10L)).thenReturn(0L);
         when(queueRuntimeStore.admitNow(10L, 101L, Duration.ofMinutes(10), Duration.ofHours(1))).thenReturn(admitted);
 
         //when
@@ -88,6 +90,7 @@ class EnterQueueEntryUseCaseTest {
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueRuntimeStore.countActive(10L)).thenReturn(1L);
+        when(queueRuntimeStore.countWaiting(10L)).thenReturn(1L);
         when(queueRuntimeStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
         when(queueRuntimeStore.findWaitingPosition(10L, "qe-2")).thenReturn(Optional.of(2L));
 
@@ -108,6 +111,7 @@ class EnterQueueEntryUseCaseTest {
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueRuntimeStore.countActive(10L)).thenReturn(1L);
+        when(queueRuntimeStore.countWaiting(10L)).thenReturn(1L);
         when(queueRuntimeStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
         when(queueRuntimeStore.findWaitingPosition(10L, "qe-2")).thenReturn(Optional.empty());
 
@@ -127,6 +131,7 @@ class EnterQueueEntryUseCaseTest {
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueRuntimeStore.countActive(10L)).thenReturn(1L);
+        when(queueRuntimeStore.countWaiting(10L)).thenReturn(1L);
         when(queueRuntimeStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
         when(queueRuntimeStore.findWaitingPosition(10L, "qe-new")).thenReturn(Optional.of(2L));
 
@@ -146,6 +151,7 @@ class EnterQueueEntryUseCaseTest {
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueRuntimeStore.countActive(10L)).thenReturn(2L);
+        when(queueRuntimeStore.countWaiting(10L)).thenReturn(1L);
         when(queueRuntimeStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
         when(queueRuntimeStore.findWaitingPosition(10L, "qe-new")).thenReturn(Optional.of(4L));
 
@@ -178,5 +184,22 @@ class EnterQueueEntryUseCaseTest {
                 queueToken,
                 LocalDateTime.of(2026, 3, 15, 20, 10)
         );
+    }
+
+    @Test
+    void 대기자가_있으면_active_슬롯이_남아도_신규_진입자는_대기열에_넣는다() {
+        ResolvedQueuePolicy policy = createPolicy(300);
+        QueueEntryRuntime waiting = new QueueEntryRuntime(10L, 101L, "qe-wait", QueueEntryStatus.WAITING, 5L, null, null);
+
+        when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
+        when(queueRuntimeStore.countActive(10L)).thenReturn(10L);
+        when(queueRuntimeStore.countWaiting(10L)).thenReturn(1L);
+        when(queueRuntimeStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
+        when(queueRuntimeStore.findWaitingPosition(10L, "qe-wait")).thenReturn(Optional.of(5L));
+
+        EnterQueueEntryUseCase.Output output = enterQueueEntryUseCase.execute(new EnterQueueEntryUseCase.Input(10L, 101L));
+
+        assertThat(output.status()).isEqualTo(QueueEntryStatus.WAITING);
+        verify(queueRuntimeStore).enqueue(10L, 101L, Duration.ofHours(1));
     }
 }

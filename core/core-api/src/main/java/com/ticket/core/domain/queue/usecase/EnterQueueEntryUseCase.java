@@ -40,7 +40,9 @@ public class EnterQueueEntryUseCase {
         final ResolvedQueuePolicy policy = queuePolicyResolver.resolve(input.performanceId());
         queueEntryLifecycleService.cleanupForReentry(input.performanceId(), input.memberId());
 
-        if (policy.shouldAdmitImmediately(queueRuntimeStore.countActive(input.performanceId()))) {
+        final long activeUsers = queueRuntimeStore.countActive(input.performanceId());
+        final long waitingUsers = queueRuntimeStore.countWaiting(input.performanceId());
+        if (policy.shouldAdmitImmediately(activeUsers) && waitingUsers == 0L) {
             final QueueEntryRuntime admitted = queueRuntimeStore.admitNow(
                     input.performanceId(),
                     input.memberId(),

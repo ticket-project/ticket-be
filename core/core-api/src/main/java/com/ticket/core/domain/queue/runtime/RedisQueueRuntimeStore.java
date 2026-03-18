@@ -34,6 +34,11 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
     }
 
     @Override
+    public long countWaiting(final Long performanceId) {
+        return waitingSet(performanceId).size();
+    }
+
+    @Override
     public QueueEntryRuntime admitNow(
             final Long performanceId,
             final Long memberId,
@@ -105,18 +110,21 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
 
     @Override
     public Optional<QueueEntryRuntime> admitNextWaiting(final Long performanceId, final Duration entryTokenTtl, final Duration entryRetention) {
-        while (true) {
-            final String queueEntryId = waitingSet(performanceId).first();
+        final RScoredSortedSet<String> waitingSet = waitingSet(performanceId);
+        final int candidates = waitingSet.size();
+        for (int i = 0; i < candidates; i++) {
+            final String queueEntryId = waitingSet.first();
             if (queueEntryId == null) {
                 return Optional.empty();
             }
-            waitingSet(performanceId).remove(queueEntryId);
+            waitingSet.remove(queueEntryId);
             final QueueEntryRuntime entry = findEntry(queueEntryId).orElse(null);
             if (entry == null || entry.status() != QueueEntryStatus.WAITING) {
                 continue;
             }
             return Optional.of(admit(performanceId, entry.memberId(), queueEntryId, entry.sequence(), entryTokenTtl, entryRetention));
         }
+        return Optional.empty();
     }
 
     @Override
