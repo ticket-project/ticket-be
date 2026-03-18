@@ -42,6 +42,7 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = QueryRepositoryTestSupport.TestApplication.class)
 @TestPropertySource(properties = {
@@ -216,7 +217,7 @@ public abstract class QueryRepositoryTestSupport {
 
         @Bean
         Clock clock() {
-            return Clock.systemDefaultZone();
+            return Clock.system(ZoneId.of("Asia/Seoul"));
         }
     }
 
