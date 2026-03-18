@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.redisson.api.RBucket;
 import org.redisson.api.RKeys;
+import org.redisson.api.RSetCache;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
 
@@ -17,6 +18,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -47,10 +49,13 @@ class RedissonHoldStoreTest {
         RBucket<Object> seat10 = mock(RBucket.class);
         RBucket<Object> seat20 = mock(RBucket.class);
         RBucket<Object> meta = mock(RBucket.class);
+        @SuppressWarnings("unchecked")
+        RSetCache<Object> holdSeatIndex = mock(RSetCache.class);
 
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 10L), StringCodec.INSTANCE)).thenReturn(seat10);
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 20L), StringCodec.INSTANCE)).thenReturn(seat20);
         when(redissonClient.getBucket(SeatRedisKey.holdMeta("hold-key"), StringCodec.INSTANCE)).thenReturn(meta);
+        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L))).thenReturn(holdSeatIndex);
         when(holdSnapshotCodec.encode(any(HoldSnapshot.class))).thenReturn("payload");
 
         //when
@@ -60,6 +65,8 @@ class RedissonHoldStoreTest {
         verify(seat10).set("hold-key", ttl);
         verify(seat20).set("hold-key", ttl);
         verify(meta).set("payload", ttl);
+        verify(holdSeatIndex).add(10L, ttl.toMillis(), TimeUnit.MILLISECONDS);
+        verify(holdSeatIndex).add(20L, ttl.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     @Test
@@ -70,10 +77,13 @@ class RedissonHoldStoreTest {
         RBucket<Object> seat10 = mock(RBucket.class);
         RBucket<Object> seat20 = mock(RBucket.class);
         RBucket<Object> meta = mock(RBucket.class);
+        @SuppressWarnings("unchecked")
+        RSetCache<Object> holdSeatIndex = mock(RSetCache.class);
 
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 10L), StringCodec.INSTANCE)).thenReturn(seat10);
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 20L), StringCodec.INSTANCE)).thenReturn(seat20);
         when(redissonClient.getBucket(SeatRedisKey.holdMeta("hold-key"), StringCodec.INSTANCE)).thenReturn(meta);
+        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L))).thenReturn(holdSeatIndex);
         doThrow(new RuntimeException("boom")).when(seat20).set("hold-key", ttl);
 
         //when
@@ -92,26 +102,59 @@ class RedissonHoldStoreTest {
         RBucket<Object> seat10 = bucketReturning("hold-key");
         RBucket<Object> seat20 = bucketReturning("other-hold");
         RBucket<Object> meta = mock(RBucket.class);
+        @SuppressWarnings("unchecked")
+        RSetCache<Object> holdSeatIndex = mock(RSetCache.class);
 
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 10L), StringCodec.INSTANCE)).thenReturn(seat10);
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 20L), StringCodec.INSTANCE)).thenReturn(seat20);
         when(redissonClient.getBucket(SeatRedisKey.holdMeta("hold-key"), StringCodec.INSTANCE)).thenReturn(meta);
+        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L))).thenReturn(holdSeatIndex);
+        when(meta.get()).thenReturn("{\"holdKey\":\"hold-key\",\"memberId\":7,\"performanceId\":1,\"seatIds\":[10,20],\"expiresAt\":\"2026-03-15T19:05:00\"}");
+        when(holdSnapshotCodec.decode("{\"holdKey\":\"hold-key\",\"memberId\":7,\"performanceId\":1,\"seatIds\":[10,20],\"expiresAt\":\"2026-03-15T19:05:00\"}"))
+                .thenReturn(new HoldSnapshot("hold-key", 7L, 1L, List.of(10L, 20L), LocalDateTime.of(2026, 3, 15, 19, 5)));
 
         //when
         redissonHoldStore.release(1L, "hold-key", List.of(20L, 10L, 10L));
 
         //then
         verify(seat10).delete();
+        verify(holdSeatIndex).remove(10L);
+        verify(meta, org.mockito.Mockito.never()).delete();
+    }
+
+    @Test
+    void release는_메타_snapshot_전체가_해제될때만_메타를_삭제한다() {
+        RBucket<Object> seat10 = bucketReturning("hold-key");
+        RBucket<Object> seat20 = bucketReturning("hold-key");
+        RBucket<Object> meta = mock(RBucket.class);
+        @SuppressWarnings("unchecked")
+        RSetCache<Object> holdSeatIndex = mock(RSetCache.class);
+        String payload = "{\"holdKey\":\"hold-key\",\"memberId\":7,\"performanceId\":1,\"seatIds\":[10,20],\"expiresAt\":\"2026-03-15T19:05:00\"}";
+
+        when(redissonClient.getBucket(SeatRedisKey.hold(1L, 10L), StringCodec.INSTANCE)).thenReturn(seat10);
+        when(redissonClient.getBucket(SeatRedisKey.hold(1L, 20L), StringCodec.INSTANCE)).thenReturn(seat20);
+        when(redissonClient.getBucket(SeatRedisKey.holdMeta("hold-key"), StringCodec.INSTANCE)).thenReturn(meta);
+        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L))).thenReturn(holdSeatIndex);
+        when(meta.get()).thenReturn(payload);
+        when(holdSnapshotCodec.decode(payload))
+                .thenReturn(new HoldSnapshot("hold-key", 7L, 1L, List.of(10L, 20L), LocalDateTime.of(2026, 3, 15, 19, 5)));
+
+        redissonHoldStore.release(1L, "hold-key", List.of(10L));
+
+        verify(seat10).delete();
+        verify(seat20).delete();
+        verify(holdSeatIndex).remove(10L);
+        verify(holdSeatIndex).remove(20L);
         verify(meta).delete();
     }
 
     @Test
     void 현재_hold중인_좌석아이디들을_조회한다() {
         //given
-        RKeys keys = mock(RKeys.class);
-        when(redissonClient.getKeys()).thenReturn(keys);
-        when(keys.getKeysByPattern(SeatRedisKey.holdPattern(1L)))
-                .thenReturn(List.of(SeatRedisKey.hold(1L, 30L), SeatRedisKey.hold(1L, 10L)));
+        @SuppressWarnings("unchecked")
+        RSetCache<Object> holdSeatIndex = mock(RSetCache.class);
+        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L))).thenReturn(holdSeatIndex);
+        when(holdSeatIndex.readAll()).thenReturn(Set.of(30L, 10L));
 
         //when
         Set<Long> result = redissonHoldStore.getHoldingSeatIds(1L);

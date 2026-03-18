@@ -30,21 +30,26 @@ public class OrderStartDomainService {
     ) {
         final List<PerformanceSeat> performanceSeats = holdSeatAvailabilityValidator.validate(performanceId, seatIds);
         final HoldSnapshot snapshot = holdManager.createHold(memberId, performanceId, seatIds, holdDuration);
-        final Order order = createOrderApplicationService.createPendingOrder(
-                memberId,
-                performanceId,
-                snapshot.holdKey(),
-                snapshot.expiresAt(),
-                performanceSeats
-        );
-        holdHistoryRecorder.recordActiveHold(
-                memberId,
-                performanceId,
-                snapshot.holdKey(),
-                snapshot.expiresAt(),
-                performanceSeats
-        );
-        return new OrderStartResult(order.getOrderKey(), snapshot);
+        try {
+            final Order order = createOrderApplicationService.createPendingOrder(
+                    memberId,
+                    performanceId,
+                    snapshot.holdKey(),
+                    snapshot.expiresAt(),
+                    performanceSeats
+            );
+            holdHistoryRecorder.recordActiveHold(
+                    memberId,
+                    performanceId,
+                    snapshot.holdKey(),
+                    snapshot.expiresAt(),
+                    performanceSeats
+            );
+            return new OrderStartResult(order.getOrderKey(), snapshot);
+        } catch (final RuntimeException e) {
+            holdManager.release(performanceId, snapshot.holdKey(), snapshot.seatIds());
+            throw e;
+        }
     }
 
     public record OrderStartResult(String orderKey, HoldSnapshot snapshot) {

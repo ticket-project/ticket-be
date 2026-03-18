@@ -14,6 +14,7 @@ public final class SeatRedisKey {
 
     private static final String HOLD_KEY = "seat:hold:{perf:%d}:%d";
     private static final String HOLD_PATTERN = "seat:hold:{perf:%d}:*";
+    private static final String HOLD_SEAT_INDEX_KEY = "seat:hold:index:{perf:%d}";
     private static final String HOLD_META_KEY = "hold:key:%s";
     private static final Pattern SELECT_KEY_PATTERN = Pattern.compile("^seat:select:\\{perf:(\\d+)}:(\\d+)$");
     private static final Pattern HOLD_KEY_PATTERN = Pattern.compile("^seat:hold:\\{perf:(\\d+)}:(\\d+)$");
@@ -39,6 +40,10 @@ public final class SeatRedisKey {
 
     public static String holdMeta(final String holdKey) {
         return String.format(HOLD_META_KEY, holdKey);
+    }
+
+    public static String holdSeatIndex(final Long perfId) {
+        return String.format(HOLD_SEAT_INDEX_KEY, perfId);
     }
 
     public static Optional<SelectKey> tryParseSelectKey(final String key) {
