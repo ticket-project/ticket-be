@@ -2,7 +2,7 @@ package com.ticket.core.config;
 
 import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import com.ticket.core.domain.queue.support.QueuePolicyResolver;
-import com.ticket.core.domain.queue.support.ResolvedQueuePolicy;
+import com.ticket.core.domain.queue.support.QueuePolicy;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ public class QueueAdmissionInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        final ResolvedQueuePolicy policy = queuePolicyResolver.resolve(performanceId);
+        final QueuePolicy policy = queuePolicyResolver.resolve(performanceId);
         if (!policy.enabled()) {
             return true;
         }

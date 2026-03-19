@@ -3,7 +3,7 @@ package com.ticket.core.domain.queue.command;
 import com.ticket.core.aop.DistributedLock;
 import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import com.ticket.core.domain.queue.support.QueuePolicyResolver;
-import com.ticket.core.domain.queue.support.ResolvedQueuePolicy;
+import com.ticket.core.domain.queue.support.QueuePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ public class QueueAdmissionProcessor {
     private final QueueTicketStore queueTicketStore;
 
     @DistributedLock(
-            prefix = "queue-enter",
+            prefix = "queue",
             dynamicKey = "#performanceId",
             leaseTime = 5000L,
             message = "대기열 승격 처리 중입니다. 잠시 후 다시 시도해 주세요."
@@ -25,7 +25,7 @@ public class QueueAdmissionProcessor {
     }
 
     @DistributedLock(
-            prefix = "queue-enter",
+            prefix = "queue",
             dynamicKey = "#performanceId",
             leaseTime = 5000L,
             message = "대기열 만료 처리 중입니다. 잠시 후 다시 시도해 주세요."
@@ -36,7 +36,7 @@ public class QueueAdmissionProcessor {
     }
 
     private void advanceWithinLock(final Long performanceId) {
-        final ResolvedQueuePolicy policy = queuePolicyResolver.resolve(performanceId);
+        final QueuePolicy policy = queuePolicyResolver.resolve(performanceId);
 
         while (queueTicketStore.countActive(performanceId) < policy.maxActiveUsers()) {
             final boolean admitted = queueTicketStore.admitNextWaiting(

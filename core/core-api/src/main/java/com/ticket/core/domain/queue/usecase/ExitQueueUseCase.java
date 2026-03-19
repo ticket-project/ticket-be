@@ -17,7 +17,7 @@ public class ExitQueueUseCase {
     public record Input(Long performanceId, Long memberId, String queueEntryId) {}
 
     @DistributedLock(
-            prefix = "queue-leave",
+            prefix = "queue",
             dynamicKey = "#input.performanceId()",
             leaseTime = 5000L,
             message = "대기열 이탈 처리 중입니다. 잠시 후 다시 시도해 주세요."
