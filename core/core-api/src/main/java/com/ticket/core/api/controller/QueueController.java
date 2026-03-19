@@ -3,8 +3,8 @@ package com.ticket.core.api.controller;
 import com.ticket.core.api.controller.docs.QueueControllerDocs;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
-import com.ticket.core.domain.queue.usecase.LeaveQueueUseCase;
-import com.ticket.core.domain.queue.usecase.EnterQueueEntryUseCase;
+import com.ticket.core.domain.queue.usecase.ExitQueueUseCase;
+import com.ticket.core.domain.queue.usecase.JoinQueueUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class QueueController implements QueueControllerDocs {
 
-    private final EnterQueueEntryUseCase enterQueueEntryUseCase;
+    private final JoinQueueUseCase joinQueueUseCase;
     private final GetQueueStatusUseCase getQueueStatusUseCase;
-    private final LeaveQueueUseCase leaveQueueUseCase;
+    private final ExitQueueUseCase exitQueueUseCase;
 
     @Override
     @PostMapping("/{performanceId}/enter")
-    public ApiResponse<EnterQueueEntryUseCase.Output> enter(
+    public ApiResponse<JoinQueueUseCase.Output> enter(
             @PathVariable final Long performanceId,
             final MemberPrincipal memberPrincipal
     ) {
-        return ApiResponse.success(enterQueueEntryUseCase.execute(
-                new EnterQueueEntryUseCase.Input(performanceId, memberPrincipal.getMemberId())
+        return ApiResponse.success(joinQueueUseCase.execute(
+                new JoinQueueUseCase.Input(performanceId, memberPrincipal.getMemberId())
         ));
     }
 
@@ -48,7 +48,7 @@ public class QueueController implements QueueControllerDocs {
             @RequestParam final String queueEntryId,
             final MemberPrincipal memberPrincipal
     ) {
-        leaveQueueUseCase.execute(new LeaveQueueUseCase.Input(
+        exitQueueUseCase.execute(new ExitQueueUseCase.Input(
                 performanceId,
                 memberPrincipal.getMemberId(),
                 queueEntryId

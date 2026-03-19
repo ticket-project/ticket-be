@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class RedisQueueRuntimeStore implements QueueRuntimeStore {
+public class RedisQueueTicketStore implements QueueTicketStore {
 
     private static final String FIELD_PERFORMANCE_ID = "performanceId";
     private static final String FIELD_MEMBER_ID = "memberId";
@@ -39,7 +39,7 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
     }
 
     @Override
-    public QueueEntryRuntime admitNow(
+    public QueueTicket admitNow(
             final Long performanceId,
             final Long memberId,
             final Duration entryTokenTtl,
@@ -49,7 +49,7 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
     }
 
     @Override
-    public QueueEntryRuntime enqueue(final Long performanceId, final Long memberId, final Duration entryRetention) {
+    public QueueTicket enqueue(final Long performanceId, final Long memberId, final Duration entryRetention) {
         final String queueEntryId = uuidSupplier.get().toString();
         final long sequence = sequence(performanceId).incrementAndGet();
 
@@ -62,7 +62,7 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
         entryMap.expire(entryRetention);
         memberEntryBucket(performanceId, memberId).set(queueEntryId, entryRetention);
 
-        return new QueueEntryRuntime(performanceId, memberId, queueEntryId, QueueEntryStatus.WAITING, sequence, null, null);
+        return new QueueTicket(performanceId, memberId, queueEntryId, QueueEntryStatus.WAITING, sequence, null, null);
     }
 
     @Override
@@ -82,13 +82,13 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
     }
 
     @Override
-    public Optional<QueueEntryRuntime> findEntry(final String queueEntryId) {
+    public Optional<QueueTicket> findEntry(final String queueEntryId) {
         final Map<String, String> values = entryMap(queueEntryId).readAllMap();
         if (values.isEmpty()) {
             return Optional.empty();
         }
 
-        return Optional.of(new QueueEntryRuntime(
+        return Optional.of(new QueueTicket(
                 Long.valueOf(values.get(FIELD_PERFORMANCE_ID)),
                 parseLong(values.get(FIELD_MEMBER_ID)),
                 queueEntryId,
@@ -109,7 +109,7 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
     }
 
     @Override
-    public Optional<QueueEntryRuntime> admitNextWaiting(final Long performanceId, final Duration entryTokenTtl, final Duration entryRetention) {
+    public Optional<QueueTicket> admitNextWaiting(final Long performanceId, final Duration entryTokenTtl, final Duration entryRetention) {
         final RScoredSortedSet<String> waitingSet = waitingSet(performanceId);
         final int candidates = waitingSet.size();
         for (int i = 0; i < candidates; i++) {
@@ -118,7 +118,7 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
                 return Optional.empty();
             }
             waitingSet.remove(queueEntryId);
-            final QueueEntryRuntime entry = findEntry(queueEntryId).orElse(null);
+            final QueueTicket entry = findEntry(queueEntryId).orElse(null);
             if (entry == null || entry.status() != QueueEntryStatus.WAITING) {
                 continue;
             }
@@ -129,7 +129,7 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
 
     @Override
     public void expireAdmitted(final Long performanceId, final String queueEntryId, final String queueToken) {
-        final QueueEntryRuntime entry = findEntry(queueEntryId).orElse(null);
+        final QueueTicket entry = findEntry(queueEntryId).orElse(null);
         activeSet(performanceId).remove(queueToken);
         tokenBucket(queueToken).delete();
         updateEntry(queueEntryId, QueueEntryStatus.EXPIRED, null, null);
@@ -138,7 +138,7 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
 
     @Override
     public void leaveWaiting(final Long performanceId, final String queueEntryId) {
-        final QueueEntryRuntime entry = findEntry(queueEntryId).orElse(null);
+        final QueueTicket entry = findEntry(queueEntryId).orElse(null);
         waitingSet(performanceId).remove(queueEntryId);
         updateEntry(queueEntryId, QueueEntryStatus.LEFT, null, null);
         clearMemberEntryIfMatches(entry, performanceId, queueEntryId);
@@ -146,14 +146,14 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
 
     @Override
     public void leaveAdmitted(final Long performanceId, final String queueEntryId, final String queueToken) {
-        final QueueEntryRuntime entry = findEntry(queueEntryId).orElse(null);
+        final QueueTicket entry = findEntry(queueEntryId).orElse(null);
         activeSet(performanceId).remove(queueToken);
         tokenBucket(queueToken).delete();
         updateEntry(queueEntryId, QueueEntryStatus.LEFT, null, null);
         clearMemberEntryIfMatches(entry, performanceId, queueEntryId);
     }
 
-    private QueueEntryRuntime admit(
+    private QueueTicket admit(
             final Long performanceId,
             final Long memberId,
             final String queueEntryId,
@@ -179,7 +179,7 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
         entryMap.expire(entryRetention);
         memberEntryBucket(performanceId, memberId).set(queueEntryId, entryRetention);
 
-        return new QueueEntryRuntime(performanceId, memberId, queueEntryId, QueueEntryStatus.ADMITTED, sequence, queueToken, expiresAt);
+        return new QueueTicket(performanceId, memberId, queueEntryId, QueueEntryStatus.ADMITTED, sequence, queueToken, expiresAt);
     }
 
     private void updateEntry(
@@ -230,7 +230,7 @@ public class RedisQueueRuntimeStore implements QueueRuntimeStore {
     }
 
     private void clearMemberEntryIfMatches(
-            final QueueEntryRuntime entry,
+            final QueueTicket entry,
             final Long performanceId,
             final String queueEntryId
     ) {

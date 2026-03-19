@@ -3,8 +3,8 @@ package com.ticket.core.api.controller;
 import com.ticket.core.config.LoginMemberArgumentResolver;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
-import com.ticket.core.domain.queue.usecase.LeaveQueueUseCase;
-import com.ticket.core.domain.queue.usecase.EnterQueueEntryUseCase;
+import com.ticket.core.domain.queue.usecase.ExitQueueUseCase;
+import com.ticket.core.domain.queue.usecase.JoinQueueUseCase;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.ApiControllerAdvice;
 import org.junit.jupiter.api.AfterEach;
@@ -29,9 +29,9 @@ class QueueControllerSecurityTest {
     @BeforeEach
     void setUp() {
         QueueController controller = new QueueController(
-                Mockito.mock(EnterQueueEntryUseCase.class),
+                Mockito.mock(JoinQueueUseCase.class),
                 Mockito.mock(GetQueueStatusUseCase.class),
-                Mockito.mock(LeaveQueueUseCase.class)
+                Mockito.mock(ExitQueueUseCase.class)
         );
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setCustomArgumentResolvers(new LoginMemberArgumentResolver())

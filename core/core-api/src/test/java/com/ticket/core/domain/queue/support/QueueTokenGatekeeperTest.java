@@ -1,6 +1,6 @@
 package com.ticket.core.domain.queue.support;
 
-import com.ticket.core.domain.queue.runtime.QueueRuntimeStore;
+import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 class QueueTokenGatekeeperTest {
 
     @Mock
-    private QueueRuntimeStore queueRuntimeStore;
+    private QueueTicketStore queueTicketStore;
 
     @InjectMocks
     private QueueTokenGatekeeper queueTokenGatekeeper;
@@ -46,7 +46,7 @@ class QueueTokenGatekeeperTest {
     @Test
     void 유효하지_않은_토큰이면_QUEUE_TOKEN_INVALID_예외를_던진다() {
         //given
-        when(queueRuntimeStore.isValidToken(10L, "qt-invalid")).thenReturn(false);
+        when(queueTicketStore.isValidToken(10L, "qt-invalid")).thenReturn(false);
 
         //when
         //then
@@ -58,7 +58,7 @@ class QueueTokenGatekeeperTest {
     @Test
     void 유효한_토큰이면_통과한다() {
         //given
-        when(queueRuntimeStore.isValidToken(10L, "qt-valid")).thenReturn(true);
+        when(queueTicketStore.isValidToken(10L, "qt-valid")).thenReturn(true);
 
         //when
         //then

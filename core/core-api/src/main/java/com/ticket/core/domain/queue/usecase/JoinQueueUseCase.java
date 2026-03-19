@@ -1,10 +1,10 @@
 package com.ticket.core.domain.queue.usecase;
 
 import com.ticket.core.aop.DistributedLock;
-import com.ticket.core.domain.queue.command.QueueAdvanceProcessor;
+import com.ticket.core.domain.queue.command.QueueAdmissionProcessor;
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
-import com.ticket.core.domain.queue.runtime.QueueEntryRuntime;
-import com.ticket.core.domain.queue.runtime.QueueRuntimeStore;
+import com.ticket.core.domain.queue.runtime.QueueTicket;
+import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import com.ticket.core.domain.queue.support.QueuePolicyResolver;
 import com.ticket.core.domain.queue.support.ResolvedQueuePolicy;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class EnterQueueEntryUseCase {
+public class JoinQueueUseCase {
 
     private final QueuePolicyResolver queuePolicyResolver;
-    private final QueueRuntimeStore queueRuntimeStore;
-    private final QueueAdvanceProcessor queueAdvanceProcessor;
+    private final QueueTicketStore queueTicketStore;
+    private final QueueAdmissionProcessor queueAdmissionProcessor;
 
     public record Input(Long performanceId, Long memberId) {}
 
@@ -40,10 +40,10 @@ public class EnterQueueEntryUseCase {
         final ResolvedQueuePolicy policy = queuePolicyResolver.resolve(input.performanceId());
         cleanupForReentry(input.performanceId(), input.memberId());
 
-        final long activeUsers = queueRuntimeStore.countActive(input.performanceId());
-        final long waitingUsers = queueRuntimeStore.countWaiting(input.performanceId());
+        final long activeUsers = queueTicketStore.countActive(input.performanceId());
+        final long waitingUsers = queueTicketStore.countWaiting(input.performanceId());
         if (policy.shouldAdmitImmediately(activeUsers) && waitingUsers == 0L) {
-            final QueueEntryRuntime admitted = queueRuntimeStore.admitNow(
+            final QueueTicket admitted = queueTicketStore.admitNow(
                     input.performanceId(),
                     input.memberId(),
                     policy.entryTokenTtl(),
@@ -58,12 +58,12 @@ public class EnterQueueEntryUseCase {
             );
         }
 
-        final QueueEntryRuntime waiting = queueRuntimeStore.enqueue(
+        final QueueTicket waiting = queueTicketStore.enqueue(
                 input.performanceId(),
                 input.memberId(),
                 policy.entryRetention()
         );
-        final long position = queueRuntimeStore.findWaitingPosition(input.performanceId(), waiting.queueEntryId())
+        final long position = queueTicketStore.findWaitingPosition(input.performanceId(), waiting.queueEntryId())
                 .orElse(1L);
         return new Output(
                 waiting.status(),
@@ -75,28 +75,28 @@ public class EnterQueueEntryUseCase {
     }
 
     private void cleanupForReentry(final Long performanceId, final Long memberId) {
-        final String existingQueueEntryId = queueRuntimeStore.findMemberEntryId(performanceId, memberId).orElse(null);
+        final String existingQueueEntryId = queueTicketStore.findMemberEntryId(performanceId, memberId).orElse(null);
         if (existingQueueEntryId == null) {
             return;
         }
 
-        final QueueEntryRuntime existingEntry = queueRuntimeStore.findEntry(existingQueueEntryId).orElse(null);
+        final QueueTicket existingEntry = queueTicketStore.findEntry(existingQueueEntryId).orElse(null);
         if (existingEntry == null) {
-            queueRuntimeStore.clearMemberEntry(performanceId, memberId);
+            queueTicketStore.clearMemberEntry(performanceId, memberId);
             return;
         }
 
         if (existingEntry.isWaiting()) {
-            queueRuntimeStore.leaveWaiting(performanceId, existingQueueEntryId);
+            queueTicketStore.leaveWaiting(performanceId, existingQueueEntryId);
             return;
         }
 
         if (existingEntry.isOwnedBy(performanceId, memberId) && existingEntry.isAdmitted()) {
-            queueRuntimeStore.leaveAdmitted(performanceId, existingQueueEntryId, existingEntry.queueToken());
-            queueAdvanceProcessor.advance(performanceId);
+            queueTicketStore.leaveAdmitted(performanceId, existingQueueEntryId, existingEntry.queueToken());
+            queueAdmissionProcessor.advance(performanceId);
             return;
         }
 
-        queueRuntimeStore.clearMemberEntry(performanceId, memberId);
+        queueTicketStore.clearMemberEntry(performanceId, memberId);
     }
 }

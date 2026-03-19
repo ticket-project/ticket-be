@@ -8,7 +8,7 @@ import com.ticket.core.support.exception.ErrorType;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public record QueueEntryRuntime(
+public record QueueTicket(
         Long performanceId,
         Long memberId,
         String queueEntryId,
@@ -18,7 +18,7 @@ public record QueueEntryRuntime(
         LocalDateTime expiresAt
 ) {
 
-    public QueueEntryRuntime {
+    public QueueTicket {
         Objects.requireNonNull(performanceId, "performanceId는 null일 수 없습니다.");
         Objects.requireNonNull(memberId, "memberId는 null일 수 없습니다.");
         Objects.requireNonNull(queueEntryId, "queueEntryId는 null일 수 없습니다.");

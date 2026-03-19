@@ -4,8 +4,8 @@ import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.enums.Role;
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
-import com.ticket.core.domain.queue.usecase.LeaveQueueUseCase;
-import com.ticket.core.domain.queue.usecase.EnterQueueEntryUseCase;
+import com.ticket.core.domain.queue.usecase.ExitQueueUseCase;
+import com.ticket.core.domain.queue.usecase.JoinQueueUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,13 +26,13 @@ class QueueControllerTest {
     private static final MemberPrincipal MEMBER = new MemberPrincipal(100L, Role.MEMBER);
 
     @Mock
-    private EnterQueueEntryUseCase enterQueueEntryUseCase;
+    private JoinQueueUseCase joinQueueUseCase;
 
     @Mock
     private GetQueueStatusUseCase getQueueStatusUseCase;
 
     @Mock
-    private LeaveQueueUseCase leaveQueueUseCase;
+    private ExitQueueUseCase exitQueueUseCase;
 
     @InjectMocks
     private QueueController queueController;
@@ -40,17 +40,17 @@ class QueueControllerTest {
     @Test
     void 대기열_진입시_usecase_output을_그대로_반환한다() {
         // given
-        final EnterQueueEntryUseCase.Output output = new EnterQueueEntryUseCase.Output(
+        final JoinQueueUseCase.Output output = new JoinQueueUseCase.Output(
                 QueueEntryStatus.WAITING,
                 "qe-1",
                 3L,
                 null,
                 null
         );
-        when(enterQueueEntryUseCase.execute(new EnterQueueEntryUseCase.Input(10L, 100L))).thenReturn(output);
+        when(joinQueueUseCase.execute(new JoinQueueUseCase.Input(10L, 100L))).thenReturn(output);
 
         // when
-        final ApiResponse<EnterQueueEntryUseCase.Output> response = queueController.enter(10L, MEMBER);
+        final ApiResponse<JoinQueueUseCase.Output> response = queueController.enter(10L, MEMBER);
 
         // then
         assertThat(response.getData()).isSameAs(output);
@@ -82,7 +82,7 @@ class QueueControllerTest {
         final ApiResponse<Void> response = queueController.leave(30L, "qe-3", MEMBER);
 
         // then
-        verify(leaveQueueUseCase).execute(new LeaveQueueUseCase.Input(30L, 100L, "qe-3"));
+        verify(exitQueueUseCase).execute(new ExitQueueUseCase.Input(30L, 100L, "qe-3"));
         assertThat(response.getData()).isNull();
     }
 

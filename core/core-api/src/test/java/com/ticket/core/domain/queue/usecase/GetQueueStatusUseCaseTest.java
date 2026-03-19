@@ -1,8 +1,8 @@
 package com.ticket.core.domain.queue.usecase;
 
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
-import com.ticket.core.domain.queue.runtime.QueueEntryRuntime;
-import com.ticket.core.domain.queue.runtime.QueueRuntimeStore;
+import com.ticket.core.domain.queue.runtime.QueueTicket;
+import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import com.ticket.core.support.exception.AuthException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 class GetQueueStatusUseCaseTest {
 
     @Mock
-    private QueueRuntimeStore queueRuntimeStore;
+    private QueueTicketStore queueTicketStore;
 
     @InjectMocks
     private GetQueueStatusUseCase getQueueStatusUseCase;
@@ -30,7 +30,7 @@ class GetQueueStatusUseCaseTest {
     @Test
     void 엔트리가_없으면_EXPIRED를_반환한다() {
         //given
-        when(queueRuntimeStore.findEntry("qe-10")).thenReturn(Optional.empty());
+        when(queueTicketStore.findEntry("qe-10")).thenReturn(Optional.empty());
 
         //when
         GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-10"));
@@ -43,9 +43,9 @@ class GetQueueStatusUseCaseTest {
     @Test
     void 대기중_엔트리는_현재_순번과_예상대기시간을_반환한다() {
         //given
-        QueueEntryRuntime waiting = new QueueEntryRuntime(10L, 100L, "qe-10", QueueEntryStatus.WAITING, 5L, null, null);
-        when(queueRuntimeStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
-        when(queueRuntimeStore.findWaitingPosition(10L, "qe-10")).thenReturn(Optional.of(5L));
+        QueueTicket waiting = new QueueTicket(10L, 100L, "qe-10", QueueEntryStatus.WAITING, 5L, null, null);
+        when(queueTicketStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
+        when(queueTicketStore.findWaitingPosition(10L, "qe-10")).thenReturn(Optional.of(5L));
 
         //when
         GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-10"));
@@ -58,9 +58,9 @@ class GetQueueStatusUseCaseTest {
     @Test
     void 대기순번을_찾지_못하면_0초기값으로_계산한다() {
         //given
-        QueueEntryRuntime waiting = new QueueEntryRuntime(10L, 100L, "qe-10", QueueEntryStatus.WAITING, 5L, null, null);
-        when(queueRuntimeStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
-        when(queueRuntimeStore.findWaitingPosition(10L, "qe-10")).thenReturn(Optional.empty());
+        QueueTicket waiting = new QueueTicket(10L, 100L, "qe-10", QueueEntryStatus.WAITING, 5L, null, null);
+        when(queueTicketStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
+        when(queueTicketStore.findWaitingPosition(10L, "qe-10")).thenReturn(Optional.empty());
 
         //when
         GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-10"));
@@ -72,7 +72,7 @@ class GetQueueStatusUseCaseTest {
     @Test
     void 입장된_엔트리의_토큰이_만료되면_EXPIRED를_반환한다() {
         //given
-        QueueEntryRuntime admitted = new QueueEntryRuntime(
+        QueueTicket admitted = new QueueTicket(
                 10L,
                 100L,
                 "qe-11",
@@ -81,8 +81,8 @@ class GetQueueStatusUseCaseTest {
                 "qt-11",
                 LocalDateTime.of(2026, 3, 15, 20, 20)
         );
-        when(queueRuntimeStore.findEntry("qe-11")).thenReturn(Optional.of(admitted));
-        when(queueRuntimeStore.isValidToken(10L, "qt-11")).thenReturn(false);
+        when(queueTicketStore.findEntry("qe-11")).thenReturn(Optional.of(admitted));
+        when(queueTicketStore.isValidToken(10L, "qt-11")).thenReturn(false);
 
         //when
         GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-11"));
@@ -95,7 +95,7 @@ class GetQueueStatusUseCaseTest {
     @Test
     void 입장된_엔트리의_토큰이_유효하면_입장정보를_반환한다() {
         //given
-        QueueEntryRuntime admitted = new QueueEntryRuntime(
+        QueueTicket admitted = new QueueTicket(
                 10L,
                 100L,
                 "qe-11",
@@ -104,8 +104,8 @@ class GetQueueStatusUseCaseTest {
                 "qt-11",
                 LocalDateTime.of(2026, 3, 15, 20, 20)
         );
-        when(queueRuntimeStore.findEntry("qe-11")).thenReturn(Optional.of(admitted));
-        when(queueRuntimeStore.isValidToken(10L, "qt-11")).thenReturn(true);
+        when(queueTicketStore.findEntry("qe-11")).thenReturn(Optional.of(admitted));
+        when(queueTicketStore.isValidToken(10L, "qt-11")).thenReturn(true);
 
         //when
         GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-11"));
@@ -119,8 +119,8 @@ class GetQueueStatusUseCaseTest {
     @Test
     void LEFT_상태_엔트리는_그대로_반환한다() {
         //given
-        QueueEntryRuntime left = new QueueEntryRuntime(10L, 100L, "qe-12", QueueEntryStatus.LEFT, 1L, null, null);
-        when(queueRuntimeStore.findEntry("qe-12")).thenReturn(Optional.of(left));
+        QueueTicket left = new QueueTicket(10L, 100L, "qe-12", QueueEntryStatus.LEFT, 1L, null, null);
+        when(queueTicketStore.findEntry("qe-12")).thenReturn(Optional.of(left));
 
         //when
         GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-12"));
@@ -132,8 +132,8 @@ class GetQueueStatusUseCaseTest {
     @Test
     void 다른_회원의_엔트리를_조회하면_예외가_발생한다() {
         //given
-        QueueEntryRuntime waiting = new QueueEntryRuntime(10L, 999L, "qe-10", QueueEntryStatus.WAITING, 5L, null, null);
-        when(queueRuntimeStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
+        QueueTicket waiting = new QueueTicket(10L, 999L, "qe-10", QueueEntryStatus.WAITING, 5L, null, null);
+        when(queueTicketStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
 
         //when //then
         assertThatThrownBy(() -> getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-10")))
