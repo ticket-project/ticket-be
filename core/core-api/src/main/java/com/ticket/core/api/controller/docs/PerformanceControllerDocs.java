@@ -62,15 +62,7 @@ public interface PerformanceControllerDocs {
                     특정 회차의 모든 좌석 상태(AVAILABLE, HELD, RESERVED 등)를 조회합니다.
                     실시간으로 변동될 수 있는 데이터입니다.
                     대기열이 활성화된 회차에서는 입장 토큰이 필요합니다.
-                    """,
-            parameters = {
-                    @Parameter(
-                            name = "X-Queue-Token",
-                            in = ParameterIn.HEADER,
-                            required = false,
-                            description = "대기열이 활성화된 회차에서 필요한 입장 토큰"
-                    )
-            }
+                    """
     )
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
