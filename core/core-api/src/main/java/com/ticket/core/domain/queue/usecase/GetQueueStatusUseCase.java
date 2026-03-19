@@ -39,7 +39,7 @@ public class GetQueueStatusUseCase {
             return new Output(entry.status(), entry.queueEntryId(), position, null, null);
         }
 
-        if (entry.requiresTokenValidation()) {
+        if (entry.isAdmitted()) {
             final boolean validToken = entry.hasQueueToken()
                     && queueRuntimeStore.isValidToken(input.performanceId(), entry.queueToken());
             if (!validToken) {

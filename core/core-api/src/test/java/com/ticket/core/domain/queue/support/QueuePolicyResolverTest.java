@@ -2,10 +2,8 @@ package com.ticket.core.domain.queue.support;
 
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.performance.PerformanceFinder;
-import com.ticket.core.domain.queue.model.PerformanceQueuePolicy;
 import com.ticket.core.domain.queue.model.QueueLevel;
 import com.ticket.core.domain.queue.model.QueueMode;
-import com.ticket.core.domain.queue.repository.PerformanceQueuePolicyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,10 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,9 +24,6 @@ class QueuePolicyResolverTest {
 
     @Mock
     private PerformanceFinder performanceFinder;
-
-    @Mock
-    private PerformanceQueuePolicyRepository performanceQueuePolicyRepository;
 
     @InjectMocks
     private QueuePolicyResolver queuePolicyResolver;
@@ -43,14 +36,13 @@ class QueuePolicyResolverTest {
         properties.setDefaultMaxActiveUsers(300);
         properties.setDefaultEntryTokenTtl(Duration.ofMinutes(10));
         properties.setEntryRetention(Duration.ofHours(1));
-        queuePolicyResolver = new QueuePolicyResolver(performanceFinder, performanceQueuePolicyRepository, properties);
-        when(performanceFinder.findById(10L)).thenReturn(mock(Performance.class));
+        queuePolicyResolver = new QueuePolicyResolver(performanceFinder, properties);
     }
 
     @Test
     void 정책이_없으면_기본값으로_해결한다() {
         //given
-        when(performanceQueuePolicyRepository.findByPerformanceId(10L)).thenReturn(Optional.empty());
+        when(performanceFinder.findById(10L)).thenReturn(createPerformance());
 
         //when
         ResolvedQueuePolicy resolved = queuePolicyResolver.resolve(10L);
@@ -67,8 +59,17 @@ class QueuePolicyResolverTest {
     @Test
     void FORCE_OFF면_기본설정보다_우선해_비활성화한다() {
         //given
-        when(performanceQueuePolicyRepository.findByPerformanceId(10L))
-                .thenReturn(Optional.of(createPolicy(QueueMode.FORCE_OFF, QueueLevel.LEVEL_2, 500, 900)));
+        Performance performance = createPerformance();
+        performance.updateQueuePolicy(
+                QueueMode.FORCE_OFF,
+                QueueLevel.LEVEL_2,
+                500,
+                900,
+                LocalDateTime.of(2026, 3, 15, 19, 50),
+                "대기열 운영",
+                "사유"
+        );
+        when(performanceFinder.findById(10L)).thenReturn(performance);
 
         //when
         ResolvedQueuePolicy resolved = queuePolicyResolver.resolve(10L);
@@ -89,10 +90,18 @@ class QueuePolicyResolverTest {
         properties.setDefaultMaxActiveUsers(300);
         properties.setDefaultEntryTokenTtl(Duration.ofMinutes(10));
         properties.setEntryRetention(Duration.ofHours(1));
-        queuePolicyResolver = new QueuePolicyResolver(performanceFinder, performanceQueuePolicyRepository, properties);
-        when(performanceFinder.findById(10L)).thenReturn(mock(Performance.class));
-        when(performanceQueuePolicyRepository.findByPerformanceId(10L))
-                .thenReturn(Optional.of(createPolicy(QueueMode.FORCE_ON, null, null, null)));
+        queuePolicyResolver = new QueuePolicyResolver(performanceFinder, properties);
+        Performance performance = createPerformance();
+        performance.updateQueuePolicy(
+                QueueMode.FORCE_ON,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+        when(performanceFinder.findById(10L)).thenReturn(performance);
 
         //when
         ResolvedQueuePolicy resolved = queuePolicyResolver.resolve(10L);
@@ -104,21 +113,16 @@ class QueuePolicyResolverTest {
         assertThat(resolved.entryTokenTtl()).isEqualTo(Duration.ofMinutes(10));
     }
 
-    private PerformanceQueuePolicy createPolicy(
-            final QueueMode queueMode,
-            final QueueLevel queueLevel,
-            final Integer maxActiveUsers,
-            final Integer entryTokenTtlSeconds
-    ) {
-        return new PerformanceQueuePolicy(
-                mock(Performance.class),
-                queueMode,
-                queueLevel,
-                maxActiveUsers,
-                entryTokenTtlSeconds,
-                LocalDateTime.of(2026, 3, 15, 19, 50),
-                "대기열 운영",
-                "사유"
+    private Performance createPerformance() {
+        return new Performance(
+                null,
+                1L,
+                LocalDateTime.of(2026, 3, 16, 10, 0),
+                LocalDateTime.of(2026, 3, 16, 12, 0),
+                LocalDateTime.of(2026, 3, 15, 10, 0),
+                LocalDateTime.of(2026, 3, 16, 9, 0),
+                4,
+                420
         );
     }
 }

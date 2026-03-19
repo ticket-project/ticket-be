@@ -16,29 +16,32 @@ class QueueEntryRuntimeTest {
 
     @Test
     void 본인_공연의_엔트리인지_판단한다() {
-        //given
         QueueEntryRuntime entry = createWaitingEntry();
 
-        //when //then
         assertThat(entry.isOwnedBy(10L, 100L)).isTrue();
         assertThat(entry.isOwnedBy(10L, 101L)).isFalse();
         assertThat(entry.isOwnedBy(11L, 100L)).isFalse();
     }
 
     @Test
-    void 다른_회원이_접근하면_예외를_던진다() {
-        //given
+    void 다른_회원이면_권한_예외를_던진다() {
         QueueEntryRuntime entry = createWaitingEntry();
 
-        //when //then
         assertThatThrownBy(() -> entry.assertOwnedBy(10L, 999L))
                 .isInstanceOf(AuthException.class);
     }
 
     @Test
-    void 재진입시_상태에_따라_정리_계획을_반환한다() {
-        //given
+    void 대기_엔트리는_WAITING_상태다() {
         QueueEntryRuntime waiting = createWaitingEntry();
+
+        assertThat(waiting.isWaiting()).isTrue();
+        assertThat(waiting.isAdmitted()).isFalse();
+        assertThat(waiting.hasQueueToken()).isFalse();
+    }
+
+    @Test
+    void 입장_엔트리는_ADMITTED_상태와_토큰을_가진다() {
         QueueEntryRuntime admitted = new QueueEntryRuntime(
                 10L,
                 100L,
@@ -49,32 +52,13 @@ class QueueEntryRuntimeTest {
                 LocalDateTime.of(2026, 3, 17, 10, 0)
         );
 
-        //when //then
-        assertThat(waiting.planReentry(10L, 100L).type()).isEqualTo(QueueEntryActionType.LEAVE_WAITING);
-        assertThat(admitted.planReentry(10L, 100L).type()).isEqualTo(QueueEntryActionType.LEAVE_ADMITTED_AND_ADVANCE);
+        assertThat(admitted.isWaiting()).isFalse();
+        assertThat(admitted.isAdmitted()).isTrue();
+        assertThat(admitted.hasQueueToken()).isTrue();
     }
 
     @Test
-    void 이탈시_상태에_따라_정리_계획을_반환한다() {
-        //given
-        QueueEntryRuntime waiting = createWaitingEntry();
-        QueueEntryRuntime admitted = new QueueEntryRuntime(
-                10L,
-                100L,
-                "qe-1",
-                QueueEntryStatus.ADMITTED,
-                1L,
-                "qt-1",
-                LocalDateTime.of(2026, 3, 17, 10, 0)
-        );
-
-        //when //then
-        assertThat(waiting.planLeave(10L, 100L).type()).isEqualTo(QueueEntryActionType.LEAVE_WAITING);
-        assertThat(admitted.planLeave(10L, 100L).type()).isEqualTo(QueueEntryActionType.LEAVE_ADMITTED_AND_ADVANCE);
-    }
-
-    @Test
-    void 입장상태는_토큰과_만료시간이_반드시_있어야_한다() {
+    void 입장_상태는_토큰과_만료시간이_반드시_있어야_한다() {
         assertThatThrownBy(() -> new QueueEntryRuntime(
                 10L,
                 100L,

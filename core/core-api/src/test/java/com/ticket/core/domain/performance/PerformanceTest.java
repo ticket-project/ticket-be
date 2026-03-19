@@ -1,5 +1,7 @@
 package com.ticket.core.domain.performance;
 
+import com.ticket.core.domain.queue.model.QueueLevel;
+import com.ticket.core.domain.queue.model.QueueMode;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -89,6 +91,33 @@ class PerformanceTest {
 
         //then
         assertThat(performance.isBookingOpen(LocalDateTime.now())).isFalse();
+    }
+
+    @Test
+    void updateQueuePolicy는_대기열_정책값을_변경한다() {
+        // given
+        Performance performance = createPerformance(3, LocalDateTime.now().minusMinutes(10), LocalDateTime.now().plusMinutes(10));
+        LocalDateTime preopen = LocalDateTime.of(2026, 3, 15, 19, 50);
+
+        // when
+        performance.updateQueuePolicy(
+                QueueMode.FORCE_ON,
+                QueueLevel.LEVEL_2,
+                500,
+                900,
+                preopen,
+                "대기열 운영",
+                "초기 정책"
+        );
+
+        // then
+        assertThat(performance.getQueueMode()).isEqualTo(QueueMode.FORCE_ON);
+        assertThat(performance.getQueueLevel()).isEqualTo(QueueLevel.LEVEL_2);
+        assertThat(performance.getMaxActiveUsers()).isEqualTo(500);
+        assertThat(performance.getEntryTokenTtlSeconds()).isEqualTo(900);
+        assertThat(performance.getPreopenQueueStartAt()).isEqualTo(preopen);
+        assertThat(performance.getWaitingRoomMessage()).isEqualTo("대기열 운영");
+        assertThat(performance.getReason()).isEqualTo("초기 정책");
     }
 
     private Performance createPerformance(
