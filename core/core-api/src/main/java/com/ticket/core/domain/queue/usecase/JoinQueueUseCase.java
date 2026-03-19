@@ -6,7 +6,7 @@ import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.runtime.QueueTicket;
 import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import com.ticket.core.domain.queue.support.QueuePolicyResolver;
-import com.ticket.core.domain.queue.support.ResolvedQueuePolicy;
+import com.ticket.core.domain.queue.support.QueuePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,13 +31,13 @@ public class JoinQueueUseCase {
     ) {}
 
     @DistributedLock(
-            prefix = "queue-enter",
+            prefix = "queue",
             dynamicKey = "#input.performanceId()",
             leaseTime = 5000L,
             message = "대기열 진입 처리 중입니다. 잠시 후 다시 시도해 주세요."
     )
     public Output execute(final Input input) {
-        final ResolvedQueuePolicy policy = queuePolicyResolver.resolve(input.performanceId());
+        final QueuePolicy policy = queuePolicyResolver.resolve(input.performanceId());
         cleanupForReentry(input.performanceId(), input.memberId());
 
         final long activeUsers = queueTicketStore.countActive(input.performanceId());

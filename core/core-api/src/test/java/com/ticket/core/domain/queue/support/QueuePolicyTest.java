@@ -8,12 +8,12 @@ import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
-class ResolvedQueuePolicyTest {
+class QueuePolicyTest {
 
     @Test
     void 활성사용자가_최대보다_적으면_즉시입장할_수_있다() {
         //given
-        ResolvedQueuePolicy policy = new ResolvedQueuePolicy(
+        QueuePolicy policy = new QueuePolicy(
                 true,
                 QueueLevel.LEVEL_1,
                 2,
@@ -29,7 +29,7 @@ class ResolvedQueuePolicyTest {
     @Test
     void 비활성화_정책이면_항상_즉시입장이다() {
         //given
-        ResolvedQueuePolicy policy = new ResolvedQueuePolicy(
+        QueuePolicy policy = new QueuePolicy(
                 false,
                 QueueLevel.LEVEL_1,
                 2,
@@ -44,7 +44,7 @@ class ResolvedQueuePolicyTest {
     @Test
     void 예상대기시간을_직접_계산한다() {
         //given
-        ResolvedQueuePolicy policy = new ResolvedQueuePolicy(
+        QueuePolicy policy = new QueuePolicy(
                 true,
                 QueueLevel.LEVEL_1,
                 2,

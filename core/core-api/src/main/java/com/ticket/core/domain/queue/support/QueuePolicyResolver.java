@@ -16,7 +16,7 @@ public class QueuePolicyResolver {
     private final PerformanceFinder performanceFinder;
     private final QueueProperties queueProperties;
 
-    public ResolvedQueuePolicy resolve(final Long performanceId) {
+    public QueuePolicy resolve(final Long performanceId) {
         final Performance performance = performanceFinder.findById(performanceId);
 
         final boolean enabled = resolveEnabled(performance.getQueueMode());
@@ -30,7 +30,7 @@ public class QueuePolicyResolver {
                 ? Duration.ofSeconds(performance.getEntryTokenTtlSeconds())
                 : queueProperties.getDefaultEntryTokenTtl();
 
-        return new ResolvedQueuePolicy(
+        return new QueuePolicy(
                 enabled,
                 queueLevel,
                 maxActiveUsers,

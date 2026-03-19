@@ -45,7 +45,7 @@ class QueuePolicyResolverTest {
         when(performanceFinder.findById(10L)).thenReturn(createPerformance());
 
         //when
-        ResolvedQueuePolicy resolved = queuePolicyResolver.resolve(10L);
+        QueuePolicy resolved = queuePolicyResolver.resolve(10L);
 
         //then
         assertThat(resolved.enabled()).isTrue();
@@ -72,7 +72,7 @@ class QueuePolicyResolverTest {
         when(performanceFinder.findById(10L)).thenReturn(performance);
 
         //when
-        ResolvedQueuePolicy resolved = queuePolicyResolver.resolve(10L);
+        QueuePolicy resolved = queuePolicyResolver.resolve(10L);
 
         //then
         assertThat(resolved.enabled()).isFalse();
@@ -104,7 +104,7 @@ class QueuePolicyResolverTest {
         when(performanceFinder.findById(10L)).thenReturn(performance);
 
         //when
-        ResolvedQueuePolicy resolved = queuePolicyResolver.resolve(10L);
+        QueuePolicy resolved = queuePolicyResolver.resolve(10L);
 
         //then
         assertThat(resolved.enabled()).isTrue();
@@ -126,4 +126,3 @@ class QueuePolicyResolverTest {
         );
     }
 }
-

@@ -4,7 +4,7 @@ import com.ticket.core.domain.queue.model.QueueLevel;
 
 import java.time.Duration;
 
-public record ResolvedQueuePolicy(
+public record QueuePolicy(
         boolean enabled,
         QueueLevel queueLevel,
         int maxActiveUsers,

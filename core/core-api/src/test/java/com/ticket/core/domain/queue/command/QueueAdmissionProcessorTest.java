@@ -5,7 +5,7 @@ import com.ticket.core.domain.queue.model.QueueLevel;
 import com.ticket.core.domain.queue.runtime.QueueTicket;
 import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import com.ticket.core.domain.queue.support.QueuePolicyResolver;
-import com.ticket.core.domain.queue.support.ResolvedQueuePolicy;
+import com.ticket.core.domain.queue.support.QueuePolicy;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,7 +36,7 @@ class QueueAdmissionProcessorTest {
     @Test
     void 빈자리가_있고_대기자가_있으면_다음_대기자를_입장시킨다() {
         //given
-        ResolvedQueuePolicy policy = createPolicy(1);
+        QueuePolicy policy = createPolicy(1);
         QueueTicket admitted = createAdmitted(10L, "qe-100", "qt-100");
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
@@ -95,8 +95,8 @@ class QueueAdmissionProcessorTest {
         verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
     }
 
-    private ResolvedQueuePolicy createPolicy(final int maxActiveUsers) {
-        return new ResolvedQueuePolicy(
+    private QueuePolicy createPolicy(final int maxActiveUsers) {
+        return new QueuePolicy(
                 true,
                 QueueLevel.LEVEL_1,
                 maxActiveUsers,
@@ -117,4 +117,3 @@ class QueueAdmissionProcessorTest {
         );
     }
 }
-
