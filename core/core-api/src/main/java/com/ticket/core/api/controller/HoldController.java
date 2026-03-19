@@ -24,7 +24,6 @@ public class HoldController implements HoldControllerDocs {
     public ResponseEntity<ApiResponse<StartOrderUseCase.Output>> createHold(
             @PathVariable final Long performanceId,
             @Valid @RequestBody final CreateHoldRequest request,
-            @RequestHeader(value = "X-Queue-Token", required = false) final String queueToken,
             final MemberPrincipal memberPrincipal
     ) {
         final StartOrderUseCase.Input input = new StartOrderUseCase.Input(performanceId, request.getSeatIds(), memberPrincipal.getMemberId());
