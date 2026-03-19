@@ -58,32 +58,4 @@ public record QueueEntryRuntime(
     public boolean hasQueueToken() {
         return queueToken != null && !queueToken.isBlank();
     }
-
-    public boolean requiresTokenValidation() {
-        return isAdmitted();
-    }
-
-    public QueueEntryAction planReentry(final Long performanceId, final Long memberId) {
-        if (!isOwnedBy(performanceId, memberId)) {
-            return QueueEntryAction.clearMemberEntry();
-        }
-        if (isWaiting()) {
-            return QueueEntryAction.leaveWaiting(queueEntryId);
-        }
-        if (isAdmitted() && hasQueueToken()) {
-            return QueueEntryAction.leaveAdmittedAndAdvance(queueEntryId, queueToken);
-        }
-        return QueueEntryAction.clearMemberEntry();
-    }
-
-    public QueueEntryAction planLeave(final Long performanceId, final Long memberId) {
-        assertOwnedBy(performanceId, memberId);
-        if (isWaiting()) {
-            return QueueEntryAction.leaveWaiting(queueEntryId);
-        }
-        if (isAdmitted() && hasQueueToken()) {
-            return QueueEntryAction.leaveAdmittedAndAdvance(queueEntryId, queueToken);
-        }
-        return QueueEntryAction.none();
-    }
 }

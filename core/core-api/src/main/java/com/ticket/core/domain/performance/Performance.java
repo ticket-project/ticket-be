@@ -1,9 +1,13 @@
 package com.ticket.core.domain.performance;
 
 import com.ticket.core.domain.BaseEntity;
+import com.ticket.core.domain.queue.model.QueueLevel;
+import com.ticket.core.domain.queue.model.QueueMode;
 import com.ticket.core.domain.show.Show;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -44,6 +48,29 @@ public class Performance extends BaseEntity {
     @Column
     private Integer holdTime = 420;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private QueueMode queueMode;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private QueueLevel queueLevel;
+
+    @Column
+    private Integer maxActiveUsers;
+
+    @Column
+    private Integer entryTokenTtlSeconds;
+
+    @Column
+    private LocalDateTime preopenQueueStartAt;
+
+    @Column(length = 255)
+    private String waitingRoomMessage;
+
+    @Column(length = 255)
+    private String reason;
+
     public Performance(
             final Show show,
             final Long performanceNo,
@@ -76,5 +103,23 @@ public class Performance extends BaseEntity {
             return false;
         }
         return !now.isAfter(orderCloseTime);
+    }
+
+    public void updateQueuePolicy(
+            final QueueMode queueMode,
+            final QueueLevel queueLevel,
+            final Integer maxActiveUsers,
+            final Integer entryTokenTtlSeconds,
+            final LocalDateTime preopenQueueStartAt,
+            final String waitingRoomMessage,
+            final String reason
+    ) {
+        this.queueMode = queueMode;
+        this.queueLevel = queueLevel;
+        this.maxActiveUsers = maxActiveUsers;
+        this.entryTokenTtlSeconds = entryTokenTtlSeconds;
+        this.preopenQueueStartAt = preopenQueueStartAt;
+        this.waitingRoomMessage = waitingRoomMessage;
+        this.reason = reason;
     }
 }
