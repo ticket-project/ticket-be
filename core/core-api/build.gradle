@@ -66,10 +66,6 @@ dependencies {
 
 def qdslDir = "$buildDir/generated/sources/annotationProcessor/java/main"
 
-sourceSets {
-    main.java.srcDirs += [qdslDir]
-}
-
 tasks.named("clean") {
     doLast {
         file(qdslDir).deleteDir()

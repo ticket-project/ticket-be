@@ -3,15 +3,15 @@ package com.ticket.core.domain.queue.runtime;
 import java.time.Duration;
 import java.util.Optional;
 
-public interface QueueRuntimeStore {
+public interface QueueTicketStore {
 
     long countActive(Long performanceId);
 
     long countWaiting(Long performanceId);
 
-    QueueEntryRuntime admitNow(Long performanceId, Long memberId, Duration entryTokenTtl, Duration entryRetention);
+    QueueTicket admitNow(Long performanceId, Long memberId, Duration entryTokenTtl, Duration entryRetention);
 
-    QueueEntryRuntime enqueue(Long performanceId, Long memberId, Duration entryRetention);
+    QueueTicket enqueue(Long performanceId, Long memberId, Duration entryRetention);
 
     Optional<String> findMemberEntryId(Long performanceId, Long memberId);
 
@@ -19,11 +19,11 @@ public interface QueueRuntimeStore {
 
     Optional<Long> findWaitingPosition(Long performanceId, String queueEntryId);
 
-    Optional<QueueEntryRuntime> findEntry(String queueEntryId);
+    Optional<QueueTicket> findEntry(String queueEntryId);
 
     boolean isValidToken(Long performanceId, String queueToken);
 
-    Optional<QueueEntryRuntime> admitNextWaiting(Long performanceId, Duration entryTokenTtl, Duration entryRetention);
+    Optional<QueueTicket> admitNextWaiting(Long performanceId, Duration entryTokenTtl, Duration entryRetention);
 
     void expireAdmitted(Long performanceId, String queueEntryId, String queueToken);
 

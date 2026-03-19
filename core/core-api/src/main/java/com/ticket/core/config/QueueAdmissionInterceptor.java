@@ -1,6 +1,6 @@
 package com.ticket.core.config;
 
-import com.ticket.core.domain.queue.runtime.QueueRuntimeStore;
+import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import com.ticket.core.domain.queue.support.QueuePolicyResolver;
 import com.ticket.core.domain.queue.support.ResolvedQueuePolicy;
 import com.ticket.core.support.exception.CoreException;
@@ -21,7 +21,7 @@ import java.util.Map;
 public class QueueAdmissionInterceptor implements HandlerInterceptor {
 
     private final QueuePolicyResolver queuePolicyResolver;
-    private final QueueRuntimeStore queueRuntimeStore;
+    private final QueueTicketStore queueTicketStore;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -48,7 +48,7 @@ public class QueueAdmissionInterceptor implements HandlerInterceptor {
         if (queueToken == null || queueToken.isBlank()) {
             throw new CoreException(ErrorType.QUEUE_TOKEN_REQUIRED);
         }
-        if (!queueRuntimeStore.isValidToken(performanceId, queueToken)) {
+        if (!queueTicketStore.isValidToken(performanceId, queueToken)) {
             throw new CoreException(ErrorType.QUEUE_TOKEN_INVALID);
         }
         return true;

@@ -12,11 +12,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings("NonAsciiCharacters")
-class QueueEntryRuntimeTest {
+class QueueTicketTest {
 
     @Test
     void 본인_공연의_엔트리인지_판단한다() {
-        QueueEntryRuntime entry = createWaitingEntry();
+        QueueTicket entry = createWaitingEntry();
 
         assertThat(entry.isOwnedBy(10L, 100L)).isTrue();
         assertThat(entry.isOwnedBy(10L, 101L)).isFalse();
@@ -25,7 +25,7 @@ class QueueEntryRuntimeTest {
 
     @Test
     void 다른_회원이면_권한_예외를_던진다() {
-        QueueEntryRuntime entry = createWaitingEntry();
+        QueueTicket entry = createWaitingEntry();
 
         assertThatThrownBy(() -> entry.assertOwnedBy(10L, 999L))
                 .isInstanceOf(AuthException.class);
@@ -33,7 +33,7 @@ class QueueEntryRuntimeTest {
 
     @Test
     void 대기_엔트리는_WAITING_상태다() {
-        QueueEntryRuntime waiting = createWaitingEntry();
+        QueueTicket waiting = createWaitingEntry();
 
         assertThat(waiting.isWaiting()).isTrue();
         assertThat(waiting.isAdmitted()).isFalse();
@@ -42,7 +42,7 @@ class QueueEntryRuntimeTest {
 
     @Test
     void 입장_엔트리는_ADMITTED_상태와_토큰을_가진다() {
-        QueueEntryRuntime admitted = new QueueEntryRuntime(
+        QueueTicket admitted = new QueueTicket(
                 10L,
                 100L,
                 "qe-1",
@@ -59,7 +59,7 @@ class QueueEntryRuntimeTest {
 
     @Test
     void 입장_상태는_토큰과_만료시간이_반드시_있어야_한다() {
-        assertThatThrownBy(() -> new QueueEntryRuntime(
+        assertThatThrownBy(() -> new QueueTicket(
                 10L,
                 100L,
                 "qe-1",
@@ -70,7 +70,7 @@ class QueueEntryRuntimeTest {
         )).isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
 
-        assertThatThrownBy(() -> new QueueEntryRuntime(
+        assertThatThrownBy(() -> new QueueTicket(
                 10L,
                 100L,
                 "qe-1",
@@ -82,7 +82,7 @@ class QueueEntryRuntimeTest {
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
     }
 
-    private QueueEntryRuntime createWaitingEntry() {
-        return new QueueEntryRuntime(10L, 100L, "qe-1", QueueEntryStatus.WAITING, 1L, null, null);
+    private QueueTicket createWaitingEntry() {
+        return new QueueTicket(10L, 100L, "qe-1", QueueEntryStatus.WAITING, 1L, null, null);
     }
 }

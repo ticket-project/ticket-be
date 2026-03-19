@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
-class RedisQueueRuntimeStoreTest {
+class RedisQueueTicketStoreTest {
 
     private static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse("2026-03-15T10:00:00Z"), ZoneId.of("Asia/Seoul"));
 
@@ -41,11 +41,11 @@ class RedisQueueRuntimeStoreTest {
     @Mock
     private com.ticket.core.support.random.UuidSupplier uuidSupplier;
 
-    private RedisQueueRuntimeStore redisQueueRuntimeStore;
+    private RedisQueueTicketStore redisQueueTicketStore;
 
     @BeforeEach
     void setUp() {
-        this.redisQueueRuntimeStore = new RedisQueueRuntimeStore(redissonClient, FIXED_CLOCK, uuidSupplier);
+        this.redisQueueTicketStore = new RedisQueueTicketStore(redissonClient, FIXED_CLOCK, uuidSupplier);
     }
 
     @Test
@@ -57,7 +57,7 @@ class RedisQueueRuntimeStoreTest {
         when(activeSet.size()).thenReturn(3);
 
         //when
-        long result = redisQueueRuntimeStore.countActive(10L);
+        long result = redisQueueTicketStore.countActive(10L);
 
         //then
         assertThat(result).isEqualTo(3L);
@@ -72,7 +72,7 @@ class RedisQueueRuntimeStoreTest {
         when(entryMap.readAllMap()).thenReturn(Map.of());
 
         //when
-        Optional<QueueEntryRuntime> result = redisQueueRuntimeStore.findEntry("qe-10");
+        Optional<QueueTicket> result = redisQueueTicketStore.findEntry("qe-10");
 
         //then
         assertThat(result).isEmpty();
@@ -94,7 +94,7 @@ class RedisQueueRuntimeStoreTest {
         ));
 
         //when
-        QueueEntryRuntime result = redisQueueRuntimeStore.findEntry("qe-10").orElseThrow();
+        QueueTicket result = redisQueueTicketStore.findEntry("qe-10").orElseThrow();
 
         //then
         assertThat(result.performanceId()).isEqualTo(10L);
@@ -111,7 +111,7 @@ class RedisQueueRuntimeStoreTest {
         //given
         //when
         //then
-        assertThat(redisQueueRuntimeStore.isValidToken(10L, "broken-token")).isFalse();
+        assertThat(redisQueueTicketStore.isValidToken(10L, "broken-token")).isFalse();
     }
 
     @Test
@@ -121,7 +121,7 @@ class RedisQueueRuntimeStoreTest {
         String token = QueueRedisKey.createToken(20L, "qe-20", "token");
 
         //then
-        assertThat(redisQueueRuntimeStore.isValidToken(10L, token)).isFalse();
+        assertThat(redisQueueTicketStore.isValidToken(10L, token)).isFalse();
     }
 
     @Test
@@ -134,7 +134,7 @@ class RedisQueueRuntimeStoreTest {
         when(bucket.get()).thenReturn("qe-10");
 
         //when
-        boolean result = redisQueueRuntimeStore.isValidToken(10L, token);
+        boolean result = redisQueueTicketStore.isValidToken(10L, token);
 
         //then
         assertThat(result).isTrue();
@@ -162,7 +162,7 @@ class RedisQueueRuntimeStoreTest {
         when(redissonClient.getMap(QueueRedisKey.entry("123e4567-e89b-12d3-a456-426614174000"), StringCodec.INSTANCE)).thenReturn(entryMap);
 
         //when
-        QueueEntryRuntime result = redisQueueRuntimeStore.admitNow(10L, 200L, Duration.ofMinutes(3), Duration.ofMinutes(10));
+        QueueTicket result = redisQueueTicketStore.admitNow(10L, 200L, Duration.ofMinutes(3), Duration.ofMinutes(10));
 
         //then
         assertThat(result.memberId()).isEqualTo(200L);
@@ -183,7 +183,7 @@ class RedisQueueRuntimeStoreTest {
         when(memberEntryBucket.get()).thenReturn("qe-200");
 
         //when
-        Optional<String> result = redisQueueRuntimeStore.findMemberEntryId(10L, 200L);
+        Optional<String> result = redisQueueTicketStore.findMemberEntryId(10L, 200L);
 
         //then
         assertThat(result).contains("qe-200");
@@ -206,7 +206,7 @@ class RedisQueueRuntimeStoreTest {
         when(entryMap1.readAllMap()).thenReturn(Map.of());
         when(entryMap2.readAllMap()).thenReturn(Map.of());
 
-        Optional<QueueEntryRuntime> result = redisQueueRuntimeStore.admitNextWaiting(10L, Duration.ofMinutes(3), Duration.ofMinutes(10));
+        Optional<QueueTicket> result = redisQueueTicketStore.admitNextWaiting(10L, Duration.ofMinutes(3), Duration.ofMinutes(10));
 
         assertThat(result).isEmpty();
         verify(waitingSet).size();

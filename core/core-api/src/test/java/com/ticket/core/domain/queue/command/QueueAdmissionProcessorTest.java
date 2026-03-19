@@ -2,8 +2,8 @@ package com.ticket.core.domain.queue.command;
 
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.model.QueueLevel;
-import com.ticket.core.domain.queue.runtime.QueueEntryRuntime;
-import com.ticket.core.domain.queue.runtime.QueueRuntimeStore;
+import com.ticket.core.domain.queue.runtime.QueueTicket;
+import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import com.ticket.core.domain.queue.support.QueuePolicyResolver;
 import com.ticket.core.domain.queue.support.ResolvedQueuePolicy;
 import org.junit.jupiter.api.Test;
@@ -22,77 +22,77 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
-class QueueAdvanceProcessorTest {
+class QueueAdmissionProcessorTest {
 
     @Mock
     private QueuePolicyResolver queuePolicyResolver;
 
     @Mock
-    private QueueRuntimeStore queueRuntimeStore;
+    private QueueTicketStore queueTicketStore;
 
     @InjectMocks
-    private QueueAdvanceProcessor queueAdvanceProcessor;
+    private QueueAdmissionProcessor queueAdmissionProcessor;
 
     @Test
     void 빈자리가_있고_대기자가_있으면_다음_대기자를_입장시킨다() {
         //given
         ResolvedQueuePolicy policy = createPolicy(1);
-        QueueEntryRuntime admitted = createAdmitted(10L, "qe-100", "qt-100");
+        QueueTicket admitted = createAdmitted(10L, "qe-100", "qt-100");
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
-        when(queueRuntimeStore.countActive(10L)).thenReturn(0L, 1L);
-        when(queueRuntimeStore.admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1)))
+        when(queueTicketStore.countActive(10L)).thenReturn(0L, 1L);
+        when(queueTicketStore.admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1)))
                 .thenReturn(Optional.of(admitted));
 
         //when
-        queueAdvanceProcessor.advance(10L);
+        queueAdmissionProcessor.advance(10L);
 
         //then
-        verify(queueRuntimeStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
+        verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
     }
 
     @Test
     void 이미_active가_가득차있으면_대기자를_입장시키지_않는다() {
         //given
         when(queuePolicyResolver.resolve(10L)).thenReturn(createPolicy(1));
-        when(queueRuntimeStore.countActive(10L)).thenReturn(1L);
+        when(queueTicketStore.countActive(10L)).thenReturn(1L);
 
         //when
-        queueAdvanceProcessor.advance(10L);
+        queueAdmissionProcessor.advance(10L);
 
         //then
-        verify(queueRuntimeStore, never()).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
+        verify(queueTicketStore, never()).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
     }
 
     @Test
     void 대기자가_없으면_즉시_종료한다() {
         //given
         when(queuePolicyResolver.resolve(10L)).thenReturn(createPolicy(1));
-        when(queueRuntimeStore.countActive(10L)).thenReturn(0L);
-        when(queueRuntimeStore.admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1)))
+        when(queueTicketStore.countActive(10L)).thenReturn(0L);
+        when(queueTicketStore.admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1)))
                 .thenReturn(Optional.empty());
 
         //when
-        queueAdvanceProcessor.advance(10L);
+        queueAdmissionProcessor.advance(10L);
 
         //then
-        verify(queueRuntimeStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
+        verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
     }
 
     @Test
     void 토큰_만료를_처리한_후_다음_대기자를_입장시킨다() {
         //given
         when(queuePolicyResolver.resolve(10L)).thenReturn(createPolicy(1));
-        when(queueRuntimeStore.countActive(10L)).thenReturn(0L, 1L);
-        when(queueRuntimeStore.admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1)))
+        when(queueTicketStore.countActive(10L)).thenReturn(0L, 1L);
+        when(queueTicketStore.admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1)))
                 .thenReturn(Optional.of(createAdmitted(10L, "qe-201", "qt-201")));
 
         //when
-        queueAdvanceProcessor.handleTokenExpired(10L, "qe-200", "qt-200");
+        queueAdmissionProcessor.handleTokenExpired(10L, "qe-200", "qt-200");
 
         //then
-        verify(queueRuntimeStore).expireAdmitted(10L, "qe-200", "qt-200");
-        verify(queueRuntimeStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
+        verify(queueTicketStore).expireAdmitted(10L, "qe-200", "qt-200");
+        verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
     }
 
     private ResolvedQueuePolicy createPolicy(final int maxActiveUsers) {
@@ -105,8 +105,8 @@ class QueueAdvanceProcessorTest {
         );
     }
 
-    private QueueEntryRuntime createAdmitted(final Long performanceId, final String entryId, final String token) {
-        return new QueueEntryRuntime(
+    private QueueTicket createAdmitted(final Long performanceId, final String entryId, final String token) {
+        return new QueueTicket(
                 performanceId,
                 100L,
                 entryId,
