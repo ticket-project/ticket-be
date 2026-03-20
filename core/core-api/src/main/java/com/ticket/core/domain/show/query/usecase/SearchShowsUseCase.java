@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SearchShowsUseCase {
     private final ShowListQueryRepository showListQueryRepository;
 
-    public record Input(ShowSearchRequest request, int size, String sort) {
+    public record Input(ShowSearchRequest request, int size, ShowSort sort) {
     }
 
     public record Output(Slice<ShowSearchResponse> shows, String nextCursor) {
@@ -27,7 +27,7 @@ public class SearchShowsUseCase {
 
     public Output execute(final Input input) {
         CursorSlice<ShowSearchResponse> result = showListQueryRepository.searchShows(
-                input.request, input.size, input.sort);
+                input.request, input.size, input.sort.apiValue());
         return new Output(result.slice(), result.nextCursor());
     }
 }
