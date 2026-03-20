@@ -82,6 +82,26 @@ class TerminateOrderUseCaseTest {
     }
 
     @Test
+    void orderId로_조회한_주문이_pending이면_만료_이벤트를_발행한다() {
+        //given
+        Order order = createOrder(10L, 100L, "hold-key");
+        LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
+
+        when(orderRepository.findByIdAndStatusForUpdate(10L, OrderState.PENDING)).thenReturn(Optional.of(order));
+        when(orderTerminationDomainService.expire(order, now))
+                .thenReturn(Optional.of(new OrderTerminationDomainService.OrderTerminationResult(100L, "hold-key", List.of(42L))));
+
+        //when
+        useCase.expireByOrderId(10L, now);
+
+        //then
+        verify(orderTerminationDomainService).expire(order, now);
+        ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
+        verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
+        assertThat(eventCaptor.getValue().toString()).contains("hold-key").contains("42");
+    }
+
+    @Test
     void holdKey로_조회한_주문이_pending이면_만료처리한다() {
         //given
         Order order = createOrder(10L, 100L, "hold-key");

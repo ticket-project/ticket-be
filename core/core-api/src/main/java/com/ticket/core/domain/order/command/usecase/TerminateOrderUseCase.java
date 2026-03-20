@@ -38,28 +38,33 @@ public class TerminateOrderUseCase {
 
     @Transactional
     public void expireByOrderId(final Long orderId, final LocalDateTime now) {
-        final Order order = orderRepository.findByIdAndStatusForUpdate(orderId, OrderState.PENDING)
-                .orElse(null);
-        if (order == null) {
-            return;
-        }
-        expire(order, now);
+        expire(findPendingOrder(orderId), now);
     }
 
     @Transactional
     public void expireByHoldKey(final String holdKey, final LocalDateTime now) {
-        final Order order = orderRepository.findByHoldKeyAndStatusForUpdate(holdKey, OrderState.PENDING)
+        expire(findPendingOrder(holdKey), now);
+    }
+
+    private Order findPendingOrder(final Long orderId) {
+        return orderRepository.findByIdAndStatusForUpdate(orderId, OrderState.PENDING)
                 .orElse(null);
-        if (order == null) {
-            return;
-        }
-        expire(order, now);
+    }
+
+    private Order findPendingOrder(final String holdKey) {
+        return orderRepository.findByHoldKeyAndStatusForUpdate(holdKey, OrderState.PENDING)
+                .orElse(null);
     }
 
     private void expire(final Order order, final LocalDateTime now) {
+        if (order == null) {
+            return;
+        }
         final Optional<OrderTerminationDomainService.OrderTerminationResult> result = orderTerminationDomainService.expire(order, now);
-        result.ifPresent(value ->
-                applicationEventPublisher.publishEvent(new OrderExpiredEvent(value.performanceId(), value.holdKey(), value.seatIds()))
-        );
+        result.ifPresent(this::publishExpiredEvent);
+    }
+
+    private void publishExpiredEvent(final OrderTerminationDomainService.OrderTerminationResult result) {
+        applicationEventPublisher.publishEvent(new OrderExpiredEvent(result.performanceId(), result.holdKey(), result.seatIds()));
     }
 }
