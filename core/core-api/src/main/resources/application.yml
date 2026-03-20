@@ -50,15 +50,15 @@ springdoc:
   default-produces-media-type: application/json;charset=UTF-8
 
   api-docs:
-    path: /api-docs
+    path: /api/api-docs
   swagger-ui:
-    path: /swagger-ui.html
+    path: /api/swagger-ui.html
     enabled: true
     display-request-duration: true
     operations-sorter: alpha
     persist-authorization: true
     filter: true
-    url: /api-docs
+    url: /api/api-docs
 
 security:
   jwt:
