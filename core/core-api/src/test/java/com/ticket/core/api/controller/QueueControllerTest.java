@@ -3,9 +3,10 @@ package com.ticket.core.api.controller;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.enums.Role;
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
-import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
 import com.ticket.core.domain.queue.usecase.ExitQueueUseCase;
+import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
 import com.ticket.core.domain.queue.usecase.JoinQueueUseCase;
+import com.ticket.core.domain.queue.usecase.QueueEntryId;
 import com.ticket.core.support.response.ApiResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,7 +68,7 @@ class QueueControllerTest {
                 "token-1",
                 snapshot.expiresAt
         );
-        when(getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(20L, 100L, "qe-2"))).thenReturn(output);
+        when(getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(20L, 100L, QueueEntryId.from("qe-2")))).thenReturn(output);
 
         // when
         final ApiResponse<GetQueueStatusUseCase.Output> response = queueController.getStatus(20L, "qe-2", MEMBER);
@@ -82,7 +83,7 @@ class QueueControllerTest {
         final ApiResponse<Void> response = queueController.leave(30L, "qe-3", MEMBER);
 
         // then
-        verify(exitQueueUseCase).execute(new ExitQueueUseCase.Input(30L, 100L, "qe-3"));
+        verify(exitQueueUseCase).execute(new ExitQueueUseCase.Input(30L, 100L, QueueEntryId.from("qe-3")));
         assertThat(response.getData()).isNull();
     }
 
