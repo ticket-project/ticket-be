@@ -53,7 +53,7 @@ class GetShowsUseCaseTest {
         when(showListQueryRepository.findAllBySearch(param, 10, "popular")).thenReturn(result);
 
         //when
-        GetShowsUseCase.Output output = useCase.execute(new GetShowsUseCase.Input(param, 10, "popular"));
+        GetShowsUseCase.Output output = useCase.execute(new GetShowsUseCase.Input(param, 10, ShowSort.from("popular")));
 
         //then
         assertThat(output.shows().getContent()).containsExactly(show);
@@ -69,7 +69,7 @@ class GetShowsUseCaseTest {
         when(showListQueryRepository.findAllBySearch(param, 10, "popular")).thenReturn(result);
 
         //when
-        GetShowsUseCase.Output output = useCase.execute(new GetShowsUseCase.Input(param, 10, "popular"));
+        GetShowsUseCase.Output output = useCase.execute(new GetShowsUseCase.Input(param, 10, ShowSort.from("popular")));
 
         //then
         assertThat(output.shows().getContent()).isEmpty();
