@@ -14,7 +14,7 @@ public class ExitQueueUseCase {
     private final QueueTicketStore queueTicketStore;
     private final QueueAdmissionProcessor queueAdmissionProcessor;
 
-    public record Input(Long performanceId, Long memberId, String queueEntryId) {}
+    public record Input(Long performanceId, Long memberId, QueueEntryId queueEntryId) {}
 
     @DistributedLock(
             prefix = "queue",
@@ -23,17 +23,17 @@ public class ExitQueueUseCase {
             message = "대기열 이탈 처리 중입니다. 잠시 후 다시 시도해 주세요."
     )
     public void execute(final Input input) {
-        final QueueTicket entry = queueTicketStore.findEntry(input.queueEntryId()).orElse(null);
+        final QueueTicket entry = queueTicketStore.findEntry(input.queueEntryId().value()).orElse(null);
         if (entry == null || !input.performanceId().equals(entry.performanceId())) {
             return;
         }
         entry.assertOwnedBy(input.performanceId(), input.memberId());
         if (entry.isWaiting()) {
-            queueTicketStore.leaveWaiting(input.performanceId(), input.queueEntryId());
+            queueTicketStore.leaveWaiting(input.performanceId(), input.queueEntryId().value());
             return;
         }
         if (entry.isAdmitted()) {
-            queueTicketStore.leaveAdmitted(input.performanceId(), input.queueEntryId(), entry.queueToken());
+            queueTicketStore.leaveAdmitted(input.performanceId(), input.queueEntryId().value(), entry.queueToken());
             queueAdmissionProcessor.advance(input.performanceId());
         }
     }

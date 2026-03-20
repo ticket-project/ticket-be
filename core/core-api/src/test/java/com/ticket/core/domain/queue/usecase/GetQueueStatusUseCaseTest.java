@@ -33,7 +33,7 @@ class GetQueueStatusUseCaseTest {
         when(queueTicketStore.findEntry("qe-10")).thenReturn(Optional.empty());
 
         //when
-        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-10"));
+        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-10")));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.EXPIRED);
@@ -48,7 +48,7 @@ class GetQueueStatusUseCaseTest {
         when(queueTicketStore.findWaitingPosition(10L, "qe-10")).thenReturn(Optional.of(5L));
 
         //when
-        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-10"));
+        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-10")));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.WAITING);
@@ -63,7 +63,7 @@ class GetQueueStatusUseCaseTest {
         when(queueTicketStore.findWaitingPosition(10L, "qe-10")).thenReturn(Optional.empty());
 
         //when
-        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-10"));
+        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-10")));
 
         //then
         assertThat(output.position()).isEqualTo(0L);
@@ -85,7 +85,7 @@ class GetQueueStatusUseCaseTest {
         when(queueTicketStore.isValidToken(10L, "qt-11")).thenReturn(false);
 
         //when
-        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-11"));
+        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-11")));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.EXPIRED);
@@ -108,7 +108,7 @@ class GetQueueStatusUseCaseTest {
         when(queueTicketStore.isValidToken(10L, "qt-11")).thenReturn(true);
 
         //when
-        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-11"));
+        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-11")));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.ADMITTED);
@@ -123,7 +123,7 @@ class GetQueueStatusUseCaseTest {
         when(queueTicketStore.findEntry("qe-12")).thenReturn(Optional.of(left));
 
         //when
-        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-12"));
+        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-12")));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.LEFT);
@@ -136,7 +136,7 @@ class GetQueueStatusUseCaseTest {
         when(queueTicketStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
 
         //when //then
-        assertThatThrownBy(() -> getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, "qe-10")))
+        assertThatThrownBy(() -> getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-10"))))
                 .isInstanceOf(AuthException.class);
     }
 

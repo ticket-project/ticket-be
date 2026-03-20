@@ -14,7 +14,7 @@ public class GetQueueStatusUseCase {
 
     private final QueueTicketStore queueTicketStore;
 
-    public record Input(Long performanceId, Long memberId, String queueEntryId) {}
+    public record Input(Long performanceId, Long memberId, QueueEntryId queueEntryId) {}
 
     public record Output(
             QueueEntryStatus status,
@@ -25,28 +25,42 @@ public class GetQueueStatusUseCase {
     ) {}
 
     public Output execute(final Input input) {
-        final QueueTicket entry = queueTicketStore.findEntry(input.queueEntryId()).orElse(null);
-
+        final QueueTicket entry = findEntry(input.queueEntryId());
         if (entry == null) {
-            return new Output(QueueEntryStatus.EXPIRED, input.queueEntryId(), null, null, null);
+            return expired(input.queueEntryId());
         }
-
         entry.assertOwnedBy(input.performanceId(), input.memberId());
-
         if (entry.isWaiting()) {
-            final long position = queueTicketStore.findWaitingPosition(input.performanceId(), input.queueEntryId())
-                    .orElse(0L);
-            return new Output(entry.status(), entry.queueEntryId(), position, null, null);
+            return waiting(input, entry);
         }
-
-        if (entry.isAdmitted()) {
-            final boolean validToken = entry.hasQueueToken()
-                    && queueTicketStore.isValidToken(input.performanceId(), entry.queueToken());
-            if (!validToken) {
-                return new Output(QueueEntryStatus.EXPIRED, entry.queueEntryId(), null, null, null);
-            }
+        if (isExpiredAdmitted(input, entry)) {
+            return expired(input.queueEntryId());
         }
+        return current(entry);
+    }
 
+    private QueueTicket findEntry(final QueueEntryId queueEntryId) {
+        return queueTicketStore.findEntry(queueEntryId.value()).orElse(null);
+    }
+
+    private Output expired(final QueueEntryId queueEntryId) {
+        return new Output(QueueEntryStatus.EXPIRED, queueEntryId.value(), null, null, null);
+    }
+
+    private Output waiting(final Input input, final QueueTicket entry) {
+        final long position = queueTicketStore.findWaitingPosition(input.performanceId(), input.queueEntryId().value())
+                .orElse(0L);
+        return new Output(entry.status(), entry.queueEntryId(), position, null, null);
+    }
+
+    private boolean isExpiredAdmitted(final Input input, final QueueTicket entry) {
+        if (!entry.isAdmitted()) {
+            return false;
+        }
+        return !entry.hasQueueToken() || !queueTicketStore.isValidToken(input.performanceId(), entry.queueToken());
+    }
+
+    private Output current(final QueueTicket entry) {
         return new Output(
                 entry.status(),
                 entry.queueEntryId(),

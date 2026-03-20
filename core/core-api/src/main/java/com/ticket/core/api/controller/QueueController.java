@@ -2,9 +2,10 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.QueueControllerDocs;
 import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
 import com.ticket.core.domain.queue.usecase.ExitQueueUseCase;
+import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
 import com.ticket.core.domain.queue.usecase.JoinQueueUseCase;
+import com.ticket.core.domain.queue.usecase.QueueEntryId;
 import com.ticket.core.support.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class QueueController implements QueueControllerDocs {
             final MemberPrincipal memberPrincipal
     ) {
         return ApiResponse.success(getQueueStatusUseCase.execute(
-                new GetQueueStatusUseCase.Input(performanceId, memberPrincipal.getMemberId(), queueEntryId)
+                new GetQueueStatusUseCase.Input(performanceId, memberPrincipal.getMemberId(), QueueEntryId.from(queueEntryId))
         ));
     }
 
@@ -51,7 +52,7 @@ public class QueueController implements QueueControllerDocs {
         exitQueueUseCase.execute(new ExitQueueUseCase.Input(
                 performanceId,
                 memberPrincipal.getMemberId(),
-                queueEntryId
+                QueueEntryId.from(queueEntryId)
         ));
         return ApiResponse.success();
     }
