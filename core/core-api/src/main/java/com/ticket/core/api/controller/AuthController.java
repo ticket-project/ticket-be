@@ -49,10 +49,7 @@ public class AuthController implements AuthControllerDocs {
             @CookieValue(name = CookieUtils.REFRESH_TOKEN_COOKIE_NAME, required = false) final String refreshToken,
             final HttpServletResponse response
     ) {
-        if (refreshToken == null) {
-            throw new AuthException(ErrorType.AUTHENTICATION_ERROR);
-        }
-        final RefreshAuthTokenUseCase.Input input = new RefreshAuthTokenUseCase.Input(refreshToken);
+        final RefreshAuthTokenUseCase.Input input = new RefreshAuthTokenUseCase.Input(AuthRefreshToken.from(refreshToken));
         return ApiResponse.success(refreshAuthTokenUseCase.execute(input, response));
     }
 
@@ -80,10 +77,10 @@ public class AuthController implements AuthControllerDocs {
             @CookieValue(name = CookieUtils.REFRESH_TOKEN_COOKIE_NAME, required = false) final String refreshToken,
             final HttpServletResponse response
     ) {
-        if (refreshToken == null) {
-            throw new AuthException(ErrorType.AUTHENTICATION_ERROR);
-        }
-        final LogoutUseCase.Input input = new LogoutUseCase.Input(principal.getMemberId(), refreshToken);
+        final LogoutUseCase.Input input = new LogoutUseCase.Input(
+                principal.getMemberId(),
+                AuthRefreshToken.from(refreshToken)
+        );
         return ApiResponse.success(logoutUseCase.execute(input, response));
     }
 }

@@ -39,7 +39,7 @@ class LogoutUseCaseTest {
         when(refreshTokenService.revokeIfOwned("refresh-token", 1L)).thenReturn(true);
 
         //when
-        useCase.execute(new LogoutUseCase.Input(1L, "refresh-token"), response);
+        useCase.execute(new LogoutUseCase.Input(1L, AuthRefreshToken.from("refresh-token")), response);
 
         //then
         verify(refreshTokenService).revokeIfOwned("refresh-token", 1L);
@@ -54,7 +54,7 @@ class LogoutUseCaseTest {
 
         //when
         //then
-        assertThatThrownBy(() -> useCase.execute(new LogoutUseCase.Input(1L, "refresh-token"), new MockHttpServletResponse()))
+        assertThatThrownBy(() -> useCase.execute(new LogoutUseCase.Input(1L, AuthRefreshToken.from("refresh-token")), new MockHttpServletResponse()))
                 .isInstanceOf(AuthException.class)
                 .satisfies(exception -> assertThat(((AuthException) exception).getErrorType()).isEqualTo(ErrorType.AUTHORIZATION_ERROR));
 
@@ -69,7 +69,7 @@ class LogoutUseCaseTest {
 
         //when
         //then
-        assertThatThrownBy(() -> useCase.execute(new LogoutUseCase.Input(1L, "refresh-token"), new MockHttpServletResponse()))
+        assertThatThrownBy(() -> useCase.execute(new LogoutUseCase.Input(1L, AuthRefreshToken.from("refresh-token")), new MockHttpServletResponse()))
                 .isInstanceOf(AuthException.class)
                 .satisfies(exception -> assertThat(((AuthException) exception).getErrorType()).isEqualTo(ErrorType.AUTHENTICATION_ERROR));
     }
