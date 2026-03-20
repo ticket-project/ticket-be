@@ -40,7 +40,7 @@ class ExitQueueUseCaseTest {
                 new QueueTicket(10L, 100L, "qe-wait", QueueEntryStatus.WAITING, 1L, null, null)
         ));
 
-        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, "qe-wait"));
+        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, QueueEntryId.from("qe-wait")));
 
         verify(queueTicketStore).leaveWaiting(10L, "qe-wait");
         verify(queueAdmissionProcessor, never()).advance(10L);
@@ -60,7 +60,7 @@ class ExitQueueUseCaseTest {
                 )
         ));
 
-        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, "qe-admit"));
+        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, QueueEntryId.from("qe-admit")));
 
         verify(queueTicketStore).leaveAdmitted(10L, "qe-admit", "qt-admit");
         verify(queueAdmissionProcessor).advance(10L);
@@ -70,7 +70,7 @@ class ExitQueueUseCaseTest {
     void 엔트리가_없으면_아무_작업도_하지_않는다() {
         when(queueTicketStore.findEntry("missing")).thenReturn(Optional.empty());
 
-        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, "missing"));
+        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, QueueEntryId.from("missing")));
 
         verify(queueAdmissionProcessor, never()).advance(10L);
     }
@@ -81,7 +81,7 @@ class ExitQueueUseCaseTest {
                 new QueueTicket(99L, 100L, "qe-other", QueueEntryStatus.WAITING, 1L, null, null)
         ));
 
-        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, "qe-other"));
+        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, QueueEntryId.from("qe-other")));
 
         verify(queueTicketStore, never()).leaveWaiting(10L, "qe-other");
         verify(queueAdmissionProcessor, never()).advance(10L);
