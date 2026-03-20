@@ -51,7 +51,7 @@ class RefreshAuthTokenUseCaseTest {
 
         //when
         RefreshAuthTokenUseCase.Output output =
-                useCase.execute(new RefreshAuthTokenUseCase.Input("refresh-token"), servletResponse);
+                useCase.execute(new RefreshAuthTokenUseCase.Input(AuthRefreshToken.from("refresh-token")), servletResponse);
 
         //then
         assertThat(output.accessToken()).isEqualTo(response.accessToken());
@@ -70,7 +70,7 @@ class RefreshAuthTokenUseCaseTest {
 
         //when
         //then
-        assertThatThrownBy(() -> useCase.execute(new RefreshAuthTokenUseCase.Input("refresh-token"), new MockHttpServletResponse()))
+        assertThatThrownBy(() -> useCase.execute(new RefreshAuthTokenUseCase.Input(AuthRefreshToken.from("refresh-token")), new MockHttpServletResponse()))
                 .isInstanceOf(AuthException.class)
                 .satisfies(exception -> assertThat(((AuthException) exception).getErrorType()).isEqualTo(ErrorType.AUTHENTICATION_ERROR));
     }
