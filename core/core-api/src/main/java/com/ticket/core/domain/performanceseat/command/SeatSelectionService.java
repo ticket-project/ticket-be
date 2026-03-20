@@ -60,13 +60,11 @@ public class SeatSelectionService {
         log.info("좌석 선택 해제에 성공했습니다. performanceId={}, seatId={}, memberId={}", performanceId, seatId, memberId);
     }
 
-    public List<Long> deselectAll(final Long performanceId, final Long memberId) {
+    public DeselectedSeatIds deselectAll(final Long performanceId, final Long memberId) {
         final String memberKey = memberId.toString();
         final List<Long> deselectedSeatIds = seatSelectionStore.releaseAllByMember(performanceId, memberKey);
-        for (final Long seatId : deselectedSeatIds) {
-            log.info("좌석 일괄 선택 해제에 성공했습니다. performanceId={}, seatId={}, memberId={}", performanceId, seatId, memberId);
-        }
-        return deselectedSeatIds;
+        logDeselectedSeats(performanceId, memberId, deselectedSeatIds);
+        return DeselectedSeatIds.from(deselectedSeatIds);
     }
 
     public void forceDeselect(final Long performanceId, final Long seatId) {
@@ -77,4 +75,9 @@ public class SeatSelectionService {
         return seatSelectionStore.getSelectingSeatIds(performanceId);
     }
 
+    private void logDeselectedSeats(final Long performanceId, final Long memberId, final List<Long> seatIds) {
+        for (final Long seatId : seatIds) {
+            log.info("좌석 일괄 선택 해제에 성공했습니다. performanceId={}, seatId={}, memberId={}", performanceId, seatId, memberId);
+        }
+    }
 }

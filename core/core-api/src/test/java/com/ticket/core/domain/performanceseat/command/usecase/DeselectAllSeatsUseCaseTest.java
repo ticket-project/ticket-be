@@ -1,6 +1,7 @@
 package com.ticket.core.domain.performanceseat.command.usecase;
 
 import com.ticket.core.domain.member.MemberFinder;
+import com.ticket.core.domain.performanceseat.command.DeselectedSeatIds;
 import com.ticket.core.domain.performanceseat.command.SeatSelectionService;
 import com.ticket.core.domain.performanceseat.support.SeatEventPublisher;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ class DeselectAllSeatsUseCaseTest {
     @Test
     void 전체_좌석_해제시_모든_좌석에_대한_이벤트를_발행한다() {
         //given
-        when(seatSelectionService.deselectAll(10L, 1L)).thenReturn(List.of(20L, 21L));
+        when(seatSelectionService.deselectAll(10L, 1L)).thenReturn(DeselectedSeatIds.from(List.of(20L, 21L)));
 
         //when
         useCase.execute(new DeselectAllSeatsUseCase.Input(10L, 1L));
