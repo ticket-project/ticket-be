@@ -39,39 +39,10 @@ public class JoinQueueUseCase {
     public Output execute(final Input input) {
         final QueuePolicy policy = queuePolicyResolver.resolve(input.performanceId());
         cleanupForReentry(input.performanceId(), input.memberId());
-
-        final long activeUsers = queueTicketStore.countActive(input.performanceId());
-        final long waitingUsers = queueTicketStore.countWaiting(input.performanceId());
-        if (policy.shouldAdmitImmediately(activeUsers) && waitingUsers == 0L) {
-            final QueueTicket admitted = queueTicketStore.admitNow(
-                    input.performanceId(),
-                    input.memberId(),
-                    policy.entryTokenTtl(),
-                    policy.entryRetention()
-            );
-            return new Output(
-                    admitted.status(),
-                    admitted.queueEntryId(),
-                    null,
-                    admitted.queueToken(),
-                    admitted.expiresAt()
-            );
+        if (shouldAdmitImmediately(input, policy)) {
+            return admit(input, policy);
         }
-
-        final QueueTicket waiting = queueTicketStore.enqueue(
-                input.performanceId(),
-                input.memberId(),
-                policy.entryRetention()
-        );
-        final long position = queueTicketStore.findWaitingPosition(input.performanceId(), waiting.queueEntryId())
-                .orElse(1L);
-        return new Output(
-                waiting.status(),
-                waiting.queueEntryId(),
-                position,
-                null,
-                null
-        );
+        return waitInQueue(input, policy);
     }
 
     private void cleanupForReentry(final Long performanceId, final Long memberId) {
@@ -79,24 +50,65 @@ public class JoinQueueUseCase {
         if (existingQueueEntryId == null) {
             return;
         }
-
         final QueueTicket existingEntry = queueTicketStore.findEntry(existingQueueEntryId).orElse(null);
         if (existingEntry == null) {
-            queueTicketStore.clearMemberEntry(performanceId, memberId);
+            clearMemberEntry(performanceId, memberId);
             return;
         }
-
         if (existingEntry.isWaiting()) {
-            queueTicketStore.leaveWaiting(performanceId, existingQueueEntryId);
+            leaveWaiting(performanceId, existingQueueEntryId);
             return;
         }
-
         if (existingEntry.isOwnedBy(performanceId, memberId) && existingEntry.isAdmitted()) {
-            queueTicketStore.leaveAdmitted(performanceId, existingQueueEntryId, existingEntry.queueToken());
-            queueAdmissionProcessor.advance(performanceId);
+            leaveAdmitted(performanceId, existingQueueEntryId, existingEntry.queueToken());
             return;
         }
+        clearMemberEntry(performanceId, memberId);
+    }
 
+    private boolean shouldAdmitImmediately(final Input input, final QueuePolicy policy) {
+        final long activeUsers = queueTicketStore.countActive(input.performanceId());
+        final long waitingUsers = queueTicketStore.countWaiting(input.performanceId());
+        return policy.shouldAdmitImmediately(activeUsers) && waitingUsers == 0L;
+    }
+
+    private Output admit(final Input input, final QueuePolicy policy) {
+        final QueueTicket admitted = queueTicketStore.admitNow(
+                input.performanceId(),
+                input.memberId(),
+                policy.entryTokenTtl(),
+                policy.entryRetention()
+        );
+        return new Output(
+                admitted.status(),
+                admitted.queueEntryId(),
+                null,
+                admitted.queueToken(),
+                admitted.expiresAt()
+        );
+    }
+
+    private Output waitInQueue(final Input input, final QueuePolicy policy) {
+        final QueueTicket waiting = queueTicketStore.enqueue(
+                input.performanceId(),
+                input.memberId(),
+                policy.entryRetention()
+        );
+        final long position = queueTicketStore.findWaitingPosition(input.performanceId(), waiting.queueEntryId())
+                .orElse(1L);
+        return new Output(waiting.status(), waiting.queueEntryId(), position, null, null);
+    }
+
+    private void leaveWaiting(final Long performanceId, final String queueEntryId) {
+        queueTicketStore.leaveWaiting(performanceId, queueEntryId);
+    }
+
+    private void leaveAdmitted(final Long performanceId, final String queueEntryId, final String queueToken) {
+        queueTicketStore.leaveAdmitted(performanceId, queueEntryId, queueToken);
+        queueAdmissionProcessor.advance(performanceId);
+    }
+
+    private void clearMemberEntry(final Long performanceId, final Long memberId) {
         queueTicketStore.clearMemberEntry(performanceId, memberId);
     }
 }
