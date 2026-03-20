@@ -3,7 +3,6 @@ package com.ticket.core.domain.show.query;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.api.controller.response.ShowOpeningSoonDetailResponse;
 import com.ticket.core.api.controller.response.ShowOpeningSoonSummaryResponse;
@@ -11,11 +10,13 @@ import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.api.controller.response.ShowSearchResponse;
 import com.ticket.core.api.controller.response.ShowSummaryResponse;
 import com.ticket.core.domain.show.Show;
+import com.ticket.core.domain.show.image.ShowImagePathResolver;
 import com.ticket.core.domain.show.query.ShowSortSupport.SortOrder;
 import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
 import com.ticket.core.domain.show.query.model.ShowParam;
 import com.ticket.core.domain.show.query.model.ShowSearchRequest;
 import com.ticket.core.support.cursor.CursorSlice;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -39,6 +40,7 @@ import static com.ticket.core.domain.show.venue.QVenue.venue;
  * - 메인 페이지 / 검색 / 오픈예정 목록 등 리스트 쿼리 담당
  */
 @Repository
+@RequiredArgsConstructor
 public class ShowListQueryRepository {
 
     private final JPAQueryFactory queryFactory;
@@ -46,20 +48,7 @@ public class ShowListQueryRepository {
     private final ShowConditionFactory showConditionFactory;
     private final ShowSortSupport sortSupport;
     private final ShowCursorPolicy showCursorPolicy;
-
-    public ShowListQueryRepository(
-            final JPAQueryFactory queryFactory,
-            final ShowQueryHelper queryHelper,
-            final ShowConditionFactory showConditionFactory,
-            final ShowSortSupport sortSupport,
-            final ShowCursorPolicy showCursorPolicy
-    ) {
-        this.queryFactory = queryFactory;
-        this.queryHelper = queryHelper;
-        this.showConditionFactory = showConditionFactory;
-        this.sortSupport = sortSupport;
-        this.showCursorPolicy = showCursorPolicy;
-    }
+    private final ShowImagePathResolver showImagePathResolver;
 
     // ========== 메인 페이지 API ==========
 
@@ -79,8 +68,7 @@ public class ShowListQueryRepository {
 
     public List<ShowSummaryResponse> findLatestShows(final String categoryCode, final int limit) {
         return queryFactory
-                .select(Projections.constructor(ShowSummaryResponse.class,
-                        show.id, show.title, show.image, show.startDate, show.endDate, venue.name, show.createdAt))
+                .select(show.id, show.title, show.image, show.startDate, show.endDate, venue.name, show.createdAt)
                 .distinct()
                 .from(show)
                 .leftJoin(show.venue, venue)
@@ -90,13 +78,15 @@ public class ShowListQueryRepository {
                 .where(queryHelper.categoryCodeEq(categoryCode))
                 .orderBy(show.createdAt.desc())
                 .limit(limit)
-                .fetch();
+                .fetch()
+                .stream()
+                .map(this::toShowSummaryResponse)
+                .toList();
     }
 
     public List<ShowOpeningSoonSummaryResponse> findShowsSaleOpeningSoon(final String categoryCode, final int limit) {
         return queryFactory
-                .select(Projections.constructor(ShowOpeningSoonSummaryResponse.class,
-                        show.id, show.title, show.image, venue.name, show.saleStartDate))
+                .select(show.id, show.title, show.image, venue.name, show.saleStartDate)
                 .distinct()
                 .from(show)
                 .leftJoin(show.venue, venue)
@@ -106,7 +96,10 @@ public class ShowListQueryRepository {
                 .where(showConditionFactory.buildSaleOpeningSoonSummaryCondition(categoryCode))
                 .orderBy(show.saleStartDate.asc())
                 .limit(limit)
-                .fetch();
+                .fetch()
+                .stream()
+                .map(this::toShowOpeningSoonSummaryResponse)
+                .toList();
     }
 
     public CursorSlice<ShowOpeningSoonDetailResponse> findSaleOpeningSoonPage(
@@ -229,7 +222,7 @@ public class ShowListQueryRepository {
 
         return new ArrayList<>(shows.stream()
                 .map(s -> new ShowResponse(
-                        s.getId(), s.getTitle(), s.getSubTitle(), s.getImage(),
+                        s.getId(), s.getTitle(), s.getSubTitle(), showImagePathResolver.toCardImage(s.getImage()),
                         genreMap.getOrDefault(s.getId(), new ArrayList<>()),
                         s.getStartDate(), s.getEndDate(), s.getViewCount(),
                         s.getSaleType(), s.getSaleStartDate(), s.getSaleEndDate(),
@@ -245,14 +238,16 @@ public class ShowListQueryRepository {
             final OrderSpecifier<Long> tieBreakerOrder
     ) {
         return queryFactory
-                .select(Projections.constructor(ShowOpeningSoonDetailResponse.class,
-                        show.id, show.title, show.subTitle, show.image, venue.name, venue.region,
-                        show.startDate, show.endDate, show.saleStartDate, show.saleEndDate, show.viewCount))
+                .select(show.id, show.title, show.subTitle, show.image, venue.name, venue.region,
+                        show.startDate, show.endDate, show.saleStartDate, show.saleEndDate, show.viewCount)
                 .from(show)
                 .leftJoin(show.venue, venue)
                 .where(show.id.in(ids))
                 .orderBy(primaryOrder, tieBreakerOrder)
-                .fetch();
+                .fetch()
+                .stream()
+                .map(this::toShowOpeningSoonDetailResponse)
+                .toList();
     }
 
     private List<ShowSearchResponse> fetchSearchResponses(
@@ -261,14 +256,16 @@ public class ShowListQueryRepository {
             final OrderSpecifier<Long> tieBreakerOrder
     ) {
         return queryFactory
-                .select(Projections.constructor(ShowSearchResponse.class,
-                        show.id, show.title, show.image, venue.name,
-                        show.startDate, show.endDate, venue.region, show.viewCount))
+                .select(show.id, show.title, show.image, venue.name,
+                        show.startDate, show.endDate, venue.region, show.viewCount)
                 .from(show)
                 .leftJoin(show.venue, venue)
                 .where(show.id.in(ids))
                 .orderBy(primaryOrder, tieBreakerOrder)
-                .fetch();
+                .fetch()
+                .stream()
+                .map(this::toShowSearchResponse)
+                .toList();
     }
 
     // ========== 내부 헬퍼 ==========
@@ -279,6 +276,57 @@ public class ShowListQueryRepository {
 
     private <T> CursorSlice<T> emptyCursorSlice(final int size) {
         return new CursorSlice<>(new SliceImpl<>(List.of(), PageRequest.of(0, size), false), null);
+    }
+
+    private ShowSummaryResponse toShowSummaryResponse(final Tuple tuple) {
+        return new ShowSummaryResponse(
+                tuple.get(show.id),
+                tuple.get(show.title),
+                showImagePathResolver.toCardImage(tuple.get(show.image)),
+                tuple.get(show.startDate),
+                tuple.get(show.endDate),
+                tuple.get(venue.name),
+                tuple.get(show.createdAt)
+        );
+    }
+
+    private ShowOpeningSoonSummaryResponse toShowOpeningSoonSummaryResponse(final Tuple tuple) {
+        return new ShowOpeningSoonSummaryResponse(
+                tuple.get(show.id),
+                tuple.get(show.title),
+                showImagePathResolver.toCardImage(tuple.get(show.image)),
+                tuple.get(venue.name),
+                tuple.get(show.saleStartDate)
+        );
+    }
+
+    private ShowOpeningSoonDetailResponse toShowOpeningSoonDetailResponse(final Tuple tuple) {
+        return new ShowOpeningSoonDetailResponse(
+                tuple.get(show.id),
+                tuple.get(show.title),
+                tuple.get(show.subTitle),
+                showImagePathResolver.toCardImage(tuple.get(show.image)),
+                tuple.get(venue.name),
+                tuple.get(venue.region),
+                tuple.get(show.startDate),
+                tuple.get(show.endDate),
+                tuple.get(show.saleStartDate),
+                tuple.get(show.saleEndDate),
+                tuple.get(show.viewCount)
+        );
+    }
+
+    private ShowSearchResponse toShowSearchResponse(final Tuple tuple) {
+        return new ShowSearchResponse(
+                tuple.get(show.id),
+                tuple.get(show.title),
+                showImagePathResolver.toCardImage(tuple.get(show.image)),
+                tuple.get(venue.name),
+                tuple.get(show.startDate),
+                tuple.get(show.endDate),
+                tuple.get(venue.region),
+                tuple.get(show.viewCount)
+        );
     }
 
     private Map<Long, List<String>> fetchGenreMap(final List<Long> ids) {
