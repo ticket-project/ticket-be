@@ -61,7 +61,7 @@ public class ShowController implements ShowControllerDocs {
             @RequestParam(defaultValue = "5") final int size,
             @RequestParam(defaultValue = "popular") final String sort
     ) {
-        final GetShowsUseCase.Input input = new GetShowsUseCase.Input(param, size, sort);
+        final GetShowsUseCase.Input input = new GetShowsUseCase.Input(param, size, ShowSort.from(sort));
         final GetShowsUseCase.Output output = getShowsUseCase.execute(input);
         return ApiResponse.success(SliceResponse.from(output.shows(), output.nextCursor()));
     }
@@ -104,7 +104,7 @@ public class ShowController implements ShowControllerDocs {
             @RequestParam(defaultValue = "20") final int size,
             @RequestParam(defaultValue = "popular") final String sort
     ) {
-        final SearchShowsUseCase.Input input = new SearchShowsUseCase.Input(request, size, sort);
+        final SearchShowsUseCase.Input input = new SearchShowsUseCase.Input(request, size, ShowSort.from(sort));
         final SearchShowsUseCase.Output output = searchShowsUseCase.execute(input);
         return ApiResponse.success(SliceResponse.from(output.shows(), output.nextCursor()));
     }

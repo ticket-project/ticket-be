@@ -38,7 +38,7 @@ class SearchShowsUseCaseTest {
         when(showListQueryRepository.searchShows(request, 20, "popular")).thenReturn(result);
 
         //when
-        SearchShowsUseCase.Output output = useCase.execute(new SearchShowsUseCase.Input(request, 20, "popular"));
+        SearchShowsUseCase.Output output = useCase.execute(new SearchShowsUseCase.Input(request, 20, ShowSort.from("popular")));
 
         //then
         assertThat(output.shows().getContent()).containsExactly(response);
@@ -54,7 +54,7 @@ class SearchShowsUseCaseTest {
         when(showListQueryRepository.searchShows(request, 20, "popular")).thenReturn(result);
 
         //when
-        SearchShowsUseCase.Output output = useCase.execute(new SearchShowsUseCase.Input(request, 20, "popular"));
+        SearchShowsUseCase.Output output = useCase.execute(new SearchShowsUseCase.Input(request, 20, ShowSort.from("popular")));
 
         //then
         assertThat(output.shows().getContent()).isEmpty();

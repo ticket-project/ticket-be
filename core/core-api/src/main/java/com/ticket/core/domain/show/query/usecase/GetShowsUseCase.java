@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GetShowsUseCase {
     private final ShowListQueryRepository showListQueryRepository;
 
-    public record Input(ShowParam param, int size, String sort) {
+    public record Input(ShowParam param, int size, ShowSort sort) {
     }
 
     public record Output(Slice<ShowResponse> shows, String nextCursor) {
@@ -23,7 +23,7 @@ public class GetShowsUseCase {
 
     public Output execute(final Input input) {
         CursorSlice<ShowResponse> result = showListQueryRepository.findAllBySearch(
-                input.param, input.size, input.sort);
+                input.param, input.size, input.sort.apiValue());
         return new Output(result.slice(), result.nextCursor());
     }
 
