@@ -89,6 +89,19 @@ class SeatSelectionServiceTest {
     }
 
     @Test
+    void 해제_시점에_다른_회원이_점유중이면_예외를_던진다() {
+        //given
+        when(seatSelectionStore.getHolder(10L, 20L)).thenReturn("3", "4");
+        when(seatSelectionStore.releaseIfOwned(10L, 20L, "3")).thenReturn(false);
+
+        //when
+        //then
+        assertThatThrownBy(() -> seatSelectionService.deselect(10L, 20L, 3L))
+                .isInstanceOf(CoreException.class)
+                .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.SEAT_NOT_OWNED));
+    }
+
+    @Test
     void 본인이_선택한_좌석만_일괄_해제한다() {
         //given
         when(seatSelectionStore.releaseAllByMember(10L, "3")).thenReturn(List.of(20L));

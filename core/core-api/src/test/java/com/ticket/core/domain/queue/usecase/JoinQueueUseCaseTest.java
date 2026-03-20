@@ -181,6 +181,26 @@ class JoinQueueUseCaseTest {
     }
 
     @Test
+    void 재진입_기존_엔트리가_대기중도_입장중도_아니면_멤버_매핑을_정리한다() {
+        QueuePolicy policy = createPolicy(1);
+        QueueTicket previous = new QueueTicket(10L, 101L, "qe-old", QueueEntryStatus.LEFT, 1L, null, null);
+        QueueTicket waiting = new QueueTicket(10L, 101L, "qe-new", QueueEntryStatus.WAITING, 1L, null, null);
+
+        when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
+        when(queueTicketStore.findMemberEntryId(10L, 101L)).thenReturn(Optional.of("qe-old"));
+        when(queueTicketStore.findEntry("qe-old")).thenReturn(Optional.of(previous));
+        when(queueTicketStore.countActive(10L)).thenReturn(1L);
+        when(queueTicketStore.countWaiting(10L)).thenReturn(0L);
+        when(queueTicketStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
+        when(queueTicketStore.findWaitingPosition(10L, "qe-new")).thenReturn(Optional.of(1L));
+
+        joinQueueUseCase.execute(new JoinQueueUseCase.Input(10L, 101L));
+
+        verify(queueTicketStore).clearMemberEntry(10L, 101L);
+        verify(queueAdmissionProcessor, never()).advance(10L);
+    }
+
+    @Test
     void 대기자가_있으면_active_여유가_있어도_신규_진입자는_대기열에_선다() {
         QueuePolicy policy = createPolicy(300);
         QueueTicket waiting = new QueueTicket(10L, 101L, "qe-wait", QueueEntryStatus.WAITING, 5L, null, null);
