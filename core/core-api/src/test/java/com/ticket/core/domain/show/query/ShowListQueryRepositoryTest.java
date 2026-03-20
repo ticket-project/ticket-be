@@ -1,6 +1,5 @@
 package com.ticket.core.domain.show.query;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.config.JpaAuditingConfig;
 import com.ticket.core.config.QuerydslConfig;
 import com.ticket.core.api.controller.response.ShowResponse;
@@ -65,7 +64,8 @@ import static org.assertj.core.api.Assertions.assertThat;
         BookingStatusWindowPolicy.class,
         ShowConditionFactory.class,
         ShowSortSupport.class,
-        ShowCursorPolicy.class
+        ShowCursorPolicy.class,
+        ShowImagePathResolver.class
 })
 @SuppressWarnings("NonAsciiCharacters")
 class ShowListQueryRepositoryTest {
@@ -255,4 +255,3 @@ class ShowListQueryRepositoryTest {
     static class TestApplication {
     }
 }
-
