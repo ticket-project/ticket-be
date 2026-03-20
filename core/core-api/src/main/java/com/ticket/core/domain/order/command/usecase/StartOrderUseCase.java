@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -41,35 +40,35 @@ public class StartOrderUseCase {
             message = "주문 시작 처리 중입니다. 잠시 후 다시 시도해 주세요."
     )
     public Output execute(final Input input) {
-        final List<Long> seatIds = normalizeSeatIds(input.seatIds());
-        memberFinder.findActiveMemberById(input.memberId());
-        final Performance performance = performanceFinder.findValidPerformanceById(input.performanceId());
-        validateSeatCount(performance, seatIds);
-        ensureNoPendingOrder(input.memberId(), input.performanceId());
-
-        final OrderStartDomainService.OrderStartResult result = orderStartDomainService.start(
-                input.memberId(),
-                input.performanceId(),
-                seatIds,
-                Duration.ofSeconds(performance.getHoldTime())
-        );
+        final SeatIds seatIds = SeatIds.from(input.seatIds());
+        final Performance performance = validateStartable(input, seatIds);
+        final OrderStartDomainService.OrderStartResult result = startOrder(input, seatIds, performance);
         applicationEventPublisher.publishEvent(new HoldCreatedEvent(result.snapshot()));
         return new Output(result.orderKey());
     }
 
-    private List<Long> normalizeSeatIds(final List<Long> requestedSeatIds) {
-        if (requestedSeatIds.size() != new HashSet<>(requestedSeatIds).size()) {
-            throw new CoreException(ErrorType.INVALID_REQUEST, "중복된 seatId가 포함되어 있습니다.");
-        }
-
-        final List<Long> seatIds = requestedSeatIds.stream().sorted().toList();
-        if (seatIds.isEmpty()) {
-            throw new CoreException(ErrorType.INVALID_REQUEST, "선점할 좌석이 없습니다.");
-        }
-        return seatIds;
+    private Performance validateStartable(final Input input, final SeatIds seatIds) {
+        memberFinder.findActiveMemberById(input.memberId());
+        final Performance performance = performanceFinder.findValidPerformanceById(input.performanceId());
+        validateSeatCount(performance, seatIds);
+        ensureNoPendingOrder(input.memberId(), input.performanceId());
+        return performance;
     }
 
-    private void validateSeatCount(final Performance performance, final List<Long> seatIds) {
+    private OrderStartDomainService.OrderStartResult startOrder(
+            final Input input,
+            final SeatIds seatIds,
+            final Performance performance
+    ) {
+        return orderStartDomainService.start(
+                input.memberId(),
+                input.performanceId(),
+                seatIds.values(),
+                Duration.ofSeconds(performance.getHoldTime())
+        );
+    }
+
+    private void validateSeatCount(final Performance performance, final SeatIds seatIds) {
         if (performance.isOverCount(seatIds.size())) {
             throw new CoreException(ErrorType.EXCEED_HOLD_LIMIT);
         }
