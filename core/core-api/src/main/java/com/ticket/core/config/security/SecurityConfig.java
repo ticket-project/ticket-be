@@ -11,6 +11,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -31,6 +32,7 @@ public class SecurityConfig {
     public SecurityFilterChain oauth2FilterChain(
             final HttpSecurity http,
             final CustomOAuth2UserService customOAuth2UserService,
+            final OAuth2FrontendRedirectResolver frontendRedirectResolver,
             final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
             final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler
     ) throws Exception {
@@ -54,6 +56,10 @@ public class SecurityConfig {
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                         .failureHandler(oAuth2AuthenticationFailureHandler)
                 );
+        http.addFilterBefore(
+                new OAuth2FrontendRedirectCaptureFilter(frontendRedirectResolver),
+                OAuth2AuthorizationRequestRedirectFilter.class
+        );
 
         return http.build();
     }
