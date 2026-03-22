@@ -5,7 +5,6 @@ import com.ticket.core.domain.member.MemberPrincipal;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -20,14 +19,14 @@ import java.io.IOException;
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final OAuth2AuthCodeService oAuth2AuthCodeService;
-    private final String redirectUri;
+    private final OAuth2FrontendRedirectResolver frontendRedirectResolver;
 
     public OAuth2AuthenticationSuccessHandler(
             final OAuth2AuthCodeService oAuth2AuthCodeService,
-            @Value("${app.auth.oauth2-success-redirect-uri}") final String redirectUri
+            final OAuth2FrontendRedirectResolver frontendRedirectResolver
     ) {
         this.oAuth2AuthCodeService = oAuth2AuthCodeService;
-        this.redirectUri = redirectUri;
+        this.frontendRedirectResolver = frontendRedirectResolver;
     }
 
     @Override
@@ -43,11 +42,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         // 1회용 auth code 생성 (Redis, TTL 30초)
         final String authCode = oAuth2AuthCodeService.createCode(memberPrincipal.getMemberId());
 
-        final String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
+        final String targetUrl = UriComponentsBuilder.fromUriString(frontendRedirectResolver.resolveSuccessRedirectUri(request))
                 .queryParam("code", authCode)
                 .build(true)
                 .toUriString();
 
+        frontendRedirectResolver.clear(request);
         clearAuthenticationAttributes(request);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
