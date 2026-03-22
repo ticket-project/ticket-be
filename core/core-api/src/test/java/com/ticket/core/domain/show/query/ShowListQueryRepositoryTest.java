@@ -6,6 +6,7 @@ import com.ticket.core.config.QuerydslConfig;
 import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.api.controller.response.ShowSearchResponse;
 import com.ticket.core.domain.show.Show;
+import com.ticket.core.domain.show.image.ShowImagePathResolver;
 import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.domain.show.meta.SaleType;
 import com.ticket.core.domain.show.query.model.ShowParam;
@@ -59,6 +60,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         QuerydslConfig.class,
         ShowListQueryRepositoryTest.TestConfig.class,
         ShowListQueryRepository.class,
+        ShowImagePathResolver.class,
         ShowQueryHelper.class,
         BookingStatusWindowPolicy.class,
         ShowConditionFactory.class,
