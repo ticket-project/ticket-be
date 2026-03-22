@@ -1,18 +1,22 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.AuthControllerDocs;
+import com.ticket.core.config.security.SocialLoginBaseUrlResolver;
 import com.ticket.core.domain.auth.usecase.*;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.util.CookieUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 
@@ -26,6 +30,7 @@ public class AuthController implements AuthControllerDocs {
     private final RefreshAuthTokenUseCase refreshAuthTokenUseCase;
     private final ExchangeOAuth2TokenUseCase exchangeOAuth2TokenUseCase;
     private final GetSocialLoginUrlsUseCase getSocialLoginUrlsUseCase;
+    private final SocialLoginBaseUrlResolver socialLoginBaseUrlResolver;
     private final LogoutUseCase logoutUseCase;
 
     @Override
@@ -68,9 +73,40 @@ public class AuthController implements AuthControllerDocs {
     @Override
     @GetMapping("/social/urls")
     public ApiResponse<Map<String, String>> getSocialLoginUrls() {
-        final String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        final HttpServletRequest request = currentRequest();
+        final String origin = request.getHeader("Origin");
+        final String referer = request.getHeader("Referer");
+        final String requestBaseUrl = requestBaseUrl(request);
+        final String baseUrl = socialLoginBaseUrlResolver.resolve(origin, referer, requestBaseUrl);
         final GetSocialLoginUrlsUseCase.Input input = new GetSocialLoginUrlsUseCase.Input(baseUrl);
         return ApiResponse.success(getSocialLoginUrlsUseCase.execute(input).urls());
+    }
+
+    private HttpServletRequest currentRequest() {
+        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+    }
+
+    private String requestBaseUrl(final HttpServletRequest request) {
+        UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
+                .scheme(request.getScheme())
+                .host(request.getServerName());
+        final Integer port = serverPort(request);
+        if (port != null) {
+            builder.port(port);
+        }
+        return builder.build().toUriString();
+    }
+
+    private Integer serverPort(final HttpServletRequest request) {
+        if (isDefaultPort(request)) {
+            return null;
+        }
+        return request.getServerPort();
+    }
+
+    private boolean isDefaultPort(final HttpServletRequest request) {
+        return "http".equalsIgnoreCase(request.getScheme()) && request.getServerPort() == 80
+                || "https".equalsIgnoreCase(request.getScheme()) && request.getServerPort() == 443;
     }
 
     @Override
