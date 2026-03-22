@@ -22,11 +22,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SeedDataLoaderTest {
 
     private static final Pattern SHOW_PATTERN = Pattern.compile(
-        "INSERT INTO SHOWS .*?VALUES \\((\\d+), .*?, '([0-9]{4}-[0-9]{2}-[0-9]{2})', '([0-9]{4}-[0-9]{2}-[0-9]{2})',",
+        "INSERT INTO SHOWS .*?VALUES \\((\\d+), .*?, '([0-9]{4}-[0-9]{2}-[0-9]{2})', '([0-9]{4}-[0-9]{2}-[0-9]{2})', .*?, '([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9:]{8})',",
         Pattern.DOTALL
     );
     private static final Pattern PERFORMANCE_PATTERN = Pattern.compile(
-        "INSERT INTO PERFORMANCES .*?VALUES \\((\\d+), (\\d+), (\\d+), '([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9:]{8})'",
+        "INSERT INTO PERFORMANCES .*?VALUES \\((\\d+), (\\d+), (\\d+), '([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9:]{8})'",
         Pattern.DOTALL
     );
     private static final Pattern PERFORMANCE_SEAT_STATE_PATTERN = Pattern.compile(
@@ -72,6 +72,38 @@ class SeedDataLoaderTest {
                     .withFailMessage("회차 날짜가 공연 기간을 벗어났습니다. showId=%s, date=%s, period=%s", entry.getKey(), date, showPeriod)
                     .isBetween(showPeriod.startDate(), showPeriod.endDate()));
         }
+    }
+
+    @Test
+    void show_sale_start_matches_earliest_performance_order_open_time() throws Exception {
+        final List<String> statements = parseStatements();
+        final Map<Long, ShowPeriod> showPeriods = extractShowPeriods(statements);
+        final Map<Long, LocalDateTime> earliestOrderOpenByShow = extractEarliestOrderOpenByShow(statements);
+
+        assertThat(showPeriods.keySet()).containsAll(earliestOrderOpenByShow.keySet());
+
+        earliestOrderOpenByShow.forEach((showId, earliestOrderOpen) ->
+            assertThat(showPeriods.get(showId).saleStartDate())
+                .withFailMessage("공연 판매 시작 시각이 첫 회차 예매 시작 시각과 다릅니다. showId=%s, saleStart=%s, earliestOrderOpen=%s",
+                    showId, showPeriods.get(showId).saleStartDate(), earliestOrderOpen)
+                .isEqualTo(earliestOrderOpen)
+        );
+    }
+
+    @Test
+    void show_sale_end_matches_latest_performance_order_close_time() throws Exception {
+        final List<String> statements = parseStatements();
+        final Map<Long, ShowPeriod> showPeriods = extractShowPeriods(statements);
+        final Map<Long, LocalDateTime> latestOrderCloseByShow = extractLatestOrderCloseByShow(statements);
+
+        assertThat(showPeriods.keySet()).containsAll(latestOrderCloseByShow.keySet());
+
+        latestOrderCloseByShow.forEach((showId, latestOrderClose) ->
+            assertThat(showPeriods.get(showId).saleEndDate())
+                .withFailMessage("공연 판매 종료 시각이 마지막 회차 예매 마감 시각과 다릅니다. showId=%s, saleEnd=%s, latestOrderClose=%s",
+                    showId, showPeriods.get(showId).saleEndDate(), latestOrderClose)
+                .isEqualTo(latestOrderClose)
+        );
     }
 
     @Test
@@ -176,7 +208,9 @@ class SeedDataLoaderTest {
                 showId,
                 new ShowPeriod(
                     LocalDate.parse(matcher.group(2)),
-                    LocalDate.parse(matcher.group(3))
+                    LocalDate.parse(matcher.group(3)),
+                    LocalDateTime.parse(matcher.group(4).replace(' ', 'T')),
+                    LocalDateTime.parse(matcher.group(5).replace(' ', 'T'))
                 )
             );
         }
@@ -215,7 +249,54 @@ class SeedDataLoaderTest {
         return result;
     }
 
-    private record ShowPeriod(LocalDate startDate, LocalDate endDate) {
+    private Map<Long, LocalDateTime> extractEarliestOrderOpenByShow(final List<String> statements) {
+        final Map<Long, LocalDateTime> earliestOrderOpenByShow = new HashMap<>();
+
+        for (String statement : statements) {
+            final Matcher matcher = PERFORMANCE_PATTERN.matcher(statement);
+            if (!matcher.find()) {
+                continue;
+            }
+
+            final long showId = Long.parseLong(matcher.group(2));
+            final LocalDateTime orderOpenTime = LocalDateTime.parse(matcher.group(6).replace(' ', 'T'));
+            earliestOrderOpenByShow.merge(showId, orderOpenTime, this::earlierTime);
+        }
+
+        return earliestOrderOpenByShow;
+    }
+
+    private Map<Long, LocalDateTime> extractLatestOrderCloseByShow(final List<String> statements) {
+        final Map<Long, LocalDateTime> latestOrderCloseByShow = new HashMap<>();
+
+        for (String statement : statements) {
+            final Matcher matcher = PERFORMANCE_PATTERN.matcher(statement);
+            if (!matcher.find()) {
+                continue;
+            }
+
+            final long showId = Long.parseLong(matcher.group(2));
+            final LocalDateTime orderCloseTime = LocalDateTime.parse(matcher.group(7).replace(' ', 'T'));
+            latestOrderCloseByShow.merge(showId, orderCloseTime, this::laterTime);
+        }
+
+        return latestOrderCloseByShow;
+    }
+
+    private LocalDateTime laterTime(final LocalDateTime current, final LocalDateTime candidate) {
+        return candidate.isAfter(current) ? candidate : current;
+    }
+
+    private LocalDateTime earlierTime(final LocalDateTime current, final LocalDateTime candidate) {
+        return candidate.isBefore(current) ? candidate : current;
+    }
+
+    private record ShowPeriod(
+        LocalDate startDate,
+        LocalDate endDate,
+        LocalDateTime saleStartDate,
+        LocalDateTime saleEndDate
+    ) {
     }
 
     private record PerformanceDate(int performanceNo, LocalDate date) {

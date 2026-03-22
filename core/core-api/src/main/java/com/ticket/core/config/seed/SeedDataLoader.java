@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -27,8 +29,9 @@ public class SeedDataLoader implements ApplicationRunner {
 
     private static final int DEFAULT_BATCH_SIZE = 500;
     private static final String SEED_CHECK_SQL = "SELECT COUNT(*) FROM CATEGORIES";
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
     private static final Pattern SHOW_INSERT_PATTERN = Pattern.compile(
-        "INSERT INTO SHOWS .*?VALUES \\((\\d+), .*?, '([0-9]{4}-[0-9]{2}-[0-9]{2})', '([0-9]{4}-[0-9]{2}-[0-9]{2})',",
+        "INSERT INTO SHOWS .*?VALUES \\((\\d+), .*?, '([0-9]{4}-[0-9]{2}-[0-9]{2})', '([0-9]{4}-[0-9]{2}-[0-9]{2})', .*?, '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})',",
         Pattern.DOTALL
     );
     private static final Pattern PERFORMANCE_INSERT_PATTERN = Pattern.compile(
@@ -102,32 +105,50 @@ public class SeedDataLoader implements ApplicationRunner {
             final List<PerformanceSeed> performanceSeeds = entry.getValue().stream()
                 .sorted(Comparator.comparingInt(PerformanceSeed::performanceNo))
                 .toList();
+            final ShowSeed showSeed = shows.get(entry.getKey());
+            final ShowWindow showWindow = buildShowWindow(performanceSeeds, showSeed, diversifiedStatements);
 
-            if (performanceSeeds.size() < 2 || hasMultipleDates(performanceSeeds)) {
+            if (showSeed == null) {
                 continue;
             }
 
-            final ShowSeed showSeed = shows.get(entry.getKey());
-            final LocalDate firstDate = showSeed == null ? performanceSeeds.get(0).startDate() : showSeed.startDate();
-            final int dateBucketCount = Math.min(3, performanceSeeds.size());
-            LocalDate lastAssignedDate = firstDate;
-
-            for (int index = 0; index < performanceSeeds.size(); index++) {
-                final PerformanceSeed performanceSeed = performanceSeeds.get(index);
-                final LocalDate assignedDate = firstDate.plusDays((long) index * dateBucketCount / performanceSeeds.size());
-                diversifiedStatements.set(performanceSeed.statementIndex(), rewritePerformanceStatement(performanceSeed.statement(), assignedDate));
-                lastAssignedDate = assignedDate;
-            }
-
-            if (showSeed != null && lastAssignedDate.isAfter(showSeed.endDate())) {
-                diversifiedStatements.set(
-                    showSeed.statementIndex(),
-                    rewriteShowStatement(showSeed.statement(), showSeed.endDate(), lastAssignedDate)
-                );
+            if (shouldRewriteShow(showSeed, showWindow)) {
+                diversifiedStatements.set(showSeed.statementIndex(), rewriteShowStatement(showSeed.statement(), showWindow));
             }
         }
 
         return diversifiedStatements;
+    }
+
+    private ShowWindow buildShowWindow(
+        final List<PerformanceSeed> performanceSeeds,
+        final ShowSeed showSeed,
+        final List<String> diversifiedStatements
+    ) {
+        if (performanceSeeds.size() < 2 || hasMultipleDates(performanceSeeds)) {
+            return new ShowWindow(
+                resolveEndDate(showSeed, performanceSeeds),
+                earliestOrderOpenTime(performanceSeeds),
+                latestOrderCloseTime(performanceSeeds)
+            );
+        }
+
+        final LocalDate firstDate = showSeed == null ? performanceSeeds.get(0).startDate() : showSeed.startDate();
+        final int dateBucketCount = Math.min(3, performanceSeeds.size());
+        LocalDate lastAssignedDate = firstDate;
+        LocalDateTime earliestOrderOpenTime = performanceSeeds.get(0).orderOpenTime();
+        LocalDateTime latestOrderCloseTime = performanceSeeds.get(0).orderCloseTime();
+
+        for (int index = 0; index < performanceSeeds.size(); index++) {
+            final PerformanceSeed performanceSeed = performanceSeeds.get(index);
+            final LocalDate assignedDate = firstDate.plusDays((long) index * dateBucketCount / performanceSeeds.size());
+            diversifiedStatements.set(performanceSeed.statementIndex(), rewritePerformanceStatement(performanceSeed.statement(), assignedDate));
+            lastAssignedDate = assignedDate;
+            earliestOrderOpenTime = earlierOf(earliestOrderOpenTime, performanceSeed.orderOpenTime());
+            latestOrderCloseTime = laterOf(latestOrderCloseTime, assignedDate.atTime(performanceSeed.orderCloseTime().toLocalTime()));
+        }
+
+        return new ShowWindow(resolveEndDate(showSeed, lastAssignedDate), earliestOrderOpenTime, latestOrderCloseTime);
     }
 
     private Map<Long, ShowSeed> extractShows(final List<String> statements) {
@@ -145,7 +166,9 @@ public class SeedDataLoader implements ApplicationRunner {
                 index,
                 statement,
                 LocalDate.parse(matcher.group(2)),
-                LocalDate.parse(matcher.group(3))
+                LocalDate.parse(matcher.group(3)),
+                LocalDateTime.parse(matcher.group(4) + "T" + matcher.group(5)),
+                LocalDateTime.parse(matcher.group(6) + "T" + matcher.group(7))
             ));
         }
 
@@ -166,7 +189,14 @@ public class SeedDataLoader implements ApplicationRunner {
             final int performanceNo = Integer.parseInt(matcher.group(3));
             final LocalDate startDate = LocalDate.parse(matcher.group(4));
             performancesByShow.computeIfAbsent(showId, ignored -> new ArrayList<>())
-                .add(new PerformanceSeed(index, statement, performanceNo, startDate));
+                .add(new PerformanceSeed(
+                    index,
+                    statement,
+                    performanceNo,
+                    startDate,
+                    LocalDateTime.parse(matcher.group(8) + "T" + matcher.group(9)),
+                    LocalDateTime.parse(matcher.group(10) + "T" + matcher.group(11))
+                ));
         }
 
         return performancesByShow;
@@ -177,15 +207,71 @@ public class SeedDataLoader implements ApplicationRunner {
         return performanceSeeds.stream().anyMatch(performanceSeed -> !performanceSeed.startDate().equals(firstDate));
     }
 
-    private String rewriteShowStatement(final String statement, final LocalDate currentEndDate, final LocalDate newEndDate) {
+    private boolean shouldRewriteShow(final ShowSeed showSeed, final ShowWindow showWindow) {
+        return !showSeed.endDate().equals(showWindow.endDate())
+            || !showSeed.saleStartDate().equals(showWindow.saleStartDate())
+            || !showSeed.saleEndDate().equals(showWindow.saleEndDate());
+    }
+
+    private LocalDate resolveEndDate(final ShowSeed showSeed, final List<PerformanceSeed> performanceSeeds) {
+        final LocalDate lastPerformanceDate = performanceSeeds.get(performanceSeeds.size() - 1).startDate();
+        return resolveEndDate(showSeed, lastPerformanceDate);
+    }
+
+    private LocalDate resolveEndDate(final ShowSeed showSeed, final LocalDate performanceEndDate) {
+        if (showSeed == null || performanceEndDate.isAfter(showSeed.endDate())) {
+            return performanceEndDate;
+        }
+        return showSeed.endDate();
+    }
+
+    private LocalDateTime earliestOrderOpenTime(final List<PerformanceSeed> performanceSeeds) {
+        LocalDateTime earliestOrderOpenTime = performanceSeeds.get(0).orderOpenTime();
+
+        for (PerformanceSeed performanceSeed : performanceSeeds) {
+            earliestOrderOpenTime = earlierOf(earliestOrderOpenTime, performanceSeed.orderOpenTime());
+        }
+
+        return earliestOrderOpenTime;
+    }
+
+    private LocalDateTime latestOrderCloseTime(final List<PerformanceSeed> performanceSeeds) {
+        LocalDateTime latestOrderCloseTime = performanceSeeds.get(0).orderCloseTime();
+
+        for (PerformanceSeed performanceSeed : performanceSeeds) {
+            latestOrderCloseTime = laterOf(latestOrderCloseTime, performanceSeed.orderCloseTime());
+        }
+
+        return latestOrderCloseTime;
+    }
+
+    private LocalDateTime earlierOf(final LocalDateTime current, final LocalDateTime candidate) {
+        if (candidate.isBefore(current)) {
+            return candidate;
+        }
+        return current;
+    }
+
+    private LocalDateTime laterOf(final LocalDateTime current, final LocalDateTime candidate) {
+        if (candidate.isAfter(current)) {
+            return candidate;
+        }
+        return current;
+    }
+
+    private String rewriteShowStatement(final String statement, final ShowWindow showWindow) {
         final Matcher matcher = SHOW_INSERT_PATTERN.matcher(statement);
         if (!matcher.find()) {
             return statement;
         }
 
-        return statement.substring(0, matcher.start(3))
-            + newEndDate
-            + statement.substring(matcher.end(3));
+        final StringBuilder builder = new StringBuilder(statement);
+        builder.replace(matcher.start(7), matcher.end(7), showWindow.saleEndDate().toLocalTime().format(TIME_FORMATTER));
+        builder.replace(matcher.start(6), matcher.end(6), showWindow.saleEndDate().toLocalDate().toString());
+        builder.replace(matcher.start(5), matcher.end(5), showWindow.saleStartDate().toLocalTime().format(TIME_FORMATTER));
+        builder.replace(matcher.start(4), matcher.end(4), showWindow.saleStartDate().toLocalDate().toString());
+        builder.replace(matcher.start(3), matcher.end(3), showWindow.endDate().toString());
+        return builder.toString();
     }
 
     private String rewritePerformanceStatement(final String statement, final LocalDate assignedDate) {
@@ -216,10 +302,27 @@ public class SeedDataLoader implements ApplicationRunner {
         }
     }
 
-    private record ShowSeed(int statementIndex, String statement, LocalDate startDate, LocalDate endDate) {
+    private record ShowSeed(
+        int statementIndex,
+        String statement,
+        LocalDate startDate,
+        LocalDate endDate,
+        LocalDateTime saleStartDate,
+        LocalDateTime saleEndDate
+    ) {
     }
 
-    private record PerformanceSeed(int statementIndex, String statement, int performanceNo, LocalDate startDate) {
+    private record PerformanceSeed(
+        int statementIndex,
+        String statement,
+        int performanceNo,
+        LocalDate startDate,
+        LocalDateTime orderOpenTime,
+        LocalDateTime orderCloseTime
+    ) {
+    }
+
+    private record ShowWindow(LocalDate endDate, LocalDateTime saleStartDate, LocalDateTime saleEndDate) {
     }
 
     private static final class SeedSqlLines {
