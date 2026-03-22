@@ -8,10 +8,12 @@ import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceInf
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformerInfo;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.show.Show;
+import com.ticket.core.domain.show.image.ShowImagePathResolver;
 import com.ticket.core.domain.show.mapping.ShowGrade;
 import com.ticket.core.domain.show.performer.Performer;
 import com.ticket.core.domain.show.venue.Venue;
 import com.ticket.core.enums.BookingStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -29,13 +31,11 @@ import static com.ticket.core.domain.show.QShow.show;
 import static com.ticket.core.domain.showlike.QShowLike.showLike;
 
 @Repository
+@RequiredArgsConstructor
 public class ShowDetailQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-
-    public ShowDetailQueryRepository(final JPAQueryFactory queryFactory) {
-        this.queryFactory = queryFactory;
-    }
+    private final ShowImagePathResolver showImagePathResolver;
 
     public Optional<ShowDetailResponse> findShowDetail(final Long showId) {
         final Show showEntity = fetchShow(showId);
@@ -157,7 +157,7 @@ public class ShowDetailQueryRepository {
                 showEntity.getSaleType(),
                 showEntity.getSaleStartDate(),
                 showEntity.getSaleEndDate(),
-                showEntity.getImage(),
+                showImagePathResolver.toCardImage(showEntity.getImage()),
                 toVenueInfo(showEntity.getVenue()),
                 toPerformerInfo(showEntity.getPerformer()),
                 genreNames,

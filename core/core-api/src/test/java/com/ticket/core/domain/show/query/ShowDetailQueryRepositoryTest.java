@@ -4,6 +4,7 @@ import com.ticket.core.api.controller.response.ShowDetailResponse;
 import com.ticket.core.domain.show.Show;
 import com.ticket.core.domain.show.category.Category;
 import com.ticket.core.domain.show.genre.Genre;
+import com.ticket.core.domain.show.image.ShowImagePathResolver;
 import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.domain.show.performer.Performer;
 import com.ticket.core.domain.show.venue.Venue;
@@ -20,7 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import(ShowDetailQueryRepository.class)
+@Import({ShowDetailQueryRepository.class, ShowImagePathResolver.class})
 @SuppressWarnings("NonAsciiCharacters")
 class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
 
@@ -37,6 +38,10 @@ class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
         Genre genre = persistGenre("KPOP", "케이팝", category);
         Show show = persistShow("대표 공연", venue, performer, 321L, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(10));
         showId = show.getId();
+        entityManager.createNativeQuery("update shows set image = :image where id = :id")
+                .setParameter("image", "/api/images/shows/" + showId + ".png")
+                .setParameter("id", showId)
+                .executeUpdate();
         persistShowGenre(show, genre);
         persistShowGrade(show, "VIP", "VIP석", BigDecimal.valueOf(150000), 1);
         persistShowGrade(show, "R", "R석", BigDecimal.valueOf(100000), 2);
@@ -62,6 +67,7 @@ class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
         assertThat(detail.grades()).extracting("gradeCode").containsExactly("VIP", "R");
         assertThat(detail.performanceDates()).hasSize(1);
         assertThat(detail.performanceDates().getFirst().performances()).hasSize(2);
+        assertThat(detail.image()).isEqualTo("/api/images/shows/card/" + showId + ".jpg");
         assertThat(detail.venue().name()).isEqualTo("예술의전당");
         assertThat(detail.performer().name()).isEqualTo("홍길동");
     }
