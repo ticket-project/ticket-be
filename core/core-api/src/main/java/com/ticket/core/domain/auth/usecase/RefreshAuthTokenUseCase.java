@@ -27,10 +27,10 @@ public class RefreshAuthTokenUseCase {
                          @Schema(description = "회원 ID", example = "1") Long memberId) {}
 
     public Output execute(final Input input, final HttpServletResponse response) {
-        final Long memberId = refreshTokenService.validate(input.refreshToken().value())
+        final Long memberId = refreshTokenService.validate(input.refreshToken())
                 .orElseThrow(() -> new AuthException(ErrorType.AUTHENTICATION_ERROR, "유효하지 않거나 만료된 리프레시 토큰입니다."));
         final Member member = memberFinder.findActiveMemberById(memberId);
-        final AuthLoginResponse result = authTokenApplicationService.rotateTokens(member, input.refreshToken().value(), response);
+        final AuthLoginResponse result = authTokenApplicationService.rotateTokens(member, input.refreshToken(), response);
         return new Output(result.accessToken(), result.tokenType(), result.expiresIn(), result.memberId());
     }
 }

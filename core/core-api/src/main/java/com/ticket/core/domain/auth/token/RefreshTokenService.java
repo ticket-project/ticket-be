@@ -1,5 +1,6 @@
 package com.ticket.core.domain.auth.token;
 
+import com.ticket.core.domain.auth.usecase.AuthRefreshToken;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -34,41 +35,42 @@ public class RefreshTokenService {
     /**
      * Refresh Token을 검증하고 원자적으로 소비합니다.
      */
-    public Optional<Long> validate(final String tokenValue) {
-        final RBucket<String> bucket = redissonClient.getBucket(KEY_PREFIX + tokenValue);
-        final String memberId = bucket.getAndDelete();
+    public Optional<Long> validate(final AuthRefreshToken refreshToken) {
+        final String memberId = bucketOf(refreshToken).getAndDelete();
         return parseMemberId(memberId);
     }
 
     /**
      * Refresh Token을 소비하지 않고 소유자 memberId만 검증합니다.
      */
-    public Optional<Long> validateWithoutConsume(final String tokenValue) {
-        final RBucket<String> bucket = redissonClient.getBucket(KEY_PREFIX + tokenValue);
-        return parseMemberId(bucket.get());
+    public Optional<Long> validateWithoutConsume(final AuthRefreshToken refreshToken) {
+        return parseMemberId(bucketOf(refreshToken).get());
     }
 
     /**
      * Refresh Token을 삭제합니다.
      */
-    public void revoke(final String tokenValue) {
-        redissonClient.getBucket(KEY_PREFIX + tokenValue).delete();
+    public void revoke(final AuthRefreshToken refreshToken) {
+        bucketOf(refreshToken).delete();
     }
 
     /**
      * Refresh Token의 소유자가 일치할 때만 원자적으로 삭제합니다.
      */
-    public boolean revokeIfOwned(final String tokenValue, final Long memberId) {
-        final RBucket<String> bucket = redissonClient.getBucket(KEY_PREFIX + tokenValue);
-        return bucket.compareAndSet(String.valueOf(memberId), null);
+    public boolean revokeIfOwned(final AuthRefreshToken refreshToken, final Long memberId) {
+        return bucketOf(refreshToken).compareAndSet(String.valueOf(memberId), null);
     }
 
     /**
      * Token Rotation: 기존 토큰 제거 + 새 토큰 발급.
      */
-    public String rotate(final String oldTokenValue, final Long memberId, final long expirationSeconds) {
-        revoke(oldTokenValue);
+    public String rotate(final AuthRefreshToken refreshToken, final Long memberId, final long expirationSeconds) {
+        revoke(refreshToken);
         return createRefreshToken(memberId, expirationSeconds);
+    }
+
+    private RBucket<String> bucketOf(final AuthRefreshToken refreshToken) {
+        return redissonClient.getBucket(KEY_PREFIX + refreshToken.value());
     }
 
     private Optional<Long> parseMemberId(final String memberId) {

@@ -40,7 +40,7 @@ public class GetQueueStatusUseCase {
     }
 
     private QueueTicket findEntry(final QueueEntryId queueEntryId) {
-        return queueTicketStore.findEntry(queueEntryId.value()).orElse(null);
+        return queueTicketStore.findEntry(queueEntryId).orElse(null);
     }
 
     private Output expired(final QueueEntryId queueEntryId) {
@@ -48,7 +48,7 @@ public class GetQueueStatusUseCase {
     }
 
     private Output waiting(final Input input, final QueueTicket entry) {
-        final long position = queueTicketStore.findWaitingPosition(input.performanceId(), input.queueEntryId().value())
+        final long position = queueTicketStore.findWaitingPosition(input.performanceId(), input.queueEntryId())
                 .orElse(0L);
         return new Output(entry.status(), entry.queueEntryId(), position, null, null);
     }

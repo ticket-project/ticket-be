@@ -86,7 +86,7 @@ class JoinQueueUseCaseTest {
         when(queueTicketStore.countActive(10L)).thenReturn(1L);
         when(queueTicketStore.countWaiting(10L)).thenReturn(1L);
         when(queueTicketStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
-        when(queueTicketStore.findWaitingPosition(10L, "qe-2")).thenReturn(Optional.of(2L));
+        when(queueTicketStore.findWaitingPosition(10L, QueueEntryId.from("qe-2"))).thenReturn(Optional.of(2L));
 
         JoinQueueUseCase.Output output = joinQueueUseCase.execute(new JoinQueueUseCase.Input(10L, 101L));
 
@@ -104,7 +104,7 @@ class JoinQueueUseCaseTest {
         when(queueTicketStore.countActive(10L)).thenReturn(1L);
         when(queueTicketStore.countWaiting(10L)).thenReturn(1L);
         when(queueTicketStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
-        when(queueTicketStore.findWaitingPosition(10L, "qe-2")).thenReturn(Optional.empty());
+        when(queueTicketStore.findWaitingPosition(10L, QueueEntryId.from("qe-2"))).thenReturn(Optional.empty());
 
         JoinQueueUseCase.Output output = joinQueueUseCase.execute(new JoinQueueUseCase.Input(10L, 101L));
 
@@ -119,15 +119,15 @@ class JoinQueueUseCaseTest {
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueTicketStore.findMemberEntryId(10L, 101L)).thenReturn(Optional.of("qe-old"));
-        when(queueTicketStore.findEntry("qe-old")).thenReturn(Optional.of(previous));
+        when(queueTicketStore.findEntry(QueueEntryId.from("qe-old"))).thenReturn(Optional.of(previous));
         when(queueTicketStore.countActive(10L)).thenReturn(1L);
         when(queueTicketStore.countWaiting(10L)).thenReturn(1L);
         when(queueTicketStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
-        when(queueTicketStore.findWaitingPosition(10L, "qe-new")).thenReturn(Optional.of(2L));
+        when(queueTicketStore.findWaitingPosition(10L, QueueEntryId.from("qe-new"))).thenReturn(Optional.of(2L));
 
         JoinQueueUseCase.Output output = joinQueueUseCase.execute(new JoinQueueUseCase.Input(10L, 101L));
 
-        verify(queueTicketStore).leaveWaiting(10L, "qe-old");
+        verify(queueTicketStore).leaveWaiting(10L, QueueEntryId.from("qe-old"));
         verify(queueAdmissionProcessor, never()).advance(10L);
         assertThat(output.queueEntryId()).isEqualTo("qe-new");
     }
@@ -148,15 +148,15 @@ class JoinQueueUseCaseTest {
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueTicketStore.findMemberEntryId(10L, 101L)).thenReturn(Optional.of("qe-old"));
-        when(queueTicketStore.findEntry("qe-old")).thenReturn(Optional.of(previous));
+        when(queueTicketStore.findEntry(QueueEntryId.from("qe-old"))).thenReturn(Optional.of(previous));
         when(queueTicketStore.countActive(10L)).thenReturn(2L);
         when(queueTicketStore.countWaiting(10L)).thenReturn(1L);
         when(queueTicketStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
-        when(queueTicketStore.findWaitingPosition(10L, "qe-new")).thenReturn(Optional.of(4L));
+        when(queueTicketStore.findWaitingPosition(10L, QueueEntryId.from("qe-new"))).thenReturn(Optional.of(4L));
 
         JoinQueueUseCase.Output output = joinQueueUseCase.execute(new JoinQueueUseCase.Input(10L, 101L));
 
-        verify(queueTicketStore).leaveAdmitted(10L, "qe-old", "qt-old");
+        verify(queueTicketStore).leaveAdmitted(10L, QueueEntryId.from("qe-old"), "qt-old");
         verify(queueAdmissionProcessor).advance(10L);
         assertThat(output.status()).isEqualTo(QueueEntryStatus.WAITING);
         assertThat(output.queueEntryId()).isEqualTo("qe-new");
@@ -169,11 +169,11 @@ class JoinQueueUseCaseTest {
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueTicketStore.findMemberEntryId(10L, 101L)).thenReturn(Optional.of("missing"));
-        when(queueTicketStore.findEntry("missing")).thenReturn(Optional.empty());
+        when(queueTicketStore.findEntry(QueueEntryId.from("missing"))).thenReturn(Optional.empty());
         when(queueTicketStore.countActive(10L)).thenReturn(1L);
         when(queueTicketStore.countWaiting(10L)).thenReturn(0L);
         when(queueTicketStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
-        when(queueTicketStore.findWaitingPosition(10L, "qe-new")).thenReturn(Optional.of(1L));
+        when(queueTicketStore.findWaitingPosition(10L, QueueEntryId.from("qe-new"))).thenReturn(Optional.of(1L));
 
         joinQueueUseCase.execute(new JoinQueueUseCase.Input(10L, 101L));
 
@@ -188,11 +188,11 @@ class JoinQueueUseCaseTest {
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueTicketStore.findMemberEntryId(10L, 101L)).thenReturn(Optional.of("qe-old"));
-        when(queueTicketStore.findEntry("qe-old")).thenReturn(Optional.of(previous));
+        when(queueTicketStore.findEntry(QueueEntryId.from("qe-old"))).thenReturn(Optional.of(previous));
         when(queueTicketStore.countActive(10L)).thenReturn(1L);
         when(queueTicketStore.countWaiting(10L)).thenReturn(0L);
         when(queueTicketStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
-        when(queueTicketStore.findWaitingPosition(10L, "qe-new")).thenReturn(Optional.of(1L));
+        when(queueTicketStore.findWaitingPosition(10L, QueueEntryId.from("qe-new"))).thenReturn(Optional.of(1L));
 
         joinQueueUseCase.execute(new JoinQueueUseCase.Input(10L, 101L));
 
@@ -209,7 +209,7 @@ class JoinQueueUseCaseTest {
         when(queueTicketStore.countActive(10L)).thenReturn(10L);
         when(queueTicketStore.countWaiting(10L)).thenReturn(1L);
         when(queueTicketStore.enqueue(10L, 101L, Duration.ofHours(1))).thenReturn(waiting);
-        when(queueTicketStore.findWaitingPosition(10L, "qe-wait")).thenReturn(Optional.of(5L));
+        when(queueTicketStore.findWaitingPosition(10L, QueueEntryId.from("qe-wait"))).thenReturn(Optional.of(5L));
 
         JoinQueueUseCase.Output output = joinQueueUseCase.execute(new JoinQueueUseCase.Input(10L, 101L));
 

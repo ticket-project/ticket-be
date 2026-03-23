@@ -4,6 +4,7 @@ import com.ticket.core.aop.DistributedLock;
 import com.ticket.core.domain.queue.command.QueueAdmissionProcessor;
 import com.ticket.core.domain.queue.usecase.ExitQueueUseCase;
 import com.ticket.core.domain.queue.usecase.JoinQueueUseCase;
+import com.ticket.core.domain.queue.usecase.QueueEntryId;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -18,7 +19,7 @@ class QueueLockConsistencyTest {
         assertThat(lockOf(JoinQueueUseCase.class, "execute", JoinQueueUseCase.Input.class).prefix()).isEqualTo("queue");
         assertThat(lockOf(ExitQueueUseCase.class, "execute", ExitQueueUseCase.Input.class).prefix()).isEqualTo("queue");
         assertThat(lockOf(QueueAdmissionProcessor.class, "advance", Long.class).prefix()).isEqualTo("queue");
-        assertThat(lockOf(QueueAdmissionProcessor.class, "handleTokenExpired", Long.class, String.class, String.class).prefix())
+        assertThat(lockOf(QueueAdmissionProcessor.class, "handleTokenExpired", Long.class, QueueEntryId.class, String.class).prefix())
                 .isEqualTo("queue");
     }
 

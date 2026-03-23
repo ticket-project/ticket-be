@@ -40,14 +40,14 @@ public class StartOrderUseCase {
             message = "주문 시작 처리 중입니다. 잠시 후 다시 시도해 주세요."
     )
     public Output execute(final Input input) {
-        final SeatIds seatIds = SeatIds.from(input.seatIds());
+        final OrderSeatIds seatIds = OrderSeatIds.from(input.seatIds());
         final Performance performance = validateStartable(input, seatIds);
         final OrderStartDomainService.OrderStartResult result = startOrder(input, seatIds, performance);
         applicationEventPublisher.publishEvent(new HoldCreatedEvent(result.snapshot()));
         return new Output(result.orderKey());
     }
 
-    private Performance validateStartable(final Input input, final SeatIds seatIds) {
+    private Performance validateStartable(final Input input, final OrderSeatIds seatIds) {
         memberFinder.findActiveMemberById(input.memberId());
         final Performance performance = performanceFinder.findValidPerformanceById(input.performanceId());
         validateSeatCount(performance, seatIds);
@@ -57,7 +57,7 @@ public class StartOrderUseCase {
 
     private OrderStartDomainService.OrderStartResult startOrder(
             final Input input,
-            final SeatIds seatIds,
+            final OrderSeatIds seatIds,
             final Performance performance
     ) {
         return orderStartDomainService.start(
@@ -68,7 +68,7 @@ public class StartOrderUseCase {
         );
     }
 
-    private void validateSeatCount(final Performance performance, final SeatIds seatIds) {
+    private void validateSeatCount(final Performance performance, final OrderSeatIds seatIds) {
         if (performance.isOverCount(seatIds.size())) {
             throw new CoreException(ErrorType.EXCEED_HOLD_LIMIT);
         }

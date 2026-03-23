@@ -10,25 +10,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings("NonAsciiCharacters")
-class SeatIdsTest {
+class OrderSeatIdsTest {
 
     @Test
     void 빈_좌석_ID_목록이면_예외를_던진다() {
-        assertThatThrownBy(() -> SeatIds.from(List.of()))
+        assertThatThrownBy(() -> OrderSeatIds.from(List.of()))
                 .isInstanceOf(CoreException.class)
                 .satisfies(error -> assertThat(((CoreException) error).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
     }
 
     @Test
     void 중복된_좌석_ID가_있으면_예외를_던진다() {
-        assertThatThrownBy(() -> SeatIds.from(List.of(3L, 1L, 3L)))
+        assertThatThrownBy(() -> OrderSeatIds.from(List.of(3L, 1L, 3L)))
                 .isInstanceOf(CoreException.class)
                 .satisfies(error -> assertThat(((CoreException) error).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
     }
 
     @Test
     void 좌석_ID를_오름차순으로_정규화한다() {
-        SeatIds seatIds = SeatIds.from(List.of(7L, 3L, 5L));
+        OrderSeatIds seatIds = OrderSeatIds.from(List.of(7L, 3L, 5L));
 
         assertThat(seatIds.values()).containsExactly(3L, 5L, 7L);
     }

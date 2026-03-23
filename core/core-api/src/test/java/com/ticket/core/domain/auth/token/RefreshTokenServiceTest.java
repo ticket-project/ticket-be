@@ -1,5 +1,7 @@
 package com.ticket.core.domain.auth.token;
 
+import com.ticket.core.domain.auth.usecase.AuthRefreshToken;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -58,7 +60,7 @@ class RefreshTokenServiceTest {
         when(bucket.getAndDelete()).thenReturn("3");
 
         //then
-        assertThat(refreshTokenService.validate("token-value")).contains(3L);
+        assertThat(refreshTokenService.validate(AuthRefreshToken.from("token-value"))).contains(3L);
     }
 
     @Test
@@ -69,7 +71,7 @@ class RefreshTokenServiceTest {
         when(bucket.get()).thenReturn("3");
 
         //then
-        assertThat(refreshTokenService.validateWithoutConsume("token-value")).contains(3L);
+        assertThat(refreshTokenService.validateWithoutConsume(AuthRefreshToken.from("token-value"))).contains(3L);
     }
 
     @Test
@@ -80,7 +82,7 @@ class RefreshTokenServiceTest {
         when(bucket.getAndDelete()).thenReturn("not-a-number");
 
         //then
-        assertThat(refreshTokenService.validate("token-value")).isEmpty();
+        assertThat(refreshTokenService.validate(AuthRefreshToken.from("token-value"))).isEmpty();
     }
 
     @Test
@@ -90,7 +92,7 @@ class RefreshTokenServiceTest {
         when(bucket.compareAndSet("3", null)).thenReturn(true);
 
         //when
-        boolean revoked = refreshTokenService.revokeIfOwned("token-value", 3L);
+        boolean revoked = refreshTokenService.revokeIfOwned(AuthRefreshToken.from("token-value"), 3L);
 
         //then
         assertThat(revoked).isTrue();

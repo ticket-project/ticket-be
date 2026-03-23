@@ -1,6 +1,7 @@
 package com.ticket.core.domain.queue.runtime;
 
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
+import com.ticket.core.domain.queue.usecase.QueueEntryId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,7 +73,7 @@ class RedisQueueTicketStoreTest {
         when(entryMap.readAllMap()).thenReturn(Map.of());
 
         //when
-        Optional<QueueTicket> result = redisQueueTicketStore.findEntry("qe-10");
+        Optional<QueueTicket> result = redisQueueTicketStore.findEntry(QueueEntryId.from("qe-10"));
 
         //then
         assertThat(result).isEmpty();
@@ -94,7 +95,7 @@ class RedisQueueTicketStoreTest {
         ));
 
         //when
-        QueueTicket result = redisQueueTicketStore.findEntry("qe-10").orElseThrow();
+        QueueTicket result = redisQueueTicketStore.findEntry(QueueEntryId.from("qe-10")).orElseThrow();
 
         //then
         assertThat(result.performanceId()).isEqualTo(10L);

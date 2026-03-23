@@ -30,10 +30,11 @@ class GetQueueStatusUseCaseTest {
     @Test
     void 엔트리가_없으면_EXPIRED를_반환한다() {
         //given
-        when(queueTicketStore.findEntry("qe-10")).thenReturn(Optional.empty());
+        QueueEntryId queueEntryId = QueueEntryId.from("qe-10");
+        when(queueTicketStore.findEntry(queueEntryId)).thenReturn(Optional.empty());
 
         //when
-        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-10")));
+        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, queueEntryId));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.EXPIRED);
@@ -43,12 +44,13 @@ class GetQueueStatusUseCaseTest {
     @Test
     void 대기중_엔트리는_현재_순번과_예상대기시간을_반환한다() {
         //given
+        QueueEntryId queueEntryId = QueueEntryId.from("qe-10");
         QueueTicket waiting = new QueueTicket(10L, 100L, "qe-10", QueueEntryStatus.WAITING, 5L, null, null);
-        when(queueTicketStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
-        when(queueTicketStore.findWaitingPosition(10L, "qe-10")).thenReturn(Optional.of(5L));
+        when(queueTicketStore.findEntry(queueEntryId)).thenReturn(Optional.of(waiting));
+        when(queueTicketStore.findWaitingPosition(10L, queueEntryId)).thenReturn(Optional.of(5L));
 
         //when
-        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-10")));
+        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, queueEntryId));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.WAITING);
@@ -58,12 +60,13 @@ class GetQueueStatusUseCaseTest {
     @Test
     void 대기순번을_찾지_못하면_0초기값으로_계산한다() {
         //given
+        QueueEntryId queueEntryId = QueueEntryId.from("qe-10");
         QueueTicket waiting = new QueueTicket(10L, 100L, "qe-10", QueueEntryStatus.WAITING, 5L, null, null);
-        when(queueTicketStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
-        when(queueTicketStore.findWaitingPosition(10L, "qe-10")).thenReturn(Optional.empty());
+        when(queueTicketStore.findEntry(queueEntryId)).thenReturn(Optional.of(waiting));
+        when(queueTicketStore.findWaitingPosition(10L, queueEntryId)).thenReturn(Optional.empty());
 
         //when
-        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-10")));
+        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, queueEntryId));
 
         //then
         assertThat(output.position()).isEqualTo(0L);
@@ -81,11 +84,12 @@ class GetQueueStatusUseCaseTest {
                 "qt-11",
                 LocalDateTime.of(2026, 3, 15, 20, 20)
         );
-        when(queueTicketStore.findEntry("qe-11")).thenReturn(Optional.of(admitted));
+        QueueEntryId queueEntryId = QueueEntryId.from("qe-11");
+        when(queueTicketStore.findEntry(queueEntryId)).thenReturn(Optional.of(admitted));
         when(queueTicketStore.isValidToken(10L, "qt-11")).thenReturn(false);
 
         //when
-        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-11")));
+        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, queueEntryId));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.EXPIRED);
@@ -104,11 +108,12 @@ class GetQueueStatusUseCaseTest {
                 "qt-11",
                 LocalDateTime.of(2026, 3, 15, 20, 20)
         );
-        when(queueTicketStore.findEntry("qe-11")).thenReturn(Optional.of(admitted));
+        QueueEntryId queueEntryId = QueueEntryId.from("qe-11");
+        when(queueTicketStore.findEntry(queueEntryId)).thenReturn(Optional.of(admitted));
         when(queueTicketStore.isValidToken(10L, "qt-11")).thenReturn(true);
 
         //when
-        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-11")));
+        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, queueEntryId));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.ADMITTED);
@@ -119,11 +124,12 @@ class GetQueueStatusUseCaseTest {
     @Test
     void LEFT_상태_엔트리는_그대로_반환한다() {
         //given
+        QueueEntryId queueEntryId = QueueEntryId.from("qe-12");
         QueueTicket left = new QueueTicket(10L, 100L, "qe-12", QueueEntryStatus.LEFT, 1L, null, null);
-        when(queueTicketStore.findEntry("qe-12")).thenReturn(Optional.of(left));
+        when(queueTicketStore.findEntry(queueEntryId)).thenReturn(Optional.of(left));
 
         //when
-        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-12")));
+        GetQueueStatusUseCase.Output output = getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, queueEntryId));
 
         //then
         assertThat(output.status()).isEqualTo(QueueEntryStatus.LEFT);
@@ -132,11 +138,12 @@ class GetQueueStatusUseCaseTest {
     @Test
     void 다른_회원의_엔트리를_조회하면_예외가_발생한다() {
         //given
+        QueueEntryId queueEntryId = QueueEntryId.from("qe-10");
         QueueTicket waiting = new QueueTicket(10L, 999L, "qe-10", QueueEntryStatus.WAITING, 5L, null, null);
-        when(queueTicketStore.findEntry("qe-10")).thenReturn(Optional.of(waiting));
+        when(queueTicketStore.findEntry(queueEntryId)).thenReturn(Optional.of(waiting));
 
         //when //then
-        assertThatThrownBy(() -> getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, QueueEntryId.from("qe-10"))))
+        assertThatThrownBy(() -> getQueueStatusUseCase.execute(new GetQueueStatusUseCase.Input(10L, 100L, queueEntryId)))
                 .isInstanceOf(AuthException.class);
     }
 
