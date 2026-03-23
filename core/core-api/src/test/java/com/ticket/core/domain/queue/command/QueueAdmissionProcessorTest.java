@@ -6,6 +6,7 @@ import com.ticket.core.domain.queue.runtime.QueueTicket;
 import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import com.ticket.core.domain.queue.support.QueuePolicyResolver;
 import com.ticket.core.domain.queue.support.QueuePolicy;
+import com.ticket.core.domain.queue.usecase.QueueEntryId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -88,10 +89,10 @@ class QueueAdmissionProcessorTest {
                 .thenReturn(Optional.of(createAdmitted(10L, "qe-201", "qt-201")));
 
         //when
-        queueAdmissionProcessor.handleTokenExpired(10L, "qe-200", "qt-200");
+        queueAdmissionProcessor.handleTokenExpired(10L, QueueEntryId.from("qe-200"), "qt-200");
 
         //then
-        verify(queueTicketStore).expireAdmitted(10L, "qe-200", "qt-200");
+        verify(queueTicketStore).expireAdmitted(10L, QueueEntryId.from("qe-200"), "qt-200");
         verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
     }
 

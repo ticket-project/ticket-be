@@ -36,19 +36,21 @@ class ExitQueueUseCaseTest {
 
     @Test
     void 대기중_엔트리는_대기열에서_제거한다() {
-        when(queueTicketStore.findEntry("qe-wait")).thenReturn(Optional.of(
+        QueueEntryId queueEntryId = QueueEntryId.from("qe-wait");
+        when(queueTicketStore.findEntry(queueEntryId)).thenReturn(Optional.of(
                 new QueueTicket(10L, 100L, "qe-wait", QueueEntryStatus.WAITING, 1L, null, null)
         ));
 
-        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, QueueEntryId.from("qe-wait")));
+        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, queueEntryId));
 
-        verify(queueTicketStore).leaveWaiting(10L, "qe-wait");
+        verify(queueTicketStore).leaveWaiting(10L, queueEntryId);
         verify(queueAdmissionProcessor, never()).advance(10L);
     }
 
     @Test
     void 입장_엔트리는_토큰을_회수하고_다음_대기자를_입장시킨다() {
-        when(queueTicketStore.findEntry("qe-admit")).thenReturn(Optional.of(
+        QueueEntryId queueEntryId = QueueEntryId.from("qe-admit");
+        when(queueTicketStore.findEntry(queueEntryId)).thenReturn(Optional.of(
                 new QueueTicket(
                         10L,
                         100L,
@@ -60,30 +62,32 @@ class ExitQueueUseCaseTest {
                 )
         ));
 
-        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, QueueEntryId.from("qe-admit")));
+        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, queueEntryId));
 
-        verify(queueTicketStore).leaveAdmitted(10L, "qe-admit", "qt-admit");
+        verify(queueTicketStore).leaveAdmitted(10L, queueEntryId, "qt-admit");
         verify(queueAdmissionProcessor).advance(10L);
     }
 
     @Test
     void 엔트리가_없으면_아무_작업도_하지_않는다() {
-        when(queueTicketStore.findEntry("missing")).thenReturn(Optional.empty());
+        QueueEntryId queueEntryId = QueueEntryId.from("missing");
+        when(queueTicketStore.findEntry(queueEntryId)).thenReturn(Optional.empty());
 
-        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, QueueEntryId.from("missing")));
+        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, queueEntryId));
 
         verify(queueAdmissionProcessor, never()).advance(10L);
     }
 
     @Test
     void 다른_공연_엔트리면_아무_작업도_하지_않는다() {
-        when(queueTicketStore.findEntry("qe-other")).thenReturn(Optional.of(
+        QueueEntryId queueEntryId = QueueEntryId.from("qe-other");
+        when(queueTicketStore.findEntry(queueEntryId)).thenReturn(Optional.of(
                 new QueueTicket(99L, 100L, "qe-other", QueueEntryStatus.WAITING, 1L, null, null)
         ));
 
-        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, QueueEntryId.from("qe-other")));
+        exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, queueEntryId));
 
-        verify(queueTicketStore, never()).leaveWaiting(10L, "qe-other");
+        verify(queueTicketStore, never()).leaveWaiting(10L, queueEntryId);
         verify(queueAdmissionProcessor, never()).advance(10L);
     }
 

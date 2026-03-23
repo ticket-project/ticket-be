@@ -19,9 +19,9 @@ public class LogoutUseCase {
     public record Output() {}
 
     public Output execute(final Input input, final HttpServletResponse response) {
-        final boolean revoked = refreshTokenService.revokeIfOwned(input.refreshToken().value(), input.memberId());
+        final boolean revoked = refreshTokenService.revokeIfOwned(input.refreshToken(), input.memberId());
         if (!revoked) {
-            final Long tokenOwnerId = refreshTokenService.validateWithoutConsume(input.refreshToken().value())
+            final Long tokenOwnerId = refreshTokenService.validateWithoutConsume(input.refreshToken())
                     .orElseThrow(() -> new AuthException(ErrorType.AUTHENTICATION_ERROR, "유효하지 않은 리프레시 토큰입니다."));
             if (!tokenOwnerId.equals(input.memberId())) {
                 throw new AuthException(ErrorType.AUTHORIZATION_ERROR, "본인의 토큰만 무효화할 수 있습니다.");

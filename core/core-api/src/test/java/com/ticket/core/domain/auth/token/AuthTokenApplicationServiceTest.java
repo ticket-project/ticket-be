@@ -3,6 +3,7 @@ package com.ticket.core.domain.auth.token;
 import com.ticket.core.api.controller.response.AuthLoginResponse;
 import com.ticket.core.config.security.JwtProperties;
 import com.ticket.core.config.security.JwtTokenService;
+import com.ticket.core.domain.auth.usecase.AuthRefreshToken;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.vo.Email;
 import com.ticket.core.domain.member.vo.EncodedPassword;
@@ -70,16 +71,17 @@ class AuthTokenApplicationServiceTest {
         //given
         Member member = createMember(7L);
         MockHttpServletResponse response = new MockHttpServletResponse();
-        when(refreshTokenService.rotate("old-refresh", 7L, 1209600L)).thenReturn("new-refresh");
+        AuthRefreshToken refreshToken = AuthRefreshToken.from("old-refresh");
+        when(refreshTokenService.rotate(refreshToken, 7L, 1209600L)).thenReturn("new-refresh");
         when(jwtProperties.getRefreshTokenExpirationSeconds()).thenReturn(1209600L);
         when(jwtTokenService.createAccessToken(any())).thenReturn("new-access");
         when(jwtTokenService.getAccessTokenExpirationSeconds()).thenReturn(1800L);
 
         //when
-        AuthLoginResponse result = authTokenApplicationService.rotateTokens(member, "old-refresh", response);
+        AuthLoginResponse result = authTokenApplicationService.rotateTokens(member, refreshToken, response);
 
         //then
-        verify(refreshTokenService).rotate("old-refresh", 7L, 1209600L);
+        verify(refreshTokenService).rotate(refreshToken, 7L, 1209600L);
         assertThat(result.accessToken()).isEqualTo("new-access");
         assertThat(result.memberId()).isEqualTo(7L);
         assertThat(response.getHeaders("Set-Cookie"))
