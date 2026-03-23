@@ -45,32 +45,34 @@ class RefreshAuthTokenUseCaseTest {
         AuthLoginResponse response = new AuthLoginResponse("access", "Bearer", 1800L, 3L);
         MockHttpServletResponse servletResponse = new MockHttpServletResponse();
 
-        when(refreshTokenService.validate("refresh-token")).thenReturn(Optional.of(3L));
+        AuthRefreshToken refreshToken = AuthRefreshToken.from("refresh-token");
+        when(refreshTokenService.validate(refreshToken)).thenReturn(Optional.of(3L));
         when(memberFinder.findActiveMemberById(3L)).thenReturn(member);
-        when(authTokenApplicationService.rotateTokens(member, "refresh-token", servletResponse)).thenReturn(response);
+        when(authTokenApplicationService.rotateTokens(member, refreshToken, servletResponse)).thenReturn(response);
 
         //when
         RefreshAuthTokenUseCase.Output output =
-                useCase.execute(new RefreshAuthTokenUseCase.Input(AuthRefreshToken.from("refresh-token")), servletResponse);
+                useCase.execute(new RefreshAuthTokenUseCase.Input(refreshToken), servletResponse);
 
         //then
         assertThat(output.accessToken()).isEqualTo(response.accessToken());
         assertThat(output.tokenType()).isEqualTo(response.tokenType());
         assertThat(output.expiresIn()).isEqualTo(response.expiresIn());
         assertThat(output.memberId()).isEqualTo(response.memberId());
-        verify(refreshTokenService).validate("refresh-token");
+        verify(refreshTokenService).validate(refreshToken);
         verify(memberFinder).findActiveMemberById(3L);
-        verify(authTokenApplicationService).rotateTokens(member, "refresh-token", servletResponse);
+        verify(authTokenApplicationService).rotateTokens(member, refreshToken, servletResponse);
     }
 
     @Test
     void 리프레시_토큰이_유효하지_않으면_인증_예외를_던진다() {
         //given
-        when(refreshTokenService.validate("refresh-token")).thenReturn(Optional.empty());
+        AuthRefreshToken refreshToken = AuthRefreshToken.from("refresh-token");
+        when(refreshTokenService.validate(refreshToken)).thenReturn(Optional.empty());
 
         //when
         //then
-        assertThatThrownBy(() -> useCase.execute(new RefreshAuthTokenUseCase.Input(AuthRefreshToken.from("refresh-token")), new MockHttpServletResponse()))
+        assertThatThrownBy(() -> useCase.execute(new RefreshAuthTokenUseCase.Input(refreshToken), new MockHttpServletResponse()))
                 .isInstanceOf(AuthException.class)
                 .satisfies(exception -> assertThat(((AuthException) exception).getErrorType()).isEqualTo(ErrorType.AUTHENTICATION_ERROR));
     }

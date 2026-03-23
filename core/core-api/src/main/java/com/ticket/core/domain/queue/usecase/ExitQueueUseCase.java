@@ -23,17 +23,17 @@ public class ExitQueueUseCase {
             message = "대기열 이탈 처리 중입니다. 잠시 후 다시 시도해 주세요."
     )
     public void execute(final Input input) {
-        final QueueTicket entry = queueTicketStore.findEntry(input.queueEntryId().value()).orElse(null);
+        final QueueTicket entry = queueTicketStore.findEntry(input.queueEntryId()).orElse(null);
         if (entry == null || !input.performanceId().equals(entry.performanceId())) {
             return;
         }
         entry.assertOwnedBy(input.performanceId(), input.memberId());
         if (entry.isWaiting()) {
-            queueTicketStore.leaveWaiting(input.performanceId(), input.queueEntryId().value());
+            queueTicketStore.leaveWaiting(input.performanceId(), input.queueEntryId());
             return;
         }
         if (entry.isAdmitted()) {
-            queueTicketStore.leaveAdmitted(input.performanceId(), input.queueEntryId().value(), entry.queueToken());
+            queueTicketStore.leaveAdmitted(input.performanceId(), input.queueEntryId(), entry.queueToken());
             queueAdmissionProcessor.advance(input.performanceId());
         }
     }

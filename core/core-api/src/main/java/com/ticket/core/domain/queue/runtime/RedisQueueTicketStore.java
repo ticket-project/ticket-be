@@ -1,6 +1,7 @@
 package com.ticket.core.domain.queue.runtime;
 
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
+import com.ticket.core.domain.queue.usecase.QueueEntryId;
 import com.ticket.core.support.random.UuidSupplier;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.*;
@@ -76,14 +77,14 @@ public class RedisQueueTicketStore implements QueueTicketStore {
     }
 
     @Override
-    public Optional<Long> findWaitingPosition(final Long performanceId, final String queueEntryId) {
-        final Integer rank = waitingSet(performanceId).rank(queueEntryId);
+    public Optional<Long> findWaitingPosition(final Long performanceId, final QueueEntryId queueEntryId) {
+        final Integer rank = waitingSet(performanceId).rank(queueEntryId.value());
         return rank == null ? Optional.empty() : Optional.of(rank.longValue() + 1L);
     }
 
     @Override
-    public Optional<QueueTicket> findEntry(final String queueEntryId) {
-        final Map<String, String> values = entryMap(queueEntryId).readAllMap();
+    public Optional<QueueTicket> findEntry(final QueueEntryId queueEntryId) {
+        final Map<String, String> values = entryMap(queueEntryId.value()).readAllMap();
         if (values.isEmpty()) {
             return Optional.empty();
         }
@@ -91,7 +92,7 @@ public class RedisQueueTicketStore implements QueueTicketStore {
         return Optional.of(new QueueTicket(
                 Long.valueOf(values.get(FIELD_PERFORMANCE_ID)),
                 parseLong(values.get(FIELD_MEMBER_ID)),
-                queueEntryId,
+                queueEntryId.value(),
                 QueueEntryStatus.valueOf(values.get(FIELD_STATUS)),
                 parseLong(values.get(FIELD_SEQUENCE)),
                 values.get(FIELD_QUEUE_TOKEN),
@@ -118,7 +119,7 @@ public class RedisQueueTicketStore implements QueueTicketStore {
                 return Optional.empty();
             }
             waitingSet.remove(queueEntryId);
-            final QueueTicket entry = findEntry(queueEntryId).orElse(null);
+            final QueueTicket entry = findEntry(QueueEntryId.from(queueEntryId)).orElse(null);
             if (entry == null || entry.status() != QueueEntryStatus.WAITING) {
                 continue;
             }
@@ -128,29 +129,29 @@ public class RedisQueueTicketStore implements QueueTicketStore {
     }
 
     @Override
-    public void expireAdmitted(final Long performanceId, final String queueEntryId, final String queueToken) {
+    public void expireAdmitted(final Long performanceId, final QueueEntryId queueEntryId, final String queueToken) {
         final QueueTicket entry = findEntry(queueEntryId).orElse(null);
         activeSet(performanceId).remove(queueToken);
         tokenBucket(queueToken).delete();
-        updateEntry(queueEntryId, QueueEntryStatus.EXPIRED, null, null);
-        clearMemberEntryIfMatches(entry, performanceId, queueEntryId);
+        updateEntry(queueEntryId.value(), QueueEntryStatus.EXPIRED, null, null);
+        clearMemberEntryIfMatches(entry, performanceId, queueEntryId.value());
     }
 
     @Override
-    public void leaveWaiting(final Long performanceId, final String queueEntryId) {
+    public void leaveWaiting(final Long performanceId, final QueueEntryId queueEntryId) {
         final QueueTicket entry = findEntry(queueEntryId).orElse(null);
-        waitingSet(performanceId).remove(queueEntryId);
-        updateEntry(queueEntryId, QueueEntryStatus.LEFT, null, null);
-        clearMemberEntryIfMatches(entry, performanceId, queueEntryId);
+        waitingSet(performanceId).remove(queueEntryId.value());
+        updateEntry(queueEntryId.value(), QueueEntryStatus.LEFT, null, null);
+        clearMemberEntryIfMatches(entry, performanceId, queueEntryId.value());
     }
 
     @Override
-    public void leaveAdmitted(final Long performanceId, final String queueEntryId, final String queueToken) {
+    public void leaveAdmitted(final Long performanceId, final QueueEntryId queueEntryId, final String queueToken) {
         final QueueTicket entry = findEntry(queueEntryId).orElse(null);
         activeSet(performanceId).remove(queueToken);
         tokenBucket(queueToken).delete();
-        updateEntry(queueEntryId, QueueEntryStatus.LEFT, null, null);
-        clearMemberEntryIfMatches(entry, performanceId, queueEntryId);
+        updateEntry(queueEntryId.value(), QueueEntryStatus.LEFT, null, null);
+        clearMemberEntryIfMatches(entry, performanceId, queueEntryId.value());
     }
 
     private QueueTicket admit(

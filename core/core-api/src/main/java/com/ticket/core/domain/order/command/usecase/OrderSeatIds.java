@@ -6,17 +6,17 @@ import com.ticket.core.support.exception.ErrorType;
 import java.util.HashSet;
 import java.util.List;
 
-public final class SeatIds {
+public final class OrderSeatIds {
 
     private final List<Long> values;
 
-    private SeatIds(final List<Long> values) {
+    private OrderSeatIds(final List<Long> values) {
         this.values = values;
     }
 
-    public static SeatIds from(final List<Long> requestedSeatIds) {
+    public static OrderSeatIds from(final List<Long> requestedSeatIds) {
         validateDuplicate(requestedSeatIds);
-        return new SeatIds(normalize(requestedSeatIds));
+        return new OrderSeatIds(normalize(requestedSeatIds));
     }
 
     private static void validateDuplicate(final List<Long> requestedSeatIds) {

@@ -50,17 +50,18 @@ public class JoinQueueUseCase {
         if (existingQueueEntryId == null) {
             return;
         }
-        final QueueTicket existingEntry = queueTicketStore.findEntry(existingQueueEntryId).orElse(null);
+        final QueueEntryId queueEntryId = QueueEntryId.from(existingQueueEntryId);
+        final QueueTicket existingEntry = queueTicketStore.findEntry(queueEntryId).orElse(null);
         if (existingEntry == null) {
             clearMemberEntry(performanceId, memberId);
             return;
         }
         if (existingEntry.isWaiting()) {
-            leaveWaiting(performanceId, existingQueueEntryId);
+            leaveWaiting(performanceId, queueEntryId);
             return;
         }
         if (existingEntry.isOwnedBy(performanceId, memberId) && existingEntry.isAdmitted()) {
-            leaveAdmitted(performanceId, existingQueueEntryId, existingEntry.queueToken());
+            leaveAdmitted(performanceId, queueEntryId, existingEntry.queueToken());
             return;
         }
         clearMemberEntry(performanceId, memberId);
@@ -94,16 +95,16 @@ public class JoinQueueUseCase {
                 input.memberId(),
                 policy.entryRetention()
         );
-        final long position = queueTicketStore.findWaitingPosition(input.performanceId(), waiting.queueEntryId())
+        final long position = queueTicketStore.findWaitingPosition(input.performanceId(), QueueEntryId.from(waiting.queueEntryId()))
                 .orElse(1L);
         return new Output(waiting.status(), waiting.queueEntryId(), position, null, null);
     }
 
-    private void leaveWaiting(final Long performanceId, final String queueEntryId) {
+    private void leaveWaiting(final Long performanceId, final QueueEntryId queueEntryId) {
         queueTicketStore.leaveWaiting(performanceId, queueEntryId);
     }
 
-    private void leaveAdmitted(final Long performanceId, final String queueEntryId, final String queueToken) {
+    private void leaveAdmitted(final Long performanceId, final QueueEntryId queueEntryId, final String queueToken) {
         queueTicketStore.leaveAdmitted(performanceId, queueEntryId, queueToken);
         queueAdmissionProcessor.advance(performanceId);
     }
