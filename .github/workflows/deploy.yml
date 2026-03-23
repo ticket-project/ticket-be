@@ -50,16 +50,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Copy deploy files to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.HOST_IP }}
-          username: ubuntu
-          key: ${{ secrets.SSH_KEY }}
-          source: "deploy/server/docker-compose.yml,deploy/server/nginx/nginx.conf"
-          target: "/home/ubuntu/deploy-tmp"
-          strip_components: 2
-
       - name: Deploy to Ubuntu server
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -72,12 +62,6 @@ jobs:
             DEPLOY_DIR="/home/ubuntu"
             CURRENT_FE_IMAGE="$(sudo docker inspect ticket-fe --format '{{.Config.Image}}' 2>/dev/null || true)"
 
-            # Copy deploy files
-            cp /home/ubuntu/deploy-tmp/docker-compose.yml $DEPLOY_DIR/docker-compose.yml
-            mkdir -p $DEPLOY_DIR/nginx
-            cp /home/ubuntu/deploy-tmp/nginx/nginx.conf $DEPLOY_DIR/nginx/nginx.conf
-            rm -rf /home/ubuntu/deploy-tmp
-
             if [ -z "$CURRENT_FE_IMAGE" ]; then
               CURRENT_FE_IMAGE="${{ secrets.DOCKER_USERNAME }}/ticket-fe:latest"
               sudo docker pull "$CURRENT_FE_IMAGE"
@@ -86,5 +70,5 @@ jobs:
             echo "${{ secrets.DOCKER_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
             sudo docker pull "$IMAGE"
             sudo DOCKER_IMAGE="$IMAGE" FRONTEND_DOCKER_IMAGE="$CURRENT_FE_IMAGE" \
-              docker compose -f $DEPLOY_DIR/docker-compose.yml up -d --remove-orphans
+              docker compose -f "$DEPLOY_DIR/docker-compose.yml" up -d --remove-orphans
             sudo docker image prune -f
