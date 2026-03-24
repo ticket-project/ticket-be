@@ -3,6 +3,8 @@ package com.ticket.core.api.controller;
 import com.ticket.core.config.LoginMemberArgumentResolver;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.domain.order.command.usecase.StartOrderUseCase;
+import com.ticket.core.domain.order.command.usecase.TerminateOrderUseCase;
+import com.ticket.core.domain.order.query.usecase.GetOrderDetailUseCase;
 import com.ticket.core.enums.OrderState;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.ApiControllerAdvice;
@@ -27,17 +29,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SuppressWarnings("NonAsciiCharacters")
-class HoldControllerContractTest {
+class OrderControllerContractTest {
 
     private static final MemberPrincipal MEMBER = new MemberPrincipal(100L, Role.MEMBER);
 
     private final StartOrderUseCase startOrderUseCase = Mockito.mock(StartOrderUseCase.class);
+    private final GetOrderDetailUseCase getOrderDetailUseCase = Mockito.mock(GetOrderDetailUseCase.class);
+    private final TerminateOrderUseCase terminateOrderUseCase = Mockito.mock(TerminateOrderUseCase.class);
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        HoldController controller = new HoldController(startOrderUseCase);
+        OrderController controller = new OrderController(
+                startOrderUseCase,
+                getOrderDetailUseCase,
+                terminateOrderUseCase
+        );
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setCustomArgumentResolvers(new LoginMemberArgumentResolver())
                 .setControllerAdvice(new ApiControllerAdvice())
@@ -53,7 +61,7 @@ class HoldControllerContractTest {
     }
 
     @Test
-    void hold_생성_성공시_기존_계약을_유지한다() throws Exception {
+    void 주문시작_성공시_201_헤더와_응답바디_계약을_지킨다() throws Exception {
         when(startOrderUseCase.execute(new StartOrderUseCase.Input(10L, List.of(7L, 3L), 100L)))
                 .thenReturn(new StartOrderUseCase.Output(
                         "ORD-20260324",
@@ -61,10 +69,11 @@ class HoldControllerContractTest {
                         LocalDateTime.of(2026, 3, 24, 14, 10)
                 ));
 
-        mockMvc.perform(post("/api/v1/performances/10/holds")
+        mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
+                                  "performanceId": 10,
                                   "seatIds": [7, 3]
                                 }
                                 """))
@@ -79,12 +88,30 @@ class HoldControllerContractTest {
     }
 
     @Test
-    void hold_생성_실패시_검증오류_응답_계약을_유지한다() throws Exception {
-        mockMvc.perform(post("/api/v1/performances/10/holds")
+    void 주문시작_실패시_검증오류를_응답_계약으로_내린다() throws Exception {
+        mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
+                                  "performanceId": 10,
                                   "seatIds": []
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.result").value("ERROR"))
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andExpect(jsonPath("$.error.code").value("E400"));
+
+        verifyNoInteractions(startOrderUseCase);
+    }
+
+    @Test
+    void 주문시작_요청에_performanceId가_없으면_검증오류를_응답한다() throws Exception {
+        mockMvc.perform(post("/api/v1/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "seatIds": [7, 3]
                                 }
                                 """))
                 .andExpect(status().isBadRequest())
