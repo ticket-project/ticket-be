@@ -4,12 +4,23 @@ import com.ticket.core.domain.queue.model.QueueLevel;
 import com.ticket.core.domain.queue.model.QueueMode;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
 class PerformanceTest {
+
+    @Test
+    void 기본_holdTime은_10분이다() throws Exception {
+        Constructor<Performance> constructor = Performance.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+
+        Performance performance = constructor.newInstance();
+
+        assertThat(performance.getHoldTime()).isEqualTo(600);
+    }
 
     @Test
     void 요청좌석수가_최대선점수보다_크면_초과다() {

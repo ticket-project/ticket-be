@@ -46,7 +46,7 @@ public class Performance extends BaseEntity {
     private int maxCanHoldCount;
 
     @Column
-    private Integer holdTime = 420;
+    private Integer holdTime = 600;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
