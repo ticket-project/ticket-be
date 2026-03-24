@@ -2,7 +2,7 @@ package com.ticket.core.domain.hold.finder;
 
 import com.ticket.core.domain.hold.model.HoldHistory;
 import com.ticket.core.domain.hold.repository.HoldHistoryRepository;
-import com.ticket.core.enums.HoldState;
+import com.ticket.core.enums.HoldReleaseReason;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,44 +27,48 @@ class HoldHistoryFinderTest {
     private HoldHistoryFinder holdHistoryFinder;
 
     @Test
-    void 활성_hold_history만_조회해_반환한다() {
+    void hold_key로_이력을_순서대로_조회한다() {
         //given
-        HoldHistory first = createHoldHistory(100L);
-        HoldHistory second = createHoldHistory(101L);
-        when(holdHistoryRepository.findAllByHoldKeyAndStatusOrderByIdAsc("hold-key", HoldState.ACTIVE))
-                .thenReturn(List.of(first, second));
-
-        //when
-        List<HoldHistory> result = holdHistoryFinder.findActiveByHoldKey("hold-key");
-
-        //then
-        assertThat(result).containsExactly(first, second);
-        verify(holdHistoryRepository).findAllByHoldKeyAndStatusOrderByIdAsc("hold-key", HoldState.ACTIVE);
-    }
-
-    @Test
-    void 활성_hold_history가_없으면_빈_목록을_반환한다() {
-        //given
-        when(holdHistoryRepository.findAllByHoldKeyAndStatusOrderByIdAsc("missing", HoldState.ACTIVE))
-                .thenReturn(List.of());
-
-        //when
-        List<HoldHistory> result = holdHistoryFinder.findActiveByHoldKey("missing");
-
-        //then
-        assertThat(result).isEmpty();
-        verify(holdHistoryRepository).findAllByHoldKeyAndStatusOrderByIdAsc("missing", HoldState.ACTIVE);
-    }
-
-    private HoldHistory createHoldHistory(final Long seatId) {
-        return new HoldHistory(
+        HoldHistory first = HoldHistory.created(
                 "hold-key",
                 1L,
                 10L,
-                seatId + 1000,
-                seatId,
+                1100L,
+                100L,
+                LocalDateTime.of(2026, 3, 15, 12, 0),
                 LocalDateTime.of(2026, 3, 15, 12, 30)
         );
+        HoldHistory second = HoldHistory.canceled(
+                "hold-key",
+                1L,
+                10L,
+                1101L,
+                101L,
+                LocalDateTime.of(2026, 3, 15, 12, 10),
+                HoldReleaseReason.USER_CANCELED
+        );
+        when(holdHistoryRepository.findAllByHoldKeyOrderByIdAsc("hold-key"))
+                .thenReturn(List.of(first, second));
+
+        //when
+        List<HoldHistory> result = holdHistoryFinder.findByHoldKey("hold-key");
+
+        //then
+        assertThat(result).containsExactly(first, second);
+        verify(holdHistoryRepository).findAllByHoldKeyOrderByIdAsc("hold-key");
+    }
+
+    @Test
+    void 이력이_없으면_빈_목록을_반환한다() {
+        //given
+        when(holdHistoryRepository.findAllByHoldKeyOrderByIdAsc("missing"))
+                .thenReturn(List.of());
+
+        //when
+        List<HoldHistory> result = holdHistoryFinder.findByHoldKey("missing");
+
+        //then
+        assertThat(result).isEmpty();
+        verify(holdHistoryRepository).findAllByHoldKeyOrderByIdAsc("missing");
     }
 }
-

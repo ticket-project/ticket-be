@@ -38,10 +38,11 @@ public class OrderStartDomainService {
                     snapshot.expiresAt(),
                     performanceSeats
             );
-            holdHistoryRecorder.recordActiveHold(
+            holdHistoryRecorder.recordCreated(
                     memberId,
                     performanceId,
                     snapshot.holdKey(),
+                    snapshot.expiresAt().minus(holdDuration),
                     snapshot.expiresAt(),
                     performanceSeats
             );

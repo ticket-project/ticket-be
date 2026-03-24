@@ -1,8 +1,8 @@
 package com.ticket.core.domain.hold.model;
 
 import com.ticket.core.domain.BaseEntity;
+import com.ticket.core.enums.HoldHistoryEventType;
 import com.ticket.core.enums.HoldReleaseReason;
-import com.ticket.core.enums.HoldState;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -50,51 +50,75 @@ public class HoldHistory extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)
-    private HoldState status;
+    private HoldHistoryEventType eventType;
 
     @Column(nullable = false)
-    private LocalDateTime expiresAt;
+    private LocalDateTime occurredAt;
 
-    private LocalDateTime releasedAt;
+    private LocalDateTime expiresAt;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 32)
     private HoldReleaseReason releaseReason;
 
-    public HoldHistory(
+    private HoldHistory(
             final String holdKey,
             final Long memberId,
             final Long performanceId,
             final Long performanceSeatId,
             final Long seatId,
-            final LocalDateTime expiresAt
+            final HoldHistoryEventType eventType,
+            final LocalDateTime occurredAt,
+            final LocalDateTime expiresAt,
+            final HoldReleaseReason releaseReason
     ) {
         this.holdKey = holdKey;
         this.memberId = memberId;
         this.performanceId = performanceId;
         this.performanceSeatId = performanceSeatId;
         this.seatId = seatId;
-        this.status = HoldState.ACTIVE;
+        this.eventType = eventType;
+        this.occurredAt = occurredAt;
         this.expiresAt = expiresAt;
+        this.releaseReason = releaseReason;
     }
 
-    public void expire(final LocalDateTime now, final HoldReleaseReason reason) {
-        ensureActive();
-        this.status = HoldState.EXPIRED;
-        this.releasedAt = now;
-        this.releaseReason = reason;
+    public static HoldHistory created(
+            final String holdKey,
+            final Long memberId,
+            final Long performanceId,
+            final Long performanceSeatId,
+            final Long seatId,
+            final LocalDateTime occurredAt,
+            final LocalDateTime expiresAt
+    ) {
+        return new HoldHistory(holdKey, memberId, performanceId, performanceSeatId, seatId,
+                HoldHistoryEventType.CREATED, occurredAt, expiresAt, null);
     }
 
-    public void cancel(final LocalDateTime now, final HoldReleaseReason reason) {
-        ensureActive();
-        this.status = HoldState.CANCELED;
-        this.releasedAt = now;
-        this.releaseReason = reason;
+    public static HoldHistory expired(
+            final String holdKey,
+            final Long memberId,
+            final Long performanceId,
+            final Long performanceSeatId,
+            final Long seatId,
+            final LocalDateTime occurredAt,
+            final HoldReleaseReason releaseReason
+    ) {
+        return new HoldHistory(holdKey, memberId, performanceId, performanceSeatId, seatId,
+                HoldHistoryEventType.EXPIRED, occurredAt, null, releaseReason);
     }
 
-    private void ensureActive() {
-        if (this.status != HoldState.ACTIVE) {
-            throw new IllegalStateException("이미 종료된 hold history 입니다.");
-        }
+    public static HoldHistory canceled(
+            final String holdKey,
+            final Long memberId,
+            final Long performanceId,
+            final Long performanceSeatId,
+            final Long seatId,
+            final LocalDateTime occurredAt,
+            final HoldReleaseReason releaseReason
+    ) {
+        return new HoldHistory(holdKey, memberId, performanceId, performanceSeatId, seatId,
+                HoldHistoryEventType.CANCELED, occurredAt, null, releaseReason);
     }
 }
