@@ -53,18 +53,18 @@ class OrderStartDomainServiceTest {
         Order order = new Order(20L, 10L, "order-key", "hold-key", BigDecimal.valueOf(120000), snapshot.expiresAt());
 
         when(holdSeatAvailabilityValidator.validate(10L, seatIds)).thenReturn(performanceSeats);
-        when(holdManager.createHold(20L, 10L, seatIds, Duration.ofSeconds(420))).thenReturn(snapshot);
+        when(holdManager.createHold(20L, 10L, seatIds, Duration.ofSeconds(600))).thenReturn(snapshot);
         when(createOrderApplicationService.createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats))
                 .thenReturn(order);
 
         //when
-        OrderStartDomainService.OrderStartResult result = orderStartDomainService.start(20L, 10L, seatIds, Duration.ofSeconds(420));
+        OrderStartDomainService.OrderResult result = orderStartDomainService.start(20L, 10L, seatIds, Duration.ofSeconds(600));
 
         //then
         assertThat(result.orderKey()).isEqualTo("order-key");
         assertThat(result.snapshot()).isEqualTo(snapshot);
         verify(holdSeatAvailabilityValidator).validate(10L, seatIds);
-        verify(holdManager).createHold(20L, 10L, seatIds, Duration.ofSeconds(420));
+        verify(holdManager).createHold(20L, 10L, seatIds, Duration.ofSeconds(600));
         verify(createOrderApplicationService).createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);
         verify(holdHistoryRecorder).recordActiveHold(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);
     }
@@ -76,11 +76,11 @@ class OrderStartDomainServiceTest {
         HoldSnapshot snapshot = new HoldSnapshot("hold-key", 20L, 10L, seatIds, LocalDateTime.of(2026, 3, 15, 12, 0));
 
         when(holdSeatAvailabilityValidator.validate(10L, seatIds)).thenReturn(performanceSeats);
-        when(holdManager.createHold(20L, 10L, seatIds, Duration.ofSeconds(420))).thenReturn(snapshot);
+        when(holdManager.createHold(20L, 10L, seatIds, Duration.ofSeconds(600))).thenReturn(snapshot);
         when(createOrderApplicationService.createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats))
                 .thenThrow(new RuntimeException("order failed"));
 
-        assertThatThrownBy(() -> orderStartDomainService.start(20L, 10L, seatIds, Duration.ofSeconds(420)))
+        assertThatThrownBy(() -> orderStartDomainService.start(20L, 10L, seatIds, Duration.ofSeconds(600)))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("order failed");
 
@@ -96,13 +96,13 @@ class OrderStartDomainServiceTest {
         Order order = new Order(20L, 10L, "order-key", "hold-key", BigDecimal.valueOf(120000), snapshot.expiresAt());
 
         when(holdSeatAvailabilityValidator.validate(10L, seatIds)).thenReturn(performanceSeats);
-        when(holdManager.createHold(20L, 10L, seatIds, Duration.ofSeconds(420))).thenReturn(snapshot);
+        when(holdManager.createHold(20L, 10L, seatIds, Duration.ofSeconds(600))).thenReturn(snapshot);
         when(createOrderApplicationService.createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats))
                 .thenReturn(order);
         doThrow(new RuntimeException("history failed"))
                 .when(holdHistoryRecorder).recordActiveHold(20L, 10L, "hold-key", snapshot.expiresAt(), performanceSeats);
 
-        assertThatThrownBy(() -> orderStartDomainService.start(20L, 10L, seatIds, Duration.ofSeconds(420)))
+        assertThatThrownBy(() -> orderStartDomainService.start(20L, 10L, seatIds, Duration.ofSeconds(600)))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("history failed");
 

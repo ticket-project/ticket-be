@@ -22,7 +22,7 @@ public class OrderStartDomainService {
     private final HoldHistoryRecorder holdHistoryRecorder;
     private final CreateOrderApplicationService createOrderApplicationService;
 
-    public OrderStartResult start(
+    public OrderResult start(
             final Long memberId,
             final Long performanceId,
             final List<Long> seatIds,
@@ -45,13 +45,13 @@ public class OrderStartDomainService {
                     snapshot.expiresAt(),
                     performanceSeats
             );
-            return new OrderStartResult(order.getOrderKey(), snapshot);
+            return new OrderResult(order.getOrderKey(), snapshot);
         } catch (final RuntimeException e) {
             holdManager.release(performanceId, snapshot.holdKey(), snapshot.seatIds());
             throw e;
         }
     }
 
-    public record OrderStartResult(String orderKey, HoldSnapshot snapshot) {
+    public record OrderResult(String orderKey, HoldSnapshot snapshot) {
     }
 }
