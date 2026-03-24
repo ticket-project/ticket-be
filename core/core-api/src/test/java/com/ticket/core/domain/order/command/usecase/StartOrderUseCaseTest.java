@@ -1,6 +1,5 @@
 package com.ticket.core.domain.order.command.usecase;
 
-import com.ticket.core.domain.hold.application.HoldHistoryRecorder;
 import com.ticket.core.domain.hold.event.HoldCreatedEvent;
 import com.ticket.core.domain.hold.model.HoldSnapshot;
 import com.ticket.core.domain.member.MemberFinder;
@@ -130,7 +129,7 @@ class StartOrderUseCaseTest {
     void 유효한_요청이면_보류와_주문을_생성한다() {
         //given
         StartOrderUseCase.Input input = new StartOrderUseCase.Input(10L, List.of(7L, 3L), 20L);
-        Performance performance = createPerformance(5, 420);
+        Performance performance = createPerformance(5, 600);
         List<Long> normalizedSeatIds = List.of(3L, 7L);
         HoldSnapshot snapshot = new HoldSnapshot(
                 "hold-key",
@@ -143,8 +142,8 @@ class StartOrderUseCaseTest {
         when(performanceFinder.findValidPerformanceById(10L)).thenReturn(performance);
         when(orderRepository.findByMemberIdAndPerformanceIdAndStatus(20L, 10L, OrderState.PENDING))
                 .thenReturn(Optional.empty());
-        when(orderStartDomainService.start(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(420)))
-                .thenReturn(new OrderStartDomainService.OrderStartResult("order-key", snapshot));
+        when(orderStartDomainService.start(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(600)))
+                .thenReturn(new OrderStartDomainService.OrderResult("order-key", snapshot));
 
         //when
         StartOrderUseCase.Output output = startOrderUseCase.execute(input);
@@ -154,12 +153,12 @@ class StartOrderUseCaseTest {
         verify(memberFinder).findActiveMemberById(20L);
         verify(performanceFinder).findValidPerformanceById(10L);
         verify(orderRepository).findByMemberIdAndPerformanceIdAndStatus(20L, 10L, OrderState.PENDING);
-        verify(orderStartDomainService).start(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(420));
+        verify(orderStartDomainService).start(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(600));
         verify(applicationEventPublisher).publishEvent(any(HoldCreatedEvent.class));
         verify(applicationEventPublisher, never()).publishEvent(eq("hold-key"));
 
         InOrder inOrder = inOrder(orderStartDomainService, applicationEventPublisher);
-        inOrder.verify(orderStartDomainService).start(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(420));
+        inOrder.verify(orderStartDomainService).start(20L, 10L, normalizedSeatIds, java.time.Duration.ofSeconds(600));
         inOrder.verify(applicationEventPublisher).publishEvent(any(HoldCreatedEvent.class));
     }
 
@@ -177,4 +176,3 @@ class StartOrderUseCaseTest {
         );
     }
 }
-
