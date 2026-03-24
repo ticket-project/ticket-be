@@ -8,10 +8,15 @@ import com.ticket.core.support.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 
+@Deprecated
 @RestController
 @RequestMapping("/api/v1/performances/{performanceId}/holds")
 @RequiredArgsConstructor
@@ -26,7 +31,8 @@ public class HoldController implements HoldControllerDocs {
             @Valid @RequestBody final CreateHoldRequest request,
             final MemberPrincipal memberPrincipal
     ) {
-        final StartOrderUseCase.Input input = new StartOrderUseCase.Input(performanceId, request.getSeatIds(), memberPrincipal.getMemberId());
+        final StartOrderUseCase.Input input =
+                new StartOrderUseCase.Input(performanceId, request.getSeatIds(), memberPrincipal.getMemberId());
         final StartOrderUseCase.Output output = startOrderUseCase.execute(input);
         return ResponseEntity.created(URI.create("/api/v1/orders/" + output.orderKey()))
                 .header("X-Order-Key", output.orderKey())
