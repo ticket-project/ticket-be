@@ -122,7 +122,7 @@ class QueuePolicyResolverTest {
                 LocalDateTime.of(2026, 3, 15, 10, 0),
                 LocalDateTime.of(2026, 3, 16, 9, 0),
                 4,
-                420
+                600
         );
     }
 }
