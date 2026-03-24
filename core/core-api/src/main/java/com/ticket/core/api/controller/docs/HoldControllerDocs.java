@@ -2,7 +2,7 @@ package com.ticket.core.api.controller.docs;
 
 import com.ticket.core.api.controller.request.CreateHoldRequest;
 import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.order.command.usecase.StartOrderUseCase;
+import com.ticket.core.domain.order.create.CreateOrderUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,8 +48,8 @@ public interface HoldControllerDocs {
                     content = @Content(schema = @Schema(implementation = com.ticket.core.support.response.ApiResponse.class))
             )
     })
-    ResponseEntity<ApiResponse<StartOrderUseCase.Output>> createHold(
-            @Parameter(description = "회차 ID", example = "1", required = true) Long performanceId,
+    ResponseEntity<ApiResponse<CreateOrderUseCase.Output>> createHold(
+            @Parameter(description = "공연 ID", example = "1", required = true) Long performanceId,
             CreateHoldRequest request,
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );
