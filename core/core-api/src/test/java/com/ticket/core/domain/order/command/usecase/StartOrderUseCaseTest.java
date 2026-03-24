@@ -150,6 +150,8 @@ class StartOrderUseCaseTest {
 
         //then
         assertThat(output.orderKey()).isEqualTo("order-key");
+        assertThat(output.status()).isEqualTo(OrderState.PENDING);
+        assertThat(output.expiresAt()).isEqualTo(LocalDateTime.of(2026, 3, 15, 12, 0));
         verify(memberFinder).findActiveMemberById(20L);
         verify(performanceFinder).findValidPerformanceById(10L);
         verify(orderRepository).findByMemberIdAndPerformanceIdAndStatus(20L, 10L, OrderState.PENDING);

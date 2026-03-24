@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -30,7 +31,7 @@ public class StartOrderUseCase {
 
     public record Input(Long performanceId, List<Long> seatIds, Long memberId) {}
 
-    public record Output(String orderKey) {}
+    public record Output(String orderKey, OrderState status, LocalDateTime expiresAt) {}
 
     @Transactional
     @DistributedLock(
@@ -44,7 +45,7 @@ public class StartOrderUseCase {
         final Performance performance = validateStartable(input.memberId, input.performanceId, requestedSeatIds);
         final OrderStartDomainService.OrderResult result = startOrder(input.memberId, input.performanceId, requestedSeatIds, performance);
         applicationEventPublisher.publishEvent(new HoldCreatedEvent(result.snapshot()));
-        return new Output(result.orderKey());
+        return new Output(result.orderKey(), OrderState.PENDING, result.snapshot().expiresAt());
     }
 
     private Performance validateStartable(
