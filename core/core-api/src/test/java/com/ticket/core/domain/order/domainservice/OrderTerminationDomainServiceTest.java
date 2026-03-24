@@ -1,7 +1,6 @@
 package com.ticket.core.domain.order.domainservice;
 
-import com.ticket.core.domain.hold.finder.HoldHistoryFinder;
-import com.ticket.core.domain.hold.model.HoldHistory;
+import com.ticket.core.domain.hold.application.HoldHistoryRecorder;
 import com.ticket.core.domain.order.finder.OrderSeatFinder;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -30,7 +28,7 @@ class OrderTerminationDomainServiceTest {
     private OrderSeatFinder orderSeatFinder;
 
     @Mock
-    private HoldHistoryFinder holdHistoryFinder;
+    private HoldHistoryRecorder holdHistoryRecorder;
 
     @Mock
     private OrderLifecycleDomainService orderLifecycleDomainService;
@@ -39,24 +37,30 @@ class OrderTerminationDomainServiceTest {
     private OrderTerminationDomainService orderTerminationDomainService;
 
     @Test
-    void 취소시_전이컨텍스트를_로드하고_결과를_반환한다() {
+    void 취소시_좌석을_조회하고_취소이력을_기록한다() {
         //given
         Order order = createOrder(10L, 100L, "hold-key");
         OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
-        HoldHistory holdHistory = mock(HoldHistory.class);
         LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
 
         when(orderSeatFinder.getOrderSeatsByOrderId(10L)).thenReturn(List.of(orderSeat));
-        when(holdHistoryFinder.findActiveByHoldKey("hold-key")).thenReturn(List.of(holdHistory));
 
         //when
-        OrderTerminationDomainService.OrderTerminationResult result = orderTerminationDomainService.cancel(order, now);
+        OrderTerminationDomainService.OrderTerminationResult result =
+                orderTerminationDomainService.cancel(order, now);
 
         //then
         assertThat(result.performanceId()).isEqualTo(100L);
         assertThat(result.holdKey()).isEqualTo("hold-key");
         assertThat(result.seatIds()).containsExactly(42L);
-        verify(orderLifecycleDomainService).cancel(order, List.of(orderSeat), List.of(holdHistory), now);
+        verify(orderLifecycleDomainService).cancel(order, List.of(orderSeat), now);
+        verify(holdHistoryRecorder).recordCanceled(
+                1L,
+                100L,
+                "hold-key",
+                now,
+                List.of(orderSeat)
+        );
     }
 
     @Test
@@ -71,11 +75,42 @@ class OrderTerminationDomainServiceTest {
 
         //then
         assertThat(result).isEmpty();
-        verifyNoInteractions(orderSeatFinder, holdHistoryFinder, orderLifecycleDomainService);
+        verifyNoInteractions(orderSeatFinder, holdHistoryRecorder, orderLifecycleDomainService);
+    }
+
+    @Test
+    void 만료시_좌석을_조회하고_만료이력을_기록한다() {
+        //given
+        Order order = createOrder(10L, 100L, "hold-key");
+        OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
+        LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
+        when(orderSeatFinder.getOrderSeatsByOrderId(10L)).thenReturn(List.of(orderSeat));
+
+        //when
+        java.util.Optional<OrderTerminationDomainService.OrderTerminationResult> result =
+                orderTerminationDomainService.expire(order, now);
+
+        //then
+        assertThat(result).isPresent();
+        verify(orderLifecycleDomainService).expire(order, List.of(orderSeat), now);
+        verify(holdHistoryRecorder).recordExpired(
+                1L,
+                100L,
+                "hold-key",
+                now,
+                List.of(orderSeat)
+        );
     }
 
     private Order createOrder(final Long id, final Long performanceId, final String holdKey) {
-        Order order = new Order(1L, performanceId, "order-key", holdKey, BigDecimal.TEN, LocalDateTime.now().plusMinutes(5));
+        Order order = new Order(
+                1L,
+                performanceId,
+                "order-key",
+                holdKey,
+                BigDecimal.TEN,
+                LocalDateTime.now().plusMinutes(5)
+        );
         ReflectionTestUtils.setField(order, "id", id);
         return order;
     }
