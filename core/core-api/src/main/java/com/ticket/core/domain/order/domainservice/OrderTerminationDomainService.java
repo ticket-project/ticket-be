@@ -1,7 +1,6 @@
 package com.ticket.core.domain.order.domainservice;
 
-import com.ticket.core.domain.hold.finder.HoldHistoryFinder;
-import com.ticket.core.domain.hold.model.HoldHistory;
+import com.ticket.core.domain.hold.application.HoldHistoryRecorder;
 import com.ticket.core.domain.order.finder.OrderSeatFinder;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
@@ -17,12 +16,19 @@ import java.util.Optional;
 public class OrderTerminationDomainService {
 
     private final OrderSeatFinder orderSeatFinder;
-    private final HoldHistoryFinder holdHistoryFinder;
+    private final HoldHistoryRecorder holdHistoryRecorder;
     private final OrderLifecycleDomainService orderLifecycleDomainService;
 
     public OrderTerminationResult cancel(final Order order, final LocalDateTime now) {
         final OrderTransitionContext context = loadTransitionContext(order);
-        orderLifecycleDomainService.cancel(order, context.orderSeats(), context.holdHistories(), now);
+        orderLifecycleDomainService.cancel(order, context.orderSeats(), now);
+        holdHistoryRecorder.recordCanceled(
+                order.getMemberId(),
+                order.getPerformanceId(),
+                order.getHoldKey(),
+                now,
+                context.orderSeats()
+        );
         return new OrderTerminationResult(order.getPerformanceId(), order.getHoldKey(), context.seatIds());
     }
 
@@ -32,22 +38,27 @@ public class OrderTerminationDomainService {
         }
 
         final OrderTransitionContext context = loadTransitionContext(order);
-        orderLifecycleDomainService.expire(order, context.orderSeats(), context.holdHistories(), now);
+        orderLifecycleDomainService.expire(order, context.orderSeats(), now);
+        holdHistoryRecorder.recordExpired(
+                order.getMemberId(),
+                order.getPerformanceId(),
+                order.getHoldKey(),
+                now,
+                context.orderSeats()
+        );
         return Optional.of(new OrderTerminationResult(order.getPerformanceId(), order.getHoldKey(), context.seatIds()));
     }
 
     private OrderTransitionContext loadTransitionContext(final Order order) {
         final List<OrderSeat> orderSeats = orderSeatFinder.getOrderSeatsByOrderId(order.getId());
-        final List<HoldHistory> holdHistories = holdHistoryFinder.findActiveByHoldKey(order.getHoldKey());
         final List<Long> seatIds = orderSeats.stream()
                 .map(OrderSeat::getSeatId)
                 .toList();
-        return new OrderTransitionContext(orderSeats, holdHistories, seatIds);
+        return new OrderTransitionContext(orderSeats, seatIds);
     }
 
     private record OrderTransitionContext(
             List<OrderSeat> orderSeats,
-            List<HoldHistory> holdHistories,
             List<Long> seatIds
     ) {
     }
