@@ -2,7 +2,7 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.config.LoginMemberArgumentResolver;
 import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.order.command.usecase.StartOrderUseCase;
+import com.ticket.core.domain.order.create.CreateOrderUseCase;
 import com.ticket.core.enums.OrderState;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.ApiControllerAdvice;
@@ -31,13 +31,13 @@ class HoldControllerContractTest {
 
     private static final MemberPrincipal MEMBER = new MemberPrincipal(100L, Role.MEMBER);
 
-    private final StartOrderUseCase startOrderUseCase = Mockito.mock(StartOrderUseCase.class);
+    private final CreateOrderUseCase createOrderUseCase = Mockito.mock(CreateOrderUseCase.class);
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        HoldController controller = new HoldController(startOrderUseCase);
+        HoldController controller = new HoldController(createOrderUseCase);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setCustomArgumentResolvers(new LoginMemberArgumentResolver())
                 .setControllerAdvice(new ApiControllerAdvice())
@@ -54,8 +54,8 @@ class HoldControllerContractTest {
 
     @Test
     void hold_생성_성공시_기존_계약을_유지한다() throws Exception {
-        when(startOrderUseCase.execute(new StartOrderUseCase.Input(10L, List.of(7L, 3L), 100L)))
-                .thenReturn(new StartOrderUseCase.Output(
+        when(createOrderUseCase.execute(new CreateOrderUseCase.Input(10L, List.of(7L, 3L), 100L)))
+                .thenReturn(new CreateOrderUseCase.Output(
                         "ORD-20260324",
                         OrderState.PENDING,
                         LocalDateTime.of(2026, 3, 24, 14, 10)
@@ -92,6 +92,6 @@ class HoldControllerContractTest {
                 .andExpect(jsonPath("$.data").isEmpty())
                 .andExpect(jsonPath("$.error.code").value("E400"));
 
-        verifyNoInteractions(startOrderUseCase);
+        verifyNoInteractions(createOrderUseCase);
     }
 }

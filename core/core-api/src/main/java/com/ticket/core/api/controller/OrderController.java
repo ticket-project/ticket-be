@@ -1,11 +1,11 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.OrderControllerDocs;
-import com.ticket.core.api.controller.request.StartOrderRequest;
+import com.ticket.core.api.controller.request.CreateOrderRequest;
 import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.order.command.usecase.StartOrderUseCase;
-import com.ticket.core.domain.order.command.usecase.TerminateOrderUseCase;
-import com.ticket.core.domain.order.query.usecase.GetOrderDetailUseCase;
+import com.ticket.core.domain.order.cancel.CancelOrderUseCase;
+import com.ticket.core.domain.order.create.CreateOrderUseCase;
+import com.ticket.core.domain.order.query.GetOrderDetailUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,22 +25,22 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class OrderController implements OrderControllerDocs {
 
-    private final StartOrderUseCase startOrderUseCase;
+    private final CreateOrderUseCase createOrderUseCase;
     private final GetOrderDetailUseCase getOrderDetailUseCase;
-    private final TerminateOrderUseCase terminateOrderUseCase;
+    private final CancelOrderUseCase cancelOrderUseCase;
 
     @Override
     @PostMapping
-    public ResponseEntity<ApiResponse<StartOrderUseCase.Output>> startOrder(
-            @Valid @RequestBody final StartOrderRequest request,
+    public ResponseEntity<ApiResponse<CreateOrderUseCase.Output>> createOrder(
+            @Valid @RequestBody final CreateOrderRequest request,
             final MemberPrincipal memberPrincipal
     ) {
-        final StartOrderUseCase.Input input = new StartOrderUseCase.Input(
+        final CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(
                 request.getPerformanceId(),
                 request.getSeatIds(),
                 memberPrincipal.getMemberId()
         );
-        final StartOrderUseCase.Output output = startOrderUseCase.execute(input);
+        final CreateOrderUseCase.Output output = createOrderUseCase.execute(input);
         return ResponseEntity.created(URI.create("/api/v1/orders/" + output.orderKey()))
                 .header("X-Order-Key", output.orderKey())
                 .body(ApiResponse.success(output));
@@ -63,7 +63,7 @@ public class OrderController implements OrderControllerDocs {
             @PathVariable final String orderKey,
             final MemberPrincipal memberPrincipal
     ) {
-        terminateOrderUseCase.cancel(new TerminateOrderUseCase.Input(orderKey, memberPrincipal.getMemberId()));
+        cancelOrderUseCase.execute(new CancelOrderUseCase.Input(orderKey, memberPrincipal.getMemberId()));
         return ApiResponse.success();
     }
 }

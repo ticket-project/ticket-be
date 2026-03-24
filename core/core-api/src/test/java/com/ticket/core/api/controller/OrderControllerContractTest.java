@@ -2,9 +2,9 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.config.LoginMemberArgumentResolver;
 import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.order.command.usecase.StartOrderUseCase;
-import com.ticket.core.domain.order.command.usecase.TerminateOrderUseCase;
-import com.ticket.core.domain.order.query.usecase.GetOrderDetailUseCase;
+import com.ticket.core.domain.order.cancel.CancelOrderUseCase;
+import com.ticket.core.domain.order.create.CreateOrderUseCase;
+import com.ticket.core.domain.order.query.GetOrderDetailUseCase;
 import com.ticket.core.enums.OrderState;
 import com.ticket.core.enums.Role;
 import com.ticket.core.support.ApiControllerAdvice;
@@ -33,18 +33,18 @@ class OrderControllerContractTest {
 
     private static final MemberPrincipal MEMBER = new MemberPrincipal(100L, Role.MEMBER);
 
-    private final StartOrderUseCase startOrderUseCase = Mockito.mock(StartOrderUseCase.class);
+    private final CreateOrderUseCase createOrderUseCase = Mockito.mock(CreateOrderUseCase.class);
     private final GetOrderDetailUseCase getOrderDetailUseCase = Mockito.mock(GetOrderDetailUseCase.class);
-    private final TerminateOrderUseCase terminateOrderUseCase = Mockito.mock(TerminateOrderUseCase.class);
+    private final CancelOrderUseCase cancelOrderUseCase = Mockito.mock(CancelOrderUseCase.class);
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         OrderController controller = new OrderController(
-                startOrderUseCase,
+                createOrderUseCase,
                 getOrderDetailUseCase,
-                terminateOrderUseCase
+                cancelOrderUseCase
         );
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setCustomArgumentResolvers(new LoginMemberArgumentResolver())
@@ -62,8 +62,8 @@ class OrderControllerContractTest {
 
     @Test
     void 주문시작_성공시_201_헤더와_응답바디_계약을_지킨다() throws Exception {
-        when(startOrderUseCase.execute(new StartOrderUseCase.Input(10L, List.of(7L, 3L), 100L)))
-                .thenReturn(new StartOrderUseCase.Output(
+        when(createOrderUseCase.execute(new CreateOrderUseCase.Input(10L, List.of(7L, 3L), 100L)))
+                .thenReturn(new CreateOrderUseCase.Output(
                         "ORD-20260324",
                         OrderState.PENDING,
                         LocalDateTime.of(2026, 3, 24, 14, 10)
@@ -102,7 +102,7 @@ class OrderControllerContractTest {
                 .andExpect(jsonPath("$.data").isEmpty())
                 .andExpect(jsonPath("$.error.code").value("E400"));
 
-        verifyNoInteractions(startOrderUseCase);
+        verifyNoInteractions(createOrderUseCase);
     }
 
     @Test
@@ -119,6 +119,6 @@ class OrderControllerContractTest {
                 .andExpect(jsonPath("$.data").isEmpty())
                 .andExpect(jsonPath("$.error.code").value("E400"));
 
-        verifyNoInteractions(startOrderUseCase);
+        verifyNoInteractions(createOrderUseCase);
     }
 }
