@@ -40,36 +40,41 @@ public class StartOrderUseCase {
             message = "주문 시작 처리 중입니다. 잠시 후 다시 시도해 주세요."
     )
     public Output execute(final Input input) {
-        final OrderSeatIds seatIds = OrderSeatIds.from(input.seatIds());
-        final Performance performance = validateStartable(input, seatIds);
-        final OrderStartDomainService.OrderStartResult result = startOrder(input, seatIds, performance);
+        final RequestedSeatIds requestedSeatIds = RequestedSeatIds.from(input.seatIds());
+        final Performance performance = validateStartable(input.memberId, input.performanceId, requestedSeatIds);
+        final OrderStartDomainService.OrderResult result = startOrder(input.memberId, input.performanceId, requestedSeatIds, performance);
         applicationEventPublisher.publishEvent(new HoldCreatedEvent(result.snapshot()));
         return new Output(result.orderKey());
     }
 
-    private Performance validateStartable(final Input input, final OrderSeatIds seatIds) {
-        memberFinder.findActiveMemberById(input.memberId());
-        final Performance performance = performanceFinder.findValidPerformanceById(input.performanceId());
-        validateSeatCount(performance, seatIds);
-        ensureNoPendingOrder(input.memberId(), input.performanceId());
+    private Performance validateStartable(
+            final Long memberId,
+            final Long performanceId,
+            final RequestedSeatIds requestedSeatIds
+    ) {
+        memberFinder.findActiveMemberById(memberId);
+        final Performance performance = performanceFinder.findValidPerformanceById(performanceId);
+        validateSeatCount(performance, requestedSeatIds);
+        ensureNoPendingOrder(memberId, performanceId);
         return performance;
     }
 
-    private OrderStartDomainService.OrderStartResult startOrder(
-            final Input input,
-            final OrderSeatIds seatIds,
+    private OrderStartDomainService.OrderResult startOrder(
+            final Long memberId,
+            final Long performanceId,
+            final RequestedSeatIds requestedSeatIds,
             final Performance performance
     ) {
         return orderStartDomainService.start(
-                input.memberId(),
-                input.performanceId(),
-                seatIds.values(),
+                memberId,
+                performanceId,
+                requestedSeatIds.values(),
                 Duration.ofSeconds(performance.getHoldTime())
         );
     }
 
-    private void validateSeatCount(final Performance performance, final OrderSeatIds seatIds) {
-        if (performance.isOverCount(seatIds.size())) {
+    private void validateSeatCount(final Performance performance, final RequestedSeatIds requestedSeatIds) {
+        if (performance.isOverCount(requestedSeatIds.size())) {
             throw new CoreException(ErrorType.EXCEED_HOLD_LIMIT);
         }
     }
