@@ -9,6 +9,8 @@ import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 @RequiredArgsConstructor
 public class CreateOrderValidator {
@@ -20,10 +22,11 @@ public class CreateOrderValidator {
     public Performance validate(
             final Long memberId,
             final Long performanceId,
-            final RequestedSeatIds requestedSeatIds
+            final RequestedSeatIds requestedSeatIds,
+            final LocalDateTime now
     ) {
         memberFinder.findActiveMemberById(memberId);
-        final Performance performance = performanceFinder.findValidPerformanceById(performanceId);
+        final Performance performance = performanceFinder.findValidPerformanceById(performanceId, now);
         validateSeatCount(performance, requestedSeatIds);
         ensureNoPendingOrder(memberId, performanceId);
         return performance;

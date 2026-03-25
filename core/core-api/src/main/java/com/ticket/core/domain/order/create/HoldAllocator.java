@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -21,10 +22,11 @@ public class HoldAllocator {
             final Long memberId,
             final Long performanceId,
             final RequestedSeatIds requestedSeatIds,
-            final Duration holdDuration
+            final Duration holdDuration,
+            final LocalDateTime now
     ) {
-        final List<PerformanceSeat> seats = holdSeatAvailabilityValidator.validate(performanceId, requestedSeatIds.values());
-        final HoldSnapshot snapshot = holdManager.createHold(memberId, performanceId, requestedSeatIds.values(), holdDuration);
+        final List<PerformanceSeat> seats = holdSeatAvailabilityValidator.validate(performanceId, requestedSeatIds);
+        final HoldSnapshot snapshot = holdManager.createHold(memberId, performanceId, requestedSeatIds, holdDuration, now);
         return new HoldAllocation(snapshot, seats);
     }
 

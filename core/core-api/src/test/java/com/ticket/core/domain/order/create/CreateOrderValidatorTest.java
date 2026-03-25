@@ -26,6 +26,8 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("NonAsciiCharacters")
 class CreateOrderValidatorTest {
 
+    private static final LocalDateTime FIXED_NOW = LocalDateTime.of(2026, 3, 15, 19, 0);
+
     @Mock
     private MemberFinder memberFinder;
 
@@ -43,14 +45,14 @@ class CreateOrderValidatorTest {
         RequestedSeatIds seatIds = RequestedSeatIds.from(List.of(1L, 2L, 3L));
         Performance performance = createPerformance(2, 300);
 
-        when(performanceFinder.findValidPerformanceById(10L)).thenReturn(performance);
+        when(performanceFinder.findValidPerformanceById(10L, FIXED_NOW)).thenReturn(performance);
 
-        assertThatThrownBy(() -> checker.validate(20L, 10L, seatIds))
+        assertThatThrownBy(() -> checker.validate(20L, 10L, seatIds, FIXED_NOW))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.EXCEED_HOLD_LIMIT));
 
         verify(memberFinder).findActiveMemberById(20L);
-        verify(performanceFinder).findValidPerformanceById(10L);
+        verify(performanceFinder).findValidPerformanceById(10L, FIXED_NOW);
         verifyNoInteractions(orderRepository);
     }
 
@@ -59,10 +61,10 @@ class CreateOrderValidatorTest {
         RequestedSeatIds seatIds = RequestedSeatIds.from(List.of(1L, 2L));
         Performance performance = createPerformance(3, 300);
 
-        when(performanceFinder.findValidPerformanceById(10L)).thenReturn(performance);
+        when(performanceFinder.findValidPerformanceById(10L, FIXED_NOW)).thenReturn(performance);
         when(orderRepository.findByMemberIdAndPerformanceIdAndStatus(20L, 10L, OrderState.PENDING)).thenReturn(java.util.Optional.of(org.mockito.Mockito.mock(com.ticket.core.domain.order.model.Order.class)));
 
-        assertThatThrownBy(() -> checker.validate(20L, 10L, seatIds))
+        assertThatThrownBy(() -> checker.validate(20L, 10L, seatIds, FIXED_NOW))
                 .isInstanceOf(CoreException.class)
                 .satisfies(exception -> assertThat(((CoreException) exception).getErrorType()).isEqualTo(ErrorType.PENDING_ORDER_ALREADY_EXISTS));
     }
@@ -72,10 +74,10 @@ class CreateOrderValidatorTest {
         RequestedSeatIds seatIds = RequestedSeatIds.from(List.of(1L, 2L));
         Performance performance = createPerformance(3, 300);
 
-        when(performanceFinder.findValidPerformanceById(10L)).thenReturn(performance);
+        when(performanceFinder.findValidPerformanceById(10L, FIXED_NOW)).thenReturn(performance);
         when(orderRepository.findByMemberIdAndPerformanceIdAndStatus(20L, 10L, OrderState.PENDING)).thenReturn(java.util.Optional.empty());
 
-        Performance result = checker.validate(20L, 10L, seatIds);
+        Performance result = checker.validate(20L, 10L, seatIds, FIXED_NOW);
 
         assertThat(result).isSameAs(performance);
     }

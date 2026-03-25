@@ -1,5 +1,6 @@
 package com.ticket.core.domain.hold.support;
 
+import com.ticket.core.domain.order.create.RequestedSeatIds;
 import com.ticket.core.domain.performanceseat.finder.PerformanceSeatFinder;
 import com.ticket.core.domain.performanceseat.model.PerformanceSeat;
 import com.ticket.core.enums.PerformanceSeatState;
@@ -11,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,47 +31,52 @@ class HoldSeatAvailabilityValidatorTest {
     private HoldSeatAvailabilityValidator validator;
 
     @Test
-    void 좌석개수가_일치하지_않으면_SEAT_MISMATCH_IN_PERFORMANCE_예외를_던진다() {
-        //given
+    void validate는_requestedSeatIds를_직접_받는다() throws NoSuchMethodException {
+        Method method = HoldSeatAvailabilityValidator.class.getDeclaredMethod(
+                "validate",
+                Long.class,
+                RequestedSeatIds.class
+        );
+
+        assertThat(method.getParameterTypes()[1]).isEqualTo(RequestedSeatIds.class);
+    }
+
+    @Test
+    void 좌석개수가_일치하지_않으면_seatMismatch예외를_던진다() {
         PerformanceSeat availableSeat = mock(PerformanceSeat.class);
+        RequestedSeatIds seatIds = RequestedSeatIds.from(List.of(10L, 20L));
         when(performanceSeatFinder.findByPerformanceIdAndSeatIdIn(1L, List.of(10L, 20L)))
                 .thenReturn(List.of(availableSeat));
 
-        //when
-        //then
-        assertThatThrownBy(() -> validator.validate(1L, List.of(10L, 20L)))
+        assertThatThrownBy(() -> validator.validate(1L, seatIds))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.SEAT_MISMATCH_IN_PERFORMANCE));
     }
 
     @Test
-    void 사용불가_좌석이_포함되면_NOT_EXIST_AVAILABLE_SEAT_예외를_던진다() {
-        //given
+    void 사용불가_좌석이_포함되면_notExistAvailableSeat예외를_던진다() {
         PerformanceSeat availableSeat = createPerformanceSeat(PerformanceSeatState.AVAILABLE);
         PerformanceSeat reservedSeat = createPerformanceSeat(PerformanceSeatState.RESERVED);
+        RequestedSeatIds seatIds = RequestedSeatIds.from(List.of(10L, 20L));
         when(performanceSeatFinder.findByPerformanceIdAndSeatIdIn(1L, List.of(10L, 20L)))
                 .thenReturn(List.of(availableSeat, reservedSeat));
 
-        //when
-        //then
-        assertThatThrownBy(() -> validator.validate(1L, List.of(10L, 20L)))
+        assertThatThrownBy(() -> validator.validate(1L, seatIds))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.NOT_EXIST_AVAILABLE_SEAT));
     }
 
     @Test
     void 모두_예매가능_좌석이면_그대로_반환한다() {
-        //given
+        RequestedSeatIds seatIds = RequestedSeatIds.from(List.of(10L, 20L));
         List<PerformanceSeat> seats = List.of(
                 createPerformanceSeat(PerformanceSeatState.AVAILABLE),
                 createPerformanceSeat(PerformanceSeatState.AVAILABLE)
         );
         when(performanceSeatFinder.findByPerformanceIdAndSeatIdIn(1L, List.of(10L, 20L))).thenReturn(seats);
 
-        //when
-        List<PerformanceSeat> result = validator.validate(1L, List.of(10L, 20L));
+        List<PerformanceSeat> result = validator.validate(1L, seatIds);
 
-        //then
         assertThat(result).containsExactlyElementsOf(seats);
     }
 
@@ -79,4 +86,3 @@ class HoldSeatAvailabilityValidatorTest {
         return performanceSeat;
     }
 }
-

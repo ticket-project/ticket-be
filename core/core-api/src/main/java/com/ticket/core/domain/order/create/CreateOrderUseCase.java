@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +27,7 @@ public class CreateOrderUseCase {
     private final OrderCreator orderCreator;
     private final HoldHistoryRecorder holdHistoryRecorder;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final Clock clock;
 
     public record Input(Long performanceId, List<Long> seatIds, Long memberId) {}
 
@@ -40,9 +42,16 @@ public class CreateOrderUseCase {
     )
     public Output execute(final Input input) {
         final RequestedSeatIds requestedSeatIds = RequestedSeatIds.from(input.seatIds());
-        final Performance performance = validator.validate(input.memberId(), input.performanceId(), requestedSeatIds);
+        final LocalDateTime now = LocalDateTime.now(clock);
+        final Performance performance = validator.validate(input.memberId(), input.performanceId(), requestedSeatIds, now);
         final Duration holdDuration = Duration.ofSeconds(performance.getHoldTime());
-        final HoldAllocation allocation = holdAllocator.allocate(input.memberId(), input.performanceId(), requestedSeatIds, holdDuration);
+        final HoldAllocation allocation = holdAllocator.allocate(
+                input.memberId(),
+                input.performanceId(),
+                requestedSeatIds,
+                holdDuration,
+                now
+        );
         try {
             return createOrder(input, holdDuration, allocation);
         } catch (final RuntimeException e) {
