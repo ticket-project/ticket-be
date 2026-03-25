@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
-class AuthTokenApplicationServiceTest {
+class AuthTokenManagerTest {
 
     @Mock
     private JwtTokenService jwtTokenService;
@@ -35,11 +35,10 @@ class AuthTokenApplicationServiceTest {
     private RefreshTokenService refreshTokenService;
 
     @InjectMocks
-    private AuthTokenApplicationService authTokenApplicationService;
+    private AuthTokenManager authTokenManager;
 
     @Test
-    void 토큰_발급시_응답과_리프레시토큰_쿠키를_함께_반환한다() {
-        //given
+    void issue_tokens_sets_refresh_cookie() {
         Member member = createMember(7L);
         MockHttpServletResponse response = new MockHttpServletResponse();
         when(jwtTokenService.createAccessToken(any())).thenReturn("access-token");
@@ -47,10 +46,8 @@ class AuthTokenApplicationServiceTest {
         when(jwtProperties.getRefreshTokenExpirationSeconds()).thenReturn(1209600L);
         when(refreshTokenService.createRefreshToken(7L, 1209600L)).thenReturn("refresh-token");
 
-        //when
-        AuthLoginResponse result = authTokenApplicationService.issueTokens(member, response);
+        AuthLoginResponse result = authTokenManager.issueTokens(member, response);
 
-        //then
         assertThat(result.accessToken()).isEqualTo("access-token");
         assertThat(result.tokenType()).isEqualTo("Bearer");
         assertThat(result.expiresIn()).isEqualTo(1800L);
@@ -67,8 +64,7 @@ class AuthTokenApplicationServiceTest {
     }
 
     @Test
-    void 토큰_재발급시_기존_리프레시토큰을_교체하고_새_쿠키를_내린다() {
-        //given
+    void rotate_tokens_replaces_refresh_cookie() {
         Member member = createMember(7L);
         MockHttpServletResponse response = new MockHttpServletResponse();
         AuthRefreshToken refreshToken = AuthRefreshToken.from("old-refresh");
@@ -77,10 +73,8 @@ class AuthTokenApplicationServiceTest {
         when(jwtTokenService.createAccessToken(any())).thenReturn("new-access");
         when(jwtTokenService.getAccessTokenExpirationSeconds()).thenReturn(1800L);
 
-        //when
-        AuthLoginResponse result = authTokenApplicationService.rotateTokens(member, refreshToken, response);
+        AuthLoginResponse result = authTokenManager.rotateTokens(member, refreshToken, response);
 
-        //then
         verify(refreshTokenService).rotate(refreshToken, 7L, 1209600L);
         assertThat(result.accessToken()).isEqualTo("new-access");
         assertThat(result.memberId()).isEqualTo(7L);
@@ -92,14 +86,11 @@ class AuthTokenApplicationServiceTest {
     }
 
     @Test
-    void 리프레시토큰_쿠키_삭제시_만료시간_0으로_설정한다() {
-        //given
+    void clear_refresh_token_cookie_sets_zero_max_age() {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        //when
-        authTokenApplicationService.clearRefreshTokenCookie(response);
+        authTokenManager.clearRefreshTokenCookie(response);
 
-        //then
         assertThat(response.getHeaders("Set-Cookie"))
                 .singleElement()
                 .asString()
@@ -108,9 +99,8 @@ class AuthTokenApplicationServiceTest {
     }
 
     private Member createMember(final Long id) {
-        Member member = new Member(Email.create("user@example.com"), EncodedPassword.create("encoded"), "사용자", Role.MEMBER);
+        Member member = new Member(Email.create("user@example.com"), EncodedPassword.create("encoded"), "user", Role.MEMBER);
         ReflectionTestUtils.setField(member, "id", id);
         return member;
     }
 }
-

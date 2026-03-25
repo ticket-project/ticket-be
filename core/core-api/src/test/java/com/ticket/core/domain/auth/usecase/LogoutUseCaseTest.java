@@ -1,6 +1,6 @@
 package com.ticket.core.domain.auth.usecase;
 
-import com.ticket.core.domain.auth.token.AuthTokenApplicationService;
+import com.ticket.core.domain.auth.token.AuthTokenManager;
 import com.ticket.core.domain.auth.token.RefreshTokenService;
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
@@ -27,54 +27,44 @@ class LogoutUseCaseTest {
     private RefreshTokenService refreshTokenService;
 
     @Mock
-    private AuthTokenApplicationService authTokenApplicationService;
+    private AuthTokenManager authTokenManager;
 
     @InjectMocks
     private LogoutUseCase useCase;
 
     @Test
-    void 본인_토큰이면_쿠키를_정리한다() {
-        //given
+    void owned_token_clears_cookie() {
         MockHttpServletResponse response = new MockHttpServletResponse();
         AuthRefreshToken refreshToken = AuthRefreshToken.from("refresh-token");
         when(refreshTokenService.revokeIfOwned(refreshToken, 1L)).thenReturn(true);
 
-        //when
         useCase.execute(new LogoutUseCase.Input(1L, refreshToken), response);
 
-        //then
         verify(refreshTokenService).revokeIfOwned(refreshToken, 1L);
-        verify(authTokenApplicationService).clearRefreshTokenCookie(response);
+        verify(authTokenManager).clearRefreshTokenCookie(response);
     }
 
     @Test
-    void 다른_회원의_토큰이면_인가_예외를_던진다() {
-        //given
+    void foreign_token_throws_authorization_exception() {
         AuthRefreshToken refreshToken = AuthRefreshToken.from("refresh-token");
         when(refreshTokenService.revokeIfOwned(refreshToken, 1L)).thenReturn(false);
         when(refreshTokenService.validateWithoutConsume(refreshToken)).thenReturn(Optional.of(2L));
 
-        //when
-        //then
         assertThatThrownBy(() -> useCase.execute(new LogoutUseCase.Input(1L, refreshToken), new MockHttpServletResponse()))
                 .isInstanceOf(AuthException.class)
                 .satisfies(exception -> assertThat(((AuthException) exception).getErrorType()).isEqualTo(ErrorType.AUTHORIZATION_ERROR));
 
-        verifyNoInteractions(authTokenApplicationService);
+        verifyNoInteractions(authTokenManager);
     }
 
     @Test
-    void 토큰_소유자를_확인할_수_없으면_인증_예외를_던진다() {
-        //given
+    void missing_owner_check_result_throws_authentication_exception() {
         AuthRefreshToken refreshToken = AuthRefreshToken.from("refresh-token");
         when(refreshTokenService.revokeIfOwned(refreshToken, 1L)).thenReturn(false);
         when(refreshTokenService.validateWithoutConsume(refreshToken)).thenReturn(Optional.empty());
 
-        //when
-        //then
         assertThatThrownBy(() -> useCase.execute(new LogoutUseCase.Input(1L, refreshToken), new MockHttpServletResponse()))
                 .isInstanceOf(AuthException.class)
                 .satisfies(exception -> assertThat(((AuthException) exception).getErrorType()).isEqualTo(ErrorType.AUTHENTICATION_ERROR));
     }
 }
-

@@ -3,7 +3,7 @@ package com.ticket.core.domain.auth.usecase;
 import com.ticket.core.api.controller.response.AuthLoginResponse;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.ticket.core.domain.auth.AuthService;
-import com.ticket.core.domain.auth.token.AuthTokenApplicationService;
+import com.ticket.core.domain.auth.token.AuthTokenManager;
 import com.ticket.core.domain.member.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class LoginUseCase {
 
     private final AuthService authService;
-    private final AuthTokenApplicationService authTokenApplicationService;
+    private final AuthTokenManager authTokenManager;
 
     public record Input(
             @Schema(description = "로그인 아이디(이메일)", example = "user@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -35,7 +35,7 @@ public class LoginUseCase {
 
     public Output execute(final Input input, final HttpServletResponse response) {
         final Member member = authService.login(input.email(), input.password());
-        final AuthLoginResponse result = authTokenApplicationService.issueTokens(member, response);
+        final AuthLoginResponse result = authTokenManager.issueTokens(member, response);
         return new Output(result.accessToken(), result.tokenType(), result.expiresIn(), result.memberId());
     }
 }
