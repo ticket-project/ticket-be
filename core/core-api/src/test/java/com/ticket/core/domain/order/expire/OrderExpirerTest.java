@@ -5,6 +5,8 @@ import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
 import com.ticket.core.domain.order.shared.OrderTerminationResult;
 import com.ticket.core.enums.OrderState;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,8 +35,8 @@ class OrderExpirerTest {
     private OrderExpirer orderExpirer;
 
     @Test
-    void expire는_optional이_아닌_종료결과를_반환한다() throws NoSuchMethodException {
-        Method method = OrderExpirer.class.getDeclaredMethod(
+    void expire_returns_termination_result_instead_of_optional() throws NoSuchMethodException {
+        final Method method = OrderExpirer.class.getDeclaredMethod(
                 "expire",
                 Order.class,
                 List.class,
@@ -45,8 +47,8 @@ class OrderExpirerTest {
     }
 
     @Test
-    void pending이_아닌_주문이면_예외가_발생한다() {
-        Order order = createOrder(10L, 100L, "hold-key");
+    void throws_when_order_is_not_pending() {
+        final Order order = createOrder(10L, 100L, "hold-key");
         order.cancel(LocalDateTime.of(2026, 3, 15, 9, 0));
 
         assertThatThrownBy(() -> orderExpirer.expire(order, List.of(), LocalDateTime.of(2026, 3, 15, 10, 0)))
@@ -56,12 +58,27 @@ class OrderExpirerTest {
     }
 
     @Test
-    void pending_주문이면_주문을_만료하고_hold_history를_기록한다() {
-        Order order = createOrder(10L, 100L, "hold-key");
-        OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
-        LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
+    void throws_when_order_seat_belongs_to_another_order() {
+        final Order order = createOrder(10L, 100L, "hold-key");
+        final Order otherOrder = createOrder(11L, 100L, "other-hold-key");
+        final OrderSeat foreignOrderSeat = new OrderSeat(otherOrder, 501L, 42L, BigDecimal.TEN);
 
-        OrderTerminationResult result = orderExpirer.expire(order, List.of(orderSeat), now);
+        assertThatThrownBy(() -> orderExpirer.expire(order, List.of(foreignOrderSeat), LocalDateTime.of(2026, 3, 15, 10, 0)))
+                .isInstanceOf(CoreException.class)
+                .satisfies(error -> {
+                    assertThat(((CoreException) error).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST);
+                    assertThat(((CoreException) error).getData()).isEqualTo("orderSeats는 같은 order에 속해야 합니다.");
+                });
+        verifyNoInteractions(holdHistoryRecorder);
+    }
+
+    @Test
+    void expires_pending_order_and_records_hold_history() {
+        final Order order = createOrder(10L, 100L, "hold-key");
+        final OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
+        final LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
+
+        final OrderTerminationResult result = orderExpirer.expire(order, List.of(orderSeat), now);
 
         assertThat(order.getStatus()).isEqualTo(OrderState.EXPIRED);
         assertThat(result.performanceId()).isEqualTo(100L);
@@ -71,7 +88,7 @@ class OrderExpirerTest {
     }
 
     private Order createOrder(final Long id, final Long performanceId, final String holdKey) {
-        Order order = new Order(1L, performanceId, "order-key", holdKey, BigDecimal.TEN, LocalDateTime.now().plusMinutes(5));
+        final Order order = new Order(1L, performanceId, "order-key", holdKey, BigDecimal.TEN, LocalDateTime.now().plusMinutes(5));
         ReflectionTestUtils.setField(order, "id", id);
         return order;
     }
