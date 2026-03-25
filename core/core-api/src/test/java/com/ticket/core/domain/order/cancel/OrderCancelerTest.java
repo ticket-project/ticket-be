@@ -4,7 +4,6 @@ import com.ticket.core.domain.hold.application.HoldHistoryRecorder;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
 import com.ticket.core.domain.order.shared.OrderTerminationResult;
-import com.ticket.core.enums.OrderSeatState;
 import com.ticket.core.enums.OrderState;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +30,7 @@ class OrderCancelerTest {
     private OrderCanceler orderCanceler;
 
     @Test
-    void 주문과_주문좌석을_취소하고_hold_history를_기록한다() {
+    void 주문과_주문좌석을_기반으로_취소를_기록한다() {
         Order order = createOrder(10L, 100L, "hold-key");
         OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
         LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
@@ -39,7 +38,6 @@ class OrderCancelerTest {
         OrderTerminationResult result = orderCanceler.cancel(order, List.of(orderSeat), now);
 
         assertThat(order.getStatus()).isEqualTo(OrderState.CANCELED);
-        assertThat(orderSeat.getStatus()).isEqualTo(OrderSeatState.CANCELED);
         assertThat(result.performanceId()).isEqualTo(100L);
         assertThat(result.holdKey()).isEqualTo("hold-key");
         assertThat(result.seatIds()).containsExactly(42L);

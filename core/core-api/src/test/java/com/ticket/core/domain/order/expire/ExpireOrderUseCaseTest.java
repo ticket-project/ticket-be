@@ -16,7 +16,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -61,7 +60,7 @@ class ExpireOrderUseCaseTest {
         final OrderTerminationResult result = new OrderTerminationResult(100L, "hold-key", List.of(42L));
         when(orderRepository.findByIdAndStatusForUpdate(10L, com.ticket.core.enums.OrderState.PENDING)).thenReturn(java.util.Optional.of(order));
         when(orderSeatRepository.findAllByOrder_IdOrderByIdAsc(10L)).thenReturn(List.of(orderSeat));
-        when(orderExpirer.expire(eq(order), eq(List.of(orderSeat)), eq(now))).thenReturn(Optional.of(result));
+        when(orderExpirer.expire(eq(order), eq(List.of(orderSeat)), eq(now))).thenReturn(result);
 
         useCase.expireByOrderId(10L, now);
 
@@ -78,29 +77,13 @@ class ExpireOrderUseCaseTest {
         final OrderTerminationResult result = new OrderTerminationResult(100L, "hold-key", List.of(42L));
         when(orderRepository.findByHoldKeyAndStatusForUpdate("hold-key", com.ticket.core.enums.OrderState.PENDING)).thenReturn(java.util.Optional.of(order));
         when(orderSeatRepository.findAllByOrder_IdOrderByIdAsc(10L)).thenReturn(List.of(orderSeat));
-        when(orderExpirer.expire(eq(order), eq(List.of(orderSeat)), eq(now))).thenReturn(Optional.of(result));
+        when(orderExpirer.expire(eq(order), eq(List.of(orderSeat)), eq(now))).thenReturn(result);
 
         useCase.expireByHoldKey("hold-key", now);
 
         verify(orderSeatRepository).findAllByOrder_IdOrderByIdAsc(10L);
         verify(orderExpirer).expire(order, List.of(orderSeat), now);
         verify(holdReleaseOutboxWriter).append(result);
-    }
-
-    @Test
-    void 만료_처리_결과가_비어있으면_outbox를_적재하지_않는다() {
-        final Order order = createOrder(10L, 100L, "hold-key");
-        final OrderSeat orderSeat = mock(OrderSeat.class);
-        final LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
-        when(orderRepository.findByHoldKeyAndStatusForUpdate("hold-key", com.ticket.core.enums.OrderState.PENDING)).thenReturn(java.util.Optional.of(order));
-        when(orderSeatRepository.findAllByOrder_IdOrderByIdAsc(10L)).thenReturn(List.of(orderSeat));
-        when(orderExpirer.expire(eq(order), eq(List.of(orderSeat)), eq(now))).thenReturn(Optional.empty());
-
-        useCase.expireByHoldKey("hold-key", now);
-
-        verify(orderSeatRepository).findAllByOrder_IdOrderByIdAsc(10L);
-        verify(orderExpirer).expire(order, List.of(orderSeat), now);
-        verifyNoInteractions(holdReleaseOutboxWriter);
     }
 
     private Order createOrder(final Long id, final Long performanceId, final String holdKey) {
