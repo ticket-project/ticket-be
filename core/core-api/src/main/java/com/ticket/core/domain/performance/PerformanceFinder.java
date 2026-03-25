@@ -6,7 +6,6 @@ import com.ticket.core.support.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Component
@@ -14,11 +13,10 @@ import java.time.LocalDateTime;
 public class PerformanceFinder {
 
     private final PerformanceRepository performanceRepository;
-    private final Clock clock;
 
-    public Performance findOpenPerformance(final Long performanceId) {
+    public Performance findOpenPerformance(final Long performanceId, final LocalDateTime now) {
         final Performance performance = findById(performanceId);
-        if (!performance.isBookingOpen(LocalDateTime.now(clock))) {
+        if (!performance.isBookingOpen(now)) {
             throw new NotFoundException(ErrorType.NOT_FOUND_DATA);
         }
         return performance;
@@ -26,18 +24,16 @@ public class PerformanceFinder {
 
     public Performance findById(final Long performanceId) {
         return performanceRepository.findById(performanceId)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA, "회차를 찾을 수 없습니다. id=" + performanceId));
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA, "공연을 찾을 수 없습니다. id=" + performanceId));
     }
 
-    public Performance findValidPerformanceById(final Long performanceId) {
-        final Performance performance = performanceRepository.findById(performanceId)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_DATA, "회차를 찾을 수 없습니다. id=" + performanceId));
-        validatePerformance(performance);
+    public Performance findValidPerformanceById(final Long performanceId, final LocalDateTime now) {
+        final Performance performance = findById(performanceId);
+        validatePerformance(performance, now);
         return performance;
     }
 
-    private void validatePerformance(final Performance performance) {
-        final LocalDateTime now = LocalDateTime.now(clock);
+    private void validatePerformance(final Performance performance, final LocalDateTime now) {
         if (performance.getOrderOpenTime() == null || now.isBefore(performance.getOrderOpenTime())) {
             throw new CoreException(ErrorType.NOT_YET_RESERVE_TIME);
         }
