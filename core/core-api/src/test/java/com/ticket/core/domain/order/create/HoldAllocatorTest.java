@@ -23,6 +23,8 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("NonAsciiCharacters")
 class HoldAllocatorTest {
 
+    private static final LocalDateTime FIXED_NOW = LocalDateTime.of(2026, 3, 15, 11, 50);
+
     @Mock
     private HoldSeatAvailabilityValidator holdSeatAvailabilityValidator;
 
@@ -33,7 +35,7 @@ class HoldAllocatorTest {
     private HoldAllocator holdAllocator;
 
     @Test
-    void 좌석을_검증하고_hold를_확보한다() {
+    void 좌석을_검증하고_hold를_생성한다() {
         RequestedSeatIds seatIds = RequestedSeatIds.from(List.of(3L, 7L));
         Duration holdDuration = Duration.ofMinutes(10);
         List<PerformanceSeat> seats = List.of(mock(PerformanceSeat.class), mock(PerformanceSeat.class));
@@ -41,21 +43,21 @@ class HoldAllocatorTest {
                 "hold-key",
                 20L,
                 10L,
-                seatIds.values(),
+                seatIds.toList(),
                 LocalDateTime.of(2026, 3, 15, 12, 0)
         );
 
-        when(holdSeatAvailabilityValidator.validate(10L, seatIds.values())).thenReturn(seats);
-        when(holdManager.createHold(20L, 10L, seatIds.values(), holdDuration)).thenReturn(snapshot);
+        when(holdSeatAvailabilityValidator.validate(10L, seatIds)).thenReturn(seats);
+        when(holdManager.createHold(20L, 10L, seatIds, holdDuration, FIXED_NOW)).thenReturn(snapshot);
 
-        HoldAllocation allocation = holdAllocator.allocate(20L, 10L, seatIds, holdDuration);
+        HoldAllocation allocation = holdAllocator.allocate(20L, 10L, seatIds, holdDuration, FIXED_NOW);
 
         assertThat(allocation.snapshot()).isEqualTo(snapshot);
         assertThat(allocation.performanceSeats()).isEqualTo(seats);
     }
 
     @Test
-    void 확보한_hold를_해제한다() {
+    void hold를_해제한다() {
         List<Long> seatIds = List.of(3L, 7L);
         HoldSnapshot snapshot = new HoldSnapshot(
                 "hold-key",

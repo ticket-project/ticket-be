@@ -55,14 +55,14 @@ public final class RequestedSeatIds {
         if (!seatIds.isEmpty()) {
             return;
         }
-        throw new CoreException(ErrorType.INVALID_REQUEST, "선점할 좌석이 없습니다.");
+        throw new CoreException(ErrorType.INVALID_REQUEST, "선택한 좌석이 없습니다.");
     }
 
     public int size() {
         return values.size();
     }
 
-    public List<Long> values() {
+    public List<Long> toList() {
         return values;
     }
 
