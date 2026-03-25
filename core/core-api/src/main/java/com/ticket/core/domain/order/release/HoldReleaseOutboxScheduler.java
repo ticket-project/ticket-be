@@ -10,15 +10,20 @@ import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class HoldReleaseOutboxScheduler {
 
     private static final int BATCH_SIZE = 100;
+    private static final List<HoldReleaseOutboxStatus> RETRYABLE_STATUSES = List.of(
+            HoldReleaseOutboxStatus.PENDING,
+            HoldReleaseOutboxStatus.FAILED
+    );
 
     private final HoldReleaseOutboxRepository holdReleaseOutboxRepository;
-    private final HoldReleaseOutboxProcessor holdReleaseOutboxProcessor;
+    private final HoldReleaseOutboxExecutor holdReleaseOutboxExecutor;
     private final Clock clock;
 
     @Scheduled(fixedDelayString = "120000")
@@ -30,7 +35,8 @@ public class HoldReleaseOutboxScheduler {
     )
     public void processPendingHoldReleases() {
         while (true) {
-            final Slice<HoldReleaseOutbox> dueOutboxes = holdReleaseOutboxRepository.findAllByCompletedAtIsNullAndNextAttemptAtLessThanEqual(
+            final Slice<HoldReleaseOutbox> dueOutboxes = holdReleaseOutboxRepository.findAllByStatusInAndNextAttemptAtLessThanEqual(
+                    RETRYABLE_STATUSES,
                     LocalDateTime.now(clock),
                     PageRequest.of(0, BATCH_SIZE, Sort.by(Sort.Direction.ASC, "id"))
             );
@@ -39,7 +45,7 @@ public class HoldReleaseOutboxScheduler {
             }
 
             for (final HoldReleaseOutbox outbox : dueOutboxes.getContent()) {
-                holdReleaseOutboxProcessor.process(outbox.getId(), LocalDateTime.now(clock));
+                holdReleaseOutboxExecutor.process(outbox.getId(), LocalDateTime.now(clock));
             }
 
             if (dueOutboxes.getNumberOfElements() < BATCH_SIZE) {

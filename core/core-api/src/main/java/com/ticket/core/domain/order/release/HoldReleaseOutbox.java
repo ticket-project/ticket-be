@@ -8,6 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Lob;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,7 +24,7 @@ import java.util.List;
 @Table(
         name = "ORDER_HOLD_RELEASE_OUTBOX",
         indexes = {
-                @Index(name = "IDX_ORDER_HOLD_RELEASE_OUTBOX_DUE", columnList = "completed_at,next_attempt_at")
+                @Index(name = "IDX_ORDER_HOLD_RELEASE_OUTBOX_DUE", columnList = "status,next_attempt_at")
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -50,6 +52,10 @@ public class HoldReleaseOutbox extends BaseEntity {
     @Column(nullable = false)
     private int retryCount;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private HoldReleaseOutboxStatus status;
+
     private LocalDateTime completedAt;
 
     @Column(length = MAX_ERROR_LENGTH)
@@ -66,6 +72,7 @@ public class HoldReleaseOutbox extends BaseEntity {
         this.seatIdsPayload = seatIdsPayload;
         this.nextAttemptAt = nextAttemptAt;
         this.retryCount = 0;
+        this.status = HoldReleaseOutboxStatus.PENDING;
     }
 
     public static HoldReleaseOutbox create(
@@ -87,15 +94,17 @@ public class HoldReleaseOutbox extends BaseEntity {
     }
 
     public boolean isCompleted() {
-        return completedAt != null;
+        return status == HoldReleaseOutboxStatus.COMPLETED;
     }
 
     public void markCompleted(final LocalDateTime completedAt) {
+        this.status = HoldReleaseOutboxStatus.COMPLETED;
         this.completedAt = completedAt;
         this.lastError = null;
     }
 
     public void scheduleRetry(final LocalDateTime nextAttemptAt, final String errorMessage) {
+        this.status = HoldReleaseOutboxStatus.FAILED;
         this.nextAttemptAt = nextAttemptAt;
         this.retryCount++;
         this.lastError = summarize(errorMessage);
