@@ -38,8 +38,8 @@ public class ExpireOrderUseCase {
             return;
         }
         final List<OrderSeat> orderSeats = orderSeatRepository.findAllByOrder_IdOrderByIdAsc(order.getId());
-        orderExpirer.expire(order, orderSeats, now)
-                .ifPresent(holdReleaseOutboxWriter::append);
+        final OrderTerminationResult result = orderExpirer.expire(order, orderSeats, now);
+        holdReleaseOutboxWriter.append(result);
     }
 
     private Order findPendingOrder(final Long orderId) {

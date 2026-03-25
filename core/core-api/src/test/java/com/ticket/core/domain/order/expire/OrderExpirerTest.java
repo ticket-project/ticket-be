@@ -4,7 +4,6 @@ import com.ticket.core.domain.hold.application.HoldHistoryRecorder;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
 import com.ticket.core.domain.order.shared.OrderTerminationResult;
-import com.ticket.core.enums.OrderSeatState;
 import com.ticket.core.enums.OrderState;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,12 +12,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -33,30 +33,40 @@ class OrderExpirerTest {
     private OrderExpirer orderExpirer;
 
     @Test
-    void pending이_아닌_주문이면_빈_결과를_반환한다() {
+    void expire는_optional이_아닌_종료결과를_반환한다() throws NoSuchMethodException {
+        Method method = OrderExpirer.class.getDeclaredMethod(
+                "expire",
+                Order.class,
+                List.class,
+                LocalDateTime.class
+        );
+
+        assertThat(method.getReturnType()).isEqualTo(OrderTerminationResult.class);
+    }
+
+    @Test
+    void pending이_아닌_주문이면_예외가_발생한다() {
         Order order = createOrder(10L, 100L, "hold-key");
         order.cancel(LocalDateTime.of(2026, 3, 15, 9, 0));
 
-        Optional<OrderTerminationResult> result = orderExpirer.expire(order, List.of(), LocalDateTime.of(2026, 3, 15, 10, 0));
-
-        assertThat(result).isEmpty();
+        assertThatThrownBy(() -> orderExpirer.expire(order, List.of(), LocalDateTime.of(2026, 3, 15, 10, 0)))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("currentStatus=CANCELED");
         verifyNoInteractions(holdHistoryRecorder);
     }
 
     @Test
-    void pending_주문이면_주문과_주문좌석을_만료하고_hold_history를_기록한다() {
+    void pending_주문이면_주문을_만료하고_hold_history를_기록한다() {
         Order order = createOrder(10L, 100L, "hold-key");
         OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
         LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
 
-        Optional<OrderTerminationResult> result = orderExpirer.expire(order, List.of(orderSeat), now);
+        OrderTerminationResult result = orderExpirer.expire(order, List.of(orderSeat), now);
 
-        assertThat(result).isPresent();
         assertThat(order.getStatus()).isEqualTo(OrderState.EXPIRED);
-        assertThat(orderSeat.getStatus()).isEqualTo(OrderSeatState.EXPIRED);
-        assertThat(result.get().performanceId()).isEqualTo(100L);
-        assertThat(result.get().holdKey()).isEqualTo("hold-key");
-        assertThat(result.get().seatIds()).containsExactly(42L);
+        assertThat(result.performanceId()).isEqualTo(100L);
+        assertThat(result.holdKey()).isEqualTo("hold-key");
+        assertThat(result.seatIds()).containsExactly(42L);
         verify(holdHistoryRecorder).recordExpired(1L, 100L, "hold-key", now, List.of(orderSeat));
     }
 
