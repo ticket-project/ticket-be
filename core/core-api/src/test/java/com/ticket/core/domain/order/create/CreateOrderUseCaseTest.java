@@ -10,16 +10,19 @@ import com.ticket.core.enums.OrderState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,8 +54,21 @@ class CreateOrderUseCaseTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
-    @InjectMocks
     private CreateOrderUseCase createOrderUseCase;
+    private final Clock fixedClock = Clock.fixed(Instant.parse("2026-03-15T10:00:00Z"), ZoneId.of("Asia/Seoul"));
+    private static final LocalDateTime FIXED_NOW = LocalDateTime.of(2026, 3, 15, 19, 0);
+
+    @BeforeEach
+    void setUp() {
+        createOrderUseCase = new CreateOrderUseCase(
+                preconditionChecker,
+                holdAllocator,
+                orderCreator,
+                holdHistoryRecorder,
+                applicationEventPublisher,
+                fixedClock
+        );
+    }
 
     @Test
     void 중복된_좌석_ID가_있으면_예외를_던진다() {
@@ -82,12 +98,13 @@ class CreateOrderUseCaseTest {
         final RequestedSeatIds seatIds = RequestedSeatIds.from(input.seatIds());
         final Performance performance = createPerformance(5, 600);
         final List<PerformanceSeat> seats = List.of(mock(PerformanceSeat.class), mock(PerformanceSeat.class));
-        final HoldSnapshot snapshot = holdSnapshot(seatIds.values());
+        final HoldSnapshot snapshot = holdSnapshot(seatIds.toList());
         final HoldAllocation allocation = new HoldAllocation(snapshot, seats);
         final Order order = order(snapshot);
 
-        when(preconditionChecker.validate(20L, 10L, seatIds)).thenReturn(performance);
-        when(holdAllocator.allocate(20L, 10L, seatIds, Duration.ofSeconds(600))).thenReturn(allocation);
+        when(preconditionChecker.validate(20L, 10L, seatIds, FIXED_NOW)).thenReturn(performance);
+        when(holdAllocator.allocate(20L, 10L, seatIds, Duration.ofSeconds(600), FIXED_NOW))
+                .thenReturn(allocation);
         when(orderCreator.createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), seats))
                 .thenReturn(order);
 
@@ -107,8 +124,8 @@ class CreateOrderUseCaseTest {
         verify(applicationEventPublisher).publishEvent(any(HoldCreatedEvent.class));
 
         final InOrder inOrder = inOrder(preconditionChecker, holdAllocator, orderCreator, holdHistoryRecorder, applicationEventPublisher);
-        inOrder.verify(preconditionChecker).validate(20L, 10L, seatIds);
-        inOrder.verify(holdAllocator).allocate(20L, 10L, seatIds, Duration.ofSeconds(600));
+        inOrder.verify(preconditionChecker).validate(20L, 10L, seatIds, FIXED_NOW);
+        inOrder.verify(holdAllocator).allocate(20L, 10L, seatIds, Duration.ofSeconds(600), FIXED_NOW);
         inOrder.verify(orderCreator).createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), seats);
         inOrder.verify(holdHistoryRecorder).recordCreated(
                 20L,
@@ -126,10 +143,11 @@ class CreateOrderUseCaseTest {
         final CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(7L, 3L), 20L);
         final RequestedSeatIds seatIds = RequestedSeatIds.from(input.seatIds());
         final Performance performance = createPerformance(5, 600);
-        final HoldAllocation allocation = new HoldAllocation(holdSnapshot(seatIds.values()), List.of(mock(PerformanceSeat.class)));
+        final HoldAllocation allocation = new HoldAllocation(holdSnapshot(seatIds.toList()), List.of(mock(PerformanceSeat.class)));
 
-        when(preconditionChecker.validate(20L, 10L, seatIds)).thenReturn(performance);
-        when(holdAllocator.allocate(20L, 10L, seatIds, Duration.ofSeconds(600))).thenReturn(allocation);
+        when(preconditionChecker.validate(20L, 10L, seatIds, FIXED_NOW)).thenReturn(performance);
+        when(holdAllocator.allocate(20L, 10L, seatIds, Duration.ofSeconds(600), FIXED_NOW))
+                .thenReturn(allocation);
         when(orderCreator.createPendingOrder(
                 20L,
                 10L,
@@ -150,11 +168,12 @@ class CreateOrderUseCaseTest {
         final CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(7L, 3L), 20L);
         final RequestedSeatIds seatIds = RequestedSeatIds.from(input.seatIds());
         final Performance performance = createPerformance(5, 600);
-        final HoldAllocation allocation = new HoldAllocation(holdSnapshot(seatIds.values()), List.of(mock(PerformanceSeat.class)));
+        final HoldAllocation allocation = new HoldAllocation(holdSnapshot(seatIds.toList()), List.of(mock(PerformanceSeat.class)));
         final RuntimeException originalException = new RuntimeException("order failed");
 
-        when(preconditionChecker.validate(20L, 10L, seatIds)).thenReturn(performance);
-        when(holdAllocator.allocate(20L, 10L, seatIds, Duration.ofSeconds(600))).thenReturn(allocation);
+        when(preconditionChecker.validate(20L, 10L, seatIds, FIXED_NOW)).thenReturn(performance);
+        when(holdAllocator.allocate(20L, 10L, seatIds, Duration.ofSeconds(600), FIXED_NOW))
+                .thenReturn(allocation);
         when(orderCreator.createPendingOrder(
                 20L,
                 10L,
@@ -180,11 +199,12 @@ class CreateOrderUseCaseTest {
         final RequestedSeatIds seatIds = RequestedSeatIds.from(input.seatIds());
         final Performance performance = createPerformance(5, 600);
         final List<PerformanceSeat> seats = List.of(mock(PerformanceSeat.class));
-        final HoldSnapshot snapshot = holdSnapshot(seatIds.values());
+        final HoldSnapshot snapshot = holdSnapshot(seatIds.toList());
         final HoldAllocation allocation = new HoldAllocation(snapshot, seats);
 
-        when(preconditionChecker.validate(20L, 10L, seatIds)).thenReturn(performance);
-        when(holdAllocator.allocate(20L, 10L, seatIds, Duration.ofSeconds(600))).thenReturn(allocation);
+        when(preconditionChecker.validate(20L, 10L, seatIds, FIXED_NOW)).thenReturn(performance);
+        when(holdAllocator.allocate(20L, 10L, seatIds, Duration.ofSeconds(600), FIXED_NOW))
+                .thenReturn(allocation);
         when(orderCreator.createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), seats))
                 .thenReturn(order(snapshot));
         doThrow(new RuntimeException("event failed"))
