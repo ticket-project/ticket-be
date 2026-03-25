@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -19,10 +18,9 @@ public class HoldReleaseOutboxProcessor {
 
     private final HoldReleaseOutboxRepository holdReleaseOutboxRepository;
     private final HoldManager holdManager;
-    private final Clock clock;
 
     @Transactional
-    public void process(final Long outboxId) {
+    public void process(final Long outboxId, final LocalDateTime now) {
         final HoldReleaseOutbox outbox = holdReleaseOutboxRepository.findById(outboxId)
                 .orElse(null);
         if (outbox == null || outbox.isCompleted()) {
@@ -31,9 +29,9 @@ public class HoldReleaseOutboxProcessor {
 
         try {
             holdManager.release(outbox.getPerformanceId(), outbox.getHoldKey(), outbox.seatIds());
-            outbox.markCompleted(LocalDateTime.now(clock));
+            outbox.markCompleted(now);
         } catch (final RuntimeException e) {
-            outbox.scheduleRetry(LocalDateTime.now(clock).plus(RETRY_DELAY), e.getMessage());
+            outbox.scheduleRetry(now.plus(RETRY_DELAY), e.getMessage());
             log.error("hold release outbox 처리 실패: outboxId={}, holdKey={}", outboxId, outbox.getHoldKey(), e);
         }
     }

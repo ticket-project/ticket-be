@@ -6,10 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,40 +25,36 @@ class HoldReleaseOutboxProcessorTest {
     @Mock
     private HoldManager holdManager;
 
-    private final Clock clock = Clock.fixed(Instant.parse("2026-03-25T03:00:00Z"), ZoneId.of("Asia/Seoul"));
+    private static final LocalDateTime FIXED_NOW = LocalDateTime.of(2026, 3, 25, 12, 0);
 
     @Test
     void hold_release에_성공하면_outbox를_완료처리한다() {
-        final HoldReleaseOutbox outbox = HoldReleaseOutbox.create(1L, "hold-key", List.of(10L, 20L), now());
+        final HoldReleaseOutbox outbox = HoldReleaseOutbox.create(1L, "hold-key", List.of(10L, 20L), FIXED_NOW);
         when(holdReleaseOutboxRepository.findById(1L)).thenReturn(Optional.of(outbox));
 
-        processor().process(1L);
+        processor().process(1L, FIXED_NOW);
 
         verify(holdManager).release(1L, "hold-key", List.of(10L, 20L));
         assertThat(outbox.isCompleted()).isTrue();
-        assertThat(outbox.getCompletedAt()).isEqualTo(now());
+        assertThat(outbox.getCompletedAt()).isEqualTo(FIXED_NOW);
         assertThat(outbox.getRetryCount()).isZero();
     }
 
     @Test
     void hold_release에_실패하면_다음_재시도_시각을_기록한다() {
-        final HoldReleaseOutbox outbox = HoldReleaseOutbox.create(1L, "hold-key", List.of(10L, 20L), now());
+        final HoldReleaseOutbox outbox = HoldReleaseOutbox.create(1L, "hold-key", List.of(10L, 20L), FIXED_NOW);
         when(holdReleaseOutboxRepository.findById(1L)).thenReturn(Optional.of(outbox));
         doThrow(new RuntimeException("release failed")).when(holdManager).release(1L, "hold-key", List.of(10L, 20L));
 
-        processor().process(1L);
+        processor().process(1L, FIXED_NOW);
 
         assertThat(outbox.isCompleted()).isFalse();
         assertThat(outbox.getRetryCount()).isEqualTo(1);
-        assertThat(outbox.getNextAttemptAt()).isEqualTo(now().plusSeconds(30));
+        assertThat(outbox.getNextAttemptAt()).isEqualTo(FIXED_NOW.plusSeconds(30));
         assertThat(outbox.getLastError()).contains("release failed");
     }
 
-    private LocalDateTime now() {
-        return LocalDateTime.now(clock);
-    }
-
     private HoldReleaseOutboxProcessor processor() {
-        return new HoldReleaseOutboxProcessor(holdReleaseOutboxRepository, holdManager, clock);
+        return new HoldReleaseOutboxProcessor(holdReleaseOutboxRepository, holdManager);
     }
 }

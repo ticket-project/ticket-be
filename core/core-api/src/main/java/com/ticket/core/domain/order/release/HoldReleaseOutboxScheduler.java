@@ -21,7 +21,7 @@ public class HoldReleaseOutboxScheduler {
     private final HoldReleaseOutboxProcessor holdReleaseOutboxProcessor;
     private final Clock clock;
 
-    @Scheduled(fixedDelayString = "10000")
+    @Scheduled(fixedDelayString = "120000")
     @DistributedLock(
             prefix = "hold-release-outbox",
             dynamicKey = "'batch'",
@@ -39,7 +39,7 @@ public class HoldReleaseOutboxScheduler {
             }
 
             for (final HoldReleaseOutbox outbox : dueOutboxes.getContent()) {
-                holdReleaseOutboxProcessor.process(outbox.getId());
+                holdReleaseOutboxProcessor.process(outbox.getId(), LocalDateTime.now(clock));
             }
 
             if (dueOutboxes.getNumberOfElements() < BATCH_SIZE) {
