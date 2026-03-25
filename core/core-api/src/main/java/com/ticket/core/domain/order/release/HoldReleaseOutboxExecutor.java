@@ -23,7 +23,7 @@ public class HoldReleaseOutboxExecutor {
 
     @Transactional
     public void process(final Long outboxId, final LocalDateTime now) {
-        final HoldReleaseOutbox outbox = holdReleaseOutboxRepository.findById(outboxId)
+        final HoldReleaseOutbox outbox = holdReleaseOutboxRepository.findByIdForUpdate(outboxId)
                 .orElse(null);
         if (outbox == null || outbox.isCompleted()) {
             return;
