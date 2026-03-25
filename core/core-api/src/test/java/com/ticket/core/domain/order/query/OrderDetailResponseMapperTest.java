@@ -16,13 +16,10 @@ import com.ticket.core.enums.OrderState;
 import com.ticket.core.enums.Role;
 import org.junit.jupiter.api.Test;
 
-import java.time.Clock;
-import java.time.Instant;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SuppressWarnings("NonAsciiCharacters")
 class OrderDetailResponseMapperTest {
 
-    private static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse("2026-03-15T10:00:00Z"), ZoneId.of("Asia/Seoul"));
+    private static final LocalDateTime FIXED_NOW = LocalDateTime.of(2026, 3, 15, 19, 0);
 
     @Test
     void 공연좌석목록이_비어있으면_예외를_던진다() {
@@ -40,7 +37,7 @@ class OrderDetailResponseMapperTest {
 
         //when
         //then
-        assertThatThrownBy(() -> OrderDetailResponseMapper.toResponse(order, List.of(), List.of(), createMember(), FIXED_CLOCK))
+        assertThatThrownBy(() -> OrderDetailResponseMapper.toResponse(order, List.of(), List.of(), createMember(), FIXED_NOW))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("performanceSeats");
     }
@@ -63,7 +60,7 @@ class OrderDetailResponseMapperTest {
                 List.of(orderSeat),
                 List.of(performanceSeat),
                 member,
-                FIXED_CLOCK
+                FIXED_NOW
         );
 
         //then

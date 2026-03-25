@@ -12,14 +12,13 @@ import java.time.LocalDateTime;
 public class HoldReleaseOutboxWriter {
 
     private final HoldReleaseOutboxRepository holdReleaseOutboxRepository;
-    private final Clock clock;
 
     public void append(final OrderTerminationResult result) {
         holdReleaseOutboxRepository.save(HoldReleaseOutbox.create(
                 result.performanceId(),
                 result.holdKey(),
                 result.seatIds(),
-                LocalDateTime.now(clock)
+                LocalDateTime.now()
         ));
     }
 }

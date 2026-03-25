@@ -67,7 +67,7 @@ class GetOrderDetailUseCaseTest {
         PerformanceSeat performanceSeat = new PerformanceSeat(performance, seat, PerformanceSeatState.AVAILABLE, BigDecimal.valueOf(120000));
         ReflectionTestUtils.setField(performanceSeat, "id", 501L);
 
-        Order order = new Order(1L, 10L, "order-key", "hold-key", BigDecimal.valueOf(120000), LocalDateTime.now().plusMinutes(10));
+        Order order = new Order(1L, 10L, "order-key", "hold-key", BigDecimal.valueOf(120000), LocalDateTime.of(2026, 3, 15, 19, 10));
         ReflectionTestUtils.setField(order, "id", 77L);
         OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.valueOf(120000));
 
@@ -87,6 +87,7 @@ class GetOrderDetailUseCaseTest {
         assertThat(output.performance().venueName()).isEqualTo("올림픽홀");
         assertThat(output.booker().email()).isEqualTo("user@example.com");
         assertThat(output.tickets().count()).isEqualTo(1);
+        assertThat(output.remainingSeconds()).isEqualTo(600L);
     }
 
     private Venue createVenue(final String name) throws Exception {
