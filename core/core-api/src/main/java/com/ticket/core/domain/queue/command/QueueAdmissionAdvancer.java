@@ -42,9 +42,9 @@ public class QueueAdmissionAdvancer {
 
     private void advanceWithinLock(final Long performanceId) {
         final QueuePolicy policy = queuePolicyResolver.resolve(performanceId);
-        final LocalDateTime now = LocalDateTime.now(clock);
 
         while (queueTicketStore.countActive(performanceId) < policy.maxActiveUsers()) {
+            final LocalDateTime now = LocalDateTime.now(clock);
             final boolean admitted = queueTicketStore.admitNextWaiting(
                     performanceId,
                     policy.entryTokenTtl(),
