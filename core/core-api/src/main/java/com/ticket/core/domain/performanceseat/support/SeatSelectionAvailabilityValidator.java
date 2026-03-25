@@ -1,8 +1,8 @@
 package com.ticket.core.domain.performanceseat.support;
 
 import com.ticket.core.domain.hold.support.HoldManager;
-import com.ticket.core.domain.performanceseat.finder.PerformanceSeatFinder;
 import com.ticket.core.domain.performanceseat.model.PerformanceSeat;
+import com.ticket.core.domain.performanceseat.repository.PerformanceSeatRepository;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
@@ -15,11 +15,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SeatSelectionAvailabilityValidator {
 
-    private final PerformanceSeatFinder performanceSeatFinder;
     private final HoldManager holdManager;
+    private final PerformanceSeatRepository performanceSeatRepository;
 
     public void validate(final Long performanceId, final Long seatId) {
-        final List<PerformanceSeat> performanceSeats = performanceSeatFinder.findByPerformanceIdAndSeatIdIn(
+        final List<PerformanceSeat> performanceSeats = performanceSeatRepository.findAllByPerformanceIdAndSeatIdIn(
                 performanceId,
                 List.of(seatId)
         );

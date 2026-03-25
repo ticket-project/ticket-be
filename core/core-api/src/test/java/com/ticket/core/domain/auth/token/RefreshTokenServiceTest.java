@@ -1,7 +1,5 @@
 package com.ticket.core.domain.auth.token;
 
-import com.ticket.core.domain.auth.usecase.AuthRefreshToken;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -99,4 +97,3 @@ class RefreshTokenServiceTest {
         verify(bucket).compareAndSet("3", null);
     }
 }
-

@@ -1,6 +1,7 @@
 package com.ticket.core.domain.auth.usecase;
 
 import com.ticket.core.api.controller.response.AuthLoginResponse;
+import com.ticket.core.domain.auth.token.AuthRefreshToken;
 import com.ticket.core.domain.auth.token.AuthTokenManager;
 import com.ticket.core.domain.auth.token.RefreshTokenService;
 import com.ticket.core.domain.member.Member;

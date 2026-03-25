@@ -3,7 +3,6 @@ package com.ticket.core.domain.auth.token;
 import com.ticket.core.api.controller.response.AuthLoginResponse;
 import com.ticket.core.config.security.JwtProperties;
 import com.ticket.core.config.security.JwtTokenService;
-import com.ticket.core.domain.auth.usecase.AuthRefreshToken;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.support.util.CookieUtils;
