@@ -10,7 +10,7 @@ import com.ticket.core.api.controller.response.ShowResponse;
 import com.ticket.core.api.controller.response.ShowSearchResponse;
 import com.ticket.core.api.controller.response.ShowSummaryResponse;
 import com.ticket.core.domain.show.Show;
-import com.ticket.core.domain.show.image.ShowImagePathResolver;
+import com.ticket.core.domain.show.image.ShowCardImagePathConverter;
 import com.ticket.core.domain.show.query.ShowSortSupport.SortOrder;
 import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
 import com.ticket.core.domain.show.query.model.ShowParam;
@@ -48,7 +48,7 @@ public class ShowListQueryRepository {
     private final ShowConditionFactory showConditionFactory;
     private final ShowSortSupport sortSupport;
     private final ShowCursorPolicy showCursorPolicy;
-    private final ShowImagePathResolver showImagePathResolver;
+    private final ShowCardImagePathConverter showCardImagePathConverter;
 
     // ========== 메인 페이지 API ==========
 
@@ -222,7 +222,7 @@ public class ShowListQueryRepository {
 
         return new ArrayList<>(shows.stream()
                 .map(s -> new ShowResponse(
-                        s.getId(), s.getTitle(), s.getSubTitle(), showImagePathResolver.toCardImage(s.getImage()),
+                s.getId(), s.getTitle(), s.getSubTitle(), showCardImagePathConverter.toCardImage(s.getImage()),
                         genreMap.getOrDefault(s.getId(), new ArrayList<>()),
                         s.getStartDate(), s.getEndDate(), s.getViewCount(),
                         s.getSaleType(), s.getSaleStartDate(), s.getSaleEndDate(),
@@ -282,7 +282,7 @@ public class ShowListQueryRepository {
         return new ShowSummaryResponse(
                 tuple.get(show.id),
                 tuple.get(show.title),
-                showImagePathResolver.toCardImage(tuple.get(show.image)),
+                showCardImagePathConverter.toCardImage(tuple.get(show.image)),
                 tuple.get(show.startDate),
                 tuple.get(show.endDate),
                 tuple.get(venue.name),
@@ -294,7 +294,7 @@ public class ShowListQueryRepository {
         return new ShowOpeningSoonSummaryResponse(
                 tuple.get(show.id),
                 tuple.get(show.title),
-                showImagePathResolver.toCardImage(tuple.get(show.image)),
+                showCardImagePathConverter.toCardImage(tuple.get(show.image)),
                 tuple.get(venue.name),
                 tuple.get(show.saleStartDate)
         );
@@ -305,7 +305,7 @@ public class ShowListQueryRepository {
                 tuple.get(show.id),
                 tuple.get(show.title),
                 tuple.get(show.subTitle),
-                showImagePathResolver.toCardImage(tuple.get(show.image)),
+                showCardImagePathConverter.toCardImage(tuple.get(show.image)),
                 tuple.get(venue.name),
                 tuple.get(venue.region),
                 tuple.get(show.startDate),
@@ -320,7 +320,7 @@ public class ShowListQueryRepository {
         return new ShowSearchResponse(
                 tuple.get(show.id),
                 tuple.get(show.title),
-                showImagePathResolver.toCardImage(tuple.get(show.image)),
+                showCardImagePathConverter.toCardImage(tuple.get(show.image)),
                 tuple.get(venue.name),
                 tuple.get(show.startDate),
                 tuple.get(show.endDate),
