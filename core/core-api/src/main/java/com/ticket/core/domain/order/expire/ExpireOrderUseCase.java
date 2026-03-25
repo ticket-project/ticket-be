@@ -1,14 +1,13 @@
 package com.ticket.core.domain.order.expire;
 
-import com.ticket.core.domain.order.event.OrderExpiredEvent;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
+import com.ticket.core.domain.order.release.HoldReleaseOutboxWriter;
 import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.domain.order.repository.OrderSeatRepository;
 import com.ticket.core.domain.order.shared.OrderTerminationResult;
 import com.ticket.core.enums.OrderState;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +21,7 @@ public class ExpireOrderUseCase {
     private final OrderRepository orderRepository;
     private final OrderSeatRepository orderSeatRepository;
     private final OrderExpirer orderExpirer;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final HoldReleaseOutboxWriter holdReleaseOutboxWriter;
 
     @Transactional
     public void expireByOrderId(final Long orderId, final LocalDateTime now) {
@@ -40,11 +39,7 @@ public class ExpireOrderUseCase {
         }
         final List<OrderSeat> orderSeats = orderSeatRepository.findAllByOrder_IdOrderByIdAsc(order.getId());
         orderExpirer.expire(order, orderSeats, now)
-                .ifPresent(this::publishExpiredEvent);
-    }
-
-    private void publishExpiredEvent(final OrderTerminationResult result) {
-        applicationEventPublisher.publishEvent(new OrderExpiredEvent(result.performanceId(), result.holdKey(), result.seatIds()));
+                .ifPresent(holdReleaseOutboxWriter::append);
     }
 
     private Order findPendingOrder(final Long orderId) {

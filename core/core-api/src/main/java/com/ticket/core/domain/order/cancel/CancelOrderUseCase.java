@@ -1,9 +1,9 @@
 package com.ticket.core.domain.order.cancel;
 
 import com.ticket.core.domain.member.MemberFinder;
-import com.ticket.core.domain.order.event.OrderCancelledEvent;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
+import com.ticket.core.domain.order.release.HoldReleaseOutboxWriter;
 import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.domain.order.repository.OrderSeatRepository;
 import com.ticket.core.domain.order.shared.OrderTerminationResult;
@@ -11,7 +11,6 @@ import com.ticket.core.enums.OrderState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +25,7 @@ public class CancelOrderUseCase {
     private final OrderRepository orderRepository;
     private final OrderSeatRepository orderSeatRepository;
     private final OrderCanceler orderCanceler;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final HoldReleaseOutboxWriter holdReleaseOutboxWriter;
 
     public record Input(String orderKey, Long memberId) {}
 
@@ -36,7 +35,7 @@ public class CancelOrderUseCase {
         final Order order = getPendingOwnedOrder(input.orderKey(), input.memberId());
         final List<OrderSeat> orderSeats = orderSeatRepository.findAllByOrder_IdOrderByIdAsc(order.getId());
         final OrderTerminationResult result = orderCanceler.cancel(order, orderSeats, LocalDateTime.now());
-        applicationEventPublisher.publishEvent(new OrderCancelledEvent(result.performanceId(), result.holdKey(), result.seatIds()));
+        holdReleaseOutboxWriter.append(result);
     }
 
     private Order getPendingOwnedOrder(final String orderKey, final Long memberId) {
