@@ -28,7 +28,7 @@ public class ShowConditionFactory {
         where.and(showQueryHelper.categoryCodeEq(param.getCategory()));
         where.and(showQueryHelper.regionEq(param.getRegion()));
         where.and(showQueryHelper.genreEq(param.getGenre()));
-        appendShowStartApproachingCondition(where, sortOrder);
+        appendShowStartApproachingCondition(where, sortOrder, LocalDate.now(clock));
         return where;
     }
 
@@ -54,19 +54,24 @@ public class ShowConditionFactory {
 
     public BooleanBuilder buildSearchCondition(final ShowSearchRequest request, final SortOrder sortOrder) {
         final BooleanBuilder where = new BooleanBuilder();
+        final LocalDateTime now = LocalDateTime.now(clock);
         where.and(showQueryHelper.keywordContains(request.getKeyword()));
         where.and(showQueryHelper.categoryCodeEq(request.getCategory()));
         where.and(showQueryHelper.regionEq(request.getRegion()));
         where.and(showQueryHelper.startDateGoe(request.getStartDateFrom()));
         where.and(showQueryHelper.startDateLoe(request.getStartDateTo()));
-        where.and(bookingStatusWindowPolicy.condition(request.getBookingStatus()));
-        appendShowStartApproachingCondition(where, sortOrder);
+        where.and(bookingStatusWindowPolicy.condition(request.getBookingStatus(), now));
+        appendShowStartApproachingCondition(where, sortOrder, now.toLocalDate());
         return where;
     }
 
-    private void appendShowStartApproachingCondition(final BooleanBuilder where, final SortOrder sortOrder) {
+    private void appendShowStartApproachingCondition(
+            final BooleanBuilder where,
+            final SortOrder sortOrder,
+            final LocalDate today
+    ) {
         if (sortOrder != null && ShowSortKey.SHOW_START_APPROACHING.equals(sortOrder.key())) {
-            where.and(show.startDate.goe(LocalDate.now(clock)));
+            where.and(show.startDate.goe(today));
         }
     }
 }
