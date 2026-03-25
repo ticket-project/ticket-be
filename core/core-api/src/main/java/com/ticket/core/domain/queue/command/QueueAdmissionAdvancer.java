@@ -8,12 +8,16 @@ import com.ticket.core.domain.queue.usecase.QueueEntryId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+
 @Component
 @RequiredArgsConstructor
 public class QueueAdmissionAdvancer {
 
     private final QueuePolicyResolver queuePolicyResolver;
     private final QueueTicketStore queueTicketStore;
+    private final Clock clock;
 
     @DistributedLock(
             prefix = "queue",
@@ -38,12 +42,14 @@ public class QueueAdmissionAdvancer {
 
     private void advanceWithinLock(final Long performanceId) {
         final QueuePolicy policy = queuePolicyResolver.resolve(performanceId);
+        final LocalDateTime now = LocalDateTime.now(clock);
 
         while (queueTicketStore.countActive(performanceId) < policy.maxActiveUsers()) {
             final boolean admitted = queueTicketStore.admitNextWaiting(
                     performanceId,
                     policy.entryTokenTtl(),
-                    policy.entryRetention()
+                    policy.entryRetention(),
+                    now
             ).isPresent();
             if (!admitted) {
                 return;

@@ -8,13 +8,16 @@ import com.ticket.core.domain.queue.support.QueuePolicyResolver;
 import com.ticket.core.domain.queue.support.QueuePolicy;
 import com.ticket.core.domain.queue.usecase.QueueEntryId;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.mockito.Mockito.never;
@@ -31,8 +34,13 @@ class QueueAdmissionAdvancerTest {
     @Mock
     private QueueTicketStore queueTicketStore;
 
-    @InjectMocks
     private QueueAdmissionAdvancer queueAdmissionAdvancer;
+    private final Clock fixedClock = Clock.fixed(Instant.parse("2026-03-15T10:00:00Z"), ZoneId.of("Asia/Seoul"));
+
+    @BeforeEach
+    void setUp() {
+        queueAdmissionAdvancer = new QueueAdmissionAdvancer(queuePolicyResolver, queueTicketStore, fixedClock);
+    }
 
     @Test
     void 빈자리가_있고_대기자가_있으면_다음_대기자를_입장시킨다() {
@@ -42,14 +50,14 @@ class QueueAdmissionAdvancerTest {
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueTicketStore.countActive(10L)).thenReturn(0L, 1L);
-        when(queueTicketStore.admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1)))
+        when(queueTicketStore.admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1), LocalDateTime.of(2026, 3, 15, 19, 0)))
                 .thenReturn(Optional.of(admitted));
 
         //when
         queueAdmissionAdvancer.advance(10L);
 
         //then
-        verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
+        verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1), LocalDateTime.of(2026, 3, 15, 19, 0));
     }
 
     @Test
@@ -62,7 +70,7 @@ class QueueAdmissionAdvancerTest {
         queueAdmissionAdvancer.advance(10L);
 
         //then
-        verify(queueTicketStore, never()).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
+        verify(queueTicketStore, never()).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1), LocalDateTime.of(2026, 3, 15, 19, 0));
     }
 
     @Test
@@ -70,14 +78,14 @@ class QueueAdmissionAdvancerTest {
         //given
         when(queuePolicyResolver.resolve(10L)).thenReturn(createPolicy(1));
         when(queueTicketStore.countActive(10L)).thenReturn(0L);
-        when(queueTicketStore.admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1)))
+        when(queueTicketStore.admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1), LocalDateTime.of(2026, 3, 15, 19, 0)))
                 .thenReturn(Optional.empty());
 
         //when
         queueAdmissionAdvancer.advance(10L);
 
         //then
-        verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
+        verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1), LocalDateTime.of(2026, 3, 15, 19, 0));
     }
 
     @Test
@@ -85,7 +93,7 @@ class QueueAdmissionAdvancerTest {
         //given
         when(queuePolicyResolver.resolve(10L)).thenReturn(createPolicy(1));
         when(queueTicketStore.countActive(10L)).thenReturn(0L, 1L);
-        when(queueTicketStore.admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1)))
+        when(queueTicketStore.admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1), LocalDateTime.of(2026, 3, 15, 19, 0)))
                 .thenReturn(Optional.of(createAdmitted(10L, "qe-201", "qt-201")));
 
         //when
@@ -93,7 +101,7 @@ class QueueAdmissionAdvancerTest {
 
         //then
         verify(queueTicketStore).expireAdmitted(10L, QueueEntryId.from("qe-200"), "qt-200");
-        verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
+        verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1), LocalDateTime.of(2026, 3, 15, 19, 0));
     }
 
     private QueuePolicy createPolicy(final int maxActiveUsers) {
