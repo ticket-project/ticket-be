@@ -22,7 +22,6 @@ public class OrderCanceler {
             final LocalDateTime now
     ) {
         order.cancel(now);
-        orderSeats.forEach(OrderSeat::cancel);
         holdHistoryRecorder.recordCanceled(
                 order.getMemberId(),
                 order.getPerformanceId(),

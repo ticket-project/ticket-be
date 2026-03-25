@@ -27,34 +27,45 @@ public class OrderExpirationScheduler {
     public void expirePendingOrders() {
         final LocalDateTime now = LocalDateTime.now();
         while (true) {
-            final Slice<Order> expiredOrders = orderRepository.findAllByStatusAndExpiresAtBefore(
-                    OrderState.PENDING,
-                    now,
-                    PageRequest.of(0, BATCH_SIZE, Sort.by(Sort.Direction.ASC, "id"))
-            );
+            final Slice<Order> expiredOrders = loadBatch(now);
             if (!expiredOrders.hasContent()) {
                 return;
             }
 
-            int processedCount = 0;
-            for (final Order order : expiredOrders.getContent()) {
-                try {
-                    expireOrderUseCase.expireByOrderId(order.getId(), now);
-                    processedCount++;
-                } catch (final RuntimeException e) {
-                    log.error("주문 만료 처리 실패: orderKey={}, orderId={}", order.getOrderKey(), order.getId(), e);
-                }
-            }
-
-            if (processedCount == 0) {
-                log.warn("주문 만료 배치에서 처리 성공 건이 없어 반복을 중단합니다. pendingCount={}",
-                        expiredOrders.getNumberOfElements());
-                return;
-            }
-
-            if (expiredOrders.getNumberOfElements() < BATCH_SIZE) {
+            final int processedCount = processBatch(expiredOrders, now);
+            if (shouldStop(expiredOrders, processedCount)) {
                 return;
             }
         }
+    }
+
+    private Slice<Order> loadBatch(final LocalDateTime now) {
+        return orderRepository.findAllByStatusAndExpiresAtBefore(
+                OrderState.PENDING,
+                now,
+                PageRequest.of(0, BATCH_SIZE, Sort.by(Sort.Direction.ASC, "id"))
+        );
+    }
+
+    private int processBatch(final Slice<Order> expiredOrders, final LocalDateTime now) {
+        int processedCount = 0;
+        for (final Order order : expiredOrders.getContent()) {
+            try {
+                expireOrderUseCase.expireByOrderId(order.getId(), now);
+                processedCount++;
+            } catch (final RuntimeException e) {
+                log.error("주문 만료 처리 실패: orderKey={}, orderId={}", order.getOrderKey(), order.getId(), e);
+            }
+        }
+        return processedCount;
+    }
+
+    private boolean shouldStop(final Slice<Order> expiredOrders, final int processedCount) {
+        if (processedCount == 0) {
+            log.warn("주문 만료 배치에서 처리 성공 건이 없어 반복을 중단합니다. pendingCount={}",
+                    expiredOrders.getNumberOfElements());
+            return true;
+        }
+        return expiredOrders.getNumberOfElements() < BATCH_SIZE;
     }
 }

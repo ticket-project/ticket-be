@@ -36,22 +36,4 @@ public class OrderFinder {
         }
         return order;
     }
-
-    public boolean findByMemberIdAndPerformanceIdAndStatus(final Long memberId, final Long performanceId, final OrderState status) {
-        return orderRepository.findByMemberIdAndPerformanceIdAndStatus(memberId, performanceId, status).isPresent();
-    }
-
-    public Order findPendingOrder(final Long orderId) {
-        return orderRepository.findByIdAndStatusForUpdate(orderId, OrderState.PENDING)
-                .orElse(null);
-    }
-
-    public Order findPendingOrderByHoldKey(final String holdKey) {
-        return orderRepository.findByHoldKeyAndStatusForUpdate(holdKey, OrderState.PENDING)
-                .orElse(null);
-    }
-
-    public Slice<Order> findAllByStatusAndExpiresAtBefore(final OrderState orderState, final LocalDateTime now, final PageRequest pageRequest) {
-        return orderRepository.findAllByStatusAndExpiresAtBefore(orderState, now, pageRequest);
-    }
 }

@@ -1,8 +1,15 @@
 package com.ticket.core.domain.order.model;
 
 import com.ticket.core.domain.BaseEntity;
-import com.ticket.core.enums.OrderSeatState;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,10 +39,6 @@ public class OrderSeat extends BaseEntity {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal price;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 32)
-    private OrderSeatState status;
-
     public OrderSeat(
             final Order order,
             final Long performanceSeatId,
@@ -46,27 +49,5 @@ public class OrderSeat extends BaseEntity {
         this.performanceSeatId = performanceSeatId;
         this.seatId = seatId;
         this.price = price;
-        this.status = OrderSeatState.HELD;
-    }
-
-    public void expire() {
-        validateHeldTransition("expire");
-        this.status = OrderSeatState.EXPIRED;
-    }
-
-    public void cancel() {
-        validateHeldTransition("cancel");
-        this.status = OrderSeatState.CANCELED;
-    }
-
-    public void confirm() {
-        validateHeldTransition("confirm");
-        this.status = OrderSeatState.CONFIRMED;
-    }
-
-    private void validateHeldTransition(final String action) {
-        if (status != OrderSeatState.HELD) {
-            throw new IllegalStateException("HELD 좌석만 " + action + " 할 수 있습니다. currentStatus=" + status);
-        }
     }
 }
