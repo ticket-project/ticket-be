@@ -1,7 +1,7 @@
 package com.ticket.core.domain.hold.support;
 
 import com.ticket.core.domain.order.create.RequestedSeatIds;
-import com.ticket.core.domain.performanceseat.finder.PerformanceSeatFinder;
+import com.ticket.core.domain.performanceseat.repository.PerformanceSeatRepository;
 import com.ticket.core.domain.performanceseat.model.PerformanceSeat;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.support.exception.CoreException;
@@ -15,11 +15,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HoldSeatAvailabilityValidator {
 
-    private final PerformanceSeatFinder performanceSeatFinder;
+    private final PerformanceSeatRepository performanceSeatRepository;
 
     public List<PerformanceSeat> validate(final Long performanceId, final RequestedSeatIds requestedSeatIds) {
         final List<Long> seatIds = requestedSeatIds.toList();
-        final List<PerformanceSeat> performanceSeats = performanceSeatFinder.findByPerformanceIdAndSeatIdIn(performanceId, seatIds);
+        final List<PerformanceSeat> performanceSeats = performanceSeatRepository.findAllByPerformanceIdAndSeatIdIn(performanceId, seatIds);
         if (performanceSeats.size() != requestedSeatIds.size()) {
             throw new CoreException(ErrorType.SEAT_MISMATCH_IN_PERFORMANCE);
         }
