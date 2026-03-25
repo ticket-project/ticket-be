@@ -1,7 +1,7 @@
 package com.ticket.core.domain.hold.event;
 
 import com.ticket.core.domain.order.expire.ExpireOrderUseCase;
-import com.ticket.core.domain.queue.command.QueueAdmissionProcessor;
+import com.ticket.core.domain.queue.command.QueueAdmissionAdvancer;
 import com.ticket.core.domain.queue.runtime.QueueRedisKey;
 import com.ticket.core.domain.queue.usecase.QueueEntryId;
 import com.ticket.core.domain.performanceseat.support.SeatEventPublisher;
@@ -25,7 +25,7 @@ public class RedisKeyExpirationListener implements MessageListener {
 
     private final SeatEventPublisher seatEventPublisher;
     private final ExpireOrderUseCase expireOrderUseCase;
-    private final QueueAdmissionProcessor queueAdmissionProcessor;
+    private final QueueAdmissionAdvancer queueAdmissionAdvancer;
 
     @Override
     public void onMessage(final Message message, final byte[] pattern) {
@@ -62,7 +62,7 @@ public class RedisKeyExpirationListener implements MessageListener {
 
     private void handleQueueTokenExpired(final QueueRedisKey.TokenKey tokenKey) {
         final String queueToken = tokenKey.performanceId() + ":" + tokenKey.queueEntryId() + ":" + tokenKey.tokenId();
-        queueAdmissionProcessor.handleTokenExpired(tokenKey.performanceId(), QueueEntryId.from(tokenKey.queueEntryId()), queueToken);
+        queueAdmissionAdvancer.handleTokenExpired(tokenKey.performanceId(), QueueEntryId.from(tokenKey.queueEntryId()), queueToken);
         log.info("대기열 토큰 만료 이벤트 처리: performanceId={}, queueEntryId={}",
                 tokenKey.performanceId(), tokenKey.queueEntryId());
     }
