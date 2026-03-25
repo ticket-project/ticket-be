@@ -49,7 +49,7 @@ public interface HoldControllerDocs {
             )
     })
     ResponseEntity<ApiResponse<CreateOrderUseCase.Output>> createHold(
-            @Parameter(description = "공연 ID", example = "1", required = true) Long performanceId,
+            @Parameter(description = "회차 ID", example = "1", required = true) Long performanceId,
             CreateHoldRequest request,
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );
