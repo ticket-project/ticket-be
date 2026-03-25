@@ -2,6 +2,7 @@ package com.ticket.core.domain.order.expire;
 
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
+import com.ticket.core.domain.order.release.HoldReleaseRequestedEvent;
 import com.ticket.core.domain.order.release.HoldReleaseOutboxWriter;
 import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.domain.order.repository.OrderSeatRepository;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -39,6 +41,9 @@ class ExpireOrderUseCaseTest {
     @Mock
     private HoldReleaseOutboxWriter holdReleaseOutboxWriter;
 
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
+
     @InjectMocks
     private ExpireOrderUseCase useCase;
 
@@ -61,12 +66,14 @@ class ExpireOrderUseCaseTest {
         when(orderRepository.findByIdAndStatusForUpdate(10L, com.ticket.core.enums.OrderState.PENDING)).thenReturn(java.util.Optional.of(order));
         when(orderSeatRepository.findAllByOrder_IdOrderByIdAsc(10L)).thenReturn(List.of(orderSeat));
         when(orderExpirer.expire(eq(order), eq(List.of(orderSeat)), eq(now))).thenReturn(result);
+        when(holdReleaseOutboxWriter.append(result)).thenReturn(99L);
 
         useCase.expireByOrderId(10L, now);
 
         verify(orderSeatRepository).findAllByOrder_IdOrderByIdAsc(10L);
         verify(orderExpirer).expire(order, List.of(orderSeat), now);
         verify(holdReleaseOutboxWriter).append(result);
+        verify(applicationEventPublisher).publishEvent(new HoldReleaseRequestedEvent(99L));
     }
 
     @Test
@@ -78,12 +85,14 @@ class ExpireOrderUseCaseTest {
         when(orderRepository.findByHoldKeyAndStatusForUpdate("hold-key", com.ticket.core.enums.OrderState.PENDING)).thenReturn(java.util.Optional.of(order));
         when(orderSeatRepository.findAllByOrder_IdOrderByIdAsc(10L)).thenReturn(List.of(orderSeat));
         when(orderExpirer.expire(eq(order), eq(List.of(orderSeat)), eq(now))).thenReturn(result);
+        when(holdReleaseOutboxWriter.append(result)).thenReturn(99L);
 
         useCase.expireByHoldKey("hold-key", now);
 
         verify(orderSeatRepository).findAllByOrder_IdOrderByIdAsc(10L);
         verify(orderExpirer).expire(order, List.of(orderSeat), now);
         verify(holdReleaseOutboxWriter).append(result);
+        verify(applicationEventPublisher).publishEvent(new HoldReleaseRequestedEvent(99L));
     }
 
     private Order createOrder(final Long id, final Long performanceId, final String holdKey) {
