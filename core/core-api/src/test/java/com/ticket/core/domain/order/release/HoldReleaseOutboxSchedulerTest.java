@@ -15,6 +15,7 @@ import java.util.List;
 import java.time.ZoneId;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,7 +37,7 @@ class HoldReleaseOutboxSchedulerTest {
 
         scheduler().processPendingHoldReleases();
 
-        verify(holdReleaseOutboxProcessor, times(0)).process(any());
+        verify(holdReleaseOutboxProcessor, times(0)).process(any(), any(LocalDateTime.class));
     }
 
     @Test
@@ -51,8 +52,8 @@ class HoldReleaseOutboxSchedulerTest {
 
         scheduler().processPendingHoldReleases();
 
-        verify(holdReleaseOutboxProcessor).process(1L);
-        verify(holdReleaseOutboxProcessor).process(2L);
+        verify(holdReleaseOutboxProcessor).process(eq(1L), any(LocalDateTime.class));
+        verify(holdReleaseOutboxProcessor).process(eq(2L), any(LocalDateTime.class));
     }
 
     private HoldReleaseOutboxScheduler scheduler() {

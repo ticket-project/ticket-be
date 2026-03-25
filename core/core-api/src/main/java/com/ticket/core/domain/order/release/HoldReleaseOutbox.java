@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -39,7 +40,8 @@ public class HoldReleaseOutbox extends BaseEntity {
     @Column(nullable = false, length = 64)
     private String holdKey;
 
-    @Column(nullable = false, length = 255)
+    @Lob
+    @Column(nullable = false, columnDefinition = "CLOB")
     private String seatIdsPayload;
 
     @Column(nullable = false)
