@@ -16,10 +16,6 @@ public class PerformanceSeatFinder {
 
     private final PerformanceSeatRepository performanceSeatRepository;
 
-    public List<PerformanceSeat> findByPerformanceIdAndSeatIdIn(final Long performanceId, final List<Long> seatIds) {
-        return performanceSeatRepository.findAllByPerformanceIdAndSeatIdIn(performanceId, seatIds);
-    }
-
     public List<PerformanceSeat> findAllByOrderSeats(final List<OrderSeat> orderSeats) {
         final List<Long> performanceSeatIds = orderSeats.stream()
                 .map(OrderSeat::getPerformanceSeatId)

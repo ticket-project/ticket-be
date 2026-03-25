@@ -1,6 +1,5 @@
 package com.ticket.core.domain.auth.token;
 
-import com.ticket.core.domain.auth.usecase.AuthRefreshToken;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;

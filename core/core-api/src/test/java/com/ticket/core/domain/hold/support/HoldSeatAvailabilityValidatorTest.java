@@ -1,8 +1,8 @@
 package com.ticket.core.domain.hold.support;
 
 import com.ticket.core.domain.order.create.RequestedSeatIds;
-import com.ticket.core.domain.performanceseat.finder.PerformanceSeatFinder;
 import com.ticket.core.domain.performanceseat.model.PerformanceSeat;
+import com.ticket.core.domain.performanceseat.repository.PerformanceSeatRepository;
 import com.ticket.core.enums.PerformanceSeatState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 class HoldSeatAvailabilityValidatorTest {
 
     @Mock
-    private PerformanceSeatFinder performanceSeatFinder;
+    private PerformanceSeatRepository performanceSeatRepository;
 
     @InjectMocks
     private HoldSeatAvailabilityValidator validator;
@@ -45,7 +45,7 @@ class HoldSeatAvailabilityValidatorTest {
     void 좌석개수가_일치하지_않으면_seatMismatch예외를_던진다() {
         PerformanceSeat availableSeat = mock(PerformanceSeat.class);
         RequestedSeatIds seatIds = RequestedSeatIds.from(List.of(10L, 20L));
-        when(performanceSeatFinder.findByPerformanceIdAndSeatIdIn(1L, List.of(10L, 20L)))
+        when(performanceSeatRepository.findAllByPerformanceIdAndSeatIdIn(1L, List.of(10L, 20L)))
                 .thenReturn(List.of(availableSeat));
 
         assertThatThrownBy(() -> validator.validate(1L, seatIds))
@@ -58,7 +58,7 @@ class HoldSeatAvailabilityValidatorTest {
         PerformanceSeat availableSeat = createPerformanceSeat(PerformanceSeatState.AVAILABLE);
         PerformanceSeat reservedSeat = createPerformanceSeat(PerformanceSeatState.RESERVED);
         RequestedSeatIds seatIds = RequestedSeatIds.from(List.of(10L, 20L));
-        when(performanceSeatFinder.findByPerformanceIdAndSeatIdIn(1L, List.of(10L, 20L)))
+        when(performanceSeatRepository.findAllByPerformanceIdAndSeatIdIn(1L, List.of(10L, 20L)))
                 .thenReturn(List.of(availableSeat, reservedSeat));
 
         assertThatThrownBy(() -> validator.validate(1L, seatIds))
@@ -73,7 +73,7 @@ class HoldSeatAvailabilityValidatorTest {
                 createPerformanceSeat(PerformanceSeatState.AVAILABLE),
                 createPerformanceSeat(PerformanceSeatState.AVAILABLE)
         );
-        when(performanceSeatFinder.findByPerformanceIdAndSeatIdIn(1L, List.of(10L, 20L))).thenReturn(seats);
+        when(performanceSeatRepository.findAllByPerformanceIdAndSeatIdIn(1L, List.of(10L, 20L))).thenReturn(seats);
 
         List<PerformanceSeat> result = validator.validate(1L, seatIds);
 

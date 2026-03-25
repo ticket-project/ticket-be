@@ -1,4 +1,4 @@
-package com.ticket.core.domain.auth.usecase;
+package com.ticket.core.domain.auth.token;
 
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
