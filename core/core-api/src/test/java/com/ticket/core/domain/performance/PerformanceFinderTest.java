@@ -9,10 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +20,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PerformanceFinderTest {
 
-    private static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse("2026-03-15T10:00:00Z"), ZoneId.of("Asia/Seoul"));
+    private static final LocalDateTime FIXED_NOW = LocalDateTime.of(2026, 3, 15, 19, 0);
 
     @Mock
     private PerformanceRepository performanceRepository;
@@ -32,7 +29,7 @@ class PerformanceFinderTest {
 
     @BeforeEach
     void setUp() {
-        this.performanceFinder = new PerformanceFinder(performanceRepository, FIXED_CLOCK);
+        this.performanceFinder = new PerformanceFinder(performanceRepository);
     }
 
     @Test
@@ -45,7 +42,7 @@ class PerformanceFinderTest {
         when(performanceRepository.findById(1L)).thenReturn(Optional.of(performance));
 
         //when
-        Performance result = performanceFinder.findOpenPerformance(1L);
+        Performance result = performanceFinder.findOpenPerformance(1L, FIXED_NOW);
 
         //then
         assertThat(result).isSameAs(performance);
@@ -62,7 +59,7 @@ class PerformanceFinderTest {
 
         //when
         //then
-        assertThatThrownBy(() -> performanceFinder.findOpenPerformance(1L))
+        assertThatThrownBy(() -> performanceFinder.findOpenPerformance(1L, FIXED_NOW))
                 .isInstanceOf(NotFoundException.class)
                 .satisfies(thrown -> assertThat(((NotFoundException) thrown).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
     }
@@ -90,7 +87,7 @@ class PerformanceFinderTest {
 
         //when
         //then
-        assertThatThrownBy(() -> performanceFinder.findValidPerformanceById(1L))
+        assertThatThrownBy(() -> performanceFinder.findValidPerformanceById(1L, FIXED_NOW))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.NOT_YET_RESERVE_TIME));
     }
@@ -106,7 +103,7 @@ class PerformanceFinderTest {
 
         //when
         //then
-        assertThatThrownBy(() -> performanceFinder.findValidPerformanceById(1L))
+        assertThatThrownBy(() -> performanceFinder.findValidPerformanceById(1L, FIXED_NOW))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.NOT_YET_RESERVE_TIME));
     }
@@ -122,7 +119,7 @@ class PerformanceFinderTest {
 
         //when
         //then
-        assertThatThrownBy(() -> performanceFinder.findValidPerformanceById(1L))
+        assertThatThrownBy(() -> performanceFinder.findValidPerformanceById(1L, FIXED_NOW))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.PERFORMANCE_IS_PAST));
     }
@@ -138,7 +135,7 @@ class PerformanceFinderTest {
 
         //when
         //then
-        assertThatThrownBy(() -> performanceFinder.findValidPerformanceById(1L))
+        assertThatThrownBy(() -> performanceFinder.findValidPerformanceById(1L, FIXED_NOW))
                 .isInstanceOf(CoreException.class)
                 .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.PERFORMANCE_IS_PAST));
     }
@@ -153,7 +150,7 @@ class PerformanceFinderTest {
         when(performanceRepository.findById(1L)).thenReturn(Optional.of(performance));
 
         //when
-        Performance result = performanceFinder.findValidPerformanceById(1L);
+        Performance result = performanceFinder.findValidPerformanceById(1L, FIXED_NOW);
 
         //then
         assertThat(result).isSameAs(performance);
