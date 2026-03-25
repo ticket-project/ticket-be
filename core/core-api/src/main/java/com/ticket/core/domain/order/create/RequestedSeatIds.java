@@ -16,8 +16,24 @@ public final class RequestedSeatIds {
     }
 
     public static RequestedSeatIds from(final List<Long> requestedSeatIds) {
+        validateNullList(requestedSeatIds);
+        validateNullElement(requestedSeatIds);
         validateDuplicate(requestedSeatIds);
         return new RequestedSeatIds(normalize(requestedSeatIds));
+    }
+
+    private static void validateNullList(final List<Long> requestedSeatIds) {
+        if (requestedSeatIds != null) {
+            return;
+        }
+        throw new CoreException(ErrorType.INVALID_REQUEST, "좌석 ID 목록은 null일 수 없습니다.");
+    }
+
+    private static void validateNullElement(final List<Long> requestedSeatIds) {
+        if (requestedSeatIds.stream().noneMatch(Objects::isNull)) {
+            return;
+        }
+        throw new CoreException(ErrorType.INVALID_REQUEST, "null seatId가 포함되어 있습니다.");
     }
 
     private static void validateDuplicate(final List<Long> requestedSeatIds) {
