@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class QueueAdmissionProcessor {
+public class QueueAdmissionAdvancer {
 
     private final QueuePolicyResolver queuePolicyResolver;
     private final QueueTicketStore queueTicketStore;

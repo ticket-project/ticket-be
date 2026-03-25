@@ -1,7 +1,7 @@
 package com.ticket.core.domain.queue.usecase;
 
 import com.ticket.core.aop.DistributedLock;
-import com.ticket.core.domain.queue.command.QueueAdmissionProcessor;
+import com.ticket.core.domain.queue.command.QueueAdmissionAdvancer;
 import com.ticket.core.domain.queue.runtime.QueueTicket;
 import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class ExitQueueUseCase {
 
     private final QueueTicketStore queueTicketStore;
-    private final QueueAdmissionProcessor queueAdmissionProcessor;
+    private final QueueAdmissionAdvancer queueAdmissionAdvancer;
 
     public record Input(Long performanceId, Long memberId, QueueEntryId queueEntryId) {}
 
@@ -34,7 +34,7 @@ public class ExitQueueUseCase {
         }
         if (entry.isAdmitted()) {
             queueTicketStore.leaveAdmitted(input.performanceId(), input.queueEntryId(), entry.queueToken());
-            queueAdmissionProcessor.advance(input.performanceId());
+        queueAdmissionAdvancer.advance(input.performanceId());
         }
     }
 }

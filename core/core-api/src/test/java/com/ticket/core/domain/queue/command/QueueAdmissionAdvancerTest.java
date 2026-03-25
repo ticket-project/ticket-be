@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
-class QueueAdmissionProcessorTest {
+class QueueAdmissionAdvancerTest {
 
     @Mock
     private QueuePolicyResolver queuePolicyResolver;
@@ -32,7 +32,7 @@ class QueueAdmissionProcessorTest {
     private QueueTicketStore queueTicketStore;
 
     @InjectMocks
-    private QueueAdmissionProcessor queueAdmissionProcessor;
+    private QueueAdmissionAdvancer queueAdmissionAdvancer;
 
     @Test
     void 빈자리가_있고_대기자가_있으면_다음_대기자를_입장시킨다() {
@@ -46,7 +46,7 @@ class QueueAdmissionProcessorTest {
                 .thenReturn(Optional.of(admitted));
 
         //when
-        queueAdmissionProcessor.advance(10L);
+        queueAdmissionAdvancer.advance(10L);
 
         //then
         verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
@@ -59,7 +59,7 @@ class QueueAdmissionProcessorTest {
         when(queueTicketStore.countActive(10L)).thenReturn(1L);
 
         //when
-        queueAdmissionProcessor.advance(10L);
+        queueAdmissionAdvancer.advance(10L);
 
         //then
         verify(queueTicketStore, never()).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
@@ -74,7 +74,7 @@ class QueueAdmissionProcessorTest {
                 .thenReturn(Optional.empty());
 
         //when
-        queueAdmissionProcessor.advance(10L);
+        queueAdmissionAdvancer.advance(10L);
 
         //then
         verify(queueTicketStore).admitNextWaiting(10L, Duration.ofMinutes(10), Duration.ofHours(1));
@@ -89,7 +89,7 @@ class QueueAdmissionProcessorTest {
                 .thenReturn(Optional.of(createAdmitted(10L, "qe-201", "qt-201")));
 
         //when
-        queueAdmissionProcessor.handleTokenExpired(10L, QueueEntryId.from("qe-200"), "qt-200");
+        queueAdmissionAdvancer.handleTokenExpired(10L, QueueEntryId.from("qe-200"), "qt-200");
 
         //then
         verify(queueTicketStore).expireAdmitted(10L, QueueEntryId.from("qe-200"), "qt-200");

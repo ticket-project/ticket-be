@@ -1,7 +1,7 @@
 package com.ticket.core.domain.queue.usecase;
 
 import com.ticket.core.aop.DistributedLock;
-import com.ticket.core.domain.queue.command.QueueAdmissionProcessor;
+import com.ticket.core.domain.queue.command.QueueAdmissionAdvancer;
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.runtime.QueueTicket;
 import com.ticket.core.domain.queue.runtime.QueueTicketStore;
@@ -18,7 +18,7 @@ public class JoinQueueUseCase {
 
     private final QueuePolicyResolver queuePolicyResolver;
     private final QueueTicketStore queueTicketStore;
-    private final QueueAdmissionProcessor queueAdmissionProcessor;
+    private final QueueAdmissionAdvancer queueAdmissionAdvancer;
 
     public record Input(Long performanceId, Long memberId) {}
 
@@ -106,7 +106,7 @@ public class JoinQueueUseCase {
 
     private void leaveAdmitted(final Long performanceId, final QueueEntryId queueEntryId, final String queueToken) {
         queueTicketStore.leaveAdmitted(performanceId, queueEntryId, queueToken);
-        queueAdmissionProcessor.advance(performanceId);
+        queueAdmissionAdvancer.advance(performanceId);
     }
 
     private void clearMemberEntry(final Long performanceId, final Long memberId) {
