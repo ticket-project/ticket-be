@@ -3,7 +3,6 @@ package com.ticket.core.domain.order.cancel;
 import com.ticket.core.domain.hold.application.HoldHistoryRecorder;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
-import com.ticket.core.domain.order.shared.OrderTerminationContext;
 import com.ticket.core.domain.order.shared.OrderTerminationResult;
 import com.ticket.core.enums.OrderSeatState;
 import com.ticket.core.enums.OrderState;
@@ -35,10 +34,9 @@ class OrderCancelerTest {
     void 주문과_주문좌석을_취소하고_hold_history를_기록한다() {
         Order order = createOrder(10L, 100L, "hold-key");
         OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
-        OrderTerminationContext context = new OrderTerminationContext(List.of(orderSeat), List.of(42L));
         LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
 
-        OrderTerminationResult result = orderCanceler.cancel(order, context, now);
+        OrderTerminationResult result = orderCanceler.cancel(order, List.of(orderSeat), now);
 
         assertThat(order.getStatus()).isEqualTo(OrderState.CANCELED);
         assertThat(orderSeat.getStatus()).isEqualTo(OrderSeatState.CANCELED);

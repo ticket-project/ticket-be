@@ -3,7 +3,6 @@ package com.ticket.core.domain.order.expire;
 import com.ticket.core.domain.hold.application.HoldHistoryRecorder;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
-import com.ticket.core.domain.order.shared.OrderTerminationContext;
 import com.ticket.core.domain.order.shared.OrderTerminationResult;
 import com.ticket.core.enums.OrderSeatState;
 import com.ticket.core.enums.OrderState;
@@ -37,9 +36,8 @@ class OrderExpirerTest {
     void pending이_아닌_주문이면_빈_결과를_반환한다() {
         Order order = createOrder(10L, 100L, "hold-key");
         order.cancel(LocalDateTime.of(2026, 3, 15, 9, 0));
-        OrderTerminationContext context = new OrderTerminationContext(List.of(), List.of());
 
-        Optional<OrderTerminationResult> result = orderExpirer.expire(order, context, LocalDateTime.of(2026, 3, 15, 10, 0));
+        Optional<OrderTerminationResult> result = orderExpirer.expire(order, List.of(), LocalDateTime.of(2026, 3, 15, 10, 0));
 
         assertThat(result).isEmpty();
         verifyNoInteractions(holdHistoryRecorder);
@@ -49,10 +47,9 @@ class OrderExpirerTest {
     void pending_주문이면_주문과_주문좌석을_만료하고_hold_history를_기록한다() {
         Order order = createOrder(10L, 100L, "hold-key");
         OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
-        OrderTerminationContext context = new OrderTerminationContext(List.of(orderSeat), List.of(42L));
         LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
 
-        Optional<OrderTerminationResult> result = orderExpirer.expire(order, context, now);
+        Optional<OrderTerminationResult> result = orderExpirer.expire(order, List.of(orderSeat), now);
 
         assertThat(result).isPresent();
         assertThat(order.getStatus()).isEqualTo(OrderState.EXPIRED);

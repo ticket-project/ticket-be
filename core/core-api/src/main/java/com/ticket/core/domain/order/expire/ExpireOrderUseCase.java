@@ -2,9 +2,9 @@ package com.ticket.core.domain.order.expire;
 
 import com.ticket.core.domain.order.event.OrderExpiredEvent;
 import com.ticket.core.domain.order.model.Order;
+import com.ticket.core.domain.order.model.OrderSeat;
 import com.ticket.core.domain.order.repository.OrderRepository;
-import com.ticket.core.domain.order.shared.OrderTerminationContext;
-import com.ticket.core.domain.order.shared.OrderTerminationContextLoader;
+import com.ticket.core.domain.order.repository.OrderSeatRepository;
 import com.ticket.core.domain.order.shared.OrderTerminationResult;
 import com.ticket.core.enums.OrderState;
 import lombok.RequiredArgsConstructor;
@@ -13,13 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ExpireOrderUseCase {
 
     private final OrderRepository orderRepository;
-    private final OrderTerminationContextLoader contextLoader;
+    private final OrderSeatRepository orderSeatRepository;
     private final OrderExpirer orderExpirer;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -37,8 +38,8 @@ public class ExpireOrderUseCase {
         if (order == null) {
             return;
         }
-        final OrderTerminationContext context = contextLoader.load(order);
-        orderExpirer.expire(order, context, now)
+        final List<OrderSeat> orderSeats = orderSeatRepository.findAllByOrder_IdOrderByIdAsc(order.getId());
+        orderExpirer.expire(order, orderSeats, now)
                 .ifPresent(this::publishExpiredEvent);
     }
 

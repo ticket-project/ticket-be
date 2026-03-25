@@ -1,19 +1,16 @@
 package com.ticket.core.domain.order.expire;
 
-import com.ticket.core.domain.order.event.OrderExpiredEvent;
 import com.ticket.core.domain.order.model.Order;
+import com.ticket.core.domain.order.model.OrderSeat;
+import com.ticket.core.domain.order.release.HoldReleaseOutboxWriter;
 import com.ticket.core.domain.order.repository.OrderRepository;
-import com.ticket.core.domain.order.shared.OrderTerminationContext;
-import com.ticket.core.domain.order.shared.OrderTerminationContextLoader;
+import com.ticket.core.domain.order.repository.OrderSeatRepository;
 import com.ticket.core.domain.order.shared.OrderTerminationResult;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -21,8 +18,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -35,23 +32,16 @@ class ExpireOrderUseCaseTest {
     private OrderRepository orderRepository;
 
     @Mock
-    private OrderTerminationContextLoader contextLoader;
+    private OrderSeatRepository orderSeatRepository;
 
     @Mock
     private OrderExpirer orderExpirer;
 
     @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
+    private HoldReleaseOutboxWriter holdReleaseOutboxWriter;
 
     @InjectMocks
     private ExpireOrderUseCase useCase;
-
-    private OrderTerminationContext context;
-
-    @BeforeEach
-    void setUp() {
-        context = new OrderTerminationContext(List.of(), List.of(42L));
-    }
 
     @Test
     void orderId로_조회한_주문이_없으면_noop이다() {
@@ -60,68 +50,61 @@ class ExpireOrderUseCaseTest {
         useCase.expireByOrderId(10L, LocalDateTime.of(2026, 3, 15, 10, 0));
 
         verify(orderRepository).findByIdAndStatusForUpdate(10L, com.ticket.core.enums.OrderState.PENDING);
-        verifyNoInteractions(orderExpirer, applicationEventPublisher);
+        verifyNoInteractions(orderExpirer, holdReleaseOutboxWriter);
     }
 
     @Test
-    void orderId로_조회한_주문이_있으면_만료_이벤트를_발행한다() {
-        Order order = createOrder(10L, 100L, "hold-key");
-        LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
+    void orderId로_조회한_주문이_있으면_만료_outbox를_적재한다() {
+        final Order order = createOrder(10L, 100L, "hold-key");
+        final OrderSeat orderSeat = mock(OrderSeat.class);
+        final LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
+        final OrderTerminationResult result = new OrderTerminationResult(100L, "hold-key", List.of(42L));
         when(orderRepository.findByIdAndStatusForUpdate(10L, com.ticket.core.enums.OrderState.PENDING)).thenReturn(java.util.Optional.of(order));
-        when(contextLoader.load(order)).thenReturn(context);
-        when(orderExpirer.expire(eq(order), eq(context), eq(now)))
-                .thenReturn(Optional.of(new OrderTerminationResult(100L, "hold-key", List.of(42L))));
+        when(orderSeatRepository.findAllByOrder_IdOrderByIdAsc(10L)).thenReturn(List.of(orderSeat));
+        when(orderExpirer.expire(eq(order), eq(List.of(orderSeat)), eq(now))).thenReturn(Optional.of(result));
 
         useCase.expireByOrderId(10L, now);
 
-        verify(contextLoader).load(order);
-        verify(orderExpirer).expire(order, context, now);
-        assertExpiredEventPublished();
+        verify(orderSeatRepository).findAllByOrder_IdOrderByIdAsc(10L);
+        verify(orderExpirer).expire(order, List.of(orderSeat), now);
+        verify(holdReleaseOutboxWriter).append(result);
     }
 
     @Test
-    void holdKey로_조회한_주문이_있으면_만료_이벤트를_발행한다() {
-        Order order = createOrder(10L, 100L, "hold-key");
-        LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
+    void holdKey로_조회한_주문이_있으면_만료_outbox를_적재한다() {
+        final Order order = createOrder(10L, 100L, "hold-key");
+        final OrderSeat orderSeat = mock(OrderSeat.class);
+        final LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
+        final OrderTerminationResult result = new OrderTerminationResult(100L, "hold-key", List.of(42L));
         when(orderRepository.findByHoldKeyAndStatusForUpdate("hold-key", com.ticket.core.enums.OrderState.PENDING)).thenReturn(java.util.Optional.of(order));
-        when(contextLoader.load(order)).thenReturn(context);
-        when(orderExpirer.expire(eq(order), eq(context), eq(now)))
-                .thenReturn(Optional.of(new OrderTerminationResult(100L, "hold-key", List.of(42L))));
+        when(orderSeatRepository.findAllByOrder_IdOrderByIdAsc(10L)).thenReturn(List.of(orderSeat));
+        when(orderExpirer.expire(eq(order), eq(List.of(orderSeat)), eq(now))).thenReturn(Optional.of(result));
 
         useCase.expireByHoldKey("hold-key", now);
 
-        verify(contextLoader).load(order);
-        verify(orderExpirer).expire(order, context, now);
-        assertExpiredEventPublished();
+        verify(orderSeatRepository).findAllByOrder_IdOrderByIdAsc(10L);
+        verify(orderExpirer).expire(order, List.of(orderSeat), now);
+        verify(holdReleaseOutboxWriter).append(result);
     }
 
     @Test
-    void 만료_처리_결과가_비어있으면_이벤트를_발행하지_않는다() {
-        Order order = createOrder(10L, 100L, "hold-key");
-        LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
+    void 만료_처리_결과가_비어있으면_outbox를_적재하지_않는다() {
+        final Order order = createOrder(10L, 100L, "hold-key");
+        final OrderSeat orderSeat = mock(OrderSeat.class);
+        final LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
         when(orderRepository.findByHoldKeyAndStatusForUpdate("hold-key", com.ticket.core.enums.OrderState.PENDING)).thenReturn(java.util.Optional.of(order));
-        when(contextLoader.load(order)).thenReturn(context);
-        when(orderExpirer.expire(eq(order), eq(context), eq(now))).thenReturn(Optional.empty());
+        when(orderSeatRepository.findAllByOrder_IdOrderByIdAsc(10L)).thenReturn(List.of(orderSeat));
+        when(orderExpirer.expire(eq(order), eq(List.of(orderSeat)), eq(now))).thenReturn(Optional.empty());
 
         useCase.expireByHoldKey("hold-key", now);
 
-        verify(contextLoader).load(order);
-        verify(orderExpirer).expire(order, context, now);
-        verifyNoInteractions(applicationEventPublisher);
-    }
-
-    private void assertExpiredEventPublished() {
-        ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
-        verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
-        assertThat(eventCaptor.getValue()).isInstanceOf(OrderExpiredEvent.class);
-        OrderExpiredEvent event = (OrderExpiredEvent) eventCaptor.getValue();
-        assertThat(event.performanceId()).isEqualTo(100L);
-        assertThat(event.holdKey()).isEqualTo("hold-key");
-        assertThat(event.seatIds()).containsExactly(42L);
+        verify(orderSeatRepository).findAllByOrder_IdOrderByIdAsc(10L);
+        verify(orderExpirer).expire(order, List.of(orderSeat), now);
+        verifyNoInteractions(holdReleaseOutboxWriter);
     }
 
     private Order createOrder(final Long id, final Long performanceId, final String holdKey) {
-        Order order = new Order(1L, performanceId, "order-key", holdKey, BigDecimal.TEN, LocalDateTime.now().plusMinutes(5));
+        final Order order = new Order(1L, performanceId, "order-key", holdKey, BigDecimal.TEN, LocalDateTime.now().plusMinutes(5));
         ReflectionTestUtils.setField(order, "id", id);
         return order;
     }
