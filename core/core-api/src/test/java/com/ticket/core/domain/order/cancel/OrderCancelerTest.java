@@ -5,6 +5,8 @@ import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
 import com.ticket.core.domain.order.shared.OrderTerminationResult;
 import com.ticket.core.enums.OrderState;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,7 +19,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
@@ -30,12 +34,27 @@ class OrderCancelerTest {
     private OrderCanceler orderCanceler;
 
     @Test
-    void 주문과_주문좌석을_기반으로_취소를_기록한다() {
-        Order order = createOrder(10L, 100L, "hold-key");
-        OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
-        LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
+    void throws_when_order_seat_belongs_to_another_order() {
+        final Order order = createOrder(10L, 100L, "hold-key");
+        final Order otherOrder = createOrder(11L, 100L, "other-hold-key");
+        final OrderSeat foreignOrderSeat = new OrderSeat(otherOrder, 501L, 42L, BigDecimal.TEN);
 
-        OrderTerminationResult result = orderCanceler.cancel(order, List.of(orderSeat), now);
+        assertThatThrownBy(() -> orderCanceler.cancel(order, List.of(foreignOrderSeat), LocalDateTime.of(2026, 3, 15, 10, 0)))
+                .isInstanceOf(CoreException.class)
+                .satisfies(error -> {
+                    assertThat(((CoreException) error).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST);
+                    assertThat(((CoreException) error).getData()).isEqualTo("orderSeats는 같은 order에 속해야 합니다.");
+                });
+        verifyNoInteractions(holdHistoryRecorder);
+    }
+
+    @Test
+    void cancels_order_and_records_hold_history() {
+        final Order order = createOrder(10L, 100L, "hold-key");
+        final OrderSeat orderSeat = new OrderSeat(order, 501L, 42L, BigDecimal.TEN);
+        final LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
+
+        final OrderTerminationResult result = orderCanceler.cancel(order, List.of(orderSeat), now);
 
         assertThat(order.getStatus()).isEqualTo(OrderState.CANCELED);
         assertThat(result.performanceId()).isEqualTo(100L);
@@ -45,7 +64,7 @@ class OrderCancelerTest {
     }
 
     private Order createOrder(final Long id, final Long performanceId, final String holdKey) {
-        Order order = new Order(1L, performanceId, "order-key", holdKey, BigDecimal.TEN, LocalDateTime.now().plusMinutes(5));
+        final Order order = new Order(1L, performanceId, "order-key", holdKey, BigDecimal.TEN, LocalDateTime.now().plusMinutes(5));
         ReflectionTestUtils.setField(order, "id", id);
         return order;
     }
