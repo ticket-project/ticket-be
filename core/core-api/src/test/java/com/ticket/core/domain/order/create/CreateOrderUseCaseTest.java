@@ -56,7 +56,7 @@ class CreateOrderUseCaseTest {
 
     @Test
     void 중복된_좌석_ID가_있으면_예외를_던진다() {
-        CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(3L, 1L, 3L), 20L);
+        final CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(3L, 1L, 3L), 20L);
 
         assertThatThrownBy(() -> createOrderUseCase.execute(input))
                 .isInstanceOf(CoreException.class)
@@ -67,7 +67,7 @@ class CreateOrderUseCaseTest {
 
     @Test
     void 좌석_ID가_비어있으면_예외를_던진다() {
-        CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(), 20L);
+        final CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(), 20L);
 
         assertThatThrownBy(() -> createOrderUseCase.execute(input))
                 .isInstanceOf(CoreException.class)
@@ -78,20 +78,20 @@ class CreateOrderUseCaseTest {
 
     @Test
     void 유효한_요청이면_hold와_주문을_생성한다() {
-        CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(7L, 3L), 20L);
-        RequestedSeatIds seatIds = RequestedSeatIds.from(input.seatIds());
-        Performance performance = createPerformance(5, 600);
-        List<PerformanceSeat> seats = List.of(mock(PerformanceSeat.class), mock(PerformanceSeat.class));
-        HoldSnapshot snapshot = holdSnapshot(seatIds.values());
-        HoldAllocation allocation = new HoldAllocation(snapshot, seats);
-        Order order = order(snapshot);
+        final CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(7L, 3L), 20L);
+        final RequestedSeatIds seatIds = RequestedSeatIds.from(input.seatIds());
+        final Performance performance = createPerformance(5, 600);
+        final List<PerformanceSeat> seats = List.of(mock(PerformanceSeat.class), mock(PerformanceSeat.class));
+        final HoldSnapshot snapshot = holdSnapshot(seatIds.values());
+        final HoldAllocation allocation = new HoldAllocation(snapshot, seats);
+        final Order order = order(snapshot);
 
         when(preconditionChecker.validate(20L, 10L, seatIds)).thenReturn(performance);
         when(holdAllocator.allocate(20L, 10L, seatIds, Duration.ofSeconds(600))).thenReturn(allocation);
         when(orderCreator.createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), seats))
                 .thenReturn(order);
 
-        CreateOrderUseCase.Output output = createOrderUseCase.execute(input);
+        final CreateOrderUseCase.Output output = createOrderUseCase.execute(input);
 
         assertThat(output.orderKey()).isEqualTo("order-key");
         assertThat(output.status()).isEqualTo(OrderState.PENDING);
@@ -106,7 +106,7 @@ class CreateOrderUseCaseTest {
         );
         verify(applicationEventPublisher).publishEvent(any(HoldCreatedEvent.class));
 
-        InOrder inOrder = inOrder(preconditionChecker, holdAllocator, orderCreator, holdHistoryRecorder, applicationEventPublisher);
+        final InOrder inOrder = inOrder(preconditionChecker, holdAllocator, orderCreator, holdHistoryRecorder, applicationEventPublisher);
         inOrder.verify(preconditionChecker).validate(20L, 10L, seatIds);
         inOrder.verify(holdAllocator).allocate(20L, 10L, seatIds, Duration.ofSeconds(600));
         inOrder.verify(orderCreator).createPendingOrder(20L, 10L, "hold-key", snapshot.expiresAt(), seats);
@@ -123,10 +123,10 @@ class CreateOrderUseCaseTest {
 
     @Test
     void 주문_생성에_실패하면_hold를_해제한다() {
-        CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(7L, 3L), 20L);
-        RequestedSeatIds seatIds = RequestedSeatIds.from(input.seatIds());
-        Performance performance = createPerformance(5, 600);
-        HoldAllocation allocation = new HoldAllocation(holdSnapshot(seatIds.values()), List.of(mock(PerformanceSeat.class)));
+        final CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(7L, 3L), 20L);
+        final RequestedSeatIds seatIds = RequestedSeatIds.from(input.seatIds());
+        final Performance performance = createPerformance(5, 600);
+        final HoldAllocation allocation = new HoldAllocation(holdSnapshot(seatIds.values()), List.of(mock(PerformanceSeat.class)));
 
         when(preconditionChecker.validate(20L, 10L, seatIds)).thenReturn(performance);
         when(holdAllocator.allocate(20L, 10L, seatIds, Duration.ofSeconds(600))).thenReturn(allocation);
@@ -146,13 +146,42 @@ class CreateOrderUseCaseTest {
     }
 
     @Test
+    void hold_해제에_실패해도_원래_예외를_유지한다() {
+        final CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(7L, 3L), 20L);
+        final RequestedSeatIds seatIds = RequestedSeatIds.from(input.seatIds());
+        final Performance performance = createPerformance(5, 600);
+        final HoldAllocation allocation = new HoldAllocation(holdSnapshot(seatIds.values()), List.of(mock(PerformanceSeat.class)));
+        final RuntimeException originalException = new RuntimeException("order failed");
+
+        when(preconditionChecker.validate(20L, 10L, seatIds)).thenReturn(performance);
+        when(holdAllocator.allocate(20L, 10L, seatIds, Duration.ofSeconds(600))).thenReturn(allocation);
+        when(orderCreator.createPendingOrder(
+                20L,
+                10L,
+                "hold-key",
+                allocation.snapshot().expiresAt(),
+                allocation.performanceSeats()
+        )).thenThrow(originalException);
+        doThrow(new RuntimeException("release failed"))
+                .when(holdAllocator).release(allocation);
+
+        assertThatThrownBy(() -> createOrderUseCase.execute(input))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("order failed")
+                .satisfies(exception -> {
+                    assertThat(exception.getSuppressed()).hasSize(1);
+                    assertThat(exception.getSuppressed()[0].getMessage()).isEqualTo("release failed");
+                });
+    }
+
+    @Test
     void 이벤트_발행에_실패하면_hold를_해제한다() {
-        CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(7L, 3L), 20L);
-        RequestedSeatIds seatIds = RequestedSeatIds.from(input.seatIds());
-        Performance performance = createPerformance(5, 600);
-        List<PerformanceSeat> seats = List.of(mock(PerformanceSeat.class));
-        HoldSnapshot snapshot = holdSnapshot(seatIds.values());
-        HoldAllocation allocation = new HoldAllocation(snapshot, seats);
+        final CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(10L, List.of(7L, 3L), 20L);
+        final RequestedSeatIds seatIds = RequestedSeatIds.from(input.seatIds());
+        final Performance performance = createPerformance(5, 600);
+        final List<PerformanceSeat> seats = List.of(mock(PerformanceSeat.class));
+        final HoldSnapshot snapshot = holdSnapshot(seatIds.values());
+        final HoldAllocation allocation = new HoldAllocation(snapshot, seats);
 
         when(preconditionChecker.validate(20L, 10L, seatIds)).thenReturn(performance);
         when(holdAllocator.allocate(20L, 10L, seatIds, Duration.ofSeconds(600))).thenReturn(allocation);
@@ -177,7 +206,7 @@ class CreateOrderUseCaseTest {
     }
 
     private Performance createPerformance(final int maxCanHoldCount, final int holdTimeSeconds) {
-        LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
+        final LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
         return new Performance(
                 null,
                 1L,

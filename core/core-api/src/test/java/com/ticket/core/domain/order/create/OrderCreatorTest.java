@@ -6,8 +6,6 @@ import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.domain.order.repository.OrderSeatRepository;
 import com.ticket.core.domain.performanceseat.model.PerformanceSeat;
 import com.ticket.core.domain.seat.Seat;
-import com.ticket.core.support.exception.CoreException;
-import com.ticket.core.support.exception.ErrorType;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,19 +44,19 @@ class OrderCreatorTest {
     private OrderCreator orderCreator;
 
     @Test
-    void 좌석가격_합계로_pending_주문과_orderSeat를_생성한다() {
-        //given
-        PerformanceSeat firstSeat = createPerformanceSeat(101L, 201L, BigDecimal.TEN);
-        PerformanceSeat secondSeat = createPerformanceSeat(102L, 202L, BigDecimal.valueOf(20));
+    void 좌석_가격_합계로_pending_주문과_orderSeat를_생성한다() {
+        // given
+        final PerformanceSeat firstSeat = createPerformanceSeat(101L, 201L, BigDecimal.TEN);
+        final PerformanceSeat secondSeat = createPerformanceSeat(102L, 202L, BigDecimal.valueOf(20));
         when(orderKeyGenerator.generate()).thenReturn("ORDER-KEY");
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
-            Order order = invocation.getArgument(0);
+            final Order order = invocation.getArgument(0);
             ReflectionTestUtils.setField(order, "id", 99L);
             return order;
         });
 
-        //when
-        Order order = orderCreator.createPendingOrder(
+        // when
+        final Order order = orderCreator.createPendingOrder(
                 1L,
                 10L,
                 "hold-key",
@@ -66,46 +64,44 @@ class OrderCreatorTest {
                 List.of(firstSeat, secondSeat)
         );
 
-        //then
+        // then
         assertThat(order.getOrderKey()).isEqualTo("ORDER-KEY");
         assertThat(order.getTotalAmount()).isEqualByComparingTo("30");
-        ArgumentCaptor<List<OrderSeat>> orderSeatCaptor = ArgumentCaptor.forClass(List.class);
+        final ArgumentCaptor<List<OrderSeat>> orderSeatCaptor = ArgumentCaptor.forClass(List.class);
         verify(orderSeatRepository).saveAll(orderSeatCaptor.capture());
         assertThat(orderSeatCaptor.getValue()).hasSize(2);
         assertThat(orderSeatCaptor.getValue()).extracting(OrderSeat::getSeatId).containsExactly(201L, 202L);
     }
 
     @Test
-    void pending_주문_유니크_제약위반이면_도메인_예외로_변환한다() {
-        //given
+    void pending_주문_저장_예외는_그대로_DataIntegrityViolationException_으로_전파한다() {
+        // given
         when(orderKeyGenerator.generate()).thenReturn("ORDER-KEY");
-        DataIntegrityViolationException exception = new DataIntegrityViolationException(
+        final DataIntegrityViolationException exception = new DataIntegrityViolationException(
                 "duplicate",
                 new ConstraintViolationException("duplicate", new SQLException("duplicate"), "", "UK_ORDERS_PENDING_MEMBER_PERF")
         );
         when(orderRepository.save(any(Order.class))).thenThrow(exception);
 
-        //when
-        //then
+        // when
+        // then
         assertThatThrownBy(() -> orderCreator.createPendingOrder(
                 1L,
                 10L,
                 "hold-key",
                 LocalDateTime.now(),
                 List.of(priceOnlyPerformanceSeat(BigDecimal.TEN))
-        ))
-                .isInstanceOf(CoreException.class)
-                .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.PENDING_ORDER_ALREADY_EXISTS));
+        )).isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
-    void 다른_데이터무결성_예외는_그대로_전파한다() {
-        //given
+    void 다른_데이터_무결성_예외도_그대로_전파한다() {
+        // given
         when(orderKeyGenerator.generate()).thenReturn("ORDER-KEY");
         when(orderRepository.save(any(Order.class))).thenThrow(new DataIntegrityViolationException("other"));
 
-        //when
-        //then
+        // when
+        // then
         assertThatThrownBy(() -> orderCreator.createPendingOrder(
                 1L,
                 10L,
@@ -116,8 +112,8 @@ class OrderCreatorTest {
     }
 
     private PerformanceSeat createPerformanceSeat(final Long performanceSeatId, final Long seatId, final BigDecimal price) {
-        PerformanceSeat performanceSeat = org.mockito.Mockito.mock(PerformanceSeat.class);
-        Seat seat = org.mockito.Mockito.mock(Seat.class);
+        final PerformanceSeat performanceSeat = org.mockito.Mockito.mock(PerformanceSeat.class);
+        final Seat seat = org.mockito.Mockito.mock(Seat.class);
         when(performanceSeat.getId()).thenReturn(performanceSeatId);
         when(performanceSeat.getPrice()).thenReturn(price);
         when(performanceSeat.getSeat()).thenReturn(seat);
@@ -126,7 +122,7 @@ class OrderCreatorTest {
     }
 
     private PerformanceSeat priceOnlyPerformanceSeat(final BigDecimal price) {
-        PerformanceSeat performanceSeat = org.mockito.Mockito.mock(PerformanceSeat.class);
+        final PerformanceSeat performanceSeat = org.mockito.Mockito.mock(PerformanceSeat.class);
         when(performanceSeat.getPrice()).thenReturn(price);
         return performanceSeat;
     }
