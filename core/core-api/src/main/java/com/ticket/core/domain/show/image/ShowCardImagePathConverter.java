@@ -3,7 +3,7 @@ package com.ticket.core.domain.show.image;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ShowImagePathResolver {
+public class ShowCardImagePathConverter {
 
     private static final String SHOW_IMAGE_PREFIX = "/api/images/shows/";
     private static final String CARD_IMAGE_PREFIX = "/api/images/shows/card/";
