@@ -8,13 +8,16 @@ import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import com.ticket.core.domain.queue.support.QueuePolicy;
 import com.ticket.core.domain.queue.support.QueuePolicyResolver;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,8 +38,13 @@ class JoinQueueUseCaseTest {
     @Mock
     private QueueAdmissionAdvancer queueAdmissionAdvancer;
 
-    @InjectMocks
     private JoinQueueUseCase joinQueueUseCase;
+    private final Clock fixedClock = Clock.fixed(Instant.parse("2026-03-15T10:00:00Z"), ZoneId.of("Asia/Seoul"));
+
+    @BeforeEach
+    void setUp() {
+        joinQueueUseCase = new JoinQueueUseCase(queuePolicyResolver, queueTicketStore, queueAdmissionAdvancer, fixedClock);
+    }
 
     @Test
     void disabled_queue_admits_immediately() {
@@ -45,13 +53,14 @@ class JoinQueueUseCaseTest {
 
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueTicketStore.countWaiting(10L)).thenReturn(0L);
-        when(queueTicketStore.admitNow(10L, 101L, Duration.ofMinutes(10), Duration.ofHours(1))).thenReturn(admitted);
+        when(queueTicketStore.admitNow(10L, 101L, Duration.ofMinutes(10), Duration.ofHours(1), LocalDateTime.of(2026, 3, 15, 19, 0)))
+                .thenReturn(admitted);
 
         JoinQueueUseCase.Output output = joinQueueUseCase.execute(new JoinQueueUseCase.Input(10L, 101L));
 
         assertThat(output.status()).isEqualTo(QueueEntryStatus.ADMITTED);
         assertThat(output.queueToken()).isEqualTo("qt-3");
-        verify(queueTicketStore).admitNow(10L, 101L, Duration.ofMinutes(10), Duration.ofHours(1));
+        verify(queueTicketStore).admitNow(10L, 101L, Duration.ofMinutes(10), Duration.ofHours(1), LocalDateTime.of(2026, 3, 15, 19, 0));
     }
 
     @Test
@@ -62,7 +71,8 @@ class JoinQueueUseCaseTest {
         when(queuePolicyResolver.resolve(10L)).thenReturn(policy);
         when(queueTicketStore.countActive(10L)).thenReturn(10L);
         when(queueTicketStore.countWaiting(10L)).thenReturn(0L);
-        when(queueTicketStore.admitNow(10L, 101L, Duration.ofMinutes(10), Duration.ofHours(1))).thenReturn(admitted);
+        when(queueTicketStore.admitNow(10L, 101L, Duration.ofMinutes(10), Duration.ofHours(1), LocalDateTime.of(2026, 3, 15, 19, 0)))
+                .thenReturn(admitted);
 
         JoinQueueUseCase.Output output = joinQueueUseCase.execute(new JoinQueueUseCase.Input(10L, 101L));
 

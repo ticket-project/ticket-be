@@ -15,11 +15,8 @@ import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
 
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,7 +31,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RedisQueueTicketStoreTest {
 
-    private static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse("2026-03-15T10:00:00Z"), ZoneId.of("Asia/Seoul"));
+    private static final LocalDateTime FIXED_NOW = LocalDateTime.of(2026, 3, 15, 19, 0);
 
     @Mock
     private RedissonClient redissonClient;
@@ -46,7 +43,7 @@ class RedisQueueTicketStoreTest {
 
     @BeforeEach
     void setUp() {
-        this.redisQueueTicketStore = new RedisQueueTicketStore(redissonClient, FIXED_CLOCK, uuidSupplier);
+        this.redisQueueTicketStore = new RedisQueueTicketStore(redissonClient, uuidSupplier);
     }
 
     @Test
@@ -163,7 +160,7 @@ class RedisQueueTicketStoreTest {
         when(redissonClient.getMap(QueueRedisKey.entry("123e4567-e89b-12d3-a456-426614174000"), StringCodec.INSTANCE)).thenReturn(entryMap);
 
         //when
-        QueueTicket result = redisQueueTicketStore.admitNow(10L, 200L, Duration.ofMinutes(3), Duration.ofMinutes(10));
+        QueueTicket result = redisQueueTicketStore.admitNow(10L, 200L, Duration.ofMinutes(3), Duration.ofMinutes(10), FIXED_NOW);
 
         //then
         assertThat(result.memberId()).isEqualTo(200L);
@@ -207,7 +204,7 @@ class RedisQueueTicketStoreTest {
         when(entryMap1.readAllMap()).thenReturn(Map.of());
         when(entryMap2.readAllMap()).thenReturn(Map.of());
 
-        Optional<QueueTicket> result = redisQueueTicketStore.admitNextWaiting(10L, Duration.ofMinutes(3), Duration.ofMinutes(10));
+        Optional<QueueTicket> result = redisQueueTicketStore.admitNextWaiting(10L, Duration.ofMinutes(3), Duration.ofMinutes(10), FIXED_NOW);
 
         assertThat(result).isEmpty();
         verify(waitingSet).size();
