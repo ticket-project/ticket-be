@@ -1,6 +1,6 @@
 package com.ticket.core.domain.auth.usecase;
 
-import com.ticket.core.domain.auth.token.AuthTokenApplicationService;
+import com.ticket.core.domain.auth.token.AuthTokenManager;
 import com.ticket.core.domain.auth.token.RefreshTokenService;
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class LogoutUseCase {
 
     private final RefreshTokenService refreshTokenService;
-    private final AuthTokenApplicationService authTokenApplicationService;
+    private final AuthTokenManager authTokenManager;
 
     public record Input(Long memberId, AuthRefreshToken refreshToken) {}
     public record Output() {}
@@ -30,7 +30,7 @@ public class LogoutUseCase {
             throw new AuthException(ErrorType.AUTHENTICATION_ERROR, "유효하지 않은 리프레시 토큰입니다.");
         }
 
-        authTokenApplicationService.clearRefreshTokenCookie(response);
+        authTokenManager.clearRefreshTokenCookie(response);
         return new Output();
     }
 }

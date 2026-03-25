@@ -1,7 +1,7 @@
 package com.ticket.core.domain.auth.usecase;
 
 import com.ticket.core.api.controller.response.AuthLoginResponse;
-import com.ticket.core.domain.auth.token.AuthTokenApplicationService;
+import com.ticket.core.domain.auth.token.AuthTokenManager;
 import com.ticket.core.domain.auth.token.RefreshTokenService;
 import com.ticket.core.domain.member.Member;
 import com.ticket.core.domain.member.MemberFinder;
@@ -18,7 +18,7 @@ public class RefreshAuthTokenUseCase {
 
     private final RefreshTokenService refreshTokenService;
     private final MemberFinder memberFinder;
-    private final AuthTokenApplicationService authTokenApplicationService;
+    private final AuthTokenManager authTokenManager;
 
     public record Input(AuthRefreshToken refreshToken) {}
     public record Output(@Schema(description = "액세스 토큰(JWT)") String accessToken,
@@ -30,7 +30,7 @@ public class RefreshAuthTokenUseCase {
         final Long memberId = refreshTokenService.validate(input.refreshToken())
                 .orElseThrow(() -> new AuthException(ErrorType.AUTHENTICATION_ERROR, "유효하지 않거나 만료된 리프레시 토큰입니다."));
         final Member member = memberFinder.findActiveMemberById(memberId);
-        final AuthLoginResponse result = authTokenApplicationService.rotateTokens(member, input.refreshToken(), response);
+        final AuthLoginResponse result = authTokenManager.rotateTokens(member, input.refreshToken(), response);
         return new Output(result.accessToken(), result.tokenType(), result.expiresIn(), result.memberId());
     }
 }

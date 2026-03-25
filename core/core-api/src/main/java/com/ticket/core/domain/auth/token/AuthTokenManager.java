@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthTokenApplicationService {
+public class AuthTokenManager {
 
     private static final String TOKEN_TYPE_BEARER = "Bearer";
 
