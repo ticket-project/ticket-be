@@ -33,12 +33,13 @@ class HoldReleaseOutboxExecutorTest {
     private static final LocalDateTime FIXED_NOW = LocalDateTime.of(2026, 3, 25, 12, 0);
 
     @Test
-    void hold_release_성공이면_좌석_해제_이벤트를_발행하고_outbox를_완료처리한다() {
+    void hold_release가_성공하면_좌석_해제_이벤트를_발행하고_outbox를_완료처리한다() {
         final HoldReleaseOutbox outbox = HoldReleaseOutbox.create(1L, "hold-key", List.of(10L, 20L), FIXED_NOW);
-        when(holdReleaseOutboxRepository.findById(1L)).thenReturn(Optional.of(outbox));
+        when(holdReleaseOutboxRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(outbox));
 
         processor().process(1L, FIXED_NOW);
 
+        verify(holdReleaseOutboxRepository).findByIdForUpdate(1L);
         verify(holdManager).release(1L, "hold-key", List.of(10L, 20L));
         verify(seatStatusPublisher).publishReleased(1L, List.of(10L, 20L));
         assertThat(outbox.isCompleted()).isTrue();
@@ -48,13 +49,14 @@ class HoldReleaseOutboxExecutorTest {
     }
 
     @Test
-    void hold_release_실패이면_다음_재시도_시각만_기록하고_해제_이벤트는_발행하지_않는다() {
+    void hold_release가_실패하면_다음_재시도_시각만_기록하고_해제_이벤트는_발행하지_않는다() {
         final HoldReleaseOutbox outbox = HoldReleaseOutbox.create(1L, "hold-key", List.of(10L, 20L), FIXED_NOW);
-        when(holdReleaseOutboxRepository.findById(1L)).thenReturn(Optional.of(outbox));
+        when(holdReleaseOutboxRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(outbox));
         doThrow(new RuntimeException("release failed")).when(holdManager).release(1L, "hold-key", List.of(10L, 20L));
 
         processor().process(1L, FIXED_NOW);
 
+        verify(holdReleaseOutboxRepository).findByIdForUpdate(1L);
         verifyNoInteractions(seatStatusPublisher);
         assertThat(outbox.isCompleted()).isFalse();
         assertThat(outbox.getStatus()).isEqualTo(HoldReleaseOutboxStatus.FAILED);
