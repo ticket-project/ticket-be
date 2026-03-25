@@ -4,6 +4,7 @@ import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
 import com.ticket.core.domain.order.release.HoldReleaseOutboxWriter;
+import com.ticket.core.domain.order.release.HoldReleaseRequestedEvent;
 import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.domain.order.repository.OrderSeatRepository;
 import com.ticket.core.domain.order.shared.OrderTerminationResult;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -43,6 +45,9 @@ class CancelOrderUseCaseTest {
     @Mock
     private HoldReleaseOutboxWriter holdReleaseOutboxWriter;
 
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
+
     @InjectMocks
     private CancelOrderUseCase useCase;
 
@@ -54,6 +59,7 @@ class CancelOrderUseCaseTest {
         when(orderRepository.findByOrderKeyAndMemberIdForUpdate("order-key", 1L)).thenReturn(java.util.Optional.of(order));
         when(orderSeatRepository.findAllByOrder_IdOrderByIdAsc(10L)).thenReturn(List.of(orderSeat));
         when(orderCanceler.cancel(eq(order), eq(List.of(orderSeat)), any(LocalDateTime.class))).thenReturn(result);
+        when(holdReleaseOutboxWriter.append(result)).thenReturn(99L);
 
         useCase.execute(new CancelOrderUseCase.Input("order-key", 1L));
 
@@ -62,6 +68,7 @@ class CancelOrderUseCaseTest {
         verify(orderSeatRepository).findAllByOrder_IdOrderByIdAsc(10L);
         verify(orderCanceler).cancel(eq(order), eq(List.of(orderSeat)), any(LocalDateTime.class));
         verify(holdReleaseOutboxWriter).append(result);
+        verify(applicationEventPublisher).publishEvent(new HoldReleaseRequestedEvent(99L));
     }
 
     private Order createOrder(final Long id, final Long performanceId, final String holdKey) {

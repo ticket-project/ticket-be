@@ -3,6 +3,7 @@ package com.ticket.core.domain.order.cancel;
 import com.ticket.core.domain.member.MemberFinder;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.order.model.OrderSeat;
+import com.ticket.core.domain.order.release.HoldReleaseRequestedEvent;
 import com.ticket.core.domain.order.release.HoldReleaseOutboxWriter;
 import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.domain.order.repository.OrderSeatRepository;
@@ -11,6 +12,7 @@ import com.ticket.core.enums.OrderState;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class CancelOrderUseCase {
     private final OrderSeatRepository orderSeatRepository;
     private final OrderCanceler orderCanceler;
     private final HoldReleaseOutboxWriter holdReleaseOutboxWriter;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public record Input(String orderKey, Long memberId) {}
 
@@ -35,7 +38,8 @@ public class CancelOrderUseCase {
         final Order order = getPendingOwnedOrder(input.orderKey(), input.memberId());
         final List<OrderSeat> orderSeats = orderSeatRepository.findAllByOrder_IdOrderByIdAsc(order.getId());
         final OrderTerminationResult result = orderCanceler.cancel(order, orderSeats, LocalDateTime.now());
-        holdReleaseOutboxWriter.append(result);
+        final Long outboxId = holdReleaseOutboxWriter.append(result);
+        applicationEventPublisher.publishEvent(new HoldReleaseRequestedEvent(outboxId));
     }
 
     private Order getPendingOwnedOrder(final String orderKey, final Long memberId) {
