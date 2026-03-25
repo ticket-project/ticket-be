@@ -17,7 +17,7 @@ class QueueNamingRefactorTest {
         assertPresent("src/main/java/com/ticket/core/domain/queue/runtime/RedisQueueTicketStore.java");
         assertPresent("src/main/java/com/ticket/core/domain/queue/usecase/JoinQueueUseCase.java");
         assertPresent("src/main/java/com/ticket/core/domain/queue/usecase/ExitQueueUseCase.java");
-        assertPresent("src/main/java/com/ticket/core/domain/queue/command/QueueAdmissionProcessor.java");
+        assertPresent("src/main/java/com/ticket/core/domain/queue/command/QueueAdmissionAdvancer.java");
 
         assertMissing("src/main/java/com/ticket/core/domain/queue/runtime/QueueEntryRuntime.java");
         assertMissing("src/main/java/com/ticket/core/domain/queue/runtime/QueueRuntimeStore.java");

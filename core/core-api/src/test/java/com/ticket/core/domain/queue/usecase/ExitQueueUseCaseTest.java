@@ -1,6 +1,6 @@
 package com.ticket.core.domain.queue.usecase;
 
-import com.ticket.core.domain.queue.command.QueueAdmissionProcessor;
+import com.ticket.core.domain.queue.command.QueueAdmissionAdvancer;
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.runtime.QueueTicket;
 import com.ticket.core.domain.queue.runtime.QueueTicketStore;
@@ -29,7 +29,7 @@ class ExitQueueUseCaseTest {
     private QueueTicketStore queueTicketStore;
 
     @Mock
-    private QueueAdmissionProcessor queueAdmissionProcessor;
+    private QueueAdmissionAdvancer queueAdmissionAdvancer;
 
     @InjectMocks
     private ExitQueueUseCase exitQueueUseCase;
@@ -44,7 +44,7 @@ class ExitQueueUseCaseTest {
         exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, queueEntryId));
 
         verify(queueTicketStore).leaveWaiting(10L, queueEntryId);
-        verify(queueAdmissionProcessor, never()).advance(10L);
+        verify(queueAdmissionAdvancer, never()).advance(10L);
     }
 
     @Test
@@ -65,7 +65,7 @@ class ExitQueueUseCaseTest {
         exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, queueEntryId));
 
         verify(queueTicketStore).leaveAdmitted(10L, queueEntryId, "qt-admit");
-        verify(queueAdmissionProcessor).advance(10L);
+        verify(queueAdmissionAdvancer).advance(10L);
     }
 
     @Test
@@ -75,7 +75,7 @@ class ExitQueueUseCaseTest {
 
         exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, queueEntryId));
 
-        verify(queueAdmissionProcessor, never()).advance(10L);
+        verify(queueAdmissionAdvancer, never()).advance(10L);
     }
 
     @Test
@@ -88,7 +88,7 @@ class ExitQueueUseCaseTest {
         exitQueueUseCase.execute(new ExitQueueUseCase.Input(10L, 100L, queueEntryId));
 
         verify(queueTicketStore, never()).leaveWaiting(10L, queueEntryId);
-        verify(queueAdmissionProcessor, never()).advance(10L);
+        verify(queueAdmissionAdvancer, never()).advance(10L);
     }
 
     @Test
