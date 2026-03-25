@@ -4,7 +4,7 @@ import com.ticket.core.api.controller.response.ShowDetailResponse;
 import com.ticket.core.domain.show.Show;
 import com.ticket.core.domain.show.category.Category;
 import com.ticket.core.domain.show.genre.Genre;
-import com.ticket.core.domain.show.image.ShowImagePathResolver;
+import com.ticket.core.domain.show.image.ShowCardImagePathConverter;
 import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.domain.show.performer.Performer;
 import com.ticket.core.domain.show.venue.Venue;
@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import({ShowDetailQueryRepository.class, ShowImagePathResolver.class})
+@Import({ShowDetailQueryRepository.class, ShowCardImagePathConverter.class})
 @SuppressWarnings("NonAsciiCharacters")
 class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
 
@@ -80,4 +80,3 @@ class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
         assertThat(showDetailQueryRepository.findShowDetail(999999L)).isEmpty();
     }
 }
-

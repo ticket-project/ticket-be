@@ -8,7 +8,7 @@ import com.ticket.core.api.controller.response.ShowDetailResponse.PerformanceInf
 import com.ticket.core.api.controller.response.ShowDetailResponse.PerformerInfo;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.domain.show.Show;
-import com.ticket.core.domain.show.image.ShowImagePathResolver;
+import com.ticket.core.domain.show.image.ShowCardImagePathConverter;
 import com.ticket.core.domain.show.mapping.ShowGrade;
 import com.ticket.core.domain.show.performer.Performer;
 import com.ticket.core.domain.show.venue.Venue;
@@ -35,7 +35,7 @@ import static com.ticket.core.domain.showlike.QShowLike.showLike;
 public class ShowDetailQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final ShowImagePathResolver showImagePathResolver;
+    private final ShowCardImagePathConverter showCardImagePathConverter;
 
     public Optional<ShowDetailResponse> findShowDetail(final Long showId) {
         final Show showEntity = fetchShow(showId);
@@ -157,7 +157,7 @@ public class ShowDetailQueryRepository {
                 showEntity.getSaleType(),
                 showEntity.getSaleStartDate(),
                 showEntity.getSaleEndDate(),
-                showImagePathResolver.toCardImage(showEntity.getImage()),
+                showCardImagePathConverter.toCardImage(showEntity.getImage()),
                 toVenueInfo(showEntity.getVenue()),
                 toPerformerInfo(showEntity.getPerformer()),
                 genreNames,
