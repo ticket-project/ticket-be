@@ -6,6 +6,7 @@ import com.ticket.core.domain.hold.event.HoldCreatedEvent;
 import com.ticket.core.domain.order.model.Order;
 import com.ticket.core.domain.performance.Performance;
 import com.ticket.core.enums.OrderState;
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CreateOrderUseCase {
@@ -44,7 +46,7 @@ public class CreateOrderUseCase {
         try {
             return createOrder(input, holdDuration, allocation);
         } catch (final RuntimeException e) {
-            holdAllocator.release(allocation);
+            releaseHold(allocation, e);
             throw e;
         }
     }
@@ -67,5 +69,14 @@ public class CreateOrderUseCase {
         );
         applicationEventPublisher.publishEvent(new HoldCreatedEvent(allocation.snapshot()));
         return new Output(order.getOrderKey(), OrderState.PENDING, allocation.expiresAt());
+    }
+
+    private void releaseHold(final HoldAllocation allocation, final RuntimeException originalException) {
+        try {
+            holdAllocator.release(allocation);
+        } catch (final RuntimeException releaseException) {
+            originalException.addSuppressed(releaseException);
+            log.warn("hold 해제에 실패했습니다. holdKey={}", allocation.holdKey(), releaseException);
+        }
     }
 }
