@@ -11,10 +11,12 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,16 +30,24 @@ class HoldReleaseOutboxSchedulerTest {
     private HoldReleaseOutboxRepository holdReleaseOutboxRepository;
 
     @Mock
-    private HoldReleaseOutboxProcessor holdReleaseOutboxProcessor;
+    private HoldReleaseOutboxExecutor holdReleaseOutboxExecutor;
 
     @Test
     void 처리할_outbox가_없으면_종료한다() {
-        when(holdReleaseOutboxRepository.findAllByCompletedAtIsNullAndNextAttemptAtLessThanEqual(any(LocalDateTime.class), any()))
+        when(holdReleaseOutboxRepository.findAllByStatusInAndNextAttemptAtLessThanEqual(any(), any(LocalDateTime.class), any()))
                 .thenReturn(new SliceImpl<>(List.of()));
 
         scheduler().processPendingHoldReleases();
 
-        verify(holdReleaseOutboxProcessor, times(0)).process(any(), any(LocalDateTime.class));
+        verify(holdReleaseOutboxExecutor, times(0)).process(any(), any(LocalDateTime.class));
+        verify(holdReleaseOutboxRepository).findAllByStatusInAndNextAttemptAtLessThanEqual(
+                argThat(statuses -> statuses.containsAll(Arrays.asList(
+                        HoldReleaseOutboxStatus.PENDING,
+                        HoldReleaseOutboxStatus.FAILED
+                )) && statuses.size() == 2),
+                any(LocalDateTime.class),
+                any()
+        );
     }
 
     @Test
@@ -47,17 +57,17 @@ class HoldReleaseOutboxSchedulerTest {
         ReflectionTestUtils.setField(first, "id", 1L);
         ReflectionTestUtils.setField(second, "id", 2L);
         final Slice<HoldReleaseOutbox> slice = new SliceImpl<>(List.of(first, second));
-        when(holdReleaseOutboxRepository.findAllByCompletedAtIsNullAndNextAttemptAtLessThanEqual(any(LocalDateTime.class), any()))
+        when(holdReleaseOutboxRepository.findAllByStatusInAndNextAttemptAtLessThanEqual(any(), any(LocalDateTime.class), any()))
                 .thenReturn(slice);
 
         scheduler().processPendingHoldReleases();
 
-        verify(holdReleaseOutboxProcessor).process(eq(1L), any(LocalDateTime.class));
-        verify(holdReleaseOutboxProcessor).process(eq(2L), any(LocalDateTime.class));
+        verify(holdReleaseOutboxExecutor).process(eq(1L), any(LocalDateTime.class));
+        verify(holdReleaseOutboxExecutor).process(eq(2L), any(LocalDateTime.class));
     }
 
     private HoldReleaseOutboxScheduler scheduler() {
         final Clock clock = Clock.fixed(Instant.parse("2026-03-25T03:00:00Z"), ZoneId.of("Asia/Seoul"));
-        return new HoldReleaseOutboxScheduler(holdReleaseOutboxRepository, holdReleaseOutboxProcessor, clock);
+        return new HoldReleaseOutboxScheduler(holdReleaseOutboxRepository, holdReleaseOutboxExecutor, clock);
     }
 }
