@@ -2,7 +2,7 @@ package com.ticket.core.domain.hold.event;
 
 import com.ticket.core.domain.hold.model.HoldSnapshot;
 import com.ticket.core.domain.hold.support.HoldManager;
-import com.ticket.core.domain.performanceseat.application.SeatStatusPublishApplicationService;
+import com.ticket.core.domain.performanceseat.application.SeatStatusPublisher;
 import com.ticket.core.domain.performanceseat.command.SeatSelectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ public class HoldTransactionEventListener {
 
     private final HoldManager holdManager;
     private final SeatSelectionService seatSelectionService;
-    private final SeatStatusPublishApplicationService seatStatusPublishApplicationService;
+    private final SeatStatusPublisher seatStatusPublisher;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleAfterCommit(final HoldCreatedEvent event) {
@@ -23,7 +23,7 @@ public class HoldTransactionEventListener {
         for (final Long seatId : snapshot.seatIds()) {
             seatSelectionService.forceDeselect(snapshot.performanceId(), seatId);
         }
-        seatStatusPublishApplicationService.publishHeld(snapshot.performanceId(), snapshot.seatIds());
+        seatStatusPublisher.publishHeld(snapshot.performanceId(), snapshot.seatIds());
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)

@@ -19,18 +19,18 @@ import static org.mockito.Mockito.verify;
 
 @SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
-class SeatStatusPublishApplicationServiceTest {
+class SeatStatusPublisherTest {
 
     @Mock
     private SeatEventPublisher seatEventPublisher;
 
     @InjectMocks
-    private SeatStatusPublishApplicationService seatStatusPublishApplicationService;
+    private SeatStatusPublisher seatStatusPublisher;
 
     @Test
     void 좌석_선점상태는_좌석별_HELD_이벤트로_발행한다() {
         //given
-        seatStatusPublishApplicationService.publishHeld(10L, List.of(1L, 2L));
+        seatStatusPublisher.publishHeld(10L, List.of(1L, 2L));
 
         //when
         ArgumentCaptor<SeatStatusMessage> captor = ArgumentCaptor.forClass(SeatStatusMessage.class);
@@ -47,7 +47,7 @@ class SeatStatusPublishApplicationServiceTest {
     @Test
     void 좌석_해제상태는_좌석별_RELEASED_이벤트로_발행한다() {
         //given
-        seatStatusPublishApplicationService.publishReleased(10L, List.of(3L, 4L));
+        seatStatusPublisher.publishReleased(10L, List.of(3L, 4L));
 
         //when
         ArgumentCaptor<SeatStatusMessage> captor = ArgumentCaptor.forClass(SeatStatusMessage.class);

@@ -12,7 +12,7 @@ import static com.ticket.core.domain.performanceseat.support.SeatStatusMessage.S
 
 @Service
 @RequiredArgsConstructor
-public class SeatStatusPublishApplicationService {
+public class SeatStatusPublisher {
 
     private final SeatEventPublisher seatEventPublisher;
 
