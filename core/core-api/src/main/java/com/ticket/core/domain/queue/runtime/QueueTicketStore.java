@@ -3,6 +3,7 @@ package com.ticket.core.domain.queue.runtime;
 import com.ticket.core.domain.queue.usecase.QueueEntryId;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface QueueTicketStore {
@@ -11,7 +12,7 @@ public interface QueueTicketStore {
 
     long countWaiting(Long performanceId);
 
-    QueueTicket admitNow(Long performanceId, Long memberId, Duration entryTokenTtl, Duration entryRetention);
+    QueueTicket admitNow(Long performanceId, Long memberId, Duration entryTokenTtl, Duration entryRetention, LocalDateTime now);
 
     QueueTicket enqueue(Long performanceId, Long memberId, Duration entryRetention);
 
@@ -25,7 +26,7 @@ public interface QueueTicketStore {
 
     boolean isValidToken(Long performanceId, String queueToken);
 
-    Optional<QueueTicket> admitNextWaiting(Long performanceId, Duration entryTokenTtl, Duration entryRetention);
+    Optional<QueueTicket> admitNextWaiting(Long performanceId, Duration entryTokenTtl, Duration entryRetention, LocalDateTime now);
 
     void expireAdmitted(Long performanceId, QueueEntryId queueEntryId, String queueToken);
 

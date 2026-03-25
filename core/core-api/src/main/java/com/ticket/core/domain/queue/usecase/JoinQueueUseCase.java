@@ -10,6 +10,7 @@ import com.ticket.core.domain.queue.support.QueuePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Service
@@ -19,6 +20,7 @@ public class JoinQueueUseCase {
     private final QueuePolicyResolver queuePolicyResolver;
     private final QueueTicketStore queueTicketStore;
     private final QueueAdmissionAdvancer queueAdmissionAdvancer;
+    private final Clock clock;
 
     public record Input(Long performanceId, Long memberId) {}
 
@@ -78,7 +80,8 @@ public class JoinQueueUseCase {
                 input.performanceId(),
                 input.memberId(),
                 policy.entryTokenTtl(),
-                policy.entryRetention()
+                policy.entryRetention(),
+                LocalDateTime.now(clock)
         );
         return new Output(
                 admitted.status(),

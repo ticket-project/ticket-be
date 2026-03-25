@@ -8,7 +8,6 @@ import org.redisson.api.*;
 import org.redisson.client.codec.StringCodec;
 import org.springframework.stereotype.Component;
 
-import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -26,7 +25,6 @@ public class RedisQueueTicketStore implements QueueTicketStore {
     private static final String FIELD_EXPIRES_AT = "expiresAt";
 
     private final RedissonClient redissonClient;
-    private final Clock clock;
     private final UuidSupplier uuidSupplier;
 
     @Override
@@ -44,9 +42,10 @@ public class RedisQueueTicketStore implements QueueTicketStore {
             final Long performanceId,
             final Long memberId,
             final Duration entryTokenTtl,
-            final Duration entryRetention
+            final Duration entryRetention,
+            final LocalDateTime now
     ) {
-        return admit(performanceId, memberId, uuidSupplier.get().toString(), null, entryTokenTtl, entryRetention);
+        return admit(performanceId, memberId, uuidSupplier.get().toString(), null, entryTokenTtl, entryRetention, now);
     }
 
     @Override
@@ -110,7 +109,12 @@ public class RedisQueueTicketStore implements QueueTicketStore {
     }
 
     @Override
-    public Optional<QueueTicket> admitNextWaiting(final Long performanceId, final Duration entryTokenTtl, final Duration entryRetention) {
+    public Optional<QueueTicket> admitNextWaiting(
+            final Long performanceId,
+            final Duration entryTokenTtl,
+            final Duration entryRetention,
+            final LocalDateTime now
+    ) {
         final RScoredSortedSet<String> waitingSet = waitingSet(performanceId);
         final int candidates = waitingSet.size();
         for (int i = 0; i < candidates; i++) {
@@ -123,7 +127,15 @@ public class RedisQueueTicketStore implements QueueTicketStore {
             if (entry == null || entry.status() != QueueEntryStatus.WAITING) {
                 continue;
             }
-            return Optional.of(admit(performanceId, entry.memberId(), queueEntryId, entry.sequence(), entryTokenTtl, entryRetention));
+            return Optional.of(admit(
+                    performanceId,
+                    entry.memberId(),
+                    queueEntryId,
+                    entry.sequence(),
+                    entryTokenTtl,
+                    entryRetention,
+                    now
+            ));
         }
         return Optional.empty();
     }
@@ -160,10 +172,11 @@ public class RedisQueueTicketStore implements QueueTicketStore {
             final String queueEntryId,
             final Long sequence,
             final Duration entryTokenTtl,
-            final Duration entryRetention
+            final Duration entryRetention,
+            final LocalDateTime now
     ) {
         final String queueToken = QueueRedisKey.createToken(performanceId, queueEntryId, uuidSupplier.get().toString());
-        final LocalDateTime expiresAt = LocalDateTime.now(clock).plus(entryTokenTtl);
+        final LocalDateTime expiresAt = now.plus(entryTokenTtl);
 
         tokenBucket(queueToken).set(queueEntryId, entryTokenTtl);
         activeSet(performanceId).add(queueToken);
