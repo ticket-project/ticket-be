@@ -17,7 +17,7 @@ pluginManagement {
 rootProject.name = 'ticket'
 
 include(
-        'core:core-enum',
+        'core:core-domain',
         'core:core-api',
         'storage:redis-core',
         'support:logging'
