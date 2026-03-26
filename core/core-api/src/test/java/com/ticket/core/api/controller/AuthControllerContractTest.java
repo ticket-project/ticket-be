@@ -1,14 +1,15 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.config.LoginMemberArgumentResolver;
-import com.ticket.core.domain.auth.usecase.ExchangeOAuth2TokenUseCase;
-import com.ticket.core.domain.auth.usecase.GetSocialLoginUrlsUseCase;
-import com.ticket.core.domain.auth.usecase.LoginUseCase;
-import com.ticket.core.domain.auth.usecase.LogoutUseCase;
-import com.ticket.core.domain.auth.usecase.RefreshAuthTokenUseCase;
-import com.ticket.core.domain.auth.usecase.RegisterMemberUseCase;
-import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.enums.Role;
+import com.ticket.core.config.security.JwtProperties;
+import com.ticket.core.domain.auth.command.ExchangeOAuth2TokenUseCase;
+import com.ticket.core.domain.auth.command.LoginUseCase;
+import com.ticket.core.domain.auth.command.LogoutUseCase;
+import com.ticket.core.domain.auth.command.RefreshAuthTokenUseCase;
+import com.ticket.core.domain.auth.command.RegisterMemberUseCase;
+import com.ticket.core.domain.auth.query.GetSocialLoginUrlsUseCase;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.member.model.Role;
 import com.ticket.core.support.ApiControllerAdvice;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,7 +36,9 @@ class AuthControllerContractTest {
 
     private final LoginUseCase loginUseCase = Mockito.mock(LoginUseCase.class);
     private final RefreshAuthTokenUseCase refreshAuthTokenUseCase = Mockito.mock(RefreshAuthTokenUseCase.class);
+    private final ExchangeOAuth2TokenUseCase exchangeOAuth2TokenUseCase = Mockito.mock(ExchangeOAuth2TokenUseCase.class);
     private final LogoutUseCase logoutUseCase = Mockito.mock(LogoutUseCase.class);
+    private final JwtProperties jwtProperties = Mockito.mock(JwtProperties.class);
 
     @BeforeEach
     void setUp() {
@@ -42,10 +46,12 @@ class AuthControllerContractTest {
                 Mockito.mock(RegisterMemberUseCase.class),
                 loginUseCase,
                 refreshAuthTokenUseCase,
-                Mockito.mock(ExchangeOAuth2TokenUseCase.class),
+                exchangeOAuth2TokenUseCase,
                 Mockito.mock(GetSocialLoginUrlsUseCase.class),
-                logoutUseCase
+                logoutUseCase,
+                jwtProperties
         );
+        when(jwtProperties.getRefreshTokenExpirationSeconds()).thenReturn(1209600L);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setCustomArgumentResolvers(new LoginMemberArgumentResolver())
                 .setControllerAdvice(new ApiControllerAdvice())
@@ -58,9 +64,12 @@ class AuthControllerContractTest {
     }
 
     @Test
-    void 로그인_API는_성공_응답_계약을_유지한다() throws Exception {
-        when(loginUseCase.execute(any(LoginUseCase.Input.class), any()))
-                .thenReturn(new LoginUseCase.Output("access-token", "Bearer", 1800L, 1L));
+    void 로그인_API는_성공_응답과_refresh_cookie를_내린다() throws Exception {
+        when(loginUseCase.execute(any(LoginUseCase.Input.class)))
+                .thenReturn(new LoginUseCase.Result(
+                        new LoginUseCase.Output("access-token", "Bearer", 1800L, 1L),
+                        "refresh-token"
+                ));
 
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -75,11 +84,12 @@ class AuthControllerContractTest {
                 .andExpect(jsonPath("$.data.accessToken").value("access-token"))
                 .andExpect(jsonPath("$.data.tokenType").value("Bearer"))
                 .andExpect(jsonPath("$.data.memberId").value(1))
+                .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("refresh_token=refresh-token")))
                 .andExpect(jsonPath("$.error").isEmpty());
     }
 
     @Test
-    void 리프레시_API는_쿠키가_없으면_인증_오류_계약을_유지한다() throws Exception {
+    void 리프레시_API는_쿠키가_없으면_인증_오류_계약을_지킨다() throws Exception {
         mockMvc.perform(post("/api/v1/auth/refresh"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.result").value("ERROR"))
@@ -87,12 +97,55 @@ class AuthControllerContractTest {
     }
 
     @Test
-    void 로그아웃_API는_성공_응답_계약을_유지한다() throws Exception {
+    void 리프레시_API는_성공_응답과_refresh_cookie를_내린다() throws Exception {
+        when(refreshAuthTokenUseCase.execute(any(RefreshAuthTokenUseCase.Input.class)))
+                .thenReturn(new RefreshAuthTokenUseCase.Result(
+                        new RefreshAuthTokenUseCase.Output("new-access-token", "Bearer", 1800L, 1L),
+                        "new-refresh-token"
+                ));
+
+        mockMvc.perform(post("/api/v1/auth/refresh")
+                        .cookie(new MockCookie("refresh_token", "refresh-token")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value("SUCCESS"))
+                .andExpect(jsonPath("$.data.accessToken").value("new-access-token"))
+                .andExpect(jsonPath("$.data.tokenType").value("Bearer"))
+                .andExpect(jsonPath("$.data.memberId").value(1))
+                .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("refresh_token=new-refresh-token")))
+                .andExpect(jsonPath("$.error").isEmpty());
+    }
+
+    @Test
+    void OAuth2_token_API는_성공_응답과_refresh_cookie를_내린다() throws Exception {
+        when(exchangeOAuth2TokenUseCase.execute(any(ExchangeOAuth2TokenUseCase.Input.class)))
+                .thenReturn(new ExchangeOAuth2TokenUseCase.Result(
+                        new ExchangeOAuth2TokenUseCase.Output("oauth-access-token", "Bearer", 1800L, 7L),
+                        "oauth-refresh-token"
+                ));
+
+        mockMvc.perform(post("/api/v1/auth/oauth2/token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "code": "oauth-code"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value("SUCCESS"))
+                .andExpect(jsonPath("$.data.accessToken").value("oauth-access-token"))
+                .andExpect(jsonPath("$.data.tokenType").value("Bearer"))
+                .andExpect(jsonPath("$.data.memberId").value(7))
+                .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("refresh_token=oauth-refresh-token")))
+                .andExpect(jsonPath("$.error").isEmpty());
+    }
+
+    @Test
+    void 로그아웃_API는_성공_응답과_쿠키_삭제를_내린다() throws Exception {
         MemberPrincipal principal = new MemberPrincipal(1L, Role.MEMBER);
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities())
         );
-        when(logoutUseCase.execute(any(LogoutUseCase.Input.class), any()))
+        when(logoutUseCase.execute(any(LogoutUseCase.Input.class)))
                 .thenReturn(new LogoutUseCase.Output());
 
         mockMvc.perform(post("/api/v1/auth/logout")
@@ -100,6 +153,7 @@ class AuthControllerContractTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("SUCCESS"))
                 .andExpect(jsonPath("$.data").isEmpty())
+                .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("Max-Age=0")))
                 .andExpect(jsonPath("$.error").isEmpty());
     }
 }

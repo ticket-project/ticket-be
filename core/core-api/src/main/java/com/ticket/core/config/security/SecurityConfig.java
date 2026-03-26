@@ -1,6 +1,5 @@
 package com.ticket.core.config.security;
 
-import com.ticket.core.domain.auth.oauth2.CustomOAuth2UserService;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

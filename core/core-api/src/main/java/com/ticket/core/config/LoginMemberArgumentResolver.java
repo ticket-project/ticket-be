@@ -1,6 +1,6 @@
 package com.ticket.core.config;
 
-import com.ticket.core.domain.member.MemberPrincipal;
+import com.ticket.core.config.security.MemberPrincipal;
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
 import org.springframework.core.MethodParameter;

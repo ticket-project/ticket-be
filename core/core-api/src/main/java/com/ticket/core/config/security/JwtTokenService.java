@@ -1,7 +1,7 @@
 package com.ticket.core.config.security;
 
-import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.enums.Role;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.member.model.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
