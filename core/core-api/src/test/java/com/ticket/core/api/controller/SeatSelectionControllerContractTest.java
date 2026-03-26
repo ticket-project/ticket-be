@@ -1,11 +1,11 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.config.LoginMemberArgumentResolver;
-import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.performanceseat.command.usecase.DeselectAllSeatsUseCase;
-import com.ticket.core.domain.performanceseat.command.usecase.DeselectSeatUseCase;
-import com.ticket.core.domain.performanceseat.command.usecase.SelectSeatUseCase;
-import com.ticket.core.enums.Role;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.performanceseat.command.DeselectAllSeatsUseCase;
+import com.ticket.core.domain.performanceseat.command.DeselectSeatUseCase;
+import com.ticket.core.domain.performanceseat.command.SelectSeatUseCase;
+import com.ticket.core.domain.member.model.Role;
 import com.ticket.core.support.ApiControllerAdvice;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
