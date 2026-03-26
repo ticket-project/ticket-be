@@ -1,13 +1,17 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.api.controller.response.*;
-import com.ticket.core.domain.performanceseat.query.usecase.GetVenueLayoutUseCase;
+import com.ticket.core.api.controller.request.ShowSearchRequest;
+import com.ticket.core.domain.performanceseat.query.GetShowSeatsUseCase;
+import com.ticket.core.domain.performanceseat.query.GetVenueLayoutUseCase;
 import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
 import com.ticket.core.domain.show.query.model.ShowParam;
-import com.ticket.core.domain.show.query.model.ShowSearchRequest;
-import com.ticket.core.domain.show.query.usecase.CountSearchShowsUseCase;
-import com.ticket.core.domain.show.query.usecase.GetLatestShowsUseCase;
-import com.ticket.core.domain.show.query.usecase.GetSaleStartApproachingShowsUseCase;
+import com.ticket.core.domain.show.query.CountSearchShowsUseCase;
+import com.ticket.core.domain.show.query.GetLatestShowsUseCase;
+import com.ticket.core.domain.show.query.GetSaleStartApproachingShowsPageUseCase;
+import com.ticket.core.domain.show.query.GetSaleStartApproachingShowsUseCase;
+import com.ticket.core.domain.show.query.GetShowDetailUseCase;
+import com.ticket.core.domain.show.query.GetShowsUseCase;
+import com.ticket.core.domain.show.query.SearchShowsUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,7 +58,7 @@ public interface ShowControllerDocs {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ApiResponse<ShowSeatResponse> getShowSeats(
+    ApiResponse<GetShowSeatsUseCase.Output> getShowSeats(
             @Parameter(description = "공연 ID", example = "1", required = true) Long showId
     );
 
@@ -73,7 +77,7 @@ public interface ShowControllerDocs {
                     description = "조회 성공"
             )
     })
-    ApiResponse<ShowDetailResponse> getShowDetail(
+    ApiResponse<GetShowDetailUseCase.Output> getShowDetail(
             @Parameter(description = "공연 ID", example = "1", required = true) Long id
     );
 
@@ -139,7 +143,7 @@ public interface ShowControllerDocs {
                     )
             )
     })
-    ApiResponse<SliceResponse<ShowResponse>> getShowsPage(
+    ApiResponse<SliceResponse<GetShowsUseCase.ShowItem>> getShowsPage(
             @ParameterObject ShowParam param,
             @Parameter(description = "한 번에 조회할 개수 (기본값: 5, 최대: 100)", example = "5") int size,
             @Parameter(description = "정렬 기준 [popular(인기순), latest(최신순), showStartApproaching(공연임박순)]", example = "popular") String sort
@@ -273,7 +277,7 @@ public interface ShowControllerDocs {
                     )
             )
     })
-    ApiResponse<SliceResponse<ShowOpeningSoonDetailResponse>> getShowsSaleOpeningSoonPage(
+    ApiResponse<SliceResponse<GetSaleStartApproachingShowsPageUseCase.ShowOpeningSoonDetail>> getShowsSaleOpeningSoonPage(
             @ParameterObject SaleOpeningSoonSearchParam param,
             @Parameter(description = "한 번에 조회할 개수 (기본값: 16)", example = "16") int size,
             @Parameter(description = "정렬 기준 [saleStartApproaching(판매시작일순), popular(인기순), latest(최신순)]", example = "saleStartApproaching") String sort
@@ -334,7 +338,7 @@ public interface ShowControllerDocs {
                     )
             )
     })
-    ApiResponse<SliceResponse<ShowSearchResponse>> searchShows(
+    ApiResponse<SliceResponse<SearchShowsUseCase.ShowSearchItem>> searchShows(
             @ParameterObject ShowSearchRequest request,
             @Parameter(description = "한 번에 조회할 개수 (기본값: 20)", example = "20") int size,
             @Parameter(description = "정렬 기준 [popular(조회순), showStartApproaching(공연임박순)]", example = "popular") String sort

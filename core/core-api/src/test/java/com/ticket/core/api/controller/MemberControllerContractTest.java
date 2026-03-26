@@ -1,11 +1,11 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.config.LoginMemberArgumentResolver;
-import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.member.usecase.GetCurrentMemberUseCase;
-import com.ticket.core.domain.member.usecase.WithdrawCurrentMemberUseCase;
-import com.ticket.core.domain.showlike.usecase.GetMyShowLikesUseCase;
-import com.ticket.core.enums.Role;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.member.query.GetCurrentMemberUseCase;
+import com.ticket.core.domain.member.command.WithdrawCurrentMemberUseCase;
+import com.ticket.core.domain.showlike.query.GetMyShowLikesUseCase;
+import com.ticket.core.domain.member.model.Role;
 import com.ticket.core.support.ApiControllerAdvice;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

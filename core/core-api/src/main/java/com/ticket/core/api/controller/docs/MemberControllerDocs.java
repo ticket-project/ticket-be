@@ -1,9 +1,9 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.api.controller.response.ShowLikeSummaryResponse;
-import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.member.usecase.GetCurrentMemberUseCase;
-import com.ticket.core.domain.member.usecase.WithdrawCurrentMemberUseCase;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.member.query.GetCurrentMemberUseCase;
+import com.ticket.core.domain.member.command.WithdrawCurrentMemberUseCase;
+import com.ticket.core.domain.showlike.query.GetMyShowLikesUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +40,7 @@ public interface MemberControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패")
     })
-    ApiResponse<SliceResponse<ShowLikeSummaryResponse>> getMyLikes(
+    ApiResponse<SliceResponse<GetMyShowLikesUseCase.ShowLikeSummary>> getMyLikes(
             @Parameter(hidden = true) MemberPrincipal memberPrincipal,
             @Parameter(description = "커서(마지막 찜 ID)", example = "123") String cursor,
             @Parameter(description = "페이지 크기", example = "20") int size
