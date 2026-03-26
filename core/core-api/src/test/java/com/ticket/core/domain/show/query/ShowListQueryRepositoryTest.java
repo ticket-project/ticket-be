@@ -59,7 +59,6 @@ import static org.assertj.core.api.Assertions.assertThat;
         QuerydslConfig.class,
         ShowListQueryRepositoryTest.TestConfig.class,
         ShowListQueryRepository.class,
-        ShowImagePathResolver.class,
         ShowQueryHelper.class,
         BookingStatusWindowPolicy.class,
         ShowConditionFactory.class,
