@@ -1,5 +1,6 @@
-package com.ticket.core.domain.member;
+package com.ticket.core.domain.member.repository;
 
+import com.ticket.core.domain.member.model.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

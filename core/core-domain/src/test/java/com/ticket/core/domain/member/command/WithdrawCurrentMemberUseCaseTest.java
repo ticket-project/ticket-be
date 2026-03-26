@@ -1,7 +1,7 @@
-package com.ticket.core.domain.member.usecase;
+package com.ticket.core.domain.member.command;
 
 import com.ticket.core.domain.auth.oauth2.KakaoUnlinkService;
-import com.ticket.core.domain.member.MemberWithdrawalTxService;
+import com.ticket.core.domain.member.command.MemberWithdrawalTxService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

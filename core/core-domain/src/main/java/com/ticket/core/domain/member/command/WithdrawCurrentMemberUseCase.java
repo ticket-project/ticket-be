@@ -1,7 +1,6 @@
-package com.ticket.core.domain.member.usecase;
+package com.ticket.core.domain.member.command;
 
 import com.ticket.core.domain.auth.oauth2.KakaoUnlinkService;
-import com.ticket.core.domain.member.MemberWithdrawalTxService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

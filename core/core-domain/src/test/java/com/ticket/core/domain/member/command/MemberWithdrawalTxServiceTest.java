@@ -1,9 +1,13 @@
-package com.ticket.core.domain.member;
+package com.ticket.core.domain.member.command;
 
-import com.ticket.core.domain.member.vo.Email;
-import com.ticket.core.domain.member.vo.EncodedPassword;
-import com.ticket.core.enums.Role;
-import com.ticket.core.enums.SocialProvider;
+import com.ticket.core.domain.member.model.Member;
+import com.ticket.core.domain.member.model.MemberSocialAccount;
+import com.ticket.core.domain.member.model.Email;
+import com.ticket.core.domain.member.model.EncodedPassword;
+import com.ticket.core.domain.member.model.Role;
+import com.ticket.core.domain.member.model.SocialProvider;
+import com.ticket.core.domain.member.query.MemberFinder;
+import com.ticket.core.domain.member.repository.MemberSocialAccountRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -54,4 +58,3 @@ class MemberWithdrawalTxServiceTest {
         verify(memberSocialAccountRepository).findAllByMemberAndDeletedAtIsNull(member);
     }
 }
-
