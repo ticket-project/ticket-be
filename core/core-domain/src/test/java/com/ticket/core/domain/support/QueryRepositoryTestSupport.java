@@ -1,15 +1,14 @@
 package com.ticket.core.domain.support;
 
-import com.ticket.core.config.JpaAuditingConfig;
 import com.ticket.core.config.QuerydslConfig;
-import com.ticket.core.domain.member.Member;
-import com.ticket.core.domain.member.vo.Email;
-import com.ticket.core.domain.performance.Performance;
+import com.ticket.core.domain.member.model.Member;
+import com.ticket.core.domain.member.model.Email;
+import com.ticket.core.domain.performance.model.Performance;
 import com.ticket.core.domain.performanceseat.model.PerformanceSeat;
-import com.ticket.core.domain.seat.Seat;
-import com.ticket.core.domain.show.Show;
-import com.ticket.core.domain.show.category.Category;
-import com.ticket.core.domain.show.genre.Genre;
+import com.ticket.core.domain.seat.model.Seat;
+import com.ticket.core.domain.show.model.Show;
+import com.ticket.core.domain.show.model.Category;
+import com.ticket.core.domain.show.model.Genre;
 import com.ticket.core.domain.show.mapping.ShowGenre;
 import com.ticket.core.domain.show.mapping.ShowGrade;
 import com.ticket.core.domain.show.mapping.ShowSeat;
@@ -22,9 +21,9 @@ import com.ticket.core.domain.show.query.ShowCursorPolicy;
 import com.ticket.core.domain.show.query.ShowQueryHelper;
 import com.ticket.core.domain.show.query.ShowSortSupport;
 import com.ticket.core.domain.show.venue.Venue;
-import com.ticket.core.domain.showlike.ShowLike;
-import com.ticket.core.enums.PerformanceSeatState;
-import com.ticket.core.enums.Role;
+import com.ticket.core.domain.showlike.model.ShowLike;
+import com.ticket.core.domain.performanceseat.model.PerformanceSeatState;
+import com.ticket.core.domain.member.model.Role;
 import com.ticket.core.support.cursor.CursorCodec;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +33,8 @@ import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.json.JsonMapper;
@@ -61,9 +62,9 @@ import java.time.ZoneId;
 })
 @Transactional
 @Import({
-        JpaAuditingConfig.class,
         QuerydslConfig.class,
         QueryRepositoryTestSupport.TestConfig.class,
+        QueryRepositoryTestSupport.AuditingTestConfig.class,
         ShowQueryHelper.class,
         BookingStatusWindowPolicy.class,
         ShowConditionFactory.class,
@@ -221,11 +222,19 @@ public abstract class QueryRepositoryTestSupport {
         }
     }
 
+    @EnableJpaAuditing
+    static class AuditingTestConfig {
+
+        @Bean
+        AuditorAware<String> auditorAware() {
+            return () -> java.util.Optional.of("test-auditor");
+        }
+    }
+
     @SpringBootConfiguration
     @EnableAutoConfiguration
     @EntityScan(basePackages = "com.ticket.core.domain")
-    @Import(TestConfig.class)
+    @Import({TestConfig.class, AuditingTestConfig.class})
     static class TestApplication {
     }
 }
-
