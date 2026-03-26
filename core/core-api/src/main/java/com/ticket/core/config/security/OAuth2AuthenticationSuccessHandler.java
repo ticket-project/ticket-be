@@ -1,7 +1,7 @@
 package com.ticket.core.config.security;
 
 import com.ticket.core.domain.auth.OAuth2AuthCodeService;
-import com.ticket.core.domain.member.MemberPrincipal;
+import com.ticket.core.config.security.MemberPrincipal;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

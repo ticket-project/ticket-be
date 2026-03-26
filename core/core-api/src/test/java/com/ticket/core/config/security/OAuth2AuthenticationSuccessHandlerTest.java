@@ -1,8 +1,8 @@
 package com.ticket.core.config.security;
 
 import com.ticket.core.domain.auth.OAuth2AuthCodeService;
-import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.enums.Role;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.member.model.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
