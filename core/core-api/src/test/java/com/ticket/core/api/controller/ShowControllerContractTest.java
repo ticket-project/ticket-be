@@ -1,21 +1,16 @@
 package com.ticket.core.api.controller;
 
-import com.ticket.core.api.controller.response.ShowResponse;
-import com.ticket.core.api.controller.response.ShowSearchResponse;
-import com.ticket.core.domain.performanceseat.query.usecase.GetShowSeatsUseCase;
-import com.ticket.core.domain.performanceseat.query.usecase.GetVenueLayoutUseCase;
+import com.ticket.core.domain.performanceseat.query.GetShowSeatsUseCase;
+import com.ticket.core.domain.performanceseat.query.GetVenueLayoutUseCase;
 import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.domain.show.meta.SaleType;
-import com.ticket.core.domain.show.query.model.ShowParam;
-import com.ticket.core.domain.show.query.model.ShowSearchRequest;
-import com.ticket.core.domain.show.query.usecase.CountSearchShowsUseCase;
-import com.ticket.core.domain.show.query.usecase.GetLatestShowsUseCase;
-import com.ticket.core.domain.show.query.usecase.GetSaleStartApproachingShowsPageUseCase;
-import com.ticket.core.domain.show.query.usecase.GetSaleStartApproachingShowsUseCase;
-import com.ticket.core.domain.show.query.usecase.GetShowDetailUseCase;
-import com.ticket.core.domain.show.query.usecase.GetShowsUseCase;
-import com.ticket.core.domain.show.query.usecase.SearchShowsUseCase;
-import com.ticket.core.domain.show.query.usecase.ShowSort;
+import com.ticket.core.domain.show.query.CountSearchShowsUseCase;
+import com.ticket.core.domain.show.query.GetLatestShowsUseCase;
+import com.ticket.core.domain.show.query.GetSaleStartApproachingShowsPageUseCase;
+import com.ticket.core.domain.show.query.GetSaleStartApproachingShowsUseCase;
+import com.ticket.core.domain.show.query.GetShowDetailUseCase;
+import com.ticket.core.domain.show.query.GetShowsUseCase;
+import com.ticket.core.domain.show.query.SearchShowsUseCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ShowControllerContractTest {
 
     @Test
-    void 공연_목록_API는_슬라이스_응답_계약을_유지한다() throws Exception {
+    void 공연_목록_api는_슬라이스_응답_계약을_유지한다() throws Exception {
         GetShowsUseCase getShowsUseCase = mock(GetShowsUseCase.class);
         ShowController controller = new ShowController(
                 getShowsUseCase,
@@ -51,7 +46,7 @@ class ShowControllerContractTest {
         );
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
-        ShowResponse show = new ShowResponse(
+        GetShowsUseCase.ShowItem show = new GetShowsUseCase.ShowItem(
                 1L,
                 "공연",
                 "부제",
@@ -82,7 +77,7 @@ class ShowControllerContractTest {
     }
 
     @Test
-    void 공연_검색_API는_슬라이스_응답_계약을_유지한다() throws Exception {
+    void 공연_검색_api는_슬라이스_응답_계약을_유지한다() throws Exception {
         SearchShowsUseCase searchShowsUseCase = mock(SearchShowsUseCase.class);
         ShowController controller = new ShowController(
                 mock(GetShowsUseCase.class),
@@ -97,8 +92,7 @@ class ShowControllerContractTest {
         );
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
-        ShowSearchRequest request = new ShowSearchRequest("공연", null, null, null, null, null, null);
-        ShowSearchResponse response = new ShowSearchResponse(
+        SearchShowsUseCase.ShowSearchItem item = new SearchShowsUseCase.ShowSearchItem(
                 1L,
                 "공연",
                 "image",
@@ -109,7 +103,7 @@ class ShowControllerContractTest {
                 10L
         );
         when(searchShowsUseCase.execute(any(SearchShowsUseCase.Input.class)))
-                .thenReturn(new SearchShowsUseCase.Output(new SliceImpl<>(List.of(response)), "cursor-1"));
+                .thenReturn(new SearchShowsUseCase.Output(new SliceImpl<>(List.of(item)), "cursor-1"));
 
         mockMvc.perform(get("/api/v1/shows/search").param("keyword", "공연"))
                 .andExpect(status().isOk())

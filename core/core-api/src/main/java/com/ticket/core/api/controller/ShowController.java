@@ -1,13 +1,12 @@
 package com.ticket.core.api.controller;
 
+import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.api.controller.docs.ShowControllerDocs;
-import com.ticket.core.api.controller.response.*;
-import com.ticket.core.domain.performanceseat.query.usecase.GetShowSeatsUseCase;
-import com.ticket.core.domain.performanceseat.query.usecase.GetVenueLayoutUseCase;
+import com.ticket.core.domain.performanceseat.query.GetShowSeatsUseCase;
+import com.ticket.core.domain.performanceseat.query.GetVenueLayoutUseCase;
 import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
 import com.ticket.core.domain.show.query.model.ShowParam;
-import com.ticket.core.domain.show.query.model.ShowSearchRequest;
-import com.ticket.core.domain.show.query.usecase.*;
+import com.ticket.core.domain.show.query.*;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
 import lombok.RequiredArgsConstructor;
@@ -40,23 +39,21 @@ public class ShowController implements ShowControllerDocs {
 
     @Override
     @GetMapping("/{showId}/seats")
-    public ApiResponse<ShowSeatResponse> getShowSeats(@PathVariable final Long showId) {
+    public ApiResponse<GetShowSeatsUseCase.Output> getShowSeats(@PathVariable final Long showId) {
         final GetShowSeatsUseCase.Input input = new GetShowSeatsUseCase.Input(showId);
-        final GetShowSeatsUseCase.Output output = getShowSeatsUseCase.execute(input);
-        return ApiResponse.success(output.seatInfo());
+        return ApiResponse.success(getShowSeatsUseCase.execute(input));
     }
 
     @Override
     @GetMapping("/{id}")
-    public ApiResponse<ShowDetailResponse> getShowDetail(@PathVariable final Long id) {
+    public ApiResponse<GetShowDetailUseCase.Output> getShowDetail(@PathVariable final Long id) {
         final GetShowDetailUseCase.Input input = new GetShowDetailUseCase.Input(id);
-        final GetShowDetailUseCase.Output output = getShowDetailUseCase.execute(input);
-        return ApiResponse.success(output.show());
+        return ApiResponse.success(getShowDetailUseCase.execute(input));
     }
 
     @Override
     @GetMapping
-    public ApiResponse<SliceResponse<ShowResponse>> getShowsPage(
+    public ApiResponse<SliceResponse<GetShowsUseCase.ShowItem>> getShowsPage(
             @ParameterObject final ShowParam param,
             @RequestParam(defaultValue = "5") final int size,
             @RequestParam(defaultValue = "popular") final String sort
@@ -87,7 +84,7 @@ public class ShowController implements ShowControllerDocs {
 
     @Override
     @GetMapping("/sale-opening-soon/page")
-    public ApiResponse<SliceResponse<ShowOpeningSoonDetailResponse>> getShowsSaleOpeningSoonPage(
+    public ApiResponse<SliceResponse<GetSaleStartApproachingShowsPageUseCase.ShowOpeningSoonDetail>> getShowsSaleOpeningSoonPage(
             @ParameterObject final SaleOpeningSoonSearchParam param,
             @RequestParam(defaultValue = "16") final int size,
             @RequestParam(defaultValue = "saleStartApproaching") final String sort
@@ -99,12 +96,12 @@ public class ShowController implements ShowControllerDocs {
 
     @Override
     @GetMapping("/search")
-    public ApiResponse<SliceResponse<ShowSearchResponse>> searchShows(
+    public ApiResponse<SliceResponse<SearchShowsUseCase.ShowSearchItem>> searchShows(
             @ParameterObject final ShowSearchRequest request,
             @RequestParam(defaultValue = "20") final int size,
             @RequestParam(defaultValue = "popular") final String sort
     ) {
-        final SearchShowsUseCase.Input input = new SearchShowsUseCase.Input(request, size, ShowSort.from(sort));
+        final SearchShowsUseCase.Input input = new SearchShowsUseCase.Input(request.toCriteria(), size, ShowSort.from(sort));
         final SearchShowsUseCase.Output output = searchShowsUseCase.execute(input);
         return ApiResponse.success(SliceResponse.from(output.shows(), output.nextCursor()));
     }
@@ -114,7 +111,7 @@ public class ShowController implements ShowControllerDocs {
     public ApiResponse<CountSearchShowsUseCase.Output> countSearchShows(
             @ParameterObject final ShowSearchRequest request
     ) {
-        final CountSearchShowsUseCase.Input input = new CountSearchShowsUseCase.Input(request);
+        final CountSearchShowsUseCase.Input input = new CountSearchShowsUseCase.Input(request.toCriteria());
         return ApiResponse.success(countSearchShowsUseCase.execute(input));
     }
 }

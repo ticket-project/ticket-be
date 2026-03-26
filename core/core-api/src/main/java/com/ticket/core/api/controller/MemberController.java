@@ -1,11 +1,10 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.MemberControllerDocs;
-import com.ticket.core.api.controller.response.ShowLikeSummaryResponse;
-import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.member.usecase.GetCurrentMemberUseCase;
-import com.ticket.core.domain.member.usecase.WithdrawCurrentMemberUseCase;
-import com.ticket.core.domain.showlike.usecase.GetMyShowLikesUseCase;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.member.query.GetCurrentMemberUseCase;
+import com.ticket.core.domain.member.command.WithdrawCurrentMemberUseCase;
+import com.ticket.core.domain.showlike.query.GetMyShowLikesUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +40,7 @@ public class MemberController implements MemberControllerDocs {
 
     @Override
     @GetMapping("/me/likes")
-    public ApiResponse<SliceResponse<ShowLikeSummaryResponse>> getMyLikes(
+    public ApiResponse<SliceResponse<GetMyShowLikesUseCase.ShowLikeSummary>> getMyLikes(
             final MemberPrincipal memberPrincipal,
             @RequestParam(required = false) final String cursor,
             @RequestParam(defaultValue = "20") final int size
