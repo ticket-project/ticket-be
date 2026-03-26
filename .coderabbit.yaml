@@ -29,6 +29,25 @@ reviews:
       enabled: true
     sqlfluff:
       enabled: true
+  path_filters:
+    - "settings.gradle"
+    - "core/core-api/build.gradle"
+    - "core/core-domain/build.gradle"
+    - "core/core-api/src/main/java/com/ticket/core/api/controller/**"
+    - "!core/core-api/src/main/java/com/ticket/core/api/controller/docs/**"
+    - "!core/core-api/src/main/java/com/ticket/core/api/controller/response/**"
+    - "core/core-api/src/main/java/com/ticket/core/config/AuditorAwareImpl.java"
+    - "core/core-api/src/main/java/com/ticket/core/config/LoginMemberArgumentResolver.java"
+    - "core/core-api/src/main/java/com/ticket/core/config/security/**"
+    - "core/core-domain/src/main/java/com/ticket/core/aop/**"
+    - "core/core-domain/src/main/java/com/ticket/core/config/**"
+    - "core/core-domain/src/main/java/com/ticket/core/domain/BaseEntity.java"
+    - "core/core-domain/src/main/java/com/ticket/core/support/**"
+    - "core/core-domain/src/main/java/com/ticket/core/domain/**/command/**"
+    - "core/core-domain/src/main/java/com/ticket/core/domain/**/query/**"
+    - "core/core-domain/src/main/java/com/ticket/core/domain/auth/AuthService.java"
+    - "core/core-domain/src/main/java/com/ticket/core/domain/auth/OAuth2AuthCodeService.java"
+    - "core/core-domain/src/main/java/com/ticket/core/domain/auth/PasswordService.java"
 
 
   # 경로별 리뷰 지침 및 제외 폴더
