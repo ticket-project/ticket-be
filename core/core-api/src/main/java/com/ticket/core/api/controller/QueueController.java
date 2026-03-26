@@ -1,11 +1,11 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.QueueControllerDocs;
-import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.queue.usecase.ExitQueueUseCase;
-import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
-import com.ticket.core.domain.queue.usecase.JoinQueueUseCase;
-import com.ticket.core.domain.queue.usecase.QueueEntryId;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.queue.command.exit.ExitQueueUseCase;
+import com.ticket.core.domain.queue.command.join.JoinQueueUseCase;
+import com.ticket.core.domain.queue.model.QueueEntryId;
+import com.ticket.core.domain.queue.query.status.GetQueueStatusUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
