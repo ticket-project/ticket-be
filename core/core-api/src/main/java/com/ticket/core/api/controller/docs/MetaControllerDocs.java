@@ -1,6 +1,6 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.api.controller.response.MetaCodesResponse;
+import com.ticket.core.domain.commoncode.query.GetMetaCodesUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -16,5 +16,5 @@ public interface MetaControllerDocs {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ApiResponse<MetaCodesResponse> getMetaCodes();
+    ApiResponse<GetMetaCodesUseCase.Output> getMetaCodes();
 }

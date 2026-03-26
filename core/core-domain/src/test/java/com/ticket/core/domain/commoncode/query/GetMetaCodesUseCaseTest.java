@@ -1,10 +1,9 @@
-package com.ticket.core.domain.commoncode.usecase;
+package com.ticket.core.domain.commoncode.query;
 
-import com.ticket.core.api.controller.response.MetaCodesResponse;
-import com.ticket.core.domain.show.category.Category;
-import com.ticket.core.domain.show.category.CategoryRepository;
-import com.ticket.core.domain.show.genre.Genre;
-import com.ticket.core.domain.show.genre.GenreRepository;
+import com.ticket.core.domain.show.model.Category;
+import com.ticket.core.domain.show.repository.CategoryRepository;
+import com.ticket.core.domain.show.model.Genre;
+import com.ticket.core.domain.show.repository.GenreRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -27,8 +26,7 @@ class GetMetaCodesUseCaseTest {
     private GenreRepository genreRepository;
 
     @Test
-    void 카테고리_장르_및_enum_코드를_모아_반환한다() {
-        //given
+    void 카테고리_장르_enum_코드를_모아_반환한다() {
         Category category = mock(Category.class);
         Genre genre = mock(Genre.class);
 
@@ -45,15 +43,14 @@ class GetMetaCodesUseCaseTest {
         when(genreRepository.findAllByOrderByCategory_IdAscNameAsc()).thenReturn(List.of(genre));
 
         GetMetaCodesUseCase useCase = new GetMetaCodesUseCase(categoryRepository, genreRepository);
+
         GetMetaCodesUseCase.Output output = useCase.execute();
 
-        //when
-        MetaCodesResponse response = output.codes();
-        //then
-        assertThat(response.categories()).containsExactly(new MetaCodesResponse.CategoryCodeItem(1L, "CONCERT", "콘서트"));
-        assertThat(response.genres()).containsExactly(new MetaCodesResponse.GenreCodeItem(2L, "CONCERT", "KPOP", "케이팝"));
-        assertThat(response.enums().bookingStatus()).isNotEmpty();
-        assertThat(response.enums().showSortKey()).isNotEmpty();
+        assertThat(output.categories())
+                .containsExactly(new GetMetaCodesUseCase.CategoryCodeItem(1L, "CONCERT", "콘서트"));
+        assertThat(output.genres())
+                .containsExactly(new GetMetaCodesUseCase.GenreCodeItem(2L, "CONCERT", "KPOP", "케이팝"));
+        assertThat(output.enums().bookingStatus()).isNotEmpty();
+        assertThat(output.enums().showSortKey()).isNotEmpty();
     }
 }
-
