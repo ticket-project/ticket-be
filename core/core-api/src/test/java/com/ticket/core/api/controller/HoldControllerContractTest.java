@@ -1,10 +1,10 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.config.LoginMemberArgumentResolver;
-import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.order.create.CreateOrderUseCase;
-import com.ticket.core.enums.OrderState;
-import com.ticket.core.enums.Role;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.order.command.create.CreateOrderUseCase;
+import com.ticket.core.domain.order.model.OrderState;
+import com.ticket.core.domain.member.model.Role;
 import com.ticket.core.support.ApiControllerAdvice;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

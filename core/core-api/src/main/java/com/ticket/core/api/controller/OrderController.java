@@ -2,9 +2,9 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.OrderControllerDocs;
 import com.ticket.core.api.controller.request.CreateOrderRequest;
-import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.order.cancel.CancelOrderUseCase;
-import com.ticket.core.domain.order.create.CreateOrderUseCase;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.order.command.cancel.CancelOrderUseCase;
+import com.ticket.core.domain.order.command.create.CreateOrderUseCase;
 import com.ticket.core.domain.order.query.GetOrderDetailUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import jakarta.validation.Valid;
