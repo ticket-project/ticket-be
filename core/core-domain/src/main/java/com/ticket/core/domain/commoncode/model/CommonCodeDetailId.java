@@ -1,4 +1,4 @@
-package com.ticket.core.domain.commoncode;
+package com.ticket.core.domain.commoncode.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

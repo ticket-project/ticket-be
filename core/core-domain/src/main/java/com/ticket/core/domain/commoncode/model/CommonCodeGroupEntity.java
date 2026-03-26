@@ -1,4 +1,4 @@
-package com.ticket.core.domain.commoncode;
+package com.ticket.core.domain.commoncode.model;
 
 import com.ticket.core.domain.BaseEntity;
 import jakarta.persistence.Column;
