@@ -1,6 +1,6 @@
 package com.ticket.core.config.security;
 
-import com.ticket.core.domain.member.MemberPrincipal;
+import com.ticket.core.config.security.MemberPrincipal;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

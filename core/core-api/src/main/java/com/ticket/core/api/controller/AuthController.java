@@ -1,9 +1,18 @@
 package com.ticket.core.api.controller;
 
+import com.ticket.core.api.controller.request.ExchangeOAuth2TokenRequest;
+import com.ticket.core.api.controller.request.LoginRequest;
+import com.ticket.core.api.controller.request.RegisterMemberRequest;
 import com.ticket.core.api.controller.docs.AuthControllerDocs;
+import com.ticket.core.config.security.JwtProperties;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.auth.command.ExchangeOAuth2TokenUseCase;
+import com.ticket.core.domain.auth.command.LoginUseCase;
+import com.ticket.core.domain.auth.command.LogoutUseCase;
+import com.ticket.core.domain.auth.command.RefreshAuthTokenUseCase;
+import com.ticket.core.domain.auth.command.RegisterMemberUseCase;
+import com.ticket.core.domain.auth.query.GetSocialLoginUrlsUseCase;
 import com.ticket.core.domain.auth.token.AuthRefreshToken;
-import com.ticket.core.domain.auth.usecase.*;
-import com.ticket.core.domain.member.MemberPrincipal;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.util.CookieUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,20 +35,23 @@ public class AuthController implements AuthControllerDocs {
     private final ExchangeOAuth2TokenUseCase exchangeOAuth2TokenUseCase;
     private final GetSocialLoginUrlsUseCase getSocialLoginUrlsUseCase;
     private final LogoutUseCase logoutUseCase;
+    private final JwtProperties jwtProperties;
 
     @Override
     @PostMapping("/signup")
-    public ApiResponse<RegisterMemberUseCase.Output> signUp(@Valid @RequestBody final RegisterMemberUseCase.Input input) {
-        return ApiResponse.success(registerMemberUseCase.execute(input));
+    public ApiResponse<RegisterMemberUseCase.Output> signUp(@Valid @RequestBody final RegisterMemberRequest request) {
+        return ApiResponse.success(registerMemberUseCase.execute(request.toInput()));
     }
 
     @Override
     @PostMapping("/login")
     public ApiResponse<LoginUseCase.Output> login(
-            @Valid @RequestBody final LoginUseCase.Input input,
+            @Valid @RequestBody final LoginRequest request,
             final HttpServletResponse response
     ) {
-        return ApiResponse.success(loginUseCase.execute(input, response));
+        final LoginUseCase.Result result = loginUseCase.execute(request.toInput());
+        addRefreshTokenCookie(response, result.refreshToken());
+        return ApiResponse.success(result.output());
     }
 
     @Override
@@ -49,16 +61,20 @@ public class AuthController implements AuthControllerDocs {
             final HttpServletResponse response
     ) {
         final RefreshAuthTokenUseCase.Input input = new RefreshAuthTokenUseCase.Input(AuthRefreshToken.from(refreshToken));
-        return ApiResponse.success(refreshAuthTokenUseCase.execute(input, response));
+        final RefreshAuthTokenUseCase.Result result = refreshAuthTokenUseCase.execute(input);
+        addRefreshTokenCookie(response, result.refreshToken());
+        return ApiResponse.success(result.output());
     }
 
     @Override
     @PostMapping("/oauth2/token")
     public ApiResponse<ExchangeOAuth2TokenUseCase.Output> exchangeOAuth2Token(
-            @Valid @RequestBody final ExchangeOAuth2TokenUseCase.Input input,
+            @Valid @RequestBody final ExchangeOAuth2TokenRequest request,
             final HttpServletResponse response
     ) {
-        return ApiResponse.success(exchangeOAuth2TokenUseCase.execute(input, response));
+        final ExchangeOAuth2TokenUseCase.Result result = exchangeOAuth2TokenUseCase.execute(request.toInput());
+        addRefreshTokenCookie(response, result.refreshToken());
+        return ApiResponse.success(result.output());
     }
 
     @Override
@@ -80,6 +96,16 @@ public class AuthController implements AuthControllerDocs {
                 principal.getMemberId(),
                 AuthRefreshToken.from(refreshToken)
         );
-        return ApiResponse.success(logoutUseCase.execute(input, response));
+        final LogoutUseCase.Output output = logoutUseCase.execute(input);
+        CookieUtils.deleteRefreshTokenCookie(response);
+        return ApiResponse.success(output);
+    }
+
+    private void addRefreshTokenCookie(final HttpServletResponse response, final String refreshToken) {
+        CookieUtils.addRefreshTokenCookie(
+                response,
+                refreshToken,
+                jwtProperties.getRefreshTokenExpirationSeconds()
+        );
     }
 }
