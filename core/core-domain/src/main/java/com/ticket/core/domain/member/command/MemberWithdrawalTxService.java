@@ -1,6 +1,10 @@
-package com.ticket.core.domain.member;
+package com.ticket.core.domain.member.command;
 
-import com.ticket.core.enums.SocialProvider;
+import com.ticket.core.domain.member.model.Member;
+import com.ticket.core.domain.member.model.MemberSocialAccount;
+import com.ticket.core.domain.member.query.MemberFinder;
+import com.ticket.core.domain.member.repository.MemberSocialAccountRepository;
+import com.ticket.core.domain.member.model.SocialProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

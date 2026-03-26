@@ -1,4 +1,4 @@
-package com.ticket.core.domain.member.vo;
+package com.ticket.core.domain.member.model;
 
 import jakarta.persistence.Embeddable;
 import lombok.Getter;

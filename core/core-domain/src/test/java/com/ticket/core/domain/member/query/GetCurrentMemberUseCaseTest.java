@@ -1,9 +1,8 @@
-package com.ticket.core.domain.member.usecase;
+package com.ticket.core.domain.member.query;
 
-import com.ticket.core.domain.member.Member;
-import com.ticket.core.domain.member.MemberFinder;
-import com.ticket.core.domain.member.vo.Email;
-import com.ticket.core.enums.Role;
+import com.ticket.core.domain.member.model.Member;
+import com.ticket.core.domain.member.model.Email;
+import com.ticket.core.domain.member.model.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -71,4 +70,3 @@ class GetCurrentMemberUseCaseTest {
                 .isInstanceOf(NullPointerException.class);
     }
 }
-
