@@ -1,9 +1,9 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.domain.performance.usecase.GetPerformanceScheduleListUseCase;
-import com.ticket.core.domain.performance.usecase.GetPerformanceSummaryUseCase;
-import com.ticket.core.domain.performanceseat.query.usecase.GetSeatAvailabilityUseCase;
-import com.ticket.core.domain.performanceseat.query.usecase.GetSeatStatusUseCase;
+import com.ticket.core.domain.performance.query.GetPerformanceScheduleListUseCase;
+import com.ticket.core.domain.performance.query.GetPerformanceSummaryUseCase;
+import com.ticket.core.domain.performanceseat.query.GetSeatAvailabilityUseCase;
+import com.ticket.core.domain.performanceseat.query.GetSeatStatusUseCase;
 import io.swagger.v3.oas.annotations.Parameter;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
