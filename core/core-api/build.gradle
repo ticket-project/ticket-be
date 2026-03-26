@@ -1,7 +1,3 @@
-plugins {
-    // id 'org.asciidoctor.jvm.convert' version '4.0.4'
-}
-
 tasks.named('bootJar') {
     enabled = true
 }
@@ -10,22 +6,13 @@ tasks.named('jar') {
     enabled = false
 }
 
-configurations {
-    // asciidoctorExt
-}
-ext {
-    // snippetsDir = file('build/generated-snippets')
-}
-
 dependencies {
-    implementation project(':core:core-enum')
-    implementation project(':storage:redis-core')
+    implementation project(':core:core-domain')
     implementation project(':support:logging')
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-restclient'
-    implementation 'org.springframework.boot:spring-boot-starter-jackson'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -34,15 +21,6 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
-    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:2.0.0'
-
-    /*DB 오라클 접속에 필요한 라이브러리*/
-    runtimeOnly 'com.oracle.database.jdbc:ojdbc8'
-    implementation 'com.oracle.database.security:osdt_cert:21.3.0.0'
-    implementation 'com.oracle.database.security:oraclepki:21.3.0.0'
-    implementation 'com.oracle.database.security:osdt_core:21.3.0.0'
-
-    runtimeOnly 'com.h2database:h2'
     testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.1.15")
 
     compileOnly 'org.projectlombok:lombok'
@@ -53,37 +31,4 @@ dependencies {
     //swagger
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1"
 
-    // REST Docs (disabled)
-    // asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-    // testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-
-    // Querydsl
-    implementation "com.querydsl:querydsl-jpa:5.1.0:jakarta"
-    annotationProcessor "com.querydsl:querydsl-apt:5.1.0:jakarta"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 }
-
-def qdslDir = "$buildDir/generated/sources/annotationProcessor/java/main"
-
-tasks.named("clean") {
-    doLast {
-        file(qdslDir).deleteDir()
-    }
-}
-
-// test {
-//     outputs.dir snippetsDir
-// }
-// asciidoctor {
-//     inputs.dir(snippetsDir).optional()
-//     configurations 'asciidoctorExt'
-//     dependsOn test
-//     onlyIf { snippetsDir.exists() }
-// }
-// bootJar {
-//     dependsOn asciidoctor
-//     from("${asciidoctor.outputDir}") {
-//         into 'static/docs'
-//     }
-// }
