@@ -1,8 +1,10 @@
-package com.ticket.core.domain.member;
+package com.ticket.core.domain.member.query;
 
-import com.ticket.core.domain.member.vo.Email;
-import com.ticket.core.domain.member.vo.EncodedPassword;
-import com.ticket.core.enums.Role;
+import com.ticket.core.domain.member.model.Member;
+import com.ticket.core.domain.member.model.Email;
+import com.ticket.core.domain.member.model.EncodedPassword;
+import com.ticket.core.domain.member.model.Role;
+import com.ticket.core.domain.member.repository.MemberRepository;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
@@ -52,4 +54,3 @@ class MemberFinderTest {
                 .satisfies(thrown -> assertThat(((NotFoundException) thrown).getErrorType()).isEqualTo(ErrorType.NOT_FOUND_DATA));
     }
 }
-

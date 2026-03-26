@@ -1,6 +1,8 @@
-package com.ticket.core.domain.member;
+package com.ticket.core.domain.member.repository;
 
-import com.ticket.core.enums.SocialProvider;
+import com.ticket.core.domain.member.model.Member;
+import com.ticket.core.domain.member.model.MemberSocialAccount;
+import com.ticket.core.domain.member.model.SocialProvider;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

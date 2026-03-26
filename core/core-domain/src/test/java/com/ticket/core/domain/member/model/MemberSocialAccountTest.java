@@ -1,9 +1,7 @@
-package com.ticket.core.domain.member;
+package com.ticket.core.domain.member.model;
 
-import com.ticket.core.domain.member.vo.Email;
-import com.ticket.core.domain.member.vo.EncodedPassword;
-import com.ticket.core.enums.Role;
-import com.ticket.core.enums.SocialProvider;
+import com.ticket.core.domain.member.model.Role;
+import com.ticket.core.domain.member.model.SocialProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -41,4 +39,3 @@ class MemberSocialAccountTest {
         assertThat(account.getSocialId()).isNotEqualTo("kakao-123");
     }
 }
-

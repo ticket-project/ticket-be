@@ -1,7 +1,6 @@
-package com.ticket.core.domain.member.vo;
+package com.ticket.core.domain.member.model;
 
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 import java.util.Objects;

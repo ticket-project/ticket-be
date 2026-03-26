@@ -1,9 +1,7 @@
-package com.ticket.core.domain.member;
+package com.ticket.core.domain.member.model;
 
 import com.ticket.core.domain.BaseEntity;
-import com.ticket.core.domain.member.vo.Email;
-import com.ticket.core.domain.member.vo.EncodedPassword;
-import com.ticket.core.enums.Role;
+import com.ticket.core.domain.member.model.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;

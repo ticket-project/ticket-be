@@ -1,12 +1,12 @@
-package com.ticket.core.enums;
+package com.ticket.core.domain.member.model;
 
-public enum SocialProvider {
-    GOOGLE("구글"),
-    KAKAO("카카오");
+public enum Role {
+    ADMIN("관리자"),
+    MEMBER("일반회원");
 
     private final String description;
 
-    SocialProvider(final String description) {
+    Role(final String description) {
         this.description = description;
     }
 

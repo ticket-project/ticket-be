@@ -1,5 +1,6 @@
 package com.ticket.core.domain.member.vo;
 
+import com.ticket.core.domain.member.model.RawPassword;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,4 +40,3 @@ class RawPasswordTest {
         assertThat(first.hashCode()).isEqualTo(second.hashCode());
     }
 }
-

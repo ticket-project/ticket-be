@@ -1,7 +1,7 @@
-package com.ticket.core.domain.member;
+package com.ticket.core.domain.member.model;
 
 import com.ticket.core.domain.BaseEntity;
-import com.ticket.core.enums.SocialProvider;
+import com.ticket.core.domain.member.model.SocialProvider;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

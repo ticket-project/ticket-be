@@ -1,7 +1,7 @@
-package com.ticket.core.domain.member.usecase;
+package com.ticket.core.domain.member.query;
 
-import com.ticket.core.domain.member.Member;
-import com.ticket.core.domain.member.MemberFinder;
+import com.ticket.core.domain.member.model.Member;
+import com.ticket.core.domain.member.query.MemberFinder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
