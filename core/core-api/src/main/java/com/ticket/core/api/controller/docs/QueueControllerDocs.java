@@ -1,8 +1,8 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.queue.usecase.GetQueueStatusUseCase;
-import com.ticket.core.domain.queue.usecase.JoinQueueUseCase;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.queue.command.join.JoinQueueUseCase;
+import com.ticket.core.domain.queue.query.status.GetQueueStatusUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

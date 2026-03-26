@@ -12,7 +12,7 @@ class QueueAdminRemovalTest {
         assertMissing("com.ticket.core.api.controller.QueueAdminController");
         assertMissing("com.ticket.core.api.controller.docs.QueueAdminControllerDocs");
         assertMissing("com.ticket.core.api.controller.request.UpdateQueuePolicyRequest");
-        assertMissing("com.ticket.core.api.controller.response.QueuePolicyResponse");
+        assertMissing("com.ticket.core.domain.response.QueuePolicyResponse");
         assertMissing("com.ticket.core.domain.queue.support.QueuePolicyAdminService");
     }
 
