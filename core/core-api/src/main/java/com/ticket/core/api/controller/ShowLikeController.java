@@ -1,10 +1,10 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.ShowLikeControllerDocs;
-import com.ticket.core.domain.member.MemberPrincipal;
-import com.ticket.core.domain.showlike.usecase.AddShowLikeUseCase;
-import com.ticket.core.domain.showlike.usecase.GetShowLikeStatusUseCase;
-import com.ticket.core.domain.showlike.usecase.RemoveShowLikeUseCase;
+import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.domain.showlike.command.AddShowLikeUseCase;
+import com.ticket.core.domain.showlike.query.GetShowLikeStatusUseCase;
+import com.ticket.core.domain.showlike.command.RemoveShowLikeUseCase;
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
 import com.ticket.core.support.response.ApiResponse;

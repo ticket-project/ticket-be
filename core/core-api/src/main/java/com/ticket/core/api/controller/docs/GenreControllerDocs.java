@@ -1,6 +1,6 @@
 package com.ticket.core.api.controller.docs;
 
-import com.ticket.core.api.controller.response.GenreResponse;
+import com.ticket.core.domain.show.query.GetGenresByCategoryUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,7 +19,7 @@ public interface GenreControllerDocs {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ApiResponse<List<GenreResponse>> getGenres(
+    ApiResponse<List<GetGenresByCategoryUseCase.GenreItem>> getGenres(
             @Parameter(description = "카테고리 코드 (예: CONCERT, THEATER, MUSICAL)", example = "CONCERT") String category
     );
 }
