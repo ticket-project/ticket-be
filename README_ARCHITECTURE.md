@@ -1,242 +1,256 @@
 # Ticket Backend Architecture
 
-## 1. 아키텍처 개요
+## 1. 프로젝트 개요
 
-현재 애플리케이션은 멀티 모듈 Spring Boot 구조다.
+현재 프로젝트는 멀티모듈 Gradle 구조이지만, 실제 아키텍처 성격은 `core-api + core-domain` 중심의 모듈러 모놀리스에 가깝다.
+
+실제 포함 모듈은 다음 4개다.
 
 - `core:core-api`
-- `core:core-enum`
+- `core:core-domain`
 - `storage:redis-core`
 - `support:logging`
 
-실행 애플리케이션은 `core:core-api` 하나이며, 나머지는 보조 모듈이다.
+`core-enum` 모듈은 현재 존재하지 않는다.
 
-핵심 구조는 아래 3개 축으로 이해하면 된다.
+## 2. 모듈 책임과 의존 방향
 
-- HTTP/JWT/OAuth2/WebSocket 진입 계층
-- 도메인별 use case / application / domain service
-- RDB + Redis 조합 상태 저장
+### 2.1 `core:core-api`
 
-## 2. 계층 구조
+실행 모듈이다. 웹 진입점과 보안, HTTP 설정, WebSocket 설정, 컨트롤러를 담당한다.
 
-### 2.1 Controller
+주요 책임:
 
-역할:
+- REST Controller
+- 요청/응답 DTO
+- Spring Security, JWT, OAuth2 설정
+- WebSocket 진입 설정
+- 공통 응답 포맷
 
-- 요청/응답 매핑
-- 인증 principal 주입
-- use case 1개 호출
+의존:
+
+- `core:core-domain`
+- `support:logging`
+
+### 2.2 `core:core-domain`
+
+비즈니스 기능의 중심 모듈이다. 단, 이름과 달리 순수 도메인 모델만 담는 모듈은 아니다. 현재는 application, domain, infra 성격의 코드가 함께 들어가 있으며, 점진적으로 `infra` 패키지로 기술 의존을 분리하는 중이다.
+
+주요 책임:
+
+- 기능별 use case
+- JPA entity / repository
+- query repository
+- 도메인 규칙
+- Redis 기반 store
+- WebSocket publish 보조
+- 외부 HTTP interface client
+- 분산락 AOP
+
+의존:
+
+- `storage:redis-core`
+- Spring Web / WebSocket / Data JPA / Querydsl / P6Spy
+
+### 2.3 `storage:redis-core`
+
+Redis 관련 공통 의존성을 제공하는 저장소 모듈이다.
+
+주요 책임:
+
+- `spring-boot-starter-data-redis`
+- `redisson-spring-boot-starter`
+
+실제 Redis 사용 구현체는 현재 `core-domain`의 각 기능별 `infra` 패키지에 위치한다.
+
+### 2.4 `support:logging`
+
+로깅 관련 공통 설정 리소스를 제공하는 보조 모듈이다. 현재 Java 소스 없이 설정 리소스 중심으로 사용된다.
+
+## 3. 현재 패키지 구조
+
+### 3.1 `core-api`
+
+- `com.ticket.core.api.controller`
+  - HTTP 엔드포인트
+- `com.ticket.core.api.controller.docs`
+  - Swagger 문서 인터페이스
+- `com.ticket.core.api.controller.request`
+  - 요청 DTO
+- `com.ticket.core.config`
+  - 웹, JPA Auditing, HTTP service, WebSocket 설정
+- `com.ticket.core.config.security`
+  - JWT, OAuth2, 인증/인가 구성
+- `com.ticket.core.support.response`
+  - 공통 응답 래퍼
+
+### 3.2 `core-domain`
+
+기능별 패키지를 기본 축으로 잡고 있다.
+
+- `com.ticket.core.domain.auth`
+- `com.ticket.core.domain.member`
+- `com.ticket.core.domain.order`
+- `com.ticket.core.domain.hold`
+- `com.ticket.core.domain.queue`
+- `com.ticket.core.domain.show`
+- `com.ticket.core.domain.performanceseat`
+
+기능 내부에서는 다음 하위 패키지 패턴을 사용한다.
+
+- `command`
+- `query`
+- `model`
+- `repository`
+- `store`
+- `support`
+- `event`
+- `infra`
+
+현재는 기술 의존 코드가 `infra` 하위로 점진적으로 이동되어 있다.
 
 예시:
 
-- [AuthController.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/api/controller/AuthController.java)
-- [HoldController.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/api/controller/HoldController.java)
-- [OrderController.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/api/controller/OrderController.java)
+- `com.ticket.core.infra.lock`
+  - 분산락 어노테이션/AOP
+- `com.ticket.core.infra.config`
+  - Querydsl, P6Spy 설정
+- `com.ticket.core.infra.redis`
+  - Redis 만료 listener 설정
+- `com.ticket.core.domain.auth.infra.oauth2`
+  - Kakao HTTP interface, OAuth2 auth code 저장 서비스
+- `com.ticket.core.domain.auth.infra.token`
+  - Redis refresh token 저장 서비스
+- `com.ticket.core.domain.hold.infra`
+  - Redis hold 저장소
+- `com.ticket.core.domain.queue.infra`
+  - Redis queue ticket 저장소
+- `com.ticket.core.domain.performanceseat.infra.store`
+  - Redis seat selection 저장소
+- `com.ticket.core.domain.performanceseat.infra.realtime`
+  - WebSocket seat event publisher
 
-### 2.2 UseCase
+## 4. 기능별 구조 원칙
 
-역할:
+### 4.1 Controller
 
-- 요청 단위 흐름 orchestration
-- 관련 컴포넌트 조합
-- 트랜잭션 경계의 중심
+Controller는 가능한 한 얇게 유지한다.
+
+- 요청 검증
+- 인증 principal 추출
+- use case 호출
+- 응답 포맷 반환
+
+비즈니스 규칙이나 저장소 접근은 controller에 두지 않는다.
+
+### 4.2 Command / Query
+
+- `command`
+  - 상태를 변경하는 유스케이스
+- `query`
+  - 조회 전용 유스케이스와 조회 저장소
+
+최근 정리 기준으로 query repository는 더 이상 use case 내부 DTO에 직접 의존하지 않고, 기능별 query model view를 반환한다.
 
 예시:
 
-- [StartOrderUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/order/command/usecase/StartOrderUseCase.java)
-- [TerminateOrderUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/order/command/usecase/TerminateOrderUseCase.java)
-- [GetOrderDetailUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/order/query/usecase/GetOrderDetailUseCase.java)
+- `show.query.model.ShowListItemView`
+- `show.query.model.ShowSearchItemView`
+- `performanceseat.query.model.SeatInfoView`
+- `performanceseat.query.model.SeatStateView`
 
-### 2.3 Application / DomainService / Manager
+use case는 이 view를 API 또는 application output으로 변환해 반환한다.
 
-이 프로젝트는 역할 기반 응집을 택하고 있다.
+## 5. 저장소 구조
 
-- `CreateOrderApplicationService`
-  - order, orderSeat 생성
-- `HoldHistoryRecorder`
-  - hold history 기록
-- `HoldManager`
-  - Redis hold 생성/해제
-- `OrderLifecycleDomainService`
-  - 주문/좌석/hold history 상태 전이 규칙
+### 5.1 RDB
 
-즉, 비즈니스 흐름은 use case가 읽고, 저장/상태/인프라 역할은 하위 컴포넌트로 나뉜 구조다.
+주 영속 저장소는 RDB다.
 
-## 3. 상태 저장 전략
+주요 대상:
 
-## 3.1 RDB
+- 회원
+- 공연/회차
+- 좌석
+- 주문
+- hold 이력
 
-RDB는 영속 상태와 조회 기준 데이터에 사용한다.
+JPA entity와 Spring Data repository는 대부분 `core-domain`에 존재한다.
 
-대표 엔티티:
+### 5.2 Redis
 
-- `Order`
-- `OrderSeat`
-- `HoldHistory`
-- `PerformanceSeat`
-- `Performance`
-- `Show`
-- `Member`
+Redis는 짧은 수명 상태와 동시성 제어, 토큰 저장, 실시간 좌석/대기열 처리에 사용한다.
 
-역할:
+주요 대상:
 
-- 주문 영속화
-- 좌석/회차/쇼 조회
-- hold 이력 저장
-- 사용자 정보 저장
-
-## 3.2 Redis
-
-Redis는 짧은 TTL을 가지는 실시간 상태와 인증 보조 상태에 사용한다.
-
-대표 사용처:
-
-- 좌석 selection
-- 좌석 hold
-- hold meta
+- seat selection
+- seat hold
+- queue ticket
 - refresh token
-- OAuth2 1회용 코드
+- OAuth2 one-time auth code
 
-역할:
+Redis 구현체는 기능별 `infra` 패키지에 위치한다.
 
-- 빠른 점유 상태 반영
-- TTL 기반 자동 만료
-- 실시간 경쟁 구간 처리
+## 6. 실시간 처리 구조
 
-## 4. 실시간 처리 구조
+### 6.1 좌석 선택 / 홀드
 
-### 4.1 Selection
+- 좌석 선택과 홀드는 Redis TTL을 사용한다.
+- 만료 시 listener 및 보정용 스케줄러로 후속 정리를 수행한다.
+- 좌석 상태 변경은 WebSocket 메시지로 전파한다.
 
-- 저장: Redis
-- 만료: TTL
-- 후처리: Redis expired listener
-- 전파: WebSocket `DESELECTED`
+### 6.2 주문 종료 보정
 
-### 4.2 Hold
+- 즉시 이벤트 처리만으로 끝내지 않고, 보정용 스케줄러를 함께 둔다.
+- 목적은 listener 누락이나 운영 중 일시 장애가 있어도 정합성을 다시 맞추는 것이다.
 
-- 저장: Redis
-- 식별: `holdKey`
-- 부가 저장: hold meta JSON
-- 만료:
-  - Redis expired listener 즉시 반응
-  - 스케줄러 보조 정리
+## 7. 동시성 제어
 
-### 4.3 Order
+분산락은 `@DistributedLock` + AOP로 처리한다.
 
-- 저장: RDB
-- 식별:
-  - 내부 `id`
-  - 외부 `orderKey`
-  - hold 연결 `holdKey`
+현재 구현 위치:
 
-## 5. 주문 시작/종료 흐름
+- 어노테이션: `com.ticket.core.infra.lock.DistributedLock`
+- 실행부: `com.ticket.core.infra.lock.DistributedLockAop`
 
-### 5.1 주문 시작
+적용 예:
 
-1. `HoldController`
-2. `StartOrderUseCase`
-3. 좌석/회차 검증
-4. 회원/회차 단위 분산 락
-5. `HoldManager.createHold`
-6. `CreateOrderApplicationService.createPendingOrder`
-7. `HoldHistoryRecorder.recordActiveHold`
-8. `orderKey` 반환
+- 동일 회원/공연 조합의 중복 주문 시작 방지
+- 동일 좌석 동시 점유 방지
+- 대기열 입장/퇴장 경쟁 상태 제어
 
-### 5.2 주문 종료
+## 8. 아키텍처 규칙
 
-1. 사용자 취소 또는 만료 감지
-2. `TerminateOrderUseCase`
-3. `OrderLifecycleDomainService`
-4. after-commit 이벤트
-5. `HoldManager.release`
-6. 좌석 상태 broadcast
+`core-domain`에는 ArchUnit 기반 구조 테스트가 있다.
 
-## 6. 동시성 제어
+현재 강제하는 핵심 규칙:
 
-현재는 Redis/Redisson 기반 분산 락을 사용한다.
+- `infra` 바깥에서는 `org.redisson..`에 직접 의존하지 않는다.
+- `infra` 바깥에서는 `org.springframework.messaging..`에 직접 의존하지 않는다.
+- `infra` 바깥과 `core.config` 바깥에서는 HTTP interface client annotation에 직접 의존하지 않는다.
 
-### 6.1 주문 시작 락
+목적은 기술 의존이 도메인/use case 전반으로 번지는 것을 CI에서 조기에 막는 것이다.
 
-- 범위: `memberId + performanceId`
-- 목적: 같은 회원/같은 회차 `PENDING` 중복 생성 방지
+## 9. 현재 구조의 특징
 
-### 6.2 좌석 hold 멀티락
+장점:
 
-- 범위: `performanceId + seatIds`
-- 목적: 같은 좌석 동시 hold 방지
+- 기능별 패키지 분리가 비교적 명확하다.
+- controller가 얇고 use case 중심 흐름이 유지된다.
+- Redis TTL, listener, scheduler 조합으로 만료 복구 전략이 있다.
+- query repository와 use case output 결합을 분리하기 시작했다.
 
-### 6.3 구현 방식
+한계:
 
-- 커스텀 애노테이션 `@DistributedLock`
-- `DistributedLockAop` 에서 Redisson multi-lock 지원
+- 여전히 `core-domain` 하나에 많은 역할이 모여 있다.
+- JPA, Redis, WebSocket, 외부 HTTP client가 같은 모듈에 공존한다.
+- 완전한 모듈 분리보다 패키지 경계 강화 단계에 가깝다.
 
-## 7. 만료 처리
+## 10. 다음 정리 방향
 
-현재 만료는 2중 안전장치 구조다.
+현재 추천 방향은 빅뱅 리팩터링이 아니라 점진적 정리다.
 
-### 7.1 Redis expired listener
-
-- selection 만료 즉시 처리
-- hold meta 만료 즉시 주문 만료 트리거
-
-### 7.2 스케줄러
-
-- 주기적으로 만료된 `PENDING` 주문 정리
-- listener 누락이나 운영 이슈를 보조
-
-즉, listener가 빠른 반응을 담당하고 스케줄러가 보정 역할을 한다.
-
-## 8. 보안 구조
-
-### 8.1 API 보안
-
-- JWT stateless 인증
-- 공개 GET API만 permit
-- 나머지는 authenticated
-
-### 8.2 OAuth2 보안
-
-- 별도 filter chain
-- 세션 사용 허용
-- callback 성공 후 1회용 code를 Redis에 저장하고 교환
-
-### 8.3 WebSocket 보안
-
-- STOMP CONNECT 시 JWT 인터셉터 적용
-
-## 9. 현재 아키텍처의 강점
-
-- selection / hold / order 역할 분리가 비교적 명확하다
-- Redis TTL + listener + scheduler 로 만료 복원력이 있다
-- order 외부 식별자를 `orderKey` 로 분리했다
-- hold 이력 기록 책임도 hold 쪽으로 이동했다
-
-## 10. 현재 아키텍처의 한계
-
-### 10.1 결제 미구현
-
-- 상태 모델은 준비됐지만 결제 aggregate가 없다
-- `CONFIRMED` 까지 닫히지 않았다
-
-### 10.2 대기열 미구현
-
-- 인기 공연 진입 제어 계층이 아직 없다
-
-### 10.3 Redis 조회 비용
-
-- 일부 조회는 key pattern scan 기반이다
-- 트래픽 증가 시 구조 개선이 필요하다
-
-### 10.4 DB 마이그레이션 체계 부족
-
-- prod는 `ddl-auto: none`
-- 스키마 변경 시 마이그레이션 절차가 문서화/자동화되어 있지 않다
-
-## 11. 권장 다음 단계
-
-1. Payment aggregate와 payment controller 추가
-2. 결제 성공 시 order confirm / performanceSeat reserve 연결
-3. Queue 도메인 추가
-4. Flyway 또는 Liquibase 도입
-5. Redis key scan 구조 최적화
-
+1. 기능별 기술 구현을 `infra` 패키지로 계속 이동한다.
+2. query 전용 view/model과 application output을 분리 유지한다.
+3. ArchUnit 규칙을 추가해 의존 방향을 더 구체적으로 고정한다.
+4. 필요 시 이후에 Gradle 모듈 단위로 `application / domain / infra`를 분리한다.
