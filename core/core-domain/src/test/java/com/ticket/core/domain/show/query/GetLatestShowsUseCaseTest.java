@@ -1,6 +1,6 @@
 package com.ticket.core.domain.show.query;
 
-import com.ticket.core.domain.show.query.ShowListQueryRepository;
+import com.ticket.core.domain.show.query.model.ShowSummaryView;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,22 +27,17 @@ class GetLatestShowsUseCaseTest {
 
     @Test
     void 최신_공연은_최대_10개를_조회한다() {
-        List<GetLatestShowsUseCase.ShowSummary> responses = List.of(
-                new GetLatestShowsUseCase.ShowSummary(
-                        1L,
-                        "공연",
-                        "image",
-                        LocalDate.now(),
-                        LocalDate.now().plusDays(1),
-                        "장소",
-                        LocalDateTime.now()
-                )
+        LocalDate startDate = LocalDate.of(2026, 3, 27);
+        LocalDate endDate = LocalDate.of(2026, 3, 28);
+        LocalDateTime createdAt = LocalDateTime.of(2026, 3, 1, 12, 0);
+        List<ShowSummaryView> responses = List.of(
+                new ShowSummaryView(1L, "concert", "image", startDate, endDate, "venue", createdAt)
         );
         when(showListQueryRepository.findLatestShows("CONCERT", GetLatestShowsUseCase.LATEST_SHOWS_MAX_COUNT)).thenReturn(responses);
 
         GetLatestShowsUseCase.Output output = useCase.execute(new GetLatestShowsUseCase.Input("CONCERT"));
 
-        assertThat(output.shows()).isEqualTo(responses);
+        assertThat(output.shows()).containsExactlyElementsOf(responses);
         verify(showListQueryRepository).findLatestShows("CONCERT", GetLatestShowsUseCase.LATEST_SHOWS_MAX_COUNT);
     }
 

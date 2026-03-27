@@ -1,8 +1,8 @@
 package com.ticket.core.domain.show.query;
 
 import com.ticket.core.domain.show.meta.Region;
-import com.ticket.core.domain.show.query.ShowListQueryRepository;
 import com.ticket.core.domain.show.query.model.ShowSearchCriteria;
+import com.ticket.core.domain.show.query.model.ShowSearchItemView;
 import com.ticket.core.support.cursor.CursorSlice;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,18 +30,18 @@ class SearchShowsUseCaseTest {
 
     @Test
     void 검색_결과와_커서를_반환한다() {
-        ShowSearchCriteria request = new ShowSearchCriteria("공연", null, null, null, null, null, null);
-        SearchShowsUseCase.ShowSearchItem item = new SearchShowsUseCase.ShowSearchItem(
+        ShowSearchCriteria request = new ShowSearchCriteria("concert", null, null, null, null, null, null);
+        ShowSearchItemView item = new ShowSearchItemView(
                 1L,
-                "공연",
+                "concert",
                 "image",
-                "장소",
-                LocalDate.now(),
-                LocalDate.now().plusDays(1),
+                "venue",
+                LocalDate.of(2026, 3, 27),
+                LocalDate.of(2026, 3, 28),
                 Region.SEOUL,
                 10L
         );
-        CursorSlice<SearchShowsUseCase.ShowSearchItem> result = new CursorSlice<>(new SliceImpl<>(List.of(item)), "next");
+        CursorSlice<ShowSearchItemView> result = new CursorSlice<>(new SliceImpl<>(List.of(item)), "next");
         when(showListQueryRepository.searchShows(request, 20, "popular")).thenReturn(result);
 
         SearchShowsUseCase.Output output = useCase.execute(new SearchShowsUseCase.Input(request, 20, ShowSort.from("popular")));
@@ -53,8 +53,8 @@ class SearchShowsUseCaseTest {
 
     @Test
     void 검색_결과가_없으면_빈_슬라이스와_null_커서를_반환한다() {
-        ShowSearchCriteria request = new ShowSearchCriteria("없는공연", null, null, null, null, null, null);
-        CursorSlice<SearchShowsUseCase.ShowSearchItem> result = new CursorSlice<>(new SliceImpl<>(List.of()), null);
+        ShowSearchCriteria request = new ShowSearchCriteria("missing", null, null, null, null, null, null);
+        CursorSlice<ShowSearchItemView> result = new CursorSlice<>(new SliceImpl<>(List.of()), null);
         when(showListQueryRepository.searchShows(request, 20, "popular")).thenReturn(result);
 
         SearchShowsUseCase.Output output = useCase.execute(new SearchShowsUseCase.Input(request, 20, ShowSort.from("popular")));

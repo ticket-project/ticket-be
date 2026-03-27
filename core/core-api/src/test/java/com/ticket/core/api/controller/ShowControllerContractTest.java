@@ -11,6 +11,8 @@ import com.ticket.core.domain.show.query.GetSaleStartApproachingShowsUseCase;
 import com.ticket.core.domain.show.query.GetShowDetailUseCase;
 import com.ticket.core.domain.show.query.GetShowsUseCase;
 import com.ticket.core.domain.show.query.SearchShowsUseCase;
+import com.ticket.core.domain.show.query.model.ShowListItemView;
+import com.ticket.core.domain.show.query.model.ShowSearchItemView;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,7 +48,7 @@ class ShowControllerContractTest {
         );
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
-        GetShowsUseCase.ShowItem show = new GetShowsUseCase.ShowItem(
+        ShowListItemView show = new ShowListItemView(
                 1L,
                 "공연",
                 "부제",
@@ -92,7 +94,7 @@ class ShowControllerContractTest {
         );
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
-        SearchShowsUseCase.ShowSearchItem item = new SearchShowsUseCase.ShowSearchItem(
+        ShowSearchItemView item = new ShowSearchItemView(
                 1L,
                 "공연",
                 "image",
