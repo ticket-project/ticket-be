@@ -1,6 +1,6 @@
 package com.ticket.core.domain.show.query;
 
-import com.ticket.core.domain.show.query.ShowListQueryRepository;
+import com.ticket.core.domain.show.query.model.ShowOpeningSoonSummaryView;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,14 +26,15 @@ class GetSaleStartApproachingShowsUseCaseTest {
 
     @Test
     void 판매시작임박_공연_목록을_반환한다() {
-        List<GetSaleStartApproachingShowsUseCase.ShowOpeningSoonSummary> shows = List.of(
-                new GetSaleStartApproachingShowsUseCase.ShowOpeningSoonSummary(1L, "공연", "image", "장소", LocalDateTime.now())
+        LocalDateTime saleStartDate = LocalDateTime.of(2026, 3, 27, 12, 0);
+        List<ShowOpeningSoonSummaryView> shows = List.of(
+                new ShowOpeningSoonSummaryView(1L, "concert", "image", "venue", saleStartDate)
         );
         when(showListQueryRepository.findShowsSaleOpeningSoon("CONCERT", 5)).thenReturn(shows);
 
         GetSaleStartApproachingShowsUseCase.Output output = useCase.execute(new GetSaleStartApproachingShowsUseCase.Input("CONCERT", 5));
 
-        assertThat(output.shows()).isEqualTo(shows);
+        assertThat(output.shows()).containsExactlyElementsOf(shows);
         verify(showListQueryRepository).findShowsSaleOpeningSoon("CONCERT", 5);
     }
 

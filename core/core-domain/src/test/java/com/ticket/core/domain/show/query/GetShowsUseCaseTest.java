@@ -1,7 +1,7 @@
 package com.ticket.core.domain.show.query;
 
 import com.ticket.core.domain.show.meta.SaleType;
-import com.ticket.core.domain.show.query.ShowListQueryRepository;
+import com.ticket.core.domain.show.query.model.ShowListItemView;
 import com.ticket.core.domain.show.query.model.ShowParam;
 import com.ticket.core.support.cursor.CursorSlice;
 import org.junit.jupiter.api.Test;
@@ -32,23 +32,29 @@ class GetShowsUseCaseTest {
     @Test
     void 공연_목록과_커서를_반환한다() {
         ShowParam param = new ShowParam(null, null, null, null);
-        GetShowsUseCase.ShowItem show = new GetShowsUseCase.ShowItem(
+        LocalDate startDate = LocalDate.of(2026, 3, 27);
+        LocalDate endDate = LocalDate.of(2026, 3, 28);
+        LocalDateTime saleStartDate = LocalDateTime.of(2026, 3, 20, 10, 0);
+        LocalDateTime saleEndDate = LocalDateTime.of(2026, 3, 28, 10, 0);
+        LocalDateTime createdAt = LocalDateTime.of(2026, 3, 1, 10, 0);
+
+        ShowListItemView show = new ShowListItemView(
                 1L,
-                "공연",
-                "부제",
+                "concert",
+                "subtitle",
                 "image",
-                List.of("장르"),
-                LocalDate.now(),
-                LocalDate.now().plusDays(1),
+                List.of("rock"),
+                startDate,
+                endDate,
                 10L,
                 SaleType.GENERAL,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(1),
-                LocalDateTime.now(),
+                saleStartDate,
+                saleEndDate,
+                createdAt,
                 null,
-                "장소"
+                "venue"
         );
-        CursorSlice<GetShowsUseCase.ShowItem> result = new CursorSlice<>(new SliceImpl<>(List.of(show)), "next");
+        CursorSlice<ShowListItemView> result = new CursorSlice<>(new SliceImpl<>(List.of(show)), "next");
         when(showListQueryRepository.findAllBySearch(param, 10, "popular")).thenReturn(result);
 
         GetShowsUseCase.Output output = useCase.execute(new GetShowsUseCase.Input(param, 10, ShowSort.from("popular")));
@@ -61,7 +67,7 @@ class GetShowsUseCaseTest {
     @Test
     void 공연이_없으면_빈_슬라이스와_null_커서를_반환한다() {
         ShowParam param = new ShowParam(null, null, null, null);
-        CursorSlice<GetShowsUseCase.ShowItem> result = new CursorSlice<>(new SliceImpl<>(List.of()), null);
+        CursorSlice<ShowListItemView> result = new CursorSlice<>(new SliceImpl<>(List.of()), null);
         when(showListQueryRepository.findAllBySearch(param, 10, "popular")).thenReturn(result);
 
         GetShowsUseCase.Output output = useCase.execute(new GetShowsUseCase.Input(param, 10, ShowSort.from("popular")));

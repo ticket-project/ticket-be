@@ -5,7 +5,10 @@ import com.ticket.core.api.controller.docs.ShowControllerDocs;
 import com.ticket.core.domain.performanceseat.query.GetShowSeatsUseCase;
 import com.ticket.core.domain.performanceseat.query.GetVenueLayoutUseCase;
 import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
+import com.ticket.core.domain.show.query.model.ShowListItemView;
+import com.ticket.core.domain.show.query.model.ShowOpeningSoonDetailView;
 import com.ticket.core.domain.show.query.model.ShowParam;
+import com.ticket.core.domain.show.query.model.ShowSearchItemView;
 import com.ticket.core.domain.show.query.*;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
@@ -53,7 +56,7 @@ public class ShowController implements ShowControllerDocs {
 
     @Override
     @GetMapping
-    public ApiResponse<SliceResponse<GetShowsUseCase.ShowItem>> getShowsPage(
+    public ApiResponse<SliceResponse<ShowListItemView>> getShowsPage(
             @ParameterObject final ShowParam param,
             @RequestParam(defaultValue = "5") final int size,
             @RequestParam(defaultValue = "popular") final String sort
@@ -84,7 +87,7 @@ public class ShowController implements ShowControllerDocs {
 
     @Override
     @GetMapping("/sale-opening-soon/page")
-    public ApiResponse<SliceResponse<GetSaleStartApproachingShowsPageUseCase.ShowOpeningSoonDetail>> getShowsSaleOpeningSoonPage(
+    public ApiResponse<SliceResponse<ShowOpeningSoonDetailView>> getShowsSaleOpeningSoonPage(
             @ParameterObject final SaleOpeningSoonSearchParam param,
             @RequestParam(defaultValue = "16") final int size,
             @RequestParam(defaultValue = "saleStartApproaching") final String sort
@@ -96,7 +99,7 @@ public class ShowController implements ShowControllerDocs {
 
     @Override
     @GetMapping("/search")
-    public ApiResponse<SliceResponse<SearchShowsUseCase.ShowSearchItem>> searchShows(
+    public ApiResponse<SliceResponse<ShowSearchItemView>> searchShows(
             @ParameterObject final ShowSearchRequest request,
             @RequestParam(defaultValue = "20") final int size,
             @RequestParam(defaultValue = "popular") final String sort

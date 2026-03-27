@@ -1,12 +1,10 @@
 package com.ticket.core.domain.show.query;
 
-import com.ticket.core.domain.show.query.ShowListQueryRepository;
+import com.ticket.core.domain.show.query.model.ShowSummaryView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -19,21 +17,10 @@ public class GetLatestShowsUseCase {
     public record Input(String category) {
     }
 
-    public record Output(List<ShowSummary> shows) {
-    }
-
-    public record ShowSummary(
-            Long id,
-            String title,
-            String image,
-            LocalDate startDate,
-            LocalDate endDate,
-            String venue,
-            LocalDateTime createdAt
-    ) {
+    public record Output(List<ShowSummaryView> shows) {
     }
 
     public Output execute(final Input input) {
-        return new Output(showListQueryRepository.findLatestShows(input.category, LATEST_SHOWS_MAX_COUNT));
+        return new Output(showListQueryRepository.findLatestShows(input.category(), LATEST_SHOWS_MAX_COUNT));
     }
 }

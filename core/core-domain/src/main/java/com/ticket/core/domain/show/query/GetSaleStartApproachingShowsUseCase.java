@@ -1,11 +1,10 @@
 package com.ticket.core.domain.show.query;
 
-import com.ticket.core.domain.show.query.ShowListQueryRepository;
+import com.ticket.core.domain.show.query.model.ShowOpeningSoonSummaryView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,19 +16,10 @@ public class GetSaleStartApproachingShowsUseCase {
     public record Input(String category, int size) {
     }
 
-    public record Output(List<ShowOpeningSoonSummary> shows) {
-    }
-
-    public record ShowOpeningSoonSummary(
-            Long id,
-            String title,
-            String image,
-            String venue,
-            LocalDateTime saleStartDate
-    ) {
+    public record Output(List<ShowOpeningSoonSummaryView> shows) {
     }
 
     public Output execute(final Input input) {
-        return new Output(showListQueryRepository.findShowsSaleOpeningSoon(input.category, input.size));
+        return new Output(showListQueryRepository.findShowsSaleOpeningSoon(input.category(), input.size()));
     }
 }

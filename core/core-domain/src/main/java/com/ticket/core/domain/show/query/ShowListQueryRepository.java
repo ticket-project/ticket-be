@@ -4,12 +4,17 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ticket.core.domain.show.model.Show;
 import com.ticket.core.domain.show.image.ShowCardImagePathConverter;
+import com.ticket.core.domain.show.model.Show;
 import com.ticket.core.domain.show.query.ShowSortSupport.SortOrder;
 import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
+import com.ticket.core.domain.show.query.model.ShowListItemView;
+import com.ticket.core.domain.show.query.model.ShowOpeningSoonDetailView;
+import com.ticket.core.domain.show.query.model.ShowOpeningSoonSummaryView;
 import com.ticket.core.domain.show.query.model.ShowParam;
 import com.ticket.core.domain.show.query.model.ShowSearchCriteria;
+import com.ticket.core.domain.show.query.model.ShowSearchItemView;
+import com.ticket.core.domain.show.query.model.ShowSummaryView;
 import com.ticket.core.support.cursor.CursorSlice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -24,16 +29,12 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static com.ticket.core.domain.show.mapping.QShowGenre.showGenre;
 import static com.ticket.core.domain.show.model.QCategory.category;
 import static com.ticket.core.domain.show.model.QGenre.genre;
 import static com.ticket.core.domain.show.model.QShow.show;
-import static com.ticket.core.domain.show.mapping.QShowGenre.showGenre;
 import static com.ticket.core.domain.show.venue.QVenue.venue;
 
-/**
- * Show 목록 조회 전용 Repository
- * - 메인 페이지 / 검색 / 오픈예정 목록 등 리스트 쿼리 담당
- */
 @Repository
 @RequiredArgsConstructor
 public class ShowListQueryRepository {
@@ -45,9 +46,7 @@ public class ShowListQueryRepository {
     private final ShowCursorPolicy showCursorPolicy;
     private final ShowCardImagePathConverter showCardImagePathConverter;
 
-    // ========== 메인 페이지 API ==========
-
-    public CursorSlice<GetShowsUseCase.ShowItem> findAllBySearch(final ShowParam param, final int size, final String sort) {
+    public CursorSlice<ShowListItemView> findAllBySearch(final ShowParam param, final int size, final String sort) {
         final SortOrder sortOrder = sortSupport.resolveSortOrder(sort);
         final BooleanBuilder where = showConditionFactory.buildMainListCondition(param, sortOrder);
 
@@ -61,7 +60,7 @@ public class ShowListQueryRepository {
         );
     }
 
-    public List<GetLatestShowsUseCase.ShowSummary> findLatestShows(final String categoryCode, final int limit) {
+    public List<ShowSummaryView> findLatestShows(final String categoryCode, final int limit) {
         return queryFactory
                 .select(show.id, show.title, show.image, show.startDate, show.endDate, venue.name, show.createdAt)
                 .distinct()
@@ -79,7 +78,7 @@ public class ShowListQueryRepository {
                 .toList();
     }
 
-    public List<GetSaleStartApproachingShowsUseCase.ShowOpeningSoonSummary> findShowsSaleOpeningSoon(final String categoryCode, final int limit) {
+    public List<ShowOpeningSoonSummaryView> findShowsSaleOpeningSoon(final String categoryCode, final int limit) {
         return queryFactory
                 .select(show.id, show.title, show.image, venue.name, show.saleStartDate)
                 .distinct()
@@ -97,7 +96,7 @@ public class ShowListQueryRepository {
                 .toList();
     }
 
-    public CursorSlice<GetSaleStartApproachingShowsPageUseCase.ShowOpeningSoonDetail> findSaleOpeningSoonPage(
+    public CursorSlice<ShowOpeningSoonDetailView> findSaleOpeningSoonPage(
             final SaleOpeningSoonSearchParam param,
             final int size,
             final String sort
@@ -115,9 +114,7 @@ public class ShowListQueryRepository {
         );
     }
 
-    // ========== 검색 API ==========
-
-    public CursorSlice<SearchShowsUseCase.ShowSearchItem> searchShows(
+    public CursorSlice<ShowSearchItemView> searchShows(
             final ShowSearchCriteria request,
             final int size,
             final String sort
@@ -147,8 +144,6 @@ public class ShowListQueryRepository {
                 .fetchOne();
         return count != null ? count : 0L;
     }
-
-    // ========== 공통 페이지 조회 ==========
 
     private <T> CursorSlice<T> findCursorPage(
             final int size,
@@ -202,7 +197,7 @@ public class ShowListQueryRepository {
                 .fetch();
     }
 
-    private List<GetShowsUseCase.ShowItem> fetchMainShowResponses(
+    private List<ShowListItemView> fetchMainShowResponses(
             final List<Long> ids,
             final OrderSpecifier<?> primaryOrder,
             final OrderSpecifier<Long> tieBreakerOrder
@@ -216,18 +211,26 @@ public class ShowListQueryRepository {
                 .fetch();
 
         return new ArrayList<>(shows.stream()
-                .map(s -> new GetShowsUseCase.ShowItem(
-                s.getId(), s.getTitle(), s.getSubTitle(), showCardImagePathConverter.toCardImage(s.getImage()),
+                .map(s -> new ShowListItemView(
+                        s.getId(),
+                        s.getTitle(),
+                        s.getSubTitle(),
+                        showCardImagePathConverter.toCardImage(s.getImage()),
                         genreMap.getOrDefault(s.getId(), new ArrayList<>()),
-                        s.getStartDate(), s.getEndDate(), s.getViewCount(),
-                        s.getSaleType(), s.getSaleStartDate(), s.getSaleEndDate(),
+                        s.getStartDate(),
+                        s.getEndDate(),
+                        s.getViewCount(),
+                        s.getSaleType(),
+                        s.getSaleStartDate(),
+                        s.getSaleEndDate(),
                         s.getCreatedAt(),
                         s.getVenue() != null ? s.getVenue().getRegion() : null,
-                        s.getVenue() != null ? s.getVenue().getName() : null))
+                        s.getVenue() != null ? s.getVenue().getName() : null
+                ))
                 .toList());
     }
 
-    private List<GetSaleStartApproachingShowsPageUseCase.ShowOpeningSoonDetail> fetchSaleOpeningResponses(
+    private List<ShowOpeningSoonDetailView> fetchSaleOpeningResponses(
             final List<Long> ids,
             final OrderSpecifier<?> primaryOrder,
             final OrderSpecifier<Long> tieBreakerOrder
@@ -245,7 +248,7 @@ public class ShowListQueryRepository {
                 .toList();
     }
 
-    private List<SearchShowsUseCase.ShowSearchItem> fetchSearchResponses(
+    private List<ShowSearchItemView> fetchSearchResponses(
             final List<Long> ids,
             final OrderSpecifier<?> primaryOrder,
             final OrderSpecifier<Long> tieBreakerOrder
@@ -263,8 +266,6 @@ public class ShowListQueryRepository {
                 .toList();
     }
 
-    // ========== 내부 헬퍼 ==========
-
     private List<Long> extractIds(final List<Tuple> rows) {
         return rows.stream().map(t -> t.get(show.id)).toList();
     }
@@ -273,8 +274,8 @@ public class ShowListQueryRepository {
         return new CursorSlice<>(new SliceImpl<>(List.of(), PageRequest.of(0, size), false), null);
     }
 
-    private GetLatestShowsUseCase.ShowSummary toShowSummaryResponse(final Tuple tuple) {
-        return new GetLatestShowsUseCase.ShowSummary(
+    private ShowSummaryView toShowSummaryResponse(final Tuple tuple) {
+        return new ShowSummaryView(
                 tuple.get(show.id),
                 tuple.get(show.title),
                 showCardImagePathConverter.toCardImage(tuple.get(show.image)),
@@ -285,8 +286,8 @@ public class ShowListQueryRepository {
         );
     }
 
-    private GetSaleStartApproachingShowsUseCase.ShowOpeningSoonSummary toShowOpeningSoonSummaryResponse(final Tuple tuple) {
-        return new GetSaleStartApproachingShowsUseCase.ShowOpeningSoonSummary(
+    private ShowOpeningSoonSummaryView toShowOpeningSoonSummaryResponse(final Tuple tuple) {
+        return new ShowOpeningSoonSummaryView(
                 tuple.get(show.id),
                 tuple.get(show.title),
                 showCardImagePathConverter.toCardImage(tuple.get(show.image)),
@@ -295,8 +296,8 @@ public class ShowListQueryRepository {
         );
     }
 
-    private GetSaleStartApproachingShowsPageUseCase.ShowOpeningSoonDetail toShowOpeningSoonDetailResponse(final Tuple tuple) {
-        return new GetSaleStartApproachingShowsPageUseCase.ShowOpeningSoonDetail(
+    private ShowOpeningSoonDetailView toShowOpeningSoonDetailResponse(final Tuple tuple) {
+        return new ShowOpeningSoonDetailView(
                 tuple.get(show.id),
                 tuple.get(show.title),
                 tuple.get(show.subTitle),
@@ -311,8 +312,8 @@ public class ShowListQueryRepository {
         );
     }
 
-    private SearchShowsUseCase.ShowSearchItem toShowSearchResponse(final Tuple tuple) {
-        return new SearchShowsUseCase.ShowSearchItem(
+    private ShowSearchItemView toShowSearchResponse(final Tuple tuple) {
+        return new ShowSearchItemView(
                 tuple.get(show.id),
                 tuple.get(show.title),
                 showCardImagePathConverter.toCardImage(tuple.get(show.image)),

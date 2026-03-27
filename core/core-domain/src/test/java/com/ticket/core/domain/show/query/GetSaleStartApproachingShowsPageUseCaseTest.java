@@ -1,8 +1,8 @@
 package com.ticket.core.domain.show.query;
 
 import com.ticket.core.domain.show.meta.Region;
-import com.ticket.core.domain.show.query.ShowListQueryRepository;
 import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
+import com.ticket.core.domain.show.query.model.ShowOpeningSoonDetailView;
 import com.ticket.core.support.cursor.CursorSlice;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,23 +30,27 @@ class GetSaleStartApproachingShowsPageUseCaseTest {
     private GetSaleStartApproachingShowsPageUseCase useCase;
 
     @Test
-    void 커서_페이지_응답을_그대로_전달한다() {
+    void 커서_페이지_응답을_output으로_변환한다() {
         SaleOpeningSoonSearchParam param = new SaleOpeningSoonSearchParam(null, null, null, null, null, null, null, null);
-        GetSaleStartApproachingShowsPageUseCase.ShowOpeningSoonDetail show =
-                new GetSaleStartApproachingShowsPageUseCase.ShowOpeningSoonDetail(
-                        1L,
-                        "공연",
-                        "부제",
-                        "image",
-                        "장소",
-                        Region.SEOUL,
-                        LocalDate.now(),
-                        LocalDate.now().plusDays(1),
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusDays(1),
-                        100L
-                );
-        CursorSlice<GetSaleStartApproachingShowsPageUseCase.ShowOpeningSoonDetail> result =
+        LocalDate startDate = LocalDate.of(2026, 3, 27);
+        LocalDate endDate = LocalDate.of(2026, 3, 28);
+        LocalDateTime saleStartDate = LocalDateTime.of(2026, 3, 27, 10, 0);
+        LocalDateTime saleEndDate = LocalDateTime.of(2026, 3, 28, 10, 0);
+
+        ShowOpeningSoonDetailView show = new ShowOpeningSoonDetailView(
+                1L,
+                "concert",
+                "subtitle",
+                "image",
+                "venue",
+                Region.SEOUL,
+                startDate,
+                endDate,
+                saleStartDate,
+                saleEndDate,
+                100L
+        );
+        CursorSlice<ShowOpeningSoonDetailView> result =
                 new CursorSlice<>(new SliceImpl<>(List.of(show)), "next-cursor");
         when(showListQueryRepository.findSaleOpeningSoonPage(param, 10, "popular")).thenReturn(result);
 
@@ -59,9 +63,9 @@ class GetSaleStartApproachingShowsPageUseCaseTest {
     }
 
     @Test
-    void 판매_오픈_예정_공연이_없으면_빈_슬라이스와_null_커서를_반환한다() {
+    void 판매_오픈예정_공연이_없으면_빈_슬라이스와_null_커서를_반환한다() {
         SaleOpeningSoonSearchParam param = new SaleOpeningSoonSearchParam(null, null, null, null, null, null, null, null);
-        CursorSlice<GetSaleStartApproachingShowsPageUseCase.ShowOpeningSoonDetail> result =
+        CursorSlice<ShowOpeningSoonDetailView> result =
                 new CursorSlice<>(new SliceImpl<>(List.of()), null);
         when(showListQueryRepository.findSaleOpeningSoonPage(param, 10, "popular")).thenReturn(result);
 

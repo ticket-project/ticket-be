@@ -4,7 +4,10 @@ import com.ticket.core.api.controller.request.ShowSearchRequest;
 import com.ticket.core.domain.performanceseat.query.GetShowSeatsUseCase;
 import com.ticket.core.domain.performanceseat.query.GetVenueLayoutUseCase;
 import com.ticket.core.domain.show.query.model.SaleOpeningSoonSearchParam;
+import com.ticket.core.domain.show.query.model.ShowListItemView;
+import com.ticket.core.domain.show.query.model.ShowOpeningSoonDetailView;
 import com.ticket.core.domain.show.query.model.ShowParam;
+import com.ticket.core.domain.show.query.model.ShowSearchItemView;
 import com.ticket.core.domain.show.query.CountSearchShowsUseCase;
 import com.ticket.core.domain.show.query.GetLatestShowsUseCase;
 import com.ticket.core.domain.show.query.GetSaleStartApproachingShowsPageUseCase;
@@ -143,7 +146,7 @@ public interface ShowControllerDocs {
                     )
             )
     })
-    ApiResponse<SliceResponse<GetShowsUseCase.ShowItem>> getShowsPage(
+    ApiResponse<SliceResponse<ShowListItemView>> getShowsPage(
             @ParameterObject ShowParam param,
             @Parameter(description = "한 번에 조회할 개수 (기본값: 5, 최대: 100)", example = "5") int size,
             @Parameter(description = "정렬 기준 [popular(인기순), latest(최신순), showStartApproaching(공연임박순)]", example = "popular") String sort
@@ -277,7 +280,7 @@ public interface ShowControllerDocs {
                     )
             )
     })
-    ApiResponse<SliceResponse<GetSaleStartApproachingShowsPageUseCase.ShowOpeningSoonDetail>> getShowsSaleOpeningSoonPage(
+    ApiResponse<SliceResponse<ShowOpeningSoonDetailView>> getShowsSaleOpeningSoonPage(
             @ParameterObject SaleOpeningSoonSearchParam param,
             @Parameter(description = "한 번에 조회할 개수 (기본값: 16)", example = "16") int size,
             @Parameter(description = "정렬 기준 [saleStartApproaching(판매시작일순), popular(인기순), latest(최신순)]", example = "saleStartApproaching") String sort
@@ -338,7 +341,7 @@ public interface ShowControllerDocs {
                     )
             )
     })
-    ApiResponse<SliceResponse<SearchShowsUseCase.ShowSearchItem>> searchShows(
+    ApiResponse<SliceResponse<ShowSearchItemView>> searchShows(
             @ParameterObject ShowSearchRequest request,
             @Parameter(description = "한 번에 조회할 개수 (기본값: 20)", example = "20") int size,
             @Parameter(description = "정렬 기준 [popular(조회순), showStartApproaching(공연임박순)]", example = "popular") String sort
