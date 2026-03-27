@@ -31,7 +31,7 @@ class LoginUseCaseTest {
     @Test
     void successful_login_issues_tokens() {
         Member member = mock(Member.class);
-        IssuedAuthTokens response = new IssuedAuthTokens("access", "refresh", "Bearer", 1800L, 1L);
+        IssuedAuthTokens response = new IssuedAuthTokens("access-token-value", "refresh-token-value", "Bearer", 1800L, 1L);
 
         when(authService.login("user@example.com", "password")).thenReturn(member);
         when(authTokenManager.issueTokens(member)).thenReturn(response);
@@ -43,7 +43,10 @@ class LoginUseCaseTest {
         assertThat(output.tokenType()).isEqualTo(response.tokenType());
         assertThat(output.expiresIn()).isEqualTo(response.expiresIn());
         assertThat(output.memberId()).isEqualTo(response.memberId());
-        assertThat(result.refreshToken()).isEqualTo("refresh");
+        assertThat(result.refreshToken()).isEqualTo("refresh-token-value");
+        assertThat(result.toString())
+                .doesNotContain("access-token-value")
+                .doesNotContain("refresh-token-value");
         verify(authService).login("user@example.com", "password");
         verify(authTokenManager).issueTokens(member);
     }

@@ -3,11 +3,14 @@ package com.ticket.core.api.controller.request;
 import com.ticket.core.domain.show.BookingStatus;
 import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.domain.show.query.model.ShowSearchCriteria;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings("NonAsciiCharacters")
 class ShowSearchRequestTest {
@@ -33,5 +36,22 @@ class ShowSearchRequestTest {
         assertThat(criteria.getStartDateTo()).isEqualTo(LocalDate.of(2026, 4, 30));
         assertThat(criteria.getRegion()).isEqualTo(Region.SEOUL);
         assertThat(criteria.getCursor()).isEqualTo("cursor-1");
+    }
+
+    @Test
+    void 시작일_From이_To보다_늦으면_예외를_던진다() {
+        ShowSearchRequest request = new ShowSearchRequest(
+                "뮤지컬",
+                "MUSICAL",
+                BookingStatus.ON_SALE,
+                LocalDate.of(2026, 4, 30),
+                LocalDate.of(2026, 4, 1),
+                Region.SEOUL,
+                null
+        );
+
+        assertThatThrownBy(request::toCriteria)
+                .isInstanceOf(CoreException.class)
+                .satisfies(thrown -> assertThat(((CoreException) thrown).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
     }
 }
