@@ -2,8 +2,10 @@ package com.ticket.core.domain.performanceseat.query;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ticket.core.domain.performanceseat.query.model.SeatStatus;
 import com.ticket.core.domain.performanceseat.model.PerformanceSeatState;
+import com.ticket.core.domain.performanceseat.query.model.SeatInfoView;
+import com.ticket.core.domain.performanceseat.query.model.SeatStateView;
+import com.ticket.core.domain.performanceseat.query.model.SeatStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -20,9 +22,9 @@ public class SeatMapQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<GetShowSeatsUseCase.SeatInfo> findShowSeats(final Long showId) {
+    public List<SeatInfoView> findShowSeats(final Long showId) {
         return queryFactory
-                .select(Projections.constructor(GetShowSeatsUseCase.SeatInfo.class,
+                .select(Projections.constructor(SeatInfoView.class,
                         seat.id,
                         seat.floor,
                         seat.section,
@@ -42,7 +44,7 @@ public class SeatMapQueryRepository {
                 .fetch();
     }
 
-    public List<GetSeatStatusUseCase.SeatState> findSeatStatuses(final Long performanceId) {
+    public List<SeatStateView> findSeatStatuses(final Long performanceId) {
         return queryFactory
                 .select(performanceSeat.seat.id, performanceSeat.state)
                 .from(performanceSeat)
@@ -50,7 +52,7 @@ public class SeatMapQueryRepository {
                 .orderBy(performanceSeat.seat.id.asc())
                 .fetch()
                 .stream()
-                .map(tuple -> new GetSeatStatusUseCase.SeatState(
+                .map(tuple -> new SeatStateView(
                         tuple.get(performanceSeat.seat.id),
                         tuple.get(performanceSeat.state) == PerformanceSeatState.AVAILABLE
                                 ? SeatStatus.AVAILABLE

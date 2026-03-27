@@ -1,12 +1,12 @@
 package com.ticket.core.domain.performanceseat.query;
 
+import com.ticket.core.domain.performanceseat.query.model.SeatInfoView;
 import com.ticket.core.domain.show.model.Show;
 import com.ticket.core.domain.show.query.ShowFinder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -20,21 +20,7 @@ public class GetShowSeatsUseCase {
     public record Input(Long showId) {
     }
 
-    public record SeatInfo(
-            Long seatId,
-            int floor,
-            String section,
-            String row,
-            String col,
-            double x,
-            double y,
-            String gradeCode,
-            String gradeName,
-            BigDecimal price
-    ) {
-    }
-
-    public record Output(List<SeatInfo> seats) {
+    public record Output(List<SeatInfoView> seats) {
     }
 
     public Output execute(final Input input) {
