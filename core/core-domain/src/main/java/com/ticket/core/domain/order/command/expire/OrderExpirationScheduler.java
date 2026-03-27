@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -22,10 +23,11 @@ public class OrderExpirationScheduler {
 
     private final ExpireOrderUseCase expireOrderUseCase;
     private final OrderRepository orderRepository;
+    private final Clock clock;
 
     @Scheduled(fixedDelayString = "300000")
     public void expirePendingOrders() {
-        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime now = LocalDateTime.now(clock);
         while (true) {
             final Slice<Order> expiredOrders = loadBatch(now);
             if (!expiredOrders.hasContent()) {

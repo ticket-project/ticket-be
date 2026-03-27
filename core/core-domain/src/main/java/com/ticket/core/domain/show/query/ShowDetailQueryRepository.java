@@ -11,6 +11,7 @@ import com.ticket.core.domain.show.BookingStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ public class ShowDetailQueryRepository {
 
     private final JPAQueryFactory queryFactory;
     private final ShowCardImagePathConverter showCardImagePathConverter;
+    private final Clock clock;
 
     public Optional<GetShowDetailUseCase.Output> findShowDetail(final Long showId) {
         final Show showEntity = fetchShow(showId);
@@ -136,7 +138,7 @@ public class ShowDetailQueryRepository {
             final List<GetShowDetailUseCase.PerformanceDateInfo> performanceDates,
             final long likeCount
     ) {
-        final BookingStatus bookingStatus = showEntity.getBookingStatus(LocalDateTime.now());
+        final BookingStatus bookingStatus = showEntity.getBookingStatus(LocalDateTime.now(clock));
 
         return new GetShowDetailUseCase.Output(
                 showEntity.getId(),

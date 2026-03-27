@@ -1,9 +1,9 @@
 package com.ticket.core.domain.member.model;
 
-import com.ticket.core.domain.member.model.Role;
-import com.ticket.core.domain.member.model.SocialProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,30 +11,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MemberSocialAccountTest {
 
     @Test
-    void 같은_소셜_ID인지_판단한다() {
-        //given
-        //when
-        Member member = new Member(Email.create("user@example.com"), EncodedPassword.create("encoded"), "홍길동", Role.MEMBER);
+    void matches_same_social_id() {
+        Member member = new Member(Email.create("user@example.com"), EncodedPassword.create("encoded"), "tester", Role.MEMBER);
         MemberSocialAccount account = MemberSocialAccount.create(member, SocialProvider.KAKAO, "kakao-123");
 
-        //then
         assertThat(account.isSameSocialId("kakao-123")).isTrue();
         assertThat(account.isSameSocialId("other")).isFalse();
     }
 
     @Test
-    void 연동계정_탈퇴시_삭제시각과_대체_socialId를_설정한다() {
-        //given
-        Member member = new Member(Email.create("user@example.com"), EncodedPassword.create("encoded"), "홍길동", Role.MEMBER);
+    void withdraw_uses_given_timestamp() {
+        Member member = new Member(Email.create("user@example.com"), EncodedPassword.create("encoded"), "tester", Role.MEMBER);
         MemberSocialAccount account = MemberSocialAccount.create(member, SocialProvider.KAKAO, "kakao-123");
+        LocalDateTime withdrawnAt = LocalDateTime.of(2026, 3, 15, 10, 0);
         ReflectionTestUtils.setField(account, "id", 11L);
 
-        //when
-        account.withdraw();
+        account.withdraw(withdrawnAt);
 
-        //then
         assertThat(account.isDeleted()).isTrue();
-        assertThat(account.getDeletedAt()).isNotNull();
+        assertThat(account.getDeletedAt()).isEqualTo(withdrawnAt);
         assertThat(account.getSocialId()).startsWith("deleted_11_");
         assertThat(account.getSocialId()).isNotEqualTo("kakao-123");
     }

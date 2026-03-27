@@ -60,8 +60,8 @@ public class Member extends BaseEntity {
         return new Member(email, null, name, role);
     }
 
-    public void withdraw() {
-        this.deletedAt = LocalDateTime.now();
+    public void withdraw(final LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
         this.email = Email.create(buildWithdrawnEmail());
         this.encodedPassword = null;
     }

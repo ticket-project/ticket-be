@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,9 +19,11 @@ public class MemberWithdrawalTxService {
 
     private final MemberFinder memberFinder;
     private final MemberSocialAccountRepository memberSocialAccountRepository;
+    private final Clock clock;
 
     @Transactional
     public List<String> withdraw(final Long memberId) {
+        final LocalDateTime now = LocalDateTime.now(clock);
         final Member member = memberFinder.findActiveMemberById(memberId);
         final List<MemberSocialAccount> socialAccounts = memberSocialAccountRepository.findAllByMemberAndDeletedAtIsNull(member);
 
@@ -28,8 +32,8 @@ public class MemberWithdrawalTxService {
                 .map(MemberSocialAccount::getSocialId)
                 .toList();
 
-        socialAccounts.forEach(MemberSocialAccount::withdraw);
-        member.withdraw();
+        socialAccounts.forEach(account -> account.withdraw(now));
+        member.withdraw(now);
 
         return kakaoSocialIds;
     }

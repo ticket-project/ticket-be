@@ -1,7 +1,7 @@
 package com.ticket.core.domain.performanceseat.command;
 
-import com.ticket.core.domain.performanceseat.command.SeatSelectionService;
 import com.ticket.core.domain.performanceseat.support.SeatEventPublisher;
+import com.ticket.core.domain.performanceseat.support.SeatStatusMessage.SeatAction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
@@ -17,6 +17,7 @@ class DeselectSeatUseCaseTest {
 
     @Mock
     private SeatSelectionService seatSelectionService;
+
     @Mock
     private SeatEventPublisher seatEventPublisher;
 
@@ -24,17 +25,13 @@ class DeselectSeatUseCaseTest {
     private DeselectSeatUseCase useCase;
 
     @Test
-    void 좌석_해제시_서비스와_이벤트를_순서대로_호출한다() {
-        //given
+    void deselect_then_publish_deselected_event() {
         DeselectSeatUseCase.Input input = new DeselectSeatUseCase.Input(10L, 20L, 1L);
 
-        //when
-        //then
         useCase.execute(input);
 
         InOrder inOrder = inOrder(seatSelectionService, seatEventPublisher);
         inOrder.verify(seatSelectionService).deselect(10L, 20L, 1L);
-        inOrder.verify(seatEventPublisher).publish(org.mockito.ArgumentMatchers.any());
+        inOrder.verify(seatEventPublisher).publish(10L, 20L, SeatAction.DESELECTED);
     }
 }
-

@@ -1,17 +1,19 @@
 package com.ticket.core.domain.order.command.expire;
 
 import com.ticket.core.domain.order.model.Order;
-import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.domain.order.model.OrderState;
+import com.ticket.core.domain.order.repository.OrderRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -32,55 +34,51 @@ class OrderExpirationSchedulerTest {
     @Mock
     private ExpireOrderUseCase expireOrderUseCase;
 
-    @InjectMocks
-    private OrderExpirationScheduler orderExpirationScheduler;
+    private final Clock fixedClock = Clock.fixed(Instant.parse("2026-03-15T01:00:00Z"), ZoneId.of("Asia/Seoul"));
 
     @Test
-    void 만료대상_주문이_없으면_종료한다() {
-        //given
-        when(orderRepository.findAllByStatusAndExpiresAtBefore(eq(OrderState.PENDING), any(LocalDateTime.class), any()))
+    void no_expired_orders_returns_immediately() {
+        OrderExpirationScheduler scheduler = new OrderExpirationScheduler(expireOrderUseCase, orderRepository, fixedClock);
+        LocalDateTime expectedNow = LocalDateTime.of(2026, 3, 15, 10, 0);
+        when(orderRepository.findAllByStatusAndExpiresAtBefore(eq(OrderState.PENDING), eq(expectedNow), any()))
                 .thenReturn(new SliceImpl<>(List.of()));
 
-        //when
-        orderExpirationScheduler.expirePendingOrders();
+        scheduler.expirePendingOrders();
 
-        //then
         verify(expireOrderUseCase, times(0)).expireByOrderId(any(), any());
     }
 
     @Test
-    void 만료대상_주문이_있으면_순서대로_만료처리한다() {
-        //given
+    void due_orders_are_expired_with_clock_now() {
+        OrderExpirationScheduler scheduler = new OrderExpirationScheduler(expireOrderUseCase, orderRepository, fixedClock);
+        LocalDateTime expectedNow = LocalDateTime.of(2026, 3, 15, 10, 0);
         Order first = createOrder(1L, null);
         Order second = createOrder(2L, null);
         Slice<Order> slice = new SliceImpl<>(List.of(first, second));
-        when(orderRepository.findAllByStatusAndExpiresAtBefore(eq(OrderState.PENDING), any(LocalDateTime.class), any()))
+        when(orderRepository.findAllByStatusAndExpiresAtBefore(eq(OrderState.PENDING), eq(expectedNow), any()))
                 .thenReturn(slice);
 
-        //when
-        orderExpirationScheduler.expirePendingOrders();
+        scheduler.expirePendingOrders();
 
-        //then
-        verify(expireOrderUseCase).expireByOrderId(eq(1L), any(LocalDateTime.class));
-        verify(expireOrderUseCase).expireByOrderId(eq(2L), any(LocalDateTime.class));
-        verify(orderRepository, times(1)).findAllByStatusAndExpiresAtBefore(eq(OrderState.PENDING), any(LocalDateTime.class), any());
+        verify(expireOrderUseCase).expireByOrderId(1L, expectedNow);
+        verify(expireOrderUseCase).expireByOrderId(2L, expectedNow);
+        verify(orderRepository, times(1)).findAllByStatusAndExpiresAtBefore(eq(OrderState.PENDING), eq(expectedNow), any());
     }
 
     @Test
-    void 주문_만료처리중_예외가_나도_배치를_중단하고_반환한다() {
-        //given
+    void batch_stops_when_all_expirations_fail() {
+        OrderExpirationScheduler scheduler = new OrderExpirationScheduler(expireOrderUseCase, orderRepository, fixedClock);
+        LocalDateTime expectedNow = LocalDateTime.of(2026, 3, 15, 10, 0);
         Order order = createOrder(1L, "order-1");
         Slice<Order> slice = new SliceImpl<>(List.of(order));
-        when(orderRepository.findAllByStatusAndExpiresAtBefore(eq(OrderState.PENDING), any(LocalDateTime.class), any()))
+        when(orderRepository.findAllByStatusAndExpiresAtBefore(eq(OrderState.PENDING), eq(expectedNow), any()))
                 .thenReturn(slice);
-        doThrow(new RuntimeException("boom")).when(expireOrderUseCase).expireByOrderId(eq(1L), any(LocalDateTime.class));
+        doThrow(new RuntimeException("boom")).when(expireOrderUseCase).expireByOrderId(1L, expectedNow);
 
-        //when
-        orderExpirationScheduler.expirePendingOrders();
+        scheduler.expirePendingOrders();
 
-        //then
-        verify(expireOrderUseCase).expireByOrderId(eq(1L), any(LocalDateTime.class));
-        verify(orderRepository, times(1)).findAllByStatusAndExpiresAtBefore(eq(OrderState.PENDING), any(LocalDateTime.class), any());
+        verify(expireOrderUseCase).expireByOrderId(1L, expectedNow);
+        verify(orderRepository, times(1)).findAllByStatusAndExpiresAtBefore(eq(OrderState.PENDING), eq(expectedNow), any());
     }
 
     private Order createOrder(final Long id, final String orderKey) {
