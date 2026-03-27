@@ -92,13 +92,16 @@ public class AuthController implements AuthControllerDocs {
             @CookieValue(name = CookieUtils.REFRESH_TOKEN_COOKIE_NAME, required = false) final String refreshToken,
             final HttpServletResponse response
     ) {
-        final LogoutUseCase.Input input = new LogoutUseCase.Input(
-                principal.getMemberId(),
-                AuthRefreshToken.from(refreshToken)
-        );
-        final LogoutUseCase.Output output = logoutUseCase.execute(input);
-        CookieUtils.deleteRefreshTokenCookie(response);
-        return ApiResponse.success(output);
+        try {
+            final LogoutUseCase.Input input = new LogoutUseCase.Input(
+                    principal.getMemberId(),
+                    AuthRefreshToken.from(refreshToken)
+            );
+            final LogoutUseCase.Output output = logoutUseCase.execute(input);
+            return ApiResponse.success(output);
+        } finally {
+            CookieUtils.deleteRefreshTokenCookie(response);
+        }
     }
 
     private void addRefreshTokenCookie(final HttpServletResponse response, final String refreshToken) {
