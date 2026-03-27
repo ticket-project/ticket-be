@@ -4,6 +4,8 @@ import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.domain.show.meta.SaleType;
 import com.ticket.core.domain.show.query.ShowFinder;
 import com.ticket.core.domain.show.BookingStatus;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,11 @@ public class GetShowDetailUseCase {
     private final ShowFinder showFinder;
 
     public record Input(Long showId) {
+        public Input {
+            if (showId == null) {
+                throw new CoreException(ErrorType.INVALID_REQUEST, "showId는 필수입니다.");
+            }
+        }
     }
 
     public record PerformerInfo(Long id, String name, String profileImageUrl) {
@@ -78,6 +85,13 @@ public class GetShowDetailUseCase {
     }
 
     public Output execute(final Input input) {
+        validateInput(input);
         return showFinder.findShowDetail(input.showId());
+    }
+
+    private void validateInput(final Input input) {
+        if (input == null) {
+            throw new CoreException(ErrorType.INVALID_REQUEST, "showId는 필수입니다.");
+        }
     }
 }
