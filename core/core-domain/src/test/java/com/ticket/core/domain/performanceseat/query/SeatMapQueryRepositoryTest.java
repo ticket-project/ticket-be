@@ -1,14 +1,16 @@
 package com.ticket.core.domain.performanceseat.query;
 
+import com.ticket.core.domain.performanceseat.model.PerformanceSeatState;
+import com.ticket.core.domain.performanceseat.query.model.SeatInfoView;
+import com.ticket.core.domain.performanceseat.query.model.SeatStateView;
 import com.ticket.core.domain.performanceseat.query.model.SeatStatus;
 import com.ticket.core.domain.performance.model.Performance;
 import com.ticket.core.domain.seat.model.Seat;
-import com.ticket.core.domain.show.model.Show;
 import com.ticket.core.domain.show.mapping.ShowGrade;
 import com.ticket.core.domain.show.meta.Region;
+import com.ticket.core.domain.show.model.Show;
 import com.ticket.core.domain.show.venue.Venue;
 import com.ticket.core.domain.support.QueryRepositoryTestSupport;
-import com.ticket.core.domain.performanceseat.model.PerformanceSeatState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +34,11 @@ class SeatMapQueryRepositoryTest extends QueryRepositoryTestSupport {
 
     @BeforeEach
     void setUp() throws Exception {
-        Venue venue = persistVenue("공연장", Region.SEOUL);
-        Show show = persistShow("공연", venue, null, 10L, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(5));
+        Venue venue = persistVenue("venue", Region.SEOUL);
+        Show show = persistShow("show", venue, null, 10L, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(5));
         showId = show.getId();
-        ShowGrade vip = persistShowGrade(show, "VIP", "VIP석", BigDecimal.valueOf(150000), 1);
-        ShowGrade r = persistShowGrade(show, "R", "R석", BigDecimal.valueOf(100000), 2);
+        ShowGrade vip = persistShowGrade(show, "VIP", "VIP", BigDecimal.valueOf(150000), 1);
+        ShowGrade r = persistShowGrade(show, "R", "R", BigDecimal.valueOf(100000), 2);
         Seat seat1 = persistSeat("A", "01", "02", 1);
         Seat seat2 = persistSeat("A", "01", "01", 1);
         persistShowSeat(show, seat1, r);
@@ -51,20 +53,20 @@ class SeatMapQueryRepositoryTest extends QueryRepositoryTestSupport {
 
     @Test
     void 공연_좌석_정보를_정렬해서_조회한다() {
-        List<GetShowSeatsUseCase.SeatInfo> result = seatMapQueryRepository.findShowSeats(showId);
+        List<SeatInfoView> result = seatMapQueryRepository.findShowSeats(showId);
 
-        assertThat(result).extracting(GetShowSeatsUseCase.SeatInfo::seatId).hasSize(2);
-        assertThat(result).extracting(GetShowSeatsUseCase.SeatInfo::gradeCode).containsExactly("VIP", "R");
-        assertThat(result).extracting(GetShowSeatsUseCase.SeatInfo::col).containsExactly("01", "02");
+        assertThat(result).extracting(SeatInfoView::seatId).hasSize(2);
+        assertThat(result).extracting(SeatInfoView::gradeCode).containsExactly("VIP", "R");
+        assertThat(result).extracting(SeatInfoView::col).containsExactly("01", "02");
     }
 
     @Test
     void 좌석별_상태를_api_상태로_변환한다() {
-        List<GetSeatStatusUseCase.SeatState> result = seatMapQueryRepository.findSeatStatuses(performanceId);
+        List<SeatStateView> result = seatMapQueryRepository.findSeatStatuses(performanceId);
 
         assertThat(result).containsExactly(
-                new GetSeatStatusUseCase.SeatState(result.get(0).seatId(), SeatStatus.OCCUPIED),
-                new GetSeatStatusUseCase.SeatState(result.get(1).seatId(), SeatStatus.AVAILABLE)
+                new SeatStateView(result.get(0).seatId(), SeatStatus.OCCUPIED),
+                new SeatStateView(result.get(1).seatId(), SeatStatus.AVAILABLE)
         );
     }
 }

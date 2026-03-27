@@ -1,5 +1,6 @@
 package com.ticket.core.domain.performanceseat.query;
 
+import com.ticket.core.domain.performanceseat.query.model.SeatInfoView;
 import com.ticket.core.domain.show.model.Show;
 import com.ticket.core.domain.show.query.ShowFinder;
 import org.junit.jupiter.api.Test;
@@ -32,8 +33,8 @@ class GetShowSeatsUseCaseTest {
     @Test
     void 공연_좌석_정보를_조회한다() {
         Show show = mock(Show.class);
-        List<GetShowSeatsUseCase.SeatInfo> seats = List.of(
-                new GetShowSeatsUseCase.SeatInfo(1L, 1, "A", "10", "7", 10.0, 20.0, "VIP", "VIP", BigDecimal.TEN)
+        List<SeatInfoView> seats = List.of(
+                new SeatInfoView(1L, 1, "A", "10", "7", 10.0, 20.0, "VIP", "VIP", BigDecimal.TEN)
         );
         when(showFinder.findById(100L)).thenReturn(show);
         when(show.getId()).thenReturn(100L);
@@ -41,7 +42,7 @@ class GetShowSeatsUseCaseTest {
 
         GetShowSeatsUseCase.Output output = useCase.execute(new GetShowSeatsUseCase.Input(100L));
 
-        assertThat(output.seats()).isEqualTo(seats);
+        assertThat(output.seats()).containsExactlyElementsOf(seats);
         verify(seatMapQueryRepository).findShowSeats(100L);
     }
 
