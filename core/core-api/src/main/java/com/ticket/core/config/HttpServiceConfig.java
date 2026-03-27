@@ -1,6 +1,6 @@
 package com.ticket.core.config;
 
-import com.ticket.core.domain.auth.oauth2.KakaoApiClient;
+import com.ticket.core.domain.auth.infra.oauth2.KakaoApiClient;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.service.registry.ImportHttpServices;
 

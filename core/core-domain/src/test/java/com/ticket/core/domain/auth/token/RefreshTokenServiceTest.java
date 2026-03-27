@@ -1,5 +1,6 @@
 package com.ticket.core.domain.auth.token;
 
+import com.ticket.core.domain.auth.infra.token.RefreshTokenService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

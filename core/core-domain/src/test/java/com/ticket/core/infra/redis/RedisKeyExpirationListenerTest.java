@@ -1,10 +1,12 @@
-package com.ticket.core.domain.hold.event;
+package com.ticket.core.infra.redis;
 
 import com.ticket.core.domain.order.command.expire.ExpireOrderUseCase;
-import com.ticket.core.domain.performanceseat.support.SeatEventPublisher;
+import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
 import com.ticket.core.domain.performanceseat.support.SeatRedisKey;
 import com.ticket.core.domain.performanceseat.support.SeatStatusMessage;
 import com.ticket.core.domain.queue.command.QueueAdmissionAdvancer;
+import com.ticket.core.domain.queue.model.QueueEntryId;
+import com.ticket.core.domain.queue.runtime.QueueRedisKey;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -63,6 +65,22 @@ class RedisKeyExpirationListenerTest {
 
         verify(seatEventPublisher).publish(10L, 20L, SeatStatusMessage.SeatAction.DESELECTED);
         verifyNoInteractions(expireOrderUseCase, queueAdmissionAdvancer);
+    }
+
+    @Test
+    void 대기열_토큰_만료_이벤트는_입장_만료를_처리한다() {
+        RedisKeyExpirationListener listener = new RedisKeyExpirationListener(
+                seatEventPublisher,
+                expireOrderUseCase,
+                queueAdmissionAdvancer,
+                fixedClock
+        );
+        String queueToken = QueueRedisKey.createToken(30L, "entry-1", "token-1");
+
+        listener.onMessage(message(QueueRedisKey.tokenStorageKey(queueToken)), new byte[0]);
+
+        verify(queueAdmissionAdvancer).handleTokenExpired(30L, QueueEntryId.from("entry-1"), queueToken);
+        verifyNoInteractions(seatEventPublisher, expireOrderUseCase);
     }
 
     private Message message(final String body) {

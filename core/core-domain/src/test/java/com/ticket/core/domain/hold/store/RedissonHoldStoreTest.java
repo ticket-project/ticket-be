@@ -1,5 +1,6 @@
 package com.ticket.core.domain.hold.store;
 
+import com.ticket.core.domain.hold.infra.RedissonHoldStore;
 import com.ticket.core.domain.hold.model.HoldSnapshot;
 import com.ticket.core.domain.performanceseat.support.SeatRedisKey;
 import org.junit.jupiter.api.Test;

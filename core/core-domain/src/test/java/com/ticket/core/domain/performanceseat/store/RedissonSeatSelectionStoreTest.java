@@ -1,5 +1,6 @@
 package com.ticket.core.domain.performanceseat.store;
 
+import com.ticket.core.domain.performanceseat.infra.store.RedissonSeatSelectionStore;
 import com.ticket.core.domain.performanceseat.support.SeatRedisKey;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

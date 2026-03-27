@@ -1,6 +1,6 @@
 package com.ticket.core.domain.support;
 
-import com.ticket.core.config.QuerydslConfig;
+import com.ticket.core.infra.config.QuerydslConfig;
 import com.ticket.core.domain.member.model.Member;
 import com.ticket.core.domain.member.model.Email;
 import com.ticket.core.domain.performance.model.Performance;

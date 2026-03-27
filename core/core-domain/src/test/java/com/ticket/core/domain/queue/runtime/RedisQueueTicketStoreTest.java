@@ -2,6 +2,7 @@ package com.ticket.core.domain.queue.runtime;
 
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.model.QueueEntryId;
+import com.ticket.core.domain.queue.infra.RedisQueueTicketStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

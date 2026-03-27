@@ -1,5 +1,6 @@
 package com.ticket.core.domain.auth.oauth2;
 
+import com.ticket.core.domain.auth.infra.oauth2.KakaoApiClient;
 import com.ticket.core.support.exception.CoreException;
 import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;

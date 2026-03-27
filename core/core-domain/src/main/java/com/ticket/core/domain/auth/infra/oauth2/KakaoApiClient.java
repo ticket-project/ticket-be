@@ -1,4 +1,4 @@
-package com.ticket.core.domain.auth.oauth2;
+package com.ticket.core.domain.auth.infra.oauth2;
 
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;

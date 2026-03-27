@@ -2,7 +2,7 @@ package com.ticket.core.domain.auth.command;
 
 import com.ticket.core.domain.auth.token.AuthRefreshToken;
 import com.ticket.core.domain.auth.token.AuthTokenManager;
-import com.ticket.core.domain.auth.token.RefreshTokenService;
+import com.ticket.core.domain.auth.infra.token.RefreshTokenService;
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;

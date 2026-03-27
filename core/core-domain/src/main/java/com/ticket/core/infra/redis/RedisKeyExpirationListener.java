@@ -1,7 +1,7 @@
-package com.ticket.core.domain.hold.event;
+package com.ticket.core.infra.redis;
 
 import com.ticket.core.domain.order.command.expire.ExpireOrderUseCase;
-import com.ticket.core.domain.performanceseat.support.SeatEventPublisher;
+import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
 import com.ticket.core.domain.performanceseat.support.SeatRedisKey;
 import com.ticket.core.domain.queue.command.QueueAdmissionAdvancer;
 import com.ticket.core.domain.queue.model.QueueEntryId;

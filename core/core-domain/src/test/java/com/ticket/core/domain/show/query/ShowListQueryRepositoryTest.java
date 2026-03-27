@@ -1,14 +1,16 @@
 package com.ticket.core.domain.show.query;
 
-import com.ticket.core.config.QuerydslConfig;
-import com.ticket.core.domain.show.model.Show;
+import com.ticket.core.infra.config.QuerydslConfig;
+import com.ticket.core.domain.show.BookingStatus;
 import com.ticket.core.domain.show.image.ShowCardImagePathConverter;
 import com.ticket.core.domain.show.meta.Region;
 import com.ticket.core.domain.show.meta.SaleType;
+import com.ticket.core.domain.show.model.Show;
+import com.ticket.core.domain.show.query.model.ShowListItemView;
 import com.ticket.core.domain.show.query.model.ShowParam;
 import com.ticket.core.domain.show.query.model.ShowSearchCriteria;
+import com.ticket.core.domain.show.query.model.ShowSearchItemView;
 import com.ticket.core.domain.show.venue.Venue;
-import com.ticket.core.domain.show.BookingStatus;
 import com.ticket.core.support.cursor.CursorCodec;
 import com.ticket.core.support.cursor.CursorSlice;
 import jakarta.persistence.EntityManager;
@@ -23,8 +25,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.json.JsonMapper;
@@ -73,21 +75,18 @@ class ShowListQueryRepositoryTest {
     @Autowired
     private ShowListQueryRepository showListQueryRepository;
 
-    @Autowired
-    private CursorCodec cursorCodec;
-
     private Venue seoulVenue;
     private Venue busanVenue;
 
     @BeforeEach
     void setUp() throws Exception {
-        seoulVenue = persistVenue("서울 공연장", Region.SEOUL);
-        busanVenue = persistVenue("부산 공연장", Region.GYEONGSANG);
+        seoulVenue = persistVenue("Seoul Hall", Region.SEOUL);
+        busanVenue = persistVenue("Busan Hall", Region.GYEONGSANG);
 
-        persistShow("서울 인기 공연", 300L, LocalDate.now().plusDays(5), seoulVenue, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(10));
-        persistShow("서울 보통 공연", 120L, LocalDate.now().plusDays(10), seoulVenue, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(8));
-        persistShow("부산 공연", 999L, LocalDate.now().plusDays(3), busanVenue, LocalDateTime.now().minusDays(3), LocalDateTime.now().plusDays(7));
-        persistShow("판매 종료 공연", 50L, LocalDate.now().minusDays(1), seoulVenue, LocalDateTime.now().minusDays(10), LocalDateTime.now().minusDays(2));
+        persistShow("Seoul Popular", 300L, LocalDate.now().plusDays(5), seoulVenue, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(10));
+        persistShow("Seoul Normal", 120L, LocalDate.now().plusDays(10), seoulVenue, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(8));
+        persistShow("Busan Hit", 999L, LocalDate.now().plusDays(3), busanVenue, LocalDateTime.now().minusDays(3), LocalDateTime.now().plusDays(7));
+        persistShow("Closed Show", 50L, LocalDate.now().minusDays(1), seoulVenue, LocalDateTime.now().minusDays(10), LocalDateTime.now().minusDays(2));
 
         entityManager.flush();
         entityManager.clear();
@@ -97,36 +96,35 @@ class ShowListQueryRepositoryTest {
     void 지역으로_필터링하고_인기순으로_공연을_조회한다() {
         ShowParam param = new ShowParam(null, null, Region.SEOUL, null);
 
-        CursorSlice<GetShowsUseCase.ShowItem> result = showListQueryRepository.findAllBySearch(param, 10, "popular");
+        CursorSlice<ShowListItemView> result = showListQueryRepository.findAllBySearch(param, 10, "popular");
+        Slice<ShowListItemView> slice = result.slice();
 
-        Slice<GetShowsUseCase.ShowItem> slice = result.slice();
-
-        assertThat(slice.getContent()).extracting(GetShowsUseCase.ShowItem::title)
-                .containsExactly("서울 인기 공연", "서울 보통 공연", "판매 종료 공연");
-        assertThat(slice.getContent()).extracting(GetShowsUseCase.ShowItem::viewCount)
+        assertThat(slice.getContent()).extracting(ShowListItemView::title)
+                .containsExactly("Seoul Popular", "Seoul Normal", "Closed Show");
+        assertThat(slice.getContent()).extracting(ShowListItemView::viewCount)
                 .containsExactly(300L, 120L, 50L);
         assertThat(result.nextCursor()).isNull();
     }
 
     @Test
-    void 인기순_커서를_전달하면_다음_페이지를_조회한다() {
+    void 커서를_전달하면_다음_페이지를_조회한다() {
         ShowParam firstPageParam = new ShowParam(null, null, Region.SEOUL, null);
-        CursorSlice<GetShowsUseCase.ShowItem> firstPage = showListQueryRepository.findAllBySearch(firstPageParam, 1, "popular");
+        CursorSlice<ShowListItemView> firstPage = showListQueryRepository.findAllBySearch(firstPageParam, 1, "popular");
 
         ShowParam secondPageParam = new ShowParam(null, null, Region.SEOUL, firstPage.nextCursor());
-        CursorSlice<GetShowsUseCase.ShowItem> secondPage = showListQueryRepository.findAllBySearch(secondPageParam, 1, "popular");
+        CursorSlice<ShowListItemView> secondPage = showListQueryRepository.findAllBySearch(secondPageParam, 1, "popular");
 
-        assertThat(firstPage.slice().getContent()).extracting(GetShowsUseCase.ShowItem::title)
-                .containsExactly("서울 인기 공연");
+        assertThat(firstPage.slice().getContent()).extracting(ShowListItemView::title)
+                .containsExactly("Seoul Popular");
         assertThat(firstPage.nextCursor()).isNotBlank();
-        assertThat(secondPage.slice().getContent()).extracting(GetShowsUseCase.ShowItem::title)
-                .containsExactly("서울 보통 공연");
+        assertThat(secondPage.slice().getContent()).extracting(ShowListItemView::title)
+                .containsExactly("Seoul Normal");
     }
 
     @Test
-    void 검색_조건에_맞는_공연_수만_집계한다() {
+    void 검색_조건에_맞는_공연만_집계한다() {
         ShowSearchCriteria request = new ShowSearchCriteria(
-                "서울",
+                "Seoul",
                 null,
                 BookingStatus.ON_SALE,
                 null,
@@ -143,7 +141,7 @@ class ShowListQueryRepositoryTest {
     @Test
     void 검색_api는_판매중인_서울_공연만_조회한다() {
         ShowSearchCriteria request = new ShowSearchCriteria(
-                "서울",
+                "Seoul",
                 null,
                 BookingStatus.ON_SALE,
                 null,
@@ -152,17 +150,17 @@ class ShowListQueryRepositoryTest {
                 null
         );
 
-        CursorSlice<SearchShowsUseCase.ShowSearchItem> result = showListQueryRepository.searchShows(request, 10, "popular");
+        CursorSlice<ShowSearchItemView> result = showListQueryRepository.searchShows(request, 10, "popular");
 
-        assertThat(result.slice().getContent()).extracting(SearchShowsUseCase.ShowSearchItem::title)
-                .containsExactly("서울 인기 공연", "서울 보통 공연");
+        assertThat(result.slice().getContent()).extracting(ShowSearchItemView::title)
+                .containsExactly("Seoul Popular", "Seoul Normal");
     }
 
     @Test
     void 조건에_맞는_공연이_없으면_빈_슬라이스를_반환한다() {
         ShowParam param = new ShowParam(null, null, Region.JEOLLA, null);
 
-        CursorSlice<GetShowsUseCase.ShowItem> result = showListQueryRepository.findAllBySearch(param, 10, "popular");
+        CursorSlice<ShowListItemView> result = showListQueryRepository.findAllBySearch(param, 10, "popular");
 
         assertThat(result.slice().getContent()).isEmpty();
         assertThat(result.slice().hasNext()).isFalse();
@@ -172,9 +170,9 @@ class ShowListQueryRepositoryTest {
     private Venue persistVenue(final String name, final Region region) throws Exception {
         Venue venue = Venue.create(
                 name,
-                name + " 주소",
+                name + " address",
                 region,
-                "상세 주소",
+                "detail",
                 "12345",
                 BigDecimal.valueOf(37.0),
                 BigDecimal.valueOf(127.0),
@@ -200,8 +198,8 @@ class ShowListQueryRepositoryTest {
     ) {
         Show show = new Show(
                 title,
-                title + " 부제",
-                title + " 소개",
+                title + " subtitle",
+                title + " description",
                 startDate,
                 startDate.plusDays(30),
                 viewCount,

@@ -1,6 +1,6 @@
 package com.ticket.core.domain.queue.command;
 
-import com.ticket.core.aop.DistributedLock;
+import com.ticket.core.infra.lock.DistributedLock;
 import com.ticket.core.domain.queue.runtime.QueueTicketStore;
 import com.ticket.core.domain.queue.support.QueuePolicyResolver;
 import com.ticket.core.domain.queue.support.QueuePolicy;
