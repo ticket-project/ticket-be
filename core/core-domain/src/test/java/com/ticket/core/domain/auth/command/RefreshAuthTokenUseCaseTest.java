@@ -41,7 +41,7 @@ class RefreshAuthTokenUseCaseTest {
     @Test
     void valid_refresh_token_rotates_tokens() {
         Member member = mock(Member.class);
-        IssuedAuthTokens response = new IssuedAuthTokens("access", "new-refresh", "Bearer", 1800L, 3L);
+        IssuedAuthTokens response = new IssuedAuthTokens("access-token-value", "new-refresh-token-value", "Bearer", 1800L, 3L);
 
         AuthRefreshToken refreshToken = AuthRefreshToken.from("refresh-token");
         when(refreshTokenService.validate(refreshToken)).thenReturn(Optional.of(3L));
@@ -56,7 +56,10 @@ class RefreshAuthTokenUseCaseTest {
         assertThat(output.tokenType()).isEqualTo(response.tokenType());
         assertThat(output.expiresIn()).isEqualTo(response.expiresIn());
         assertThat(output.memberId()).isEqualTo(response.memberId());
-        assertThat(result.refreshToken()).isEqualTo("new-refresh");
+        assertThat(result.refreshToken()).isEqualTo("new-refresh-token-value");
+        assertThat(result.toString())
+                .doesNotContain("access-token-value")
+                .doesNotContain("new-refresh-token-value");
         verify(refreshTokenService).validate(refreshToken);
         verify(memberFinder).findActiveMemberById(3L);
         verify(authTokenManager).rotateTokens(member, refreshToken);

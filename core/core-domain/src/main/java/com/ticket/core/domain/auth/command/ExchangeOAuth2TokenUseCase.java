@@ -25,9 +25,27 @@ public class ExchangeOAuth2TokenUseCase {
             String tokenType,
             long expiresIn,
             Long memberId
-    ) {}
+    ) {
+        @Override
+        public String toString() {
+            return "Output[" +
+                    "accessToken=" + redact(accessToken) +
+                    ", tokenType=" + tokenType +
+                    ", expiresIn=" + expiresIn +
+                    ", memberId=" + memberId +
+                    ']';
+        }
+    }
 
-    public record Result(Output output, String refreshToken) {}
+    public record Result(Output output, String refreshToken) {
+        @Override
+        public String toString() {
+            return "Result[" +
+                    "output=" + output +
+                    ", refreshToken=" + redact(refreshToken) +
+                    ']';
+        }
+    }
 
     public Result execute(final Input input) {
         final Long memberId = oAuth2AuthCodeService.consumeCode(input.code())
@@ -38,5 +56,12 @@ public class ExchangeOAuth2TokenUseCase {
                 new Output(result.accessToken(), result.tokenType(), result.expiresIn(), result.memberId()),
                 result.refreshToken()
         );
+    }
+
+    private static String redact(final String value) {
+        if (value == null) {
+            return "null";
+        }
+        return "[REDACTED]";
     }
 }
