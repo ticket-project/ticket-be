@@ -16,6 +16,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class CancelOrderUseCase {
     private final OrderCanceler orderCanceler;
     private final HoldReleaseOutboxWriter holdReleaseOutboxWriter;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final Clock clock;
 
     public record Input(String orderKey, Long memberId) {}
 
@@ -37,7 +39,7 @@ public class CancelOrderUseCase {
         memberFinder.findActiveMemberById(input.memberId());
         final Order order = getPendingOwnedOrder(input.orderKey(), input.memberId());
         final List<OrderSeat> orderSeats = orderSeatRepository.findAllByOrder_IdOrderByIdAsc(order.getId());
-        final OrderTerminationResult result = orderCanceler.cancel(order, orderSeats, LocalDateTime.now());
+        final OrderTerminationResult result = orderCanceler.cancel(order, orderSeats, LocalDateTime.now(clock));
         final Long outboxId = holdReleaseOutboxWriter.append(result);
         applicationEventPublisher.publishEvent(new HoldReleaseRequestedEvent(outboxId));
     }
