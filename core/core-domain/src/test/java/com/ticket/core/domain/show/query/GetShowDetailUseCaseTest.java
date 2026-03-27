@@ -3,6 +3,8 @@ package com.ticket.core.domain.show.query;
 import com.ticket.core.domain.show.meta.SaleType;
 import com.ticket.core.domain.show.query.ShowFinder;
 import com.ticket.core.domain.show.BookingStatus;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,5 +59,21 @@ class GetShowDetailUseCaseTest {
 
         assertThat(output).isEqualTo(detail);
         verify(showFinder).findShowDetail(1L);
+    }
+
+    @Test
+    void null_input_throws_invalid_request() {
+        assertThatThrownBy(() -> useCase.execute(null))
+                .isInstanceOf(CoreException.class)
+                .satisfies(exception -> assertThat(((CoreException) exception).getErrorType())
+                        .isEqualTo(ErrorType.INVALID_REQUEST));
+    }
+
+    @Test
+    void null_show_id_throws_invalid_request() {
+        assertThatThrownBy(() -> new GetShowDetailUseCase.Input(null))
+                .isInstanceOf(CoreException.class)
+                .satisfies(exception -> assertThat(((CoreException) exception).getErrorType())
+                        .isEqualTo(ErrorType.INVALID_REQUEST));
     }
 }
