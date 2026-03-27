@@ -1,7 +1,7 @@
 package com.ticket.core.domain.performanceseat.command;
 
 import com.ticket.core.domain.member.query.MemberFinder;
-import com.ticket.core.domain.performanceseat.support.SeatEventPublisher;
+import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
 import com.ticket.core.domain.performanceseat.support.SeatStatusMessage.SeatAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

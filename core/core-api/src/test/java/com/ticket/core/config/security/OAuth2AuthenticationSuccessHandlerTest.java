@@ -1,6 +1,6 @@
 package com.ticket.core.config.security;
 
-import com.ticket.core.domain.auth.OAuth2AuthCodeService;
+import com.ticket.core.domain.auth.infra.oauth2.OAuth2AuthCodeService;
 import com.ticket.core.config.security.MemberPrincipal;
 import com.ticket.core.domain.member.model.Role;
 import org.junit.jupiter.api.Test;

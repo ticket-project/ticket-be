@@ -1,6 +1,6 @@
 package com.ticket.core.domain.performanceseat.command;
 
-import com.ticket.core.domain.performanceseat.support.SeatEventPublisher;
+import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

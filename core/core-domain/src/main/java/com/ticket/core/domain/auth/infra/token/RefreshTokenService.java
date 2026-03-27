@@ -1,5 +1,6 @@
-package com.ticket.core.domain.auth.token;
+package com.ticket.core.domain.auth.infra.token;
 
+import com.ticket.core.domain.auth.token.AuthRefreshToken;
 import com.ticket.core.support.random.UuidSupplier;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBucket;

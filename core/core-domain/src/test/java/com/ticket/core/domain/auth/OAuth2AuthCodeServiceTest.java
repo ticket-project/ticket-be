@@ -1,5 +1,6 @@
 package com.ticket.core.domain.auth;
 
+import com.ticket.core.domain.auth.infra.oauth2.OAuth2AuthCodeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

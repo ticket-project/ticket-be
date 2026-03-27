@@ -1,6 +1,8 @@
-package com.ticket.core.domain.hold.store;
+package com.ticket.core.domain.hold.infra;
 
 import com.ticket.core.domain.hold.model.HoldSnapshot;
+import com.ticket.core.domain.hold.store.HoldSnapshotCodec;
+import com.ticket.core.domain.hold.store.HoldStore;
 import com.ticket.core.domain.performanceseat.support.SeatRedisKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

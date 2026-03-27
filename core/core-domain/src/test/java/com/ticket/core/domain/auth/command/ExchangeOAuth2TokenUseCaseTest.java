@@ -1,6 +1,6 @@
 package com.ticket.core.domain.auth.command;
 
-import com.ticket.core.domain.auth.OAuth2AuthCodeService;
+import com.ticket.core.domain.auth.infra.oauth2.OAuth2AuthCodeService;
 import com.ticket.core.domain.auth.token.AuthTokenManager;
 import com.ticket.core.domain.auth.token.IssuedAuthTokens;
 import com.ticket.core.domain.member.model.Member;
