@@ -11,6 +11,8 @@ import com.ticket.core.domain.auth.query.GetSocialLoginUrlsUseCase;
 import com.ticket.core.config.security.MemberPrincipal;
 import com.ticket.core.domain.member.model.Role;
 import com.ticket.core.support.ApiControllerAdvice;
+import com.ticket.core.support.exception.AuthException;
+import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -155,5 +157,20 @@ class AuthControllerContractTest {
                 .andExpect(jsonPath("$.data").isEmpty())
                 .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("Max-Age=0")))
                 .andExpect(jsonPath("$.error").isEmpty());
+    }
+    @Test
+    void 로그아웃_API는_실패해도_refresh_cookie를_삭제한다() throws Exception {
+        MemberPrincipal principal = new MemberPrincipal(1L, Role.MEMBER);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities())
+        );
+        when(logoutUseCase.execute(any(LogoutUseCase.Input.class)))
+                .thenThrow(new AuthException(ErrorType.AUTHENTICATION_ERROR));
+
+        mockMvc.perform(post("/api/v1/auth/logout")
+                        .cookie(new MockCookie("refresh_token", "refresh-token")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.result").value("ERROR"))
+                .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("Max-Age=0")));
     }
 }
