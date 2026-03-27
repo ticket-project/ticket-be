@@ -7,11 +7,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,19 +24,27 @@ class HoldReleaseOutboxWriterTest {
     @Mock
     private HoldReleaseOutboxRepository holdReleaseOutboxRepository;
 
-    @Test
-    void outbox를_저장하면_생성된_id를_반환한다() {
-        final OrderTerminationResult result = new OrderTerminationResult(1L, "hold-key", List.of(10L, 20L));
-        final HoldReleaseOutbox saved = HoldReleaseOutbox.create(1L, "hold-key", List.of(10L, 20L), LocalDateTime.now());
-        ReflectionTestUtils.setField(saved, "id", 99L);
-        when(holdReleaseOutboxRepository.save(any(HoldReleaseOutbox.class))).thenReturn(saved);
+    private final Clock fixedClock = Clock.fixed(Instant.parse("2026-03-15T01:00:00Z"), ZoneId.of("Asia/Seoul"));
 
-        final Long outboxId = writer().append(result);
+    @Test
+    void append_uses_clock_now_as_next_attempt_at() {
+        OrderTerminationResult result = new OrderTerminationResult(1L, "hold-key", List.of(10L, 20L));
+        LocalDateTime expectedNow = LocalDateTime.of(2026, 3, 15, 10, 0);
+        HoldReleaseOutbox saved = HoldReleaseOutbox.create(1L, "hold-key", List.of(10L, 20L), expectedNow);
+        ReflectionTestUtils.setField(saved, "id", 99L);
+        when(holdReleaseOutboxRepository.save(argThat(outbox ->
+                outbox.getPerformanceId().equals(1L)
+                        && outbox.getHoldKey().equals("hold-key")
+                        && outbox.seatIds().equals(List.of(10L, 20L))
+                        && outbox.getNextAttemptAt().equals(expectedNow)
+        ))).thenReturn(saved);
+
+        Long outboxId = writer().append(result);
 
         assertThat(outboxId).isEqualTo(99L);
     }
 
     private HoldReleaseOutboxWriter writer() {
-        return new HoldReleaseOutboxWriter(holdReleaseOutboxRepository);
+        return new HoldReleaseOutboxWriter(holdReleaseOutboxRepository, fixedClock);
     }
 }

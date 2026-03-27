@@ -1,9 +1,8 @@
 package com.ticket.core.domain.performanceseat.command;
 
 import com.ticket.core.domain.member.query.MemberFinder;
-import com.ticket.core.domain.performanceseat.command.DeselectedSeatIds;
-import com.ticket.core.domain.performanceseat.command.SeatSelectionService;
 import com.ticket.core.domain.performanceseat.support.SeatEventPublisher;
+import com.ticket.core.domain.performanceseat.support.SeatStatusMessage.SeatAction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,8 +21,10 @@ class DeselectAllSeatsUseCaseTest {
 
     @Mock
     private MemberFinder memberFinder;
+
     @Mock
     private SeatSelectionService seatSelectionService;
+
     @Mock
     private SeatEventPublisher seatEventPublisher;
 
@@ -31,17 +32,15 @@ class DeselectAllSeatsUseCaseTest {
     private DeselectAllSeatsUseCase useCase;
 
     @Test
-    void 전체_좌석_해제시_모든_좌석에_대한_이벤트를_발행한다() {
-        //given
+    void deselect_all_then_publish_each_seat() {
         when(seatSelectionService.deselectAll(10L, 1L)).thenReturn(DeselectedSeatIds.from(List.of(20L, 21L)));
 
-        //when
         useCase.execute(new DeselectAllSeatsUseCase.Input(10L, 1L));
 
-        //then
         verify(memberFinder).findActiveMemberById(1L);
         verify(seatSelectionService).deselectAll(10L, 1L);
-        verify(seatEventPublisher, times(2)).publish(org.mockito.ArgumentMatchers.any());
+        verify(seatEventPublisher).publish(10L, 20L, SeatAction.DESELECTED);
+        verify(seatEventPublisher).publish(10L, 21L, SeatAction.DESELECTED);
+        verify(seatEventPublisher, times(2)).publish(org.mockito.ArgumentMatchers.anyLong(), org.mockito.ArgumentMatchers.anyLong(), org.mockito.ArgumentMatchers.any());
     }
 }
-

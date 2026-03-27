@@ -1,10 +1,11 @@
 package com.ticket.core.domain.show.query;
 
-import com.ticket.core.domain.show.model.Show;
-import com.ticket.core.domain.show.model.Category;
-import com.ticket.core.domain.show.model.Genre;
+import com.ticket.core.domain.show.BookingStatus;
 import com.ticket.core.domain.show.image.ShowCardImagePathConverter;
 import com.ticket.core.domain.show.meta.Region;
+import com.ticket.core.domain.show.model.Category;
+import com.ticket.core.domain.show.model.Genre;
+import com.ticket.core.domain.show.model.Show;
 import com.ticket.core.domain.show.performer.Performer;
 import com.ticket.core.domain.show.venue.Venue;
 import com.ticket.core.domain.support.QueryRepositoryTestSupport;
@@ -20,7 +21,10 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import({ShowDetailQueryRepository.class, ShowCardImagePathConverter.class})
+@Import({
+        ShowDetailQueryRepository.class,
+        ShowCardImagePathConverter.class
+})
 @SuppressWarnings("NonAsciiCharacters")
 class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
 
@@ -35,7 +39,14 @@ class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
         Performer performer = persistPerformer("홍길동");
         Category category = persistCategory("CONCERT", "콘서트");
         Genre genre = persistGenre("KPOP", "케이팝", category);
-        Show show = persistShow("단독 공연", venue, performer, 321L, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(10));
+        Show show = persistShow(
+                "단독 공연",
+                venue,
+                performer,
+                321L,
+                LocalDateTime.of(2026, 3, 10, 0, 0),
+                LocalDateTime.of(2026, 3, 20, 23, 59)
+        );
         showId = show.getId();
         entityManager.createNativeQuery("update shows set image = :image where id = :id")
                 .setParameter("image", "/api/images/shows/" + showId + ".png")
@@ -44,15 +55,15 @@ class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
         persistShowGenre(show, genre);
         persistShowGrade(show, "VIP", "VIP석", BigDecimal.valueOf(150000), 1);
         persistShowGrade(show, "R", "R석", BigDecimal.valueOf(100000), 2);
-        persistPerformance(show, 1L, LocalDate.now().plusDays(1).atTime(14, 0));
-        persistPerformance(show, 2L, LocalDate.now().plusDays(1).atTime(19, 0));
+        persistPerformance(show, 1L, LocalDate.of(2026, 3, 16).atTime(14, 0));
+        persistPerformance(show, 2L, LocalDate.of(2026, 3, 16).atTime(19, 0));
         persistShowLike(persistMember("a@example.com", "A"), show);
         persistShowLike(persistMember("b@example.com", "B"), show);
         flushAndClear();
     }
 
     @Test
-    void 공연_상세정보를_조합해_조회한다() {
+    void 공연_상세정보를_조합해_조회하고_예매상태는_Clock_기준으로_계산한다() {
         Optional<GetShowDetailUseCase.Output> result = showDetailQueryRepository.findShowDetail(showId);
 
         assertThat(result).isPresent();
@@ -66,6 +77,7 @@ class ShowDetailQueryRepositoryTest extends QueryRepositoryTestSupport {
         assertThat(detail.image()).isEqualTo("/api/images/shows/card/" + showId + ".jpg");
         assertThat(detail.venue().name()).isEqualTo("예술의전당");
         assertThat(detail.performer().name()).isEqualTo("홍길동");
+        assertThat(detail.bookingStatus()).isEqualTo(BookingStatus.ON_SALE);
     }
 
     @Test

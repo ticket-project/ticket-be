@@ -71,8 +71,8 @@ public class MemberSocialAccount extends BaseEntity {
         return socialId.equals(providerId);
     }
 
-    public void withdraw() {
-        this.deletedAt = LocalDateTime.now();
+    public void withdraw(final LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
         final String idPart = id == null ? "unknown" : id.toString();
         this.socialId = "deleted_" + idPart + "_" + UUID.randomUUID();
     }

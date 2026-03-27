@@ -41,6 +41,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -76,6 +77,9 @@ public abstract class QueryRepositoryTestSupport {
 
     @Autowired
     protected EntityManager entityManager;
+
+    @Autowired
+    protected Clock clock;
 
     protected Venue persistVenue(final String name, final Region region) throws Exception {
         Venue venue = Venue.create(
@@ -128,8 +132,8 @@ public abstract class QueryRepositoryTestSupport {
                 title,
                 title + " 부제",
                 title + " 소개",
-                LocalDate.now().plusDays(1),
-                LocalDate.now().plusDays(30),
+                LocalDate.now(clock).plusDays(1),
+                LocalDate.now(clock).plusDays(30),
                 viewCount,
                 SaleType.GENERAL,
                 saleStartDate,
@@ -218,7 +222,7 @@ public abstract class QueryRepositoryTestSupport {
 
         @Bean
         Clock clock() {
-            return Clock.system(ZoneId.of("Asia/Seoul"));
+            return Clock.fixed(Instant.parse("2026-03-15T01:00:00Z"), ZoneId.of("Asia/Seoul"));
         }
     }
 
