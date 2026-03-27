@@ -26,7 +26,7 @@ public class LogoutUseCase {
                 throw new AuthException(ErrorType.AUTHORIZATION_ERROR, "본인 토큰만 무효화할 수 있습니다.");
             }
 
-            throw new AuthException(ErrorType.AUTHENTICATION_ERROR, "유효하지 않은 리프레시 토큰입니다.");
+            throw new AuthException(ErrorType.AUTHENTICATION_ERROR, "이미 무효화된 토큰이거나 처리할 수 없는 상태입니다.");
         }
 
         return new Output();

@@ -30,9 +30,20 @@ class AuditorAwareImplTest {
     }
 
     @Test
-    void 인증정보가_없으면_빈값을_반환한다() {
+    void 인증정보가_없으면_system_감사자를_반환한다() {
         AuditorAwareImpl auditorAware = new AuditorAwareImpl();
 
-        assertThat(auditorAware.getCurrentAuditor()).isEmpty();
+        assertThat(auditorAware.getCurrentAuditor()).contains("system");
+    }
+
+    @Test
+    void MemberPrincipal이_아니면_system_감사자를_반환한다() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("anonymousUser", null)
+        );
+
+        AuditorAwareImpl auditorAware = new AuditorAwareImpl();
+
+        assertThat(auditorAware.getCurrentAuditor()).contains("system");
     }
 }

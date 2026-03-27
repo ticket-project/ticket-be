@@ -2,7 +2,9 @@ package com.ticket.core.domain.auth.token;
 
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode
 public final class AuthRefreshToken {
 
     private final String value;

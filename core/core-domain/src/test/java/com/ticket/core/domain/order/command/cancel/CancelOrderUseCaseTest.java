@@ -1,28 +1,27 @@
 package com.ticket.core.domain.order.command.cancel;
 
 import com.ticket.core.domain.member.query.MemberFinder;
-import com.ticket.core.domain.order.command.cancel.OrderCanceler;
-import com.ticket.core.domain.order.model.Order;
-import com.ticket.core.domain.order.model.OrderSeat;
+import com.ticket.core.domain.order.OrderTerminationResult;
 import com.ticket.core.domain.order.command.release.HoldReleaseOutboxWriter;
 import com.ticket.core.domain.order.command.release.HoldReleaseRequestedEvent;
+import com.ticket.core.domain.order.model.Order;
+import com.ticket.core.domain.order.model.OrderSeat;
 import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.domain.order.repository.OrderSeatRepository;
-import com.ticket.core.domain.order.OrderTerminationResult;
-import com.ticket.core.domain.order.command.cancel.CancelOrderUseCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -50,17 +49,26 @@ class CancelOrderUseCaseTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
-    @InjectMocks
-    private CancelOrderUseCase useCase;
+    private final Clock fixedClock = Clock.fixed(Instant.parse("2026-03-15T01:00:00Z"), ZoneId.of("Asia/Seoul"));
 
     @Test
-    void 취소_요청이면_회원과_주문을_검증하고_hold_release_outbox를_적재한다() {
+    void 취소_요청이면_고정_Clock_시간으로_주문을_취소한다() {
+        final CancelOrderUseCase useCase = new CancelOrderUseCase(
+                memberFinder,
+                orderRepository,
+                orderSeatRepository,
+                orderCanceler,
+                holdReleaseOutboxWriter,
+                applicationEventPublisher,
+                fixedClock
+        );
         final Order order = createOrder(10L, 100L, "hold-key");
         final OrderSeat orderSeat = mock(OrderSeat.class);
         final OrderTerminationResult result = new OrderTerminationResult(100L, "hold-key", List.of(42L));
+        final LocalDateTime expectedNow = LocalDateTime.of(2026, 3, 15, 10, 0);
         when(orderRepository.findByOrderKeyAndMemberIdForUpdate("order-key", 1L)).thenReturn(java.util.Optional.of(order));
         when(orderSeatRepository.findAllByOrder_IdOrderByIdAsc(10L)).thenReturn(List.of(orderSeat));
-        when(orderCanceler.cancel(eq(order), eq(List.of(orderSeat)), any(LocalDateTime.class))).thenReturn(result);
+        when(orderCanceler.cancel(eq(order), eq(List.of(orderSeat)), eq(expectedNow))).thenReturn(result);
         when(holdReleaseOutboxWriter.append(result)).thenReturn(99L);
 
         useCase.execute(new CancelOrderUseCase.Input("order-key", 1L));
@@ -68,7 +76,7 @@ class CancelOrderUseCaseTest {
         verify(memberFinder).findActiveMemberById(1L);
         verify(orderRepository).findByOrderKeyAndMemberIdForUpdate("order-key", 1L);
         verify(orderSeatRepository).findAllByOrder_IdOrderByIdAsc(10L);
-        verify(orderCanceler).cancel(eq(order), eq(List.of(orderSeat)), any(LocalDateTime.class));
+        verify(orderCanceler).cancel(eq(order), eq(List.of(orderSeat)), eq(expectedNow));
         verify(holdReleaseOutboxWriter).append(result);
         verify(applicationEventPublisher).publishEvent(new HoldReleaseRequestedEvent(99L));
     }
