@@ -4,6 +4,8 @@ import com.ticket.core.domain.BaseEntity;
 import com.ticket.core.domain.queue.model.QueueLevel;
 import com.ticket.core.domain.queue.model.QueueMode;
 import com.ticket.core.domain.show.model.Show;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -43,7 +45,7 @@ public class Performance extends BaseEntity {
 
     private LocalDateTime orderCloseTime;
 
-    private int maxCanHoldCount;
+    private Integer maxCanHoldCount;
 
     @Column
     private Integer holdTime = 600;
@@ -78,7 +80,7 @@ public class Performance extends BaseEntity {
             final LocalDateTime endTime,
             final LocalDateTime orderOpenTime,
             final LocalDateTime orderCloseTime,
-            final int maxCanHoldCount,
+            final Integer maxCanHoldCount,
             final Integer holdTime
     ) {
         this.show = show;
@@ -87,11 +89,14 @@ public class Performance extends BaseEntity {
         this.endTime = endTime;
         this.orderOpenTime = orderOpenTime;
         this.orderCloseTime = orderCloseTime;
-        this.maxCanHoldCount = maxCanHoldCount;
+        this.maxCanHoldCount = validateMaxCanHoldCount(maxCanHoldCount);
         this.holdTime = holdTime;
     }
 
     public boolean isOverCount(final long requestReserveCount) {
+        if (maxCanHoldCount == null) {
+            return false;
+        }
         return requestReserveCount > maxCanHoldCount;
     }
 
@@ -121,5 +126,15 @@ public class Performance extends BaseEntity {
         this.preopenQueueStartAt = preopenQueueStartAt;
         this.waitingRoomMessage = waitingRoomMessage;
         this.reason = reason;
+    }
+
+    private Integer validateMaxCanHoldCount(final Integer maxCanHoldCount) {
+        if (maxCanHoldCount == null) {
+            return null;
+        }
+        if (maxCanHoldCount >= 2) {
+            return maxCanHoldCount;
+        }
+        throw new CoreException(ErrorType.INVALID_REQUEST, "maxCanHoldCount는 2 이상 또는 null 이어야 합니다.");
     }
 }

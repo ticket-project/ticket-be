@@ -24,7 +24,8 @@ public class GetPerformanceSummaryUseCase {
     public record Output(
             String title,
             String region,
-            LocalDateTime startTime
+            LocalDateTime startTime,
+            Integer maxCanHoldCount
     ) {}
 
     public Output execute(final Input input) {
@@ -43,7 +44,8 @@ public class GetPerformanceSummaryUseCase {
         return new Output(
                 show.getTitle(),
                 region != null ? region.getDescription() : null,
-                performance.getStartTime()
+                performance.getStartTime(),
+                performance.getMaxCanHoldCount()
         );
     }
 }

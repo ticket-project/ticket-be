@@ -82,7 +82,20 @@ class CreateOrderValidatorTest {
         assertThat(result).isSameAs(performance);
     }
 
-    private Performance createPerformance(final int maxCanHoldCount, final int holdTimeSeconds) {
+    @Test
+    void does_not_limit_requested_seat_count_when_hold_limit_is_null() {
+        RequestedSeatIds seatIds = RequestedSeatIds.from(List.of(1L, 2L, 3L, 4L, 5L));
+        Performance performance = createPerformance(null, 300);
+
+        when(performanceFinder.findValidPerformanceById(10L, FIXED_NOW)).thenReturn(performance);
+        when(orderRepository.findByMemberIdAndPerformanceIdAndStatus(20L, 10L, OrderState.PENDING)).thenReturn(java.util.Optional.empty());
+
+        Performance result = checker.validate(20L, 10L, seatIds, FIXED_NOW);
+
+        assertThat(result).isSameAs(performance);
+    }
+
+    private Performance createPerformance(final Integer maxCanHoldCount, final int holdTimeSeconds) {
         LocalDateTime now = LocalDateTime.of(2026, 3, 15, 10, 0);
         return new Performance(
                 null,

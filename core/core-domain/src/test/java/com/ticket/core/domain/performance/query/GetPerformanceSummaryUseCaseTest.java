@@ -40,6 +40,7 @@ class GetPerformanceSummaryUseCaseTest {
         when(performanceFinder.findById(1L)).thenReturn(performance);
         when(performance.getShow()).thenReturn(show);
         when(performance.getStartTime()).thenReturn(startTime);
+        when(performance.getMaxCanHoldCount()).thenReturn(4);
         when(show.getTitle()).thenReturn("싱어게인");
         when(show.getVenue()).thenReturn(venue);
         when(venue.getRegion()).thenReturn(Region.CHUNGCHEONG);
@@ -51,6 +52,7 @@ class GetPerformanceSummaryUseCaseTest {
         assertThat(output.title()).isEqualTo("싱어게인");
         assertThat(output.region()).isEqualTo("충청");
         assertThat(output.startTime()).isEqualTo(startTime);
+        assertThat(output.maxCanHoldCount()).isEqualTo(4);
     }
 
     @Test
@@ -77,6 +79,7 @@ class GetPerformanceSummaryUseCaseTest {
         when(performanceFinder.findById(1L)).thenReturn(performance);
         when(performance.getShow()).thenReturn(show);
         when(performance.getStartTime()).thenReturn(startTime);
+        when(performance.getMaxCanHoldCount()).thenReturn(null);
         when(show.getTitle()).thenReturn("싱어게인");
         when(show.getVenue()).thenReturn(null);
 
@@ -87,5 +90,6 @@ class GetPerformanceSummaryUseCaseTest {
         assertThat(output.title()).isEqualTo("싱어게인");
         assertThat(output.region()).isNull();
         assertThat(output.startTime()).isEqualTo(startTime);
+        assertThat(output.maxCanHoldCount()).isNull();
     }
 }
