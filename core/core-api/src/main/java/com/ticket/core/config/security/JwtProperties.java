@@ -12,6 +12,6 @@ public class JwtProperties {
     private String issuer = "ticket";
     private String secretKey;
     private long accessTokenExpirationSeconds = 1800L;
-    private long refreshTokenExpirationSeconds = 1209600L;
+    private long refreshTokenExpirationSeconds = 86400L;
 
 }
