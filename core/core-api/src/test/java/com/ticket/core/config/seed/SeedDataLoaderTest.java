@@ -3,6 +3,8 @@ package com.ticket.core.config.seed;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -14,6 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +34,10 @@ class SeedDataLoaderTest {
     );
     private static final Pattern PERFORMANCE_SEAT_STATE_PATTERN = Pattern.compile(
         "CASE\\s+WHEN.*'RESERVED'.*ELSE\\s+'AVAILABLE'\\s+END",
+        Pattern.DOTALL
+    );
+    private static final Pattern SHOW_IMAGE_PATTERN = Pattern.compile(
+        "INSERT INTO SHOWS .*? '(/api/images/shows/[^']+)'\\s*,\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*\\d+\\s*,",
         Pattern.DOTALL
     );
 
@@ -181,6 +188,37 @@ class SeedDataLoaderTest {
         assertThat(rewritten).contains("'2026-03-05 20:00:00'");
     }
 
+    @Test
+    void local_show_images_have_original_and_card_assets() throws Exception {
+        final Path staticRoot = resolveStaticRoot();
+        assertThat(staticRoot)
+            .withFailMessage("정적 이미지 루트를 찾을 수 없습니다: %s", staticRoot.toAbsolutePath())
+            .exists();
+
+        final List<String> localImagePaths = parseStatements().stream()
+            .map(this::extractLocalShowImagePath)
+            .filter(Objects::nonNull)
+            .toList();
+
+        assertThat(localImagePaths).isNotEmpty();
+
+        for (String imagePath : localImagePaths) {
+            final String relativePath = imagePath.startsWith("/") ? imagePath.substring(1) : imagePath;
+            final Path originalPath = staticRoot.resolve(relativePath);
+            final String fileName = originalPath.getFileName().toString();
+            final int extensionIndex = fileName.lastIndexOf('.');
+            final String baseName = extensionIndex >= 0 ? fileName.substring(0, extensionIndex) : fileName;
+            final Path cardPath = staticRoot.resolve(Path.of("api", "images", "shows", "card", baseName + ".jpg"));
+
+            assertThat(Files.exists(originalPath))
+                .withFailMessage("원본 공연 이미지가 없습니다: %s", originalPath.toAbsolutePath())
+                .isTrue();
+            assertThat(Files.exists(cardPath))
+                .withFailMessage("카드 공연 이미지가 없습니다: %s", cardPath.toAbsolutePath())
+                .isTrue();
+        }
+    }
+
     private int longestReservedRunLength(final int base, final int seatCount) {
         final int blockSize = base + 2;
         final int cycleSize = base + 5;
@@ -232,6 +270,26 @@ class SeedDataLoaderTest {
         }
 
         return showPeriods;
+    }
+
+    private String extractLocalShowImagePath(final String statement) {
+        final Matcher matcher = SHOW_IMAGE_PATTERN.matcher(statement);
+        if (!matcher.find()) {
+            return null;
+        }
+        return matcher.group(1);
+    }
+
+    private Path resolveStaticRoot() {
+        final List<Path> candidates = List.of(
+            Path.of("src", "main", "resources", "static"),
+            Path.of("core", "core-api", "src", "main", "resources", "static")
+        );
+
+        return candidates.stream()
+            .filter(Files::exists)
+            .findFirst()
+            .orElse(candidates.get(0));
     }
 
     private Map<Long, List<LocalDate>> extractPerformanceDates(final List<String> statements) {
