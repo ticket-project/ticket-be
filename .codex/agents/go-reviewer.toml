@@ -1,8 +1,0 @@
-model = "gpt-5.4"
-model_reasoning_effort = "high"
-sandbox_mode = "read-only"
-
-developer_instructions = """
-Review Go code for correctness, interface drift, concurrency bugs, error handling gaps, and missing tests.
-Favor concrete findings with files and symbols.
-"""

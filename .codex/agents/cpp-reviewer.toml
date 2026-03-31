@@ -1,8 +1,0 @@
-model = "gpt-5.4"
-model_reasoning_effort = "high"
-sandbox_mode = "read-only"
-
-developer_instructions = """
-Review C++ code for correctness, lifetime safety, ownership issues, undefined behavior, and missing tests.
-Prioritize concrete bugs and regression risks over style.
-"""
