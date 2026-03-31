@@ -111,10 +111,6 @@ max_depth = 1
 description = "Read-only codebase explorer for gathering evidence before changes are proposed."
 config_file = "agents/explorer.toml"
 
-[agents.reviewer]
-description = "PR reviewer focused on correctness, security, and missing tests."
-config_file = "agents/reviewer.toml"
-
 [agents.docs_researcher]
 description = "Documentation specialist that verifies APIs, framework behavior, and release notes."
 config_file = "agents/docs-researcher.toml"
@@ -143,6 +139,22 @@ config_file = "agents/security-reviewer.toml"
 description = "Build and type error resolver that fixes failures incrementally."
 config_file = "agents/build-error-resolver.toml"
 
+[agents."docs-lookup"]
+description = "Documentation lookup specialist for API references and framework behavior."
+config_file = "agents/docs-lookup.toml"
+
+[agents."java-reviewer"]
+description = "Java and Spring Boot reviewer focused on correctness, transactions, and test gaps."
+config_file = "agents/java-reviewer.toml"
+
+[agents."java-build-resolver"]
+description = "Java and Gradle/Maven build resolver for compile, dependency, and test failures."
+config_file = "agents/java-build-resolver.toml"
+
+[agents."database-reviewer"]
+description = "Database reviewer focused on schema design, queries, transactions, and performance."
+config_file = "agents/database-reviewer.toml"
+
 [agents."e2e-runner"]
 description = "End-to-end testing specialist for critical user flows and flaky scenario fixes."
 config_file = "agents/e2e-runner.toml"
@@ -155,49 +167,9 @@ config_file = "agents/refactor-cleaner.toml"
 description = "Documentation updater for runbooks, codemaps, and behavior-aligned docs."
 config_file = "agents/doc-updater.toml"
 
-[agents."docs-lookup"]
-description = "Documentation lookup specialist for API references and framework behavior."
-config_file = "agents/docs-lookup.toml"
-
-[agents."cpp-reviewer"]
-description = "C++ code reviewer focused on correctness, safety, and missing tests."
-config_file = "agents/cpp-reviewer.toml"
-
-[agents."cpp-build-resolver"]
-description = "C++ build resolver for compiler, linker, and configuration failures."
-config_file = "agents/cpp-build-resolver.toml"
-
-[agents."go-reviewer"]
-description = "Go code reviewer focused on correctness, concurrency risks, and test gaps."
-config_file = "agents/go-reviewer.toml"
-
-[agents."go-build-resolver"]
-description = "Go build resolver for module, compile, and test failures."
-config_file = "agents/go-build-resolver.toml"
-
-[agents."kotlin-reviewer"]
-description = "Kotlin reviewer for JVM, Android, and KMP code quality and regressions."
-config_file = "agents/kotlin-reviewer.toml"
-
-[agents."kotlin-build-resolver"]
-description = "Kotlin and Gradle build resolver for compiler and dependency issues."
-config_file = "agents/kotlin-build-resolver.toml"
-
-[agents."database-reviewer"]
-description = "Database reviewer focused on schema design, queries, transactions, and performance."
-config_file = "agents/database-reviewer.toml"
-
-[agents."python-reviewer"]
-description = "Python code reviewer focused on correctness, typing, and security."
-config_file = "agents/python-reviewer.toml"
-
-[agents."java-reviewer"]
-description = "Java and Spring Boot reviewer focused on correctness, transactions, and test gaps."
-config_file = "agents/java-reviewer.toml"
-
-[agents."java-build-resolver"]
-description = "Java and Gradle/Maven build resolver for compile, dependency, and test failures."
-config_file = "agents/java-build-resolver.toml"
+[agents."performance-optimizer"]
+description = "Performance analysis and optimization specialist for bottlenecks, memory, and runtime efficiency."
+config_file = "agents/performance-optimizer.toml"
 
 [agents."chief-of-staff"]
 description = "Communication specialist for drafts, triage, summaries, and stakeholder messaging."
@@ -210,19 +182,3 @@ config_file = "agents/loop-operator.toml"
 [agents."harness-optimizer"]
 description = "Harness optimizer for reliability, context budget, and tool configuration tuning."
 config_file = "agents/harness-optimizer.toml"
-
-[agents."rust-reviewer"]
-description = "Rust reviewer focused on ownership, safety, correctness, and tests."
-config_file = "agents/rust-reviewer.toml"
-
-[agents."rust-build-resolver"]
-description = "Rust build resolver for cargo, dependency, and compiler failures."
-config_file = "agents/rust-build-resolver.toml"
-
-[agents."pytorch-build-resolver"]
-description = "PyTorch build and runtime resolver for CUDA, environment, and training failures."
-config_file = "agents/pytorch-build-resolver.toml"
-
-[agents."typescript-reviewer"]
-description = "TypeScript and JavaScript reviewer focused on correctness, types, and regression risk."
-config_file = "agents/typescript-reviewer.toml"
