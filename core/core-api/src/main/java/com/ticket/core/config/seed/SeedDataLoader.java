@@ -35,7 +35,7 @@ public class SeedDataLoader implements ApplicationRunner {
         Pattern.DOTALL
     );
     private static final Pattern PERFORMANCE_INSERT_PATTERN = Pattern.compile(
-        "INSERT INTO PERFORMANCES .*?VALUES \\((\\d+), (\\d+), (\\d+), '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})'(.*)",
+        "INSERT INTO PERFORMANCES .*?VALUES \\((\\d+), (\\d+), (\\d+), '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})',\\s*(NULL|\\d+),\\s*(\\d+)(.*)",
         Pattern.DOTALL
     );
 
@@ -280,7 +280,6 @@ public class SeedDataLoader implements ApplicationRunner {
             return statement;
         }
 
-        final String suffix = matcher.group(12);
         return "INSERT INTO PERFORMANCES (id, show_id, performance_no, start_time, end_time, order_open_time, order_close_time, max_can_hold_count, hold_time, created_at, created_by) VALUES ("
             + matcher.group(1) + ", "
             + matcher.group(2) + ", "
@@ -289,7 +288,11 @@ public class SeedDataLoader implements ApplicationRunner {
             + assignedDate + " " + matcher.group(7) + "', '"
             + matcher.group(8) + " " + matcher.group(9) + "', '"
             + assignedDate + " " + matcher.group(11) + "'"
-            + suffix;
+            + ", "
+            + matcher.group(12)
+            + ", "
+            + matcher.group(13)
+            + matcher.group(14);
     }
 
     private void executeInBatches(final List<String> statements) {

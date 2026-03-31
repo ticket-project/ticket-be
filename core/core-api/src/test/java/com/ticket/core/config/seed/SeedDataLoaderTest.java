@@ -165,6 +165,22 @@ class SeedDataLoaderTest {
         }
     }
 
+    @Test
+    void rewrite_performance_statement_preserves_null_max_can_hold_count() throws Exception {
+        final SeedDataLoader loader = new SeedDataLoader(null, null);
+        final Method method = SeedDataLoader.class.getDeclaredMethod("rewritePerformanceStatement", String.class, LocalDate.class);
+        method.setAccessible(true);
+
+        final String statement = "INSERT INTO PERFORMANCES (id, show_id, performance_no, start_time, end_time, order_open_time, order_close_time, max_can_hold_count, hold_time, created_at, created_by) VALUES (1, 2, 3, '2026-03-01 19:00:00', '2026-03-01 21:00:00', '2026-02-20 10:00:00', '2026-03-01 20:00:00', NULL, 300, '2026-01-01 10:00:00', 'seed')";
+
+        final String rewritten = (String) method.invoke(loader, statement, LocalDate.of(2026, 3, 5));
+
+        assertThat(rewritten).contains(", NULL, 300,");
+        assertThat(rewritten).contains("'2026-03-05 19:00:00'");
+        assertThat(rewritten).contains("'2026-03-05 21:00:00'");
+        assertThat(rewritten).contains("'2026-03-05 20:00:00'");
+    }
+
     private int longestReservedRunLength(final int base, final int seatCount) {
         final int blockSize = base + 2;
         final int cycleSize = base + 5;

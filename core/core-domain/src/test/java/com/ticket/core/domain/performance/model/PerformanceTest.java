@@ -2,12 +2,15 @@ package com.ticket.core.domain.performance.model;
 
 import com.ticket.core.domain.queue.model.QueueLevel;
 import com.ticket.core.domain.queue.model.QueueMode;
+import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings("NonAsciiCharacters")
 class PerformanceTest {
@@ -40,6 +43,24 @@ class PerformanceTest {
 
         //then
         assertThat(performance.isOverCount(3)).isFalse();
+    }
+
+    @Test
+    void treats_null_hold_limit_as_unlimited() {
+        Performance performance = createPerformance(null, LocalDateTime.now().minusMinutes(10), LocalDateTime.now().plusMinutes(10));
+
+        assertThat(performance.isOverCount(999)).isFalse();
+    }
+
+    @Test
+    void rejects_hold_limit_less_than_two() {
+        assertThatThrownBy(() -> createPerformance(1, LocalDateTime.now().minusMinutes(10), LocalDateTime.now().plusMinutes(10)))
+                .isInstanceOf(CoreException.class)
+                .satisfies(error -> assertThat(((CoreException) error).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
+
+        assertThatThrownBy(() -> createPerformance(0, LocalDateTime.now().minusMinutes(10), LocalDateTime.now().plusMinutes(10)))
+                .isInstanceOf(CoreException.class)
+                .satisfies(error -> assertThat(((CoreException) error).getErrorType()).isEqualTo(ErrorType.INVALID_REQUEST));
     }
 
     @Test
@@ -132,7 +153,7 @@ class PerformanceTest {
     }
 
     private Performance createPerformance(
-            final int maxCanHoldCount,
+            final Integer maxCanHoldCount,
             final LocalDateTime orderOpenTime,
             final LocalDateTime orderCloseTime
     ) {
