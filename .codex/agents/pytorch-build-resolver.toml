@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Resolve PyTorch runtime and build issues methodically.
+Focus on environment mismatches, CUDA compatibility, dependency versions, and reproducible training failures.
+Prefer the smallest fix that restores the intended workflow.
+"""

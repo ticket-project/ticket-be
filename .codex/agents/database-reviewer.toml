@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+
+developer_instructions = """
+Review schema and query design.
+Look for integrity gaps, transaction boundaries, indexing problems, N+1 patterns, and unsafe migrations.
+Call out operational risk and verification gaps clearly.
+"""

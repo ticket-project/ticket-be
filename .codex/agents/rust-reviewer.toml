@@ -1,0 +1,8 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+
+developer_instructions = """
+Review Rust code for ownership correctness, unsafe usage, lifetimes, concurrency, and missing tests.
+Prioritize concrete bugs and soundness issues.
+"""

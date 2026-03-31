@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Resolve C++ build failures methodically.
+Focus on compiler errors, linker issues, build flags, and dependency mismatches.
+Keep fixes minimal and re-run the relevant build command after each step.
+"""

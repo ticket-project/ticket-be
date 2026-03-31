@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Focus on end-to-end user flows.
+Prefer stable selectors, deterministic setup, and minimal product changes needed to make scenarios reliable.
+Treat flaky tests, timing dependence, and missing assertions as first-class issues.
+"""

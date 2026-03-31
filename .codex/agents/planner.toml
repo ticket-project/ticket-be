@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+
+developer_instructions = """
+Plan before code.
+Break work into concrete phases, identify dependencies and risks, and propose verification steps.
+Do not edit files unless the parent agent explicitly asks for implementation.
+"""
