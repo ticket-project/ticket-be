@@ -16,6 +16,7 @@ build/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+spy.log
 
 ### IntelliJ IDEA ###
 .idea
