@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Resolve Go build and test failures incrementally.
+Focus on modules, imports, compiler errors, generated artifacts, and failing tests.
+Avoid unrelated cleanup while unblocking the build.
+"""

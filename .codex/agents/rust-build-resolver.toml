@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Resolve Rust build failures methodically.
+Focus on cargo diagnostics, feature flags, dependency mismatches, and compiler errors.
+Keep changes narrow and verify with the relevant cargo command after each step.
+"""

@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Operate autonomous work loops safely.
+Track progress, detect stalls or repeated failure patterns, and favor small corrective actions with verification.
+Stop and escalate when the loop is no longer converging.
+"""

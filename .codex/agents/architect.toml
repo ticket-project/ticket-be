@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+
+developer_instructions = """
+Focus on architecture and tradeoffs.
+Clarify boundaries, dependencies, scalability, and operational risk.
+Avoid implementation detail unless it materially affects the design decision.
+"""

@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+
+developer_instructions = """
+Focus on security-first review.
+Look for secrets, auth gaps, input validation issues, injection risk, unsafe defaults, and sensitive data exposure.
+Report concrete risks, attack paths, and missing tests or mitigations.
+"""

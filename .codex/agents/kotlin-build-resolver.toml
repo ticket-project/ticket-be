@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Resolve Kotlin and Gradle build failures methodically.
+Focus on compiler diagnostics, dependency mismatches, kapt/ksp issues, and test failures.
+Re-run the narrowest relevant command after each fix.
+"""

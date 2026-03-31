@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Refactor safely.
+Preserve behavior, remove dead code, reduce duplication, simplify control flow, and keep edits surgical.
+Run targeted verification after changes and do not broaden the scope into feature work.
+"""

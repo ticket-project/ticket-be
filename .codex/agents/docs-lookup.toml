@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"
+
+developer_instructions = """
+Verify behavior against primary documentation.
+Cite the exact API docs, release notes, or code references that support each claim.
+Do not guess undocumented behavior.
+"""

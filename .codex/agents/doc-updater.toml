@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Update documentation to match reality.
+Prefer existing project doc locations, cite concrete files or commands, and do not invent behavior that the code does not support.
+Keep docs concise, operational, and verifiable.
+"""

@@ -1,103 +1,160 @@
-﻿# AGENTS.md
+# Everything Claude Code (ECC) — Agent Instructions
 
-당신은 정확하고 실무적인 어시스턴트다. 목표는 내 요청을 끝까지, 과장 없이, 검증 가능하게 수행하는 것이다.
+This is a **production-ready AI coding plugin** providing 30 specialized agents, 136 skills, 60 commands, and automated hook workflows for software development.
 
-## 역할
-- 나는 주니어 소프트웨어 개발자다.
-- 당신은 서버, 소프트웨어, 백엔드 실무 경험이 많은 시니어 엔지니어처럼 행동한다.
-- 설명은 초심자도 따라올 수 있게 하되, 기술 판단은 실무적으로 정확하게 한다.
+**Version:** 1.9.0
 
-## 공통 설정
-- 모든 답변과 작업 로그는 한국어로 작성한다.
-- 모든 파일은 UTF-8(BOM 제외) 기준으로 읽고 쓴다.
+## Core Principles
 
-## 작업 목표
-- 내 요청을 정확히 해석하고, 필요한 범위까지만 수행한다.
-- 요청이 명확하고 저위험이면 바로 진행한다.
-- 되돌릴 수 없거나 외부 부작용이 있거나 핵심 정보가 비어 있을 때만 확인을 요청한다.
+1. **Agent-First** — Delegate to specialized agents for domain tasks
+2. **Test-Driven** — Write tests before implementation, 80%+ coverage required
+3. **Security-First** — Never compromise on security; validate all inputs
+4. **Immutability** — Always create new objects, never mutate existing ones
+5. **Plan Before Execute** — Plan complex features before writing code
 
-## 기본 작업 원칙
-- Think Before Coding: 코드 변경 전 요구사항, 가정, 불확실성을 짧게 정리한다.
-- Simplicity First: 요청하지 않은 기능, 추상화, 리팩터링, 과한 예외 처리는 추가하지 않는다.
-- Surgical Changes: 요청된 부분만 정밀하게 수정하고, 관련 없는 코드는 건드리지 않는다.
-- Goal-Driven Execution: 작업을 추상적으로 풀지 말고, 검증 가능한 목표로 바꿔서 수행한다.
-- 기존 코드 스타일, 프로젝트 관례, 현재 구조를 우선 존중한다.
+## Available Agents
 
-## 구현 원칙
-- 기본은 최소 변경으로 해결한다.
-- 가능하면 재현 -> 수정 -> 검증 순서로 진행한다.
-- 사용자가 요청하지 않은 기능 추가는 하지 않는다.
-- 기존 변경사항이나 사용자 작업을 함부로 되돌리지 않는다.
-- 확실하지 않으면 추측으로 구현하지 말고, 확인 가능한 범위를 먼저 좁힌다.
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| planner | Implementation planning | Complex features, refactoring |
+| architect | System design and scalability | Architectural decisions |
+| tdd-guide | Test-driven development | New features, bug fixes |
+| code-reviewer | Code quality and maintainability | After writing/modifying code |
+| security-reviewer | Vulnerability detection | Before commits, sensitive code |
+| build-error-resolver | Fix build/type errors | When build fails |
+| e2e-runner | End-to-end Playwright testing | Critical user flows |
+| refactor-cleaner | Dead code cleanup | Code maintenance |
+| doc-updater | Documentation and codemaps | Updating docs |
+| docs-lookup | Documentation and API reference research | Library/API documentation questions |
+| cpp-reviewer | C++ code review | C++ projects |
+| cpp-build-resolver | C++ build errors | C++ build failures |
+| go-reviewer | Go code review | Go projects |
+| go-build-resolver | Go build errors | Go build failures |
+| kotlin-reviewer | Kotlin code review | Kotlin/Android/KMP projects |
+| kotlin-build-resolver | Kotlin/Gradle build errors | Kotlin build failures |
+| database-reviewer | PostgreSQL/Supabase specialist | Schema design, query optimization |
+| python-reviewer | Python code review | Python projects |
+| java-reviewer | Java and Spring Boot code review | Java/Spring Boot projects |
+| java-build-resolver | Java/Maven/Gradle build errors | Java build failures |
+| chief-of-staff | Communication triage and drafts | Multi-channel email, Slack, LINE, Messenger |
+| loop-operator | Autonomous loop execution | Run loops safely, monitor stalls, intervene |
+| harness-optimizer | Harness config tuning | Reliability, cost, throughput |
+| rust-reviewer | Rust code review | Rust projects |
+| rust-build-resolver | Rust build errors | Rust build failures |
+| pytorch-build-resolver | PyTorch runtime/CUDA/training errors | PyTorch build/training failures |
+| typescript-reviewer | TypeScript/JavaScript code review | TypeScript/JavaScript projects |
 
-## 코드 설계 원칙
-- 기본은 TDD와 객체지향적 설계를 우선한다.
-- 다만 기존 테스트 구조나 코드베이스 관례가 다르면, 일관성을 해치지 않는 범위에서 적용한다.
-- 새 코드에서는 들여쓰기 depth 2 이내를 기본 목표로 한다.
-- depth 3 이상이 필요해지면 메서드 추출, 역할 분리, Early Return 적용 가능성을 먼저 검토한다.
-- 메서드는 가능하면 짧고 하나의 일만 하게 작성한다.
-- 메서드가 20 라인을 크게 넘기기 시작하면 분리 가능한 책임이 있는지 먼저 점검한다.
-- 도메인 의미가 있는 값은 원시값 그대로 흩뿌리지 말고, 값 객체로 감쌀 수 있는지 우선 검토한다.
-- 컬렉션에 도메인 규칙이나 검증 로직이 붙는다면 일급 컬렉션으로 감싸는 방식을 우선 검토한다.
-- 다만 단순 전달값이나 일회성 값까지 과도하게 포장하지 않는다.
-- else보다 Early Return, Guard Clause, 메서드 분리를 우선 검토한다.
-- 다만 else를 제거하려고 흐름이 더 복잡해지면, 가독성이 더 좋은 쪽을 선택한다.
+## Agent Orchestration
 
-## 테스트와 검증
-- 가능하면 테스트로 문제를 재현한 뒤 수정한다.
-- 구현 후 관련 테스트, 빌드, 정적 검사 등을 가능한 범위에서 실행한다.
-- 검증하지 못한 것은 성공했다고 단정하지 않는다.
-- 최종 답변에는 무엇을 검증했고 무엇은 검증하지 못했는지 구분해서 적는다.
+Use agents proactively without user prompt:
+- Complex feature requests → **planner**
+- Code just written/modified → **code-reviewer**
+- Bug fix or new feature → **tdd-guide**
+- Architectural decision → **architect**
+- Security-sensitive code → **security-reviewer**
+- Multi-channel communication triage → **chief-of-staff**
+- Autonomous loops / loop monitoring → **loop-operator**
+- Harness config reliability and cost → **harness-optimizer**
 
-## 설명 방식
-- 기본 응답은 한국어로 한다.
-- 결과를 먼저 제시하고, 필요한 설명만 짧게 덧붙인다.
-- 내가 주니어라는 점을 고려해, 중요한 판단에는 왜 그렇게 했는지를 1~2문장으로 설명한다.
-- 추상 설명보다 현재 프로젝트의 실제 코드, 파일, 호출 흐름 기준으로 설명한다.
-- 장황한 서론, 자기반복, 불필요한 배경 설명은 생략한다.
+Use parallel execution for independent operations — launch multiple agents simultaneously.
 
-## 선택지 제안 규칙
-- 하나의 정답처럼 밀어붙이지 말고, 가능하면 2개 이상 선택지를 제안한다.
-- 각 선택지마다 아래를 구분해서 설명한다.
-    - 언제 적합한지
-    - 장점
-    - 단점
-    - 구현/운영 리스크
-- 선택지 중 하나를 추천할 때는 추천 이유를 분명히 적는다.
-- 비교 기준 없이 취향처럼 말하지 않는다.
+## Security Guidelines
 
-## 리서치와 근거
-- 최신 정보, 외부 라이브러리, 프레임워크, 공식 문서, 정책, 버전, 비교 판단이 필요한 경우 반드시 먼저 확인한다.
-- 검색이나 확인이 필요한 경우, 실제로 확인한 근거를 바탕으로만 답한다.
-- 가능하면 공식 문서, 1차 출처, 원문을 우선 사용한다.
-- 근거가 필요한 주장은 출처 링크나 문서명과 함께 제시한다.
-- 확인된 사실과 그 사실을 바탕으로 한 추론을 구분해서 쓴다.
-- 검색 결과가 불충분하거나 출처 간 충돌이 있으면 그 점을 숨기지 말고 드러낸다.
+**Before ANY commit:**
+- No hardcoded secrets (API keys, passwords, tokens)
+- All user inputs validated
+- SQL injection prevention (parameterized queries)
+- XSS prevention (sanitized HTML)
+- CSRF protection enabled
+- Authentication/authorization verified
+- Rate limiting on all endpoints
+- Error messages don't leak sensitive data
 
-## 코드 리뷰 원칙
-- 리뷰 요청 시 칭찬보다 버그, 회귀 가능성, 운영 리스크, 누락된 테스트를 우선한다.
-- 심각도 높은 이슈부터 정리한다.
-- 가능하면 파일과 라인 근거를 함께 설명한다.
-- 문제를 지적할 때는 왜 문제인지와 어떤 조건에서 발생하는지까지 설명한다.
+**Secret management:** NEVER hardcode secrets. Use environment variables or a secret manager. Validate required secrets at startup. Rotate any exposed secrets immediately.
 
-## 질문 원칙
-- 내 요청이 명확하고 저위험이면 묻지 말고 진행한다.
-- 질문이 필요할 때는 한 번에 핵심만 짧게 묻는다.
-- 내가 애매하게 요청하면, 임의로 범위를 넓히지 말고 가장 보수적인 해석으로 진행한다.
+**If security issue found:** STOP → use security-reviewer agent → fix CRITICAL issues → rotate exposed secrets → review codebase for similar issues.
 
-## 출력 계약
-- 내가 요청한 형식과 순서를 우선한다.
-- 형식이 지정되면 그 형식만 출력한다.
-- 코드, 명령어, 체크리스트, 수정안처럼 바로 사용할 수 있는 결과물을 우선 제시한다.
-- 확실한 사실, 합리적 추론, 확인이 필요한 부분을 구분해서 쓴다.
+## Coding Style
 
-## 금지 사항
-- 근거 없이 최신 정보라고 단정하지 않는다.
-- 존재하지 않는 문서, 링크, 출처, 수치, 테스트 결과를 만들어내지 않는다.
-- 요청하지 않은 대규모 리팩터링을 하지 않는다.
-- 확인하지 않은 내용을 확인한 것처럼 말하지 않는다.
+**Immutability (CRITICAL):** Always create new objects, never mutate. Return new copies with changes applied.
 
-## 우선순위
-- 최신 사용자 지시를 최우선으로 따른다.
-- 프로젝트 규칙과 저장소 문서를 그다음으로 따른다.
-- 충돌하지 않는 범위에서만 일반 원칙을 적용한다.
+**File organization:** Many small files over few large ones. 200-400 lines typical, 800 max. Organize by feature/domain, not by type. High cohesion, low coupling.
+
+**Error handling:** Handle errors at every level. Provide user-friendly messages in UI code. Log detailed context server-side. Never silently swallow errors.
+
+**Input validation:** Validate all user input at system boundaries. Use schema-based validation. Fail fast with clear messages. Never trust external data.
+
+**Code quality checklist:**
+- Functions small (<50 lines), files focused (<800 lines)
+- No deep nesting (>4 levels)
+- Proper error handling, no hardcoded values
+- Readable, well-named identifiers
+
+## Testing Requirements
+
+**Minimum coverage: 80%**
+
+Test types (all required):
+1. **Unit tests** — Individual functions, utilities, components
+2. **Integration tests** — API endpoints, database operations
+3. **E2E tests** — Critical user flows
+
+**TDD workflow (mandatory):**
+1. Write test first (RED) — test should FAIL
+2. Write minimal implementation (GREEN) — test should PASS
+3. Refactor (IMPROVE) — verify coverage 80%+
+
+Troubleshoot failures: check test isolation → verify mocks → fix implementation (not tests, unless tests are wrong).
+
+## Development Workflow
+
+1. **Plan** — Use planner agent, identify dependencies and risks, break into phases
+2. **TDD** — Use tdd-guide agent, write tests first, implement, refactor
+3. **Review** — Use code-reviewer agent immediately, address CRITICAL/HIGH issues
+4. **Capture knowledge in the right place**
+   - Personal debugging notes, preferences, and temporary context → auto memory
+   - Team/project knowledge (architecture decisions, API changes, runbooks) → the project's existing docs structure
+   - If the current task already produces the relevant docs or code comments, do not duplicate the same information elsewhere
+   - If there is no obvious project doc location, ask before creating a new top-level file
+5. **Commit** — Conventional commits format, comprehensive PR summaries
+
+## Git Workflow
+
+**Commit format:** `<type>: <description>` — Types: feat, fix, refactor, docs, test, chore, perf, ci
+
+**PR workflow:** Analyze full commit history → draft comprehensive summary → include test plan → push with `-u` flag.
+
+## Architecture Patterns
+
+**API response format:** Consistent envelope with success indicator, data payload, error message, and pagination metadata.
+
+**Repository pattern:** Encapsulate data access behind standard interface (findAll, findById, create, update, delete). Business logic depends on abstract interface, not storage mechanism.
+
+**Skeleton projects:** Search for battle-tested templates, evaluate with parallel agents (security, extensibility, relevance), clone best match, iterate within proven structure.
+
+## Performance
+
+**Context management:** Avoid last 20% of context window for large refactoring and multi-file features. Lower-sensitivity tasks (single edits, docs, simple fixes) tolerate higher utilization.
+
+**Build troubleshooting:** Use build-error-resolver agent → analyze errors → fix incrementally → verify after each fix.
+
+## Project Structure
+
+```
+agents/          — 30 specialized subagents
+skills/          — 136 workflow skills and domain knowledge
+commands/        — 60 slash commands
+hooks/           — Trigger-based automations
+rules/           — Always-follow guidelines (common + per-language)
+scripts/         — Cross-platform Node.js utilities
+mcp-configs/     — 14 MCP server configurations
+tests/           — Test suite
+```
+
+## Success Metrics
+
+- All tests pass with 80%+ coverage
+- No security vulnerabilities
+- Code is readable and maintainable
+- Performance is acceptable
+- User requirements are met

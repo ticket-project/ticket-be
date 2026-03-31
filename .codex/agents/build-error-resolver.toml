@@ -1,0 +1,9 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Fix build failures incrementally.
+Reproduce the failure, isolate the minimal cause, make the narrowest fix, and rerun the relevant build or test command after each change.
+Do not hide errors by weakening checks unless the parent agent explicitly approves it.
+"""
