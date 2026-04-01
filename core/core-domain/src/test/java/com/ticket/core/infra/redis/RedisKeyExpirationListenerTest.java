@@ -1,12 +1,5 @@
 package com.ticket.core.infra.redis;
 
-import com.ticket.core.domain.order.command.expire.ExpireOrderUseCase;
-import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
-import com.ticket.core.domain.performanceseat.support.SeatRedisKey;
-import com.ticket.core.domain.performanceseat.support.SeatStatusMessage;
-import com.ticket.core.domain.queue.command.QueueAdmissionAdvancer;
-import com.ticket.core.domain.queue.model.QueueEntryId;
-import com.ticket.core.domain.queue.runtime.QueueRedisKey;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -14,73 +7,51 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.connection.Message;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
 class RedisKeyExpirationListenerTest {
 
     @Mock
-    private SeatEventPublisher seatEventPublisher;
+    private RedisKeyExpirationHandler firstHandler;
 
     @Mock
-    private ExpireOrderUseCase expireOrderUseCase;
-
-    @Mock
-    private QueueAdmissionAdvancer queueAdmissionAdvancer;
-
-    private final Clock fixedClock = Clock.fixed(Instant.parse("2026-03-15T01:00:00Z"), ZoneId.of("Asia/Seoul"));
+    private RedisKeyExpirationHandler secondHandler;
 
     @Test
-    void 홀드_만료_이벤트는_Clock_기준_시간으로_주문_만료를_처리한다() {
-        RedisKeyExpirationListener listener = new RedisKeyExpirationListener(
-                seatEventPublisher,
-                expireOrderUseCase,
-                queueAdmissionAdvancer,
-                fixedClock
-        );
+    void 만료_키를_처리할_수_있는_첫번째_핸들러에만_위임한다() {
+        RedisKeyExpirationListener listener = new RedisKeyExpirationListener(List.of(firstHandler, secondHandler));
 
-        listener.onMessage(message(SeatRedisKey.holdMeta("hold-key")), new byte[0]);
+        when(firstHandler.supports("seat:select:10:20")).thenReturn(true);
 
-        verify(expireOrderUseCase).expireByHoldKey("hold-key", LocalDateTime.of(2026, 3, 15, 10, 0));
-        verifyNoInteractions(queueAdmissionAdvancer);
+        listener.onMessage(message("seat:select:10:20"), new byte[0]);
+
+        verify(firstHandler).supports("seat:select:10:20");
+        verify(firstHandler).handle("seat:select:10:20");
+        verify(secondHandler, never()).supports(anyString());
+        verifyNoInteractions(secondHandler);
     }
 
     @Test
-    void 좌석_선택_만료_이벤트는_DESELECTED를_발행한다() {
-        RedisKeyExpirationListener listener = new RedisKeyExpirationListener(
-                seatEventPublisher,
-                expireOrderUseCase,
-                queueAdmissionAdvancer,
-                fixedClock
-        );
+    void 지원하는_핸들러가_없으면_아무_처리도_하지_않는다() {
+        RedisKeyExpirationListener listener = new RedisKeyExpirationListener(List.of(firstHandler, secondHandler));
 
-        listener.onMessage(message(SeatRedisKey.select(10L, 20L)), new byte[0]);
+        when(firstHandler.supports("unknown:key")).thenReturn(false);
+        when(secondHandler.supports("unknown:key")).thenReturn(false);
 
-        verify(seatEventPublisher).publish(10L, 20L, SeatStatusMessage.SeatAction.DESELECTED);
-        verifyNoInteractions(expireOrderUseCase, queueAdmissionAdvancer);
-    }
+        listener.onMessage(message("unknown:key"), new byte[0]);
 
-    @Test
-    void 대기열_토큰_만료_이벤트는_입장_만료를_처리한다() {
-        RedisKeyExpirationListener listener = new RedisKeyExpirationListener(
-                seatEventPublisher,
-                expireOrderUseCase,
-                queueAdmissionAdvancer,
-                fixedClock
-        );
-        String queueToken = QueueRedisKey.createToken(30L, "entry-1", "token-1");
-
-        listener.onMessage(message(QueueRedisKey.tokenStorageKey(queueToken)), new byte[0]);
-
-        verify(queueAdmissionAdvancer).handleTokenExpired(30L, QueueEntryId.from("entry-1"), queueToken);
-        verifyNoInteractions(seatEventPublisher, expireOrderUseCase);
+        verify(firstHandler).supports("unknown:key");
+        verify(secondHandler).supports("unknown:key");
+        verify(firstHandler, never()).handle(anyString());
+        verify(secondHandler, never()).handle(anyString());
     }
 
     private Message message(final String body) {
