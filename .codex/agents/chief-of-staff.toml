@@ -146,7 +146,7 @@ claude /schedule-reply "Reply to Sarah about the board meeting"
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
 - Gmail CLI (e.g., gog by @pterm)
-- Node.js 18+ (for calendar-suggest.js)
+- A working local runtime for helper scripts when scheduling automation is used
 - Optional: Slack MCP server, Matrix bridge (LINE), Chrome + Playwright (Messenger)
 
 '''
