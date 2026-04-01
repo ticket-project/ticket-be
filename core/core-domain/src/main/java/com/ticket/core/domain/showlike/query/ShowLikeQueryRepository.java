@@ -34,7 +34,7 @@ public class ShowLikeQueryRepository {
             where.and(showLike.id.lt(cursorLikeId));
         }
 
-        List<Tuple> rows = queryFactory
+        final List<Tuple> rows = queryFactory
                 .select(
                         showLike.id,
                         show.id,
@@ -54,21 +54,23 @@ public class ShowLikeQueryRepository {
                 .fetch();
 
         if (rows.isEmpty()) {
-            return new CursorSlice<>(new SliceImpl<>(List.of(), PageRequest.of(0, size), false), null);
+            return emptyCursorSlice(size);
         }
 
         final boolean hasNext = rows.size() > size;
-        if (hasNext) {
-            rows = rows.subList(0, size);
-        }
+        final List<Tuple> pageRows = hasNext ? rows.subList(0, size) : rows;
 
-        final List<GetMyShowLikesUseCase.ShowLikeSummary> items = rows.stream()
+        final List<GetMyShowLikesUseCase.ShowLikeSummary> items = pageRows.stream()
                 .map(this::mapRow)
                 .toList();
 
         final Slice<GetMyShowLikesUseCase.ShowLikeSummary> slice = new SliceImpl<>(items, PageRequest.of(0, size), hasNext);
-        final String nextCursor = hasNext ? String.valueOf(rows.get(rows.size() - 1).get(showLike.id)) : null;
+        final String nextCursor = hasNext ? String.valueOf(pageRows.get(pageRows.size() - 1).get(showLike.id)) : null;
         return new CursorSlice<>(slice, nextCursor);
+    }
+
+    private <T> CursorSlice<T> emptyCursorSlice(final int size) {
+        return new CursorSlice<>(new SliceImpl<>(List.of(), PageRequest.of(0, size), false), null);
     }
 
     private GetMyShowLikesUseCase.ShowLikeSummary mapRow(final Tuple tuple) {
