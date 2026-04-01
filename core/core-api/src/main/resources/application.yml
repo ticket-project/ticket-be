@@ -44,6 +44,16 @@ spring:
 server:
   forward-headers-strategy: framework
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
 springdoc:
   use-fqn: true
   default-consumes-media-type: application/json;charset=UTF-8
