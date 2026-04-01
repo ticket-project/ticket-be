@@ -64,6 +64,14 @@ class PerformanceTest {
     }
 
     @Test
+    void accepts_hold_limit_of_two_as_minimum_boundary() {
+        Performance performance = createPerformance(2, LocalDateTime.now().minusMinutes(10), LocalDateTime.now().plusMinutes(10));
+
+        assertThat(performance.isOverCount(2)).isFalse();
+        assertThat(performance.isOverCount(3)).isTrue();
+    }
+
+    @Test
     void 오픈시간과_마감시간_사이면_예매가능하다() {
         //given
         //when
