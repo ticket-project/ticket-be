@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -21,7 +23,7 @@ public class HoldReleaseOutboxExecutor {
     private final HoldManager holdManager;
     private final SeatStatusPublisher seatStatusPublisher;
 
-    @Transactional
+    @Transactional(propagation = REQUIRES_NEW)
     public void process(final Long outboxId, final LocalDateTime now) {
         final HoldReleaseOutbox outbox = holdReleaseOutboxRepository.findByIdForUpdate(outboxId)
                 .orElse(null);

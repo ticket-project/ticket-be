@@ -158,3 +158,25 @@ tests/           — Test suite
 - Code is readable and maintainable
 - Performance is acceptable
 - User requirements are met
+
+## 이 저장소 작업 기준
+
+이 저장소는 ECC 템플릿을 기반으로 하지만, 실제 작업 흐름은 로컬 Codex 설정과 프로젝트 문서를 기준으로 맞춘다.
+
+- 현재 동작 기준 문서는 `README_CODEX.md`, 패키지/모듈 경계 기준 문서는 `README_ARCHITECTURE.md`다. `README.md`, `README_JUNIE.md`는 초안/예전 참고 문서로 보고, 해당 문서를 직접 다루는 작업이 아니면 우선순위를 낮춘다.
+- 구조 변경이나 설계 비중이 큰 작업은 `docs/superpowers/plans/`와 `docs/superpowers/specs/`에 계획/설계 문서를 짝으로 남기는 현재 흐름을 따른다.
+- Codex 전용 역할은 `.codex/agents/*.toml`에 정의되어 있고 `.codex/config.toml`에서 `[features] multi_agent = true`로 켜져 있다. Codex CLI에서는 `/agent`로 역할 상태를 확인하거나 조정한다.
+- 프로젝트 스킬은 루트 `skills/`가 아니라 `.agents/skills/` 경로를 기준으로 본다.
+- 기술 의존이나 패키지 경계를 건드리는 변경은 `core/core-domain/src/test/java/com/ticket/core/domain/CoreDomainArchitectureTest.java`와 `CoreDomainModuleStructureTest.java`가 포함된 `:core:core-domain:test` 검증을 우선 확인한다.
+
+현재 문서와 워크플로 파일에서 확인된 공통 명령:
+
+```bash
+docker compose up -d redis
+./gradlew :core:core-api:bootRun
+./gradlew :core:core-api:compileJava
+./gradlew :core:core-domain:test
+./gradlew clean :core:core-api:bootJar -x test
+```
+
+- 위 `bootJar` 명령은 현재 `.github/workflows/deploy.yml` 배포 흐름과 맞춘 기준이다.
