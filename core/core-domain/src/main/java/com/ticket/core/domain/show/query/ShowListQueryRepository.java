@@ -169,13 +169,11 @@ public class ShowListQueryRepository {
             return emptyCursorSlice(size);
         }
 
-        List<T> results = new ArrayList<>(resultFetcher.apply(context, ids));
+        final List<T> results = new ArrayList<>(resultFetcher.apply(context, ids));
         final boolean hasNext = results.size() > size;
-        if (hasNext) {
-            results = results.subList(0, size);
-        }
+        final List<T> pageResults = hasNext ? results.subList(0, size) : results;
 
-        final Slice<T> slice = new SliceImpl<>(results, PageRequest.of(0, size), hasNext);
+        final Slice<T> slice = new SliceImpl<>(pageResults, PageRequest.of(0, size), hasNext);
         final String nextCursor = hasNext
                 ? showCursorPolicy.buildNextCursor(rows, size, sortOrder)
                 : null;
@@ -216,7 +214,7 @@ public class ShowListQueryRepository {
                         s.getTitle(),
                         s.getSubTitle(),
                         showCardImagePathConverter.toCardImage(s.getImage()),
-                        genreMap.getOrDefault(s.getId(), new ArrayList<>()),
+                        genreMap.getOrDefault(s.getId(), List.of()),
                         s.getStartDate(),
                         s.getEndDate(),
                         s.getViewCount(),
