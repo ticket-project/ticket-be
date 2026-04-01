@@ -54,12 +54,12 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.HOST_IP }}
-          username: ubuntu
+          username: root
           key: ${{ secrets.SSH_KEY }}
           script: |
             set -e
             IMAGE="${{ secrets.DOCKER_USERNAME }}/ticket-be:latest"
-            DEPLOY_DIR="/home/ubuntu"
+            DEPLOY_DIR="/root"
             CURRENT_FE_IMAGE="$(sudo docker inspect ticket-fe --format '{{.Config.Image}}' 2>/dev/null || true)"
 
             if [ -z "$CURRENT_FE_IMAGE" ]; then
@@ -71,4 +71,5 @@ jobs:
             sudo docker pull "$IMAGE"
             sudo DOCKER_IMAGE="$IMAGE" FRONTEND_DOCKER_IMAGE="$CURRENT_FE_IMAGE" \
               docker compose -f "$DEPLOY_DIR/docker-compose.yml" up -d --remove-orphans
+            sudo docker restart ticket-nginx
             sudo docker image prune -f
