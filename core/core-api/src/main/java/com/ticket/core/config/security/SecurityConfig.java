@@ -89,6 +89,8 @@ public class SecurityConfig {
                         // 정적 리소스 & 인프라
                         .requestMatchers("/", "/api/swagger-ui.html", "/api/swagger-ui/**",
                                 "/api/api-docs/**", "/ws/**","/api/images/**").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/health/**",
+                                "/actuator/info", "/actuator/prometheus").permitAll()
                         // 인증 관련 (로그아웃 제외 — 로그아웃은 인증 필요)
                         .requestMatchers("/api/v1/auth/signup", "/api/v1/auth/login",
                                 "/api/v1/auth/refresh", "/api/v1/auth/oauth2/token",
