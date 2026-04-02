@@ -1,83 +1,99 @@
-# ECC for Codex CLI
+# Ticket Codex 리뷰 가이드
 
-이 문서는 루트 [AGENTS.md](/Users/mn040/IdeaProjects/ticket/AGENTS.md)를 보완하는 `.codex` 전용 운영 가이드다.
-이 저장소의 기본 기준은 Java, Spring Boot, Gradle, JUnit, Redis, Querydsl이다. 다른 템플릿 기준 예시는 적용하지 않는다.
+이 문서는 루트 [AGENTS.md](C:/Users/mn040/IdeaProjects/ticket/AGENTS.md)를 보완하는 Codex 전용 지침이다.
+이 저장소에서 Codex는 기본적으로 Java, Spring Boot, Gradle, JUnit, Redis, Querydsl 기반 백엔드 저장소를 리뷰한다고 가정한다.
 
 ## 기본 원칙
 
-- 실행 기준 문서는 [README_CODEX.md](/Users/mn040/IdeaProjects/ticket/README_CODEX.md) 와 [README_ARCHITECTURE.md](/Users/mn040/IdeaProjects/ticket/README_ARCHITECTURE.md) 다.
-- 구조 변경은 현재 모듈 경계와 아키텍처 테스트를 존중한다.
-- 범용 에이전트도 이 저장소에서는 Java/Spring/Gradle 워크플로를 우선 사용한다.
-- 명령 예시는 가능하면 `./gradlew` 기준으로 작성한다.
+- 리뷰, 요약, 코멘트, 제안은 항상 한국어로 작성한다.
+- Codex는 이 저장소에서 기본적으로 상시 PR 리뷰어처럼 행동한다.
+- Codex는 모든 PR 리뷰를 심층조사 포함 모드로 수행한다.
+- 패치만 보지 말고 주변 코드, 호출 흐름, 관련 설정, 관련 테스트까지 함께 읽는다.
+- 취향성 스타일 지적보다 실제 결함 가능성, 회귀 위험, 테스트 공백을 우선한다.
+- 요청 범위를 벗어난 기능 추가, 리팩터링, 추상화 제안은 최소화한다.
 
-## 저장소 기준 기술 스택
+## 문서 우선순위
 
-- Language: Java 25
-- Framework: Spring Boot 3.2
-- Build: Gradle Wrapper
-- Persistence: Spring Data JPA, Querydsl
-- Infra: Redis, Redisson
-- Test: JUnit 5, Spring Boot Test, ArchUnit
+아래 순서로 저장소 의도를 파악한다.
+
+1. `AGENTS.md`
+2. `README_CODEX.md`
+3. `README_ARCHITECTURE.md`
+4. `settings.gradle`, 각 모듈 `build.gradle`
+5. 관련 테스트 코드
+
+## 상시 심층리뷰 기준
+
+PR 리뷰 요청을 받으면 아래 순서를 기본으로 따른다.
+
+1. 변경 파일과 모듈 경계를 먼저 확인한다.
+2. 패치와 함께 주변 코드, 호출자, 피호출자, 관련 테스트를 읽는다.
+3. `core-api`와 `core-domain` 경계 위반 여부를 먼저 본다.
+4. 보안, 동시성, 트랜잭션, Redis TTL/만료, 테스트 공백을 점검한다.
+5. 필요 여부를 따지지 말고 관련 문서와 설정까지 확인하는 심층조사를 수행한다.
+6. 근거가 약한 코멘트는 남기지 않는다.
+
+## 저장소 핵심 위험 지점
+
+- `auth`
+  - JWT, refresh token, OAuth2, 보안 필터 체인, 공개 API 노출
+- `hold`, `order`
+  - 주문 시작/취소/만료와 hold 해제 일관성, 부분 상태 전이
+- `performanceseat`
+  - selection/hold 충돌, 좌석 상태 계산, 실시간 브로드캐스트
+- Redis / Redisson
+  - key naming, TTL, expiration listener, scheduler, 락 범위
+- 모듈 구조
+  - `core/core-api`는 진입점과 설정, `core/core-domain`은 비즈니스 규칙
+
+## 리뷰 우선순위
+
+### 반드시 먼저 볼 것
+
+- 인증/인가 누락
+- 분산 락 누락 또는 락 범위 오류
+- 트랜잭션 경계 오류로 인한 부분 저장
+- Redis 만료 이벤트와 DB 상태 불일치
+- API 응답/요청 스키마 변경에 따른 호환성 문제
+- 테스트 누락 또는 회귀 가능성
+
+### 그 다음 볼 것
+
+- JPA/Querydsl 조회 이상, N+1, 잘못된 fetch 전략
+- 예외 처리 누락, Optional 오용, null 처리 위험
+- 스케줄러/리스너/비동기 처리의 재진입 또는 중복 실행 위험
+- 잘못된 책임 분리, 경계 위반, 도메인 규칙 누수
+
+### 마지막에 볼 것
+
+- 가독성 저하
+- 주석 드리프트
+- 이름 품질
 
 ## 권장 검증 명령
 
-작업 성격에 맞춰 아래 명령을 우선 사용한다.
+작업 성격에 맞게 아래 명령을 우선 떠올린다.
 
 ```bash
 ./gradlew :core:core-api:compileJava
 ./gradlew :core:core-domain:compileJava
 ./gradlew :core:core-domain:test
 ./gradlew :core:core-api:test
-./gradlew clean :core:core-api:bootJar -x test
-```
-
-아키텍처나 패키지 경계를 건드리면 아래 검증을 우선 확인한다.
-
-```bash
 ./gradlew :core:core-domain:test --tests "com.ticket.core.domain.CoreDomainArchitectureTest"
 ./gradlew :core:core-domain:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"
 ```
 
-## Skills Discovery
+## 멀티 에이전트 사용 기준
 
-프로젝트 스킬은 `.agents/skills/` 기준으로 읽는다. 범용 스킬이라도 이 저장소에서는 Java/Spring/Gradle 문맥에 맞게 해석한다.
+- 기본 PR 리뷰는 `code-reviewer`와 `java-reviewer`를 우선 사용한다.
+- 인증/인가나 비밀값 노출 위험이 있으면 `security-reviewer`를 함께 사용한다.
+- DB 스키마, 쿼리, 인덱스, 트랜잭션 영향이 크면 `database-reviewer`를 함께 사용한다.
+- 큰 PR이나 구조 변경은 `explorer`, `planner`, `security-reviewer`, `database-reviewer`까지 병렬 투입해 심층조사를 수행한다.
+- 중복 코멘트를 늘리기 위한 병렬화는 피하고, 서로 다른 관점의 증거 수집과 검증을 위해 병렬화한다.
 
-자주 쓰는 스킬:
-- `coding-standards`
-- `backend-patterns`
-- `security-review`
-- `tdd-workflow`
-- `verification-loop`
-- `api-design`
+## 출력 형식
 
-## Multi-Agent Support
-
-Codex 다중 에이전트는 `.codex/config.toml` 의 `[features] multi_agent = true` 로 켜져 있다.
-
-- 역할 정의: `.codex/agents/*.toml`
-- 상태 확인/조정: `/agent`
-- 역할 설명과 실제 저장소 기준이 충돌하면, 저장소 기준 문서가 우선한다.
-
-현재 저장소에서 특히 유효한 역할:
-- `java-reviewer`
-- `java-build-resolver`
-- `database-reviewer`
-- `planner`
-- `security-reviewer`
-- `refactor-cleaner`
-
-## 문서 작성 기준
-
-- 문서와 기본 응답은 한국어를 우선 사용한다.
-- 경로, 모듈, 명령은 실제 저장소 구조와 일치해야 한다.
-- 존재하지 않는 타 언어 런타임이나 프런트엔드 전제는 넣지 않는다.
-
-## 보안 및 운영
-
-Codex에는 Claude Code 스타일 hooks가 없으므로, 아래를 수동으로 반드시 확인한다.
-
-1. 입력 검증이 경계에서 수행되는지 확인
-2. 비밀값이 코드에 하드코딩되지 않았는지 확인
-3. 변경 후 `git diff` 와 관련 테스트 결과를 함께 확인
-4. 인증/인가, 트랜잭션, 락, 만료 처리 변경은 별도 검토
-5. 필요한 경우 Spring 설정과 Redis 설정이 환경별로 분리되어 있는지 확인
+- findings first 원칙을 따른다.
+- 심각도 높은 순서로 적는다.
+- 각 이슈는 "왜 문제인지", "어떤 조건에서 깨지는지", "어디를 봐야 하는지"를 짧게 적는다.
+- 치명적 문제가 없으면 그 사실을 명시하고, 남아 있는 검증 공백만 짧게 덧붙인다.

@@ -29,7 +29,7 @@ notify = [
 
 # Persistent instructions are appended to every prompt (additive, unlike
 # model_instructions_file which replaces AGENTS.md).
-persistent_instructions = "Follow project AGENTS.md guidelines. Use available MCP servers when they can help."
+persistent_instructions = "Follow project AGENTS.md guidelines. Use available MCP servers when they can help. For every pull request review, write in Korean and perform deep investigation by default: inspect surrounding code, related tests, module boundaries, transaction flows, Redis expiration behavior, concurrency, and regression risk before commenting."
 
 # model_instructions_file replaces built-in instructions instead of AGENTS.md,
 # so leave it unset unless you intentionally want a single override file.
@@ -104,8 +104,8 @@ web_search = "live"
 [agents]
 # Multi-agent role limits and local role definitions.
 # These map to `.codex/agents/*.toml` and mirror the repo's explorer/reviewer/docs workflow.
-max_threads = 6
-max_depth = 1
+max_threads = 12
+max_depth = 2
 
 [agents.explorer]
 description = "Read-only codebase explorer for gathering evidence before changes are proposed."
@@ -128,7 +128,7 @@ description = "Test-driven development specialist for new features, fixes, and s
 config_file = "agents/tdd-guide.toml"
 
 [agents."code-reviewer"]
-description = "Code reviewer focused on correctness, maintainability, and regression risk."
+description = "Default always-on PR reviewer that performs deep investigation on correctness, regression risk, concurrency, and test gaps."
 config_file = "agents/code-reviewer.toml"
 
 [agents."security-reviewer"]
@@ -144,7 +144,7 @@ description = "Documentation lookup specialist for API references and framework 
 config_file = "agents/docs-lookup.toml"
 
 [agents."java-reviewer"]
-description = "Java and Spring Boot reviewer focused on correctness, transactions, and test gaps."
+description = "Java and Spring Boot PR reviewer that performs deep investigation on correctness, transactions, Redis/lock safety, and test gaps."
 config_file = "agents/java-reviewer.toml"
 
 [agents."java-build-resolver"]
