@@ -1,0 +1,101 @@
+{
+  "usage": "Persist this file inside your repositories as .codescene/custom-quality-gates.json",
+  "rule_sets": [
+    {
+      "quality_gates": {
+        "hotspot_decline": false,
+        "critical_health_rules": false,
+        "refactoring_goals": false,
+        "supervise_goals": false,
+        "new_code_health": false,
+        "advisory_health_rules": false,
+        "codeowners_for_critical_code": false
+      },
+      "quality_gates_doc": "정적 자산은 PR 게이트 대상에서 제외합니다.",
+      "matching_content_path": "storage/images/**",
+      "matching_content_path_doc": "이미지 자산 경로입니다."
+    },
+    {
+      "quality_gates": {
+        "hotspot_decline": false,
+        "critical_health_rules": false,
+        "refactoring_goals": false,
+        "supervise_goals": false,
+        "new_code_health": false,
+        "advisory_health_rules": false,
+        "codeowners_for_critical_code": false
+      },
+      "quality_gates_doc": "문서 변경은 우선 게이트 대상에서 제외합니다.",
+      "matching_content_path": "docs/**",
+      "matching_content_path_doc": "문서 경로입니다."
+    },
+    {
+      "quality_gates": {
+        "hotspot_decline": false,
+        "critical_health_rules": false,
+        "refactoring_goals": false,
+        "supervise_goals": false,
+        "new_code_health": false,
+        "advisory_health_rules": false,
+        "codeowners_for_critical_code": false
+      },
+      "quality_gates_doc": "빌드 산출물과 로컬 상태 폴더는 제외합니다.",
+      "matching_content_path": "**/build/**",
+      "matching_content_path_doc": "빌드 산출물 경로입니다."
+    },
+    {
+      "quality_gates": "clean_code_collective",
+      "quality_gates_doc": "핵심 도메인 로직은 가장 강한 품질 게이트로 검증합니다.",
+      "matching_content_path": "core/core-domain/**",
+      "matching_content_path_doc": "도메인 모듈 경로입니다."
+    },
+    {
+      "quality_gates": "pay_down_tech_debt",
+      "quality_gates_doc": "API 진입점과 설정도 강한 품질 게이트로 검증합니다.",
+      "matching_content_path": "core/core-api/**",
+      "matching_content_path_doc": "API 모듈 경로입니다."
+    },
+    {
+      "quality_gates": "pay_down_tech_debt",
+      "quality_gates_doc": "Redis 공통 모듈도 강한 품질 게이트로 검증합니다.",
+      "matching_content_path": "storage/redis-core/**",
+      "matching_content_path_doc": "Redis 공통 모듈 경로입니다."
+    },
+    {
+      "quality_gates": "clean_code_collective",
+      "quality_gates_doc": "공통 로깅 모듈도 엄격하게 검증합니다.",
+      "matching_content_path": "support/logging/**",
+      "matching_content_path_doc": "로깅 모듈 경로입니다."
+    },
+    {
+      "quality_gates": "clean_code_collective",
+      "quality_gates_doc": "배포 워크플로우 변경도 엄격하게 검증합니다.",
+      "matching_content_path": ".github/workflows/**",
+      "matching_content_path_doc": "GitHub Actions 워크플로우 경로입니다."
+    },
+    {
+      "quality_gates": "clean_code_collective",
+      "quality_gates_doc": "루트 Gradle 설정 변경도 엄격하게 검증합니다.",
+      "matching_content_path": "build.gradle",
+      "matching_content_path_doc": "루트 build.gradle 파일입니다."
+    },
+    {
+      "quality_gates": "clean_code_collective",
+      "quality_gates_doc": "모듈 경계 설정 변경도 엄격하게 검증합니다.",
+      "matching_content_path": "settings.gradle",
+      "matching_content_path_doc": "루트 settings.gradle 파일입니다."
+    },
+    {
+      "quality_gates": "clean_code_collective",
+      "quality_gates_doc": "배포 이미지 정의 변경도 엄격하게 검증합니다.",
+      "matching_content_path": "Dockerfile",
+      "matching_content_path_doc": "루트 Dockerfile 파일입니다."
+    },
+    {
+      "quality_gates": "clean_code_collective",
+      "quality_gates_doc": "명시되지 않은 나머지 코드도 기본적으로 엄격하게 검증합니다.",
+      "matching_content_path": "**/*",
+      "matching_content_path_doc": "나머지 모든 경로입니다."
+    }
+  ]
+}
