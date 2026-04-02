@@ -1,123 +1,63 @@
-name: 🐛 버그 리포트
-description: 버그나 예상치 못한 동작을 발견하셨나요?
+---
+name: 버그 리포트 (자유 서술)
+about: 구조화 폼으로 정리하기 어려운 버그를 자유 형식으로 제보합니다.
 title: "[Bug] "
-labels: ["bug", "needs-triage"]
-assignees: []
+labels: bug, needs-triage
+assignees: ""
+---
 
-body:
-- type: markdown
-  attributes:
-  value: |
-  버그 리포트를 작성해주셔서 감사합니다. 가능한 한 자세히 작성해주시면 빠른 해결에 도움이 됩니다.
+## 문제 요약
+- 무엇이 잘못됐는지 한 문단으로 요약해 주세요.
 
-- type: textarea
-  id: description
-  attributes:
-  label: 🔍 버그 설명
-  description: 어떤 버그가 발생했는지 명확하고 간결하게 설명해주세요.
-  placeholder: |
-  예: 동일한 좌석을 여러 사용자가 동시에 예매할 수 있는 문제가 발생합니다.
-  validations:
-  required: true
+## 버그 유형
+- 예: 기능 오동작 / 회귀 / 동시성 / 데이터 불일치 / 성능 저하 / 보안 / 배포 설정
 
-- type: textarea
-  id: reproduction
-  attributes:
-  label: 📝 재현 방법
-  description: 버그를 재현할 수 있는 단계를 상세히 작성해주세요.
-  placeholder: |
-  1. 두 개의 클라이언트에서 동시에 로그인
-  2. 같은 공연의 같은 좌석 선택
-  3. 동시에 예매 버튼 클릭
-  4. 두 예매 모두 성공하는 문제 발생
-  validations:
-  required: true
+## 관련 영역
+- 예: Auth, Hold, Order, Seat, Queue, Redis Expiration, Lock, WebSocket, API, Database
 
-- type: textarea
-  id: expected
-  attributes:
-  label: ✅ 예상 동작
-  description: 어떤 동작이 예상되었나요?
-  placeholder: |
-  예: 한 명의 예매만 성공하고, 나머지는 실패해야 합니다.
-  validations:
-  required: true
+## 관련 API / 클래스 / 잡 이름
+- 예: `POST /api/v1/performances/{performanceId}/holds`
+- 예: `StartOrderUseCase`, `RedisKeyExpirationListener`
 
-- type: textarea
-  id: actual
-  attributes:
-  label: ❌ 실제 동작
-  description: 실제로는 어떤 동작이 발생했나요?
-  placeholder: |
-  예: 두 명 모두 예매가 성공했습니다.
-  validations:
-  required: true
+## 사전 조건
+- 재현 전에 필요한 데이터, 계정, Redis 상태, 주문 상태 등을 적어 주세요.
 
-- type: dropdown
-  id: severity
-  attributes:
-  label: 🚨 심각도
-  description: 이 버그의 영향도는 어느 정도인가요?
-  options:
-  - Critical (시스템 전체에 영향, 즉시 수정 필요)
-  - High (주요 기능 장애, 빠른 수정 필요)
-  - Medium (기능 일부 제한, 우회 방법 존재)
-  - Low (사소한 문제, 사용자 경험에 미미한 영향)
-  validations:
-  required: true
+## 재현 절차
+1. 단계 1
+2. 단계 2
+3. 단계 3
 
-- type: dropdown
-  id: component
-  attributes:
-  label: 🎯 관련 컴포넌트
-  description: 어느 영역에서 발생한 버그인가요?
-  multiple: true
-  options:
-  - 인증/회원 (Auth/Member)
-  - 공연 관리 (Performance)
-  - 좌석 관리 (Seat)
-  - 예매 (Reservation)
-  - 선점 (Hold)
-  - 결제 (Payment)
-  - 동시성 처리 (Concurrency)
-  - API/컨트롤러
-  - 데이터베이스
-  - 스케줄러
-  - 기타
-  validations:
-  required: true
+## 기대 결과
+- 정상이라면 어떤 결과가 나와야 하나요?
 
-- type: textarea
-  id: environment
-  attributes:
-  label: 🖥️ 환경 정보
-  description: 버그가 발생한 환경을 알려주세요.
-  placeholder: |
-  - OS: Ubuntu 22.04
-  - Java: 17
-  - Spring Boot: 3.x
-  - Database: MySQL 8.0
-  - 브라우저: Chrome 120 (프론트엔드 관련 시)
-  validations:
-  required: false
+## 실제 결과
+- 실제로 어떤 응답, 상태 변화, 로그가 나왔나요?
 
-- type: textarea
-  id: logs
-  attributes:
-  label: 📋 로그 및 에러 메시지
-  description: 관련된 로그나 에러 메시지를 첨부해주세요.
-  render: shell
-  placeholder: |
-  예시:
-  java.lang.RuntimeException: Seat already reserved
-  at com.ticket.core.domain.reservation.ReservationService.addReservation(...)
-  validations:
-  required: false
+## 영향 범위
+- 사용자 영향
+- 운영 영향
+- 데이터 정합성 영향
 
-- type: textarea
-  id: additional
-  attributes:
-  label: 📎 추가 정보
-  description: 스크린샷, 관련 PR, 또는 기타 참고 사항이 있다면 작성해주세요.
-  validations:
-  required: false
+## 심각도 / 발생 빈도 / 환경
+- 심각도:
+- 발생 빈도:
+- 환경: local / dev / staging / production 유사 / CI
+
+## 실행 환경 상세
+- Profile:
+- Branch:
+- Commit:
+- DB:
+- Redis:
+- Client:
+
+## 추정 원인
+- 의심되는 클래스, 락 범위, Redis TTL, listener/scheduler 흐름이 있으면 적어 주세요.
+
+## 로그 / 에러 / 요청-응답 예시
+```text
+붙여 넣기
+```
+
+## 추가 참고
+- 관련 이슈 / PR / 스크린샷 / 문서 링크

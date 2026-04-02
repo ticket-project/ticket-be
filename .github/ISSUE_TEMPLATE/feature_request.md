@@ -1,100 +1,44 @@
-name: ✨ 기능 요청
-description: 새로운 기능이나 개선 사항을 제안해주세요.
+---
+name: 기능 제안 (자유 서술)
+about: 구조화 폼보다 자유로운 설명이 필요한 기능 제안을 남깁니다.
 title: "[Feature] "
-labels: ["enhancement", "needs-review"]
-assignees: []
+labels: enhancement, needs-review
+assignees: ""
+---
 
-body:
-- type: markdown
-  attributes:
-  value: |
-  새로운 기능 제안을 환영합니다! 아래 항목들을 작성해주시면 검토에 큰 도움이 됩니다.
+## 해결하려는 문제
+- 지금 어떤 불편, 병목, 리스크가 있나요?
 
-- type: textarea
-  id: problem
-  attributes:
-  label: 🤔 해결하고자 하는 문제
-  description: 어떤 문제나 불편함을 경험하셨나요?
-  placeholder: |
-  예: 현재 좌석 선점 시간이 5분으로 고정되어 있어, 결제 시간이 오래 걸리는 사용자에게는 부족합니다.
-  validations:
-  required: true
+## 왜 지금 필요한가
+- 이번 시점에 우선순위를 높여야 하는 이유를 적어 주세요.
 
-- type: textarea
-  id: solution
-  attributes:
-  label: 💡 제안하는 해결 방법
-  description: 어떤 기능이나 개선이 이 문제를 해결할 수 있을까요?
-  placeholder: |
-  예: 사용자가 선택한 결제 수단에 따라 선점 시간을 동적으로 조정하는 기능을 추가합니다.
-  - 간편 결제: 5분
-  - 카드 결제: 10분
-  - 계좌이체: 15분
-  validations:
-  required: true
+## 사용자 시나리오 / 운영 시나리오
+- 누가, 언제, 어떤 흐름에서 이 기능을 사용하나요?
 
-- type: dropdown
-  id: component
-  attributes:
-  label: 🎯 관련 컴포넌트
-  description: 어느 영역과 관련된 기능인가요?
-  multiple: true
-  options:
-  - 인증/회원 (Auth/Member)
-  - 공연 관리 (Performance)
-  - 좌석 관리 (Seat)
-  - 예매 (Reservation)
-  - 선점 (Hold)
-  - 결제 (Payment)
-  - 동시성 처리 (Concurrency)
-  - API/컨트롤러
-  - 데이터베이스
-  - 스케줄러
-  - 성능 최적화
-  - 모니터링/로깅
-  - 기타
-  validations:
-  required: true
+## 제안 내용
+- 무엇을 바꾸거나 추가하고 싶은지 구체적으로 적어 주세요.
 
-- type: dropdown
-  id: priority
-  attributes:
-  label: ⚡ 우선순위
-  description: 이 기능의 중요도는 어느 정도인가요?
-  options:
-  - High (핵심 기능, 빠른 구현 필요)
-  - Medium (유용하지만 필수는 아님)
-  - Low (있으면 좋은 기능)
-  validations:
-  required: true
+## 관련 영역
+- 예: Auth / Hold / Order / Seat / Queue / Redis / API / Security / WebSocket
 
-- type: textarea
-  id: alternatives
-  attributes:
-  label: 🔄 대안
-  description: 다른 해결 방법을 고려해보셨나요?
-  placeholder: |
-  예: Redis를 사용한 TTL 기반 선점 관리도 고려해볼 수 있습니다.
-  validations:
-  required: false
+## API / 도메인 영향
+- 요청/응답 변경
+- 도메인 규칙 변경
+- 이벤트/배치/Redis 구조 변경
 
-- type: textarea
-  id: implementation
-  attributes:
-  label: 🛠️ 구현 아이디어 (선택)
-  description: 기술적인 구현 방법에 대한 아이디어가 있다면 공유해주세요.
-  placeholder: |
-  예:
-  - SeatHoldEntity에 holdDuration 필드 추가
-  - PaymentType enum 추가 및 duration 매핑 테이블 생성
-  - HoldExpireScheduler 로직 수정
-  validations:
-  required: false
+## 수용 기준
+- [ ] 조건 1
+- [ ] 조건 2
+- [ ] 조건 3
 
-- type: textarea
-  id: additional
-  attributes:
-  label: 📎 추가 정보
-  description: 참고 자료, 다른 시스템 사례, 또는 기타 참고 사항이 있다면 작성해주세요.
-  validations:
-  required: false
+## 제외 범위
+- 이번 요청에서 하지 않을 일을 적어 주세요.
+
+## 제약 조건 / 의존성
+- 기술적 제약, 일정 제약, 운영 제약, 선행 이슈를 적어 주세요.
+
+## 고려한 대안
+- 다른 접근 방식이나 임시 우회안이 있나요?
+
+## 참고 자료
+- 관련 이슈 / PR / 문서 / 화면 / 클래스 / 예시 API
