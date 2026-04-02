@@ -1,5 +1,5 @@
-name: 🐛 버그 리포트
-description: 버그나 예상치 못한 동작을 발견하셨나요?
+name: 버그 리포트 (구조화 폼)
+description: 재현 가능한 결함, 회귀, 데이터 이상, 성능 저하를 구조화해서 보고합니다.
 title: "[Bug] "
 labels: ["bug", "needs-triage"]
 assignees: []
@@ -8,116 +8,225 @@ body:
   - type: markdown
     attributes:
       value: |
-        버그 리포트를 작성해주셔서 감사합니다. 가능한 한 자세히 작성해주시면 빠른 해결에 도움이 됩니다.
+        하나의 이슈에는 하나의 버그만 작성해 주세요.
+
+        이 저장소는 `core-api`, `core-domain`, Redis/락, WebSocket 실시간 처리, 주문/홀드/좌석 흐름이 강하게 연결되어 있습니다.
+        아래 항목을 구체적으로 적어 주시면 재현과 원인 추적 속도가 크게 올라갑니다.
+
+        특히 아래 정보가 있으면 함께 남겨 주세요.
+        - 관련 API, 클래스, 배치/스케줄러 이름
+        - `performanceId`, `seatId`, `orderKey`, `holdKey` 같은 식별자
+        - 동시성/만료 이슈라면 Redis TTL, 락 키, listener/scheduler 로그
+
+  - type: dropdown
+    id: bug_type
+    attributes:
+      label: 버그 유형
+      description: 어떤 성격의 문제인지 선택해 주세요.
+      options:
+        - 기능 오동작
+        - 회귀(regression)
+        - 동시성/락 문제
+        - 데이터 불일치
+        - 성능 저하
+        - 배포/설정 문제
+        - 보안/권한 문제
+        - 기타
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected_area
+    attributes:
+      label: 관련 영역
+      description: 영향받는 기능이나 모듈을 모두 선택해 주세요.
+      multiple: true
+      options:
+        - Auth / Member
+        - Show / Performance
+        - Seat / PerformanceSeat
+        - Hold
+        - Order
+        - Queue
+        - Redis / Expiration / Lock
+        - WebSocket / Realtime
+        - API / Controller / Security
+        - Build / Deploy / Configuration
+        - Database / Query
+        - Logging / Monitoring
+        - 기타
+    validations:
+      required: true
+
+  - type: input
+    id: related_entrypoint
+    attributes:
+      label: 관련 API / 클래스 / 잡 이름
+      description: 알고 있다면 가장 먼저 의심되는 진입점을 적어 주세요.
+      placeholder: POST /api/v1/performances/{performanceId}/holds, StartOrderUseCase, RedisKeyExpirationListener
+    validations:
+      required: false
 
   - type: textarea
-    id: description
+    id: summary
     attributes:
-      label: 🔍 버그 설명
-      description: 어떤 버그가 발생했는지 명확하고 간결하게 설명해주세요.
+      label: 문제 요약
+      description: 무엇이 잘못됐는지 한 문단으로 요약해 주세요.
       placeholder: |
-        예: 동일한 좌석을 여러 사용자가 동시에 예매할 수 있는 문제가 발생합니다.
+        동일한 공연 좌석에 대해 두 사용자가 거의 동시에 hold를 요청하면,
+        한쪽만 성공해야 하지만 간헐적으로 두 요청 모두 `201 Created`를 반환합니다.
     validations:
       required: true
 
   - type: textarea
-    id: reproduction
+    id: preconditions
     attributes:
-      label: 📝 재현 방법
-      description: 버그를 재현할 수 있는 단계를 상세히 작성해주세요.
+      label: 사전 조건
+      description: 재현 전에 필요한 데이터, 계정 상태, 캐시 상태, 선행 작업을 적어 주세요.
       placeholder: |
-        1. 두 개의 클라이언트에서 동시에 로그인
-        2. 같은 공연의 같은 좌석 선택
-        3. 동시에 예매 버튼 클릭
-        4. 두 예매 모두 성공하는 문제 발생
+        - Redis와 애플리케이션이 모두 실행 중
+        - 동일 공연/회차에 판매 가능한 좌석이 1개 존재
+        - 서로 다른 두 사용자 계정으로 로그인
+        - 기존 `PENDING` 주문 없음
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: 재현 절차
+      description: 사람이 그대로 따라 할 수 있게 순서대로 적어 주세요.
+      placeholder: |
+        1. 사용자 A, B로 각각 로그인합니다.
+        2. 같은 `performanceId`, `seatId`를 대상으로 동시에 hold 요청을 보냅니다.
+        3. 응답 코드와 주문 키를 확인합니다.
+        4. DB 주문 상태와 Redis hold 키를 확인합니다.
     validations:
       required: true
 
   - type: textarea
-    id: expected
+    id: expected_result
     attributes:
-      label: ✅ 예상 동작
-      description: 어떤 동작이 예상되었나요?
+      label: 기대 결과
+      description: 정상이라면 어떤 결과가 나와야 하는지 적어 주세요.
       placeholder: |
-        예: 한 명의 예매만 성공하고, 나머지는 실패해야 합니다.
+        한 요청만 성공해야 하며, 다른 요청은 좌석 선점 실패 또는 이미 처리 중인 상태로 거절되어야 합니다.
     validations:
       required: true
 
   - type: textarea
-    id: actual
+    id: actual_result
     attributes:
-      label: ❌ 실제 동작
-      description: 실제로는 어떤 동작이 발생했나요?
+      label: 실제 결과
+      description: 실제로 어떤 결과가 나왔는지 응답/로그/상태 기준으로 적어 주세요.
       placeholder: |
-        예: 두 명 모두 예매가 성공했습니다.
+        두 요청 모두 성공했고 서로 다른 `orderKey`가 발급되었습니다.
+        이후 만료 처리 시점에 좌석 상태와 주문 상태가 어긋납니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: 영향 범위
+      description: 사용자, 운영, 데이터 무결성, 매출에 어떤 영향이 있는지 적어 주세요.
+      placeholder: |
+        - 실사용자 중복 주문 가능성
+        - 좌석 상태 브로드캐스트 불일치
+        - 주문/홀드 정합성 깨짐
+        - 장애 발생 시 수동 정리 필요
     validations:
       required: true
 
   - type: dropdown
     id: severity
     attributes:
-      label: 🚨 심각도
-      description: 이 버그의 영향도는 어느 정도인가요?
+      label: 심각도
+      description: 우선 대응 수준을 선택해 주세요.
       options:
-        - Critical (시스템 전체에 영향, 즉시 수정 필요)
-        - High (주요 기능 장애, 빠른 수정 필요)
-        - Medium (기능 일부 제한, 우회 방법 존재)
-        - Low (사소한 문제, 사용자 경험에 미미한 영향)
+        - Critical - 서비스 핵심 흐름 장애 또는 데이터 손상
+        - High - 주요 기능 장애, 빠른 수정 필요
+        - Medium - 우회 가능하지만 사용자 영향 존재
+        - Low - 영향이 제한적이거나 국소적 문제
     validations:
       required: true
 
   - type: dropdown
-    id: component
+    id: frequency
     attributes:
-      label: 🎯 관련 컴포넌트
-      description: 어느 영역에서 발생한 버그인가요?
-      multiple: true
+      label: 발생 빈도
+      description: 얼마나 자주 재현되는지 선택해 주세요.
       options:
-        - 인증/회원 (Auth/Member)
-        - 공연 관리 (Performance)
-        - 좌석 관리 (Seat)
-        - 예매 (Reservation)
-        - 선점 (Hold)
-        - 결제 (Payment)
-        - 동시성 처리 (Concurrency)
-        - API/컨트롤러
-        - 데이터베이스
-        - 스케줄러
+        - 항상 재현됨
+        - 자주 재현됨
+        - 간헐적으로 재현됨
+        - 1회만 확인됨
+        - 아직 미확인
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: 발생 환경
+      description: 문제가 확인된 환경을 선택해 주세요.
+      options:
+        - local
+        - dev
+        - staging
+        - production 유사 환경
+        - CI / test
         - 기타
     validations:
       required: true
 
   - type: textarea
-    id: environment
+    id: runtime_context
     attributes:
-      label: 🖥️ 환경 정보
-      description: 버그가 발생한 환경을 알려주세요.
+      label: 실행 환경 상세
+      description: 프로파일, 브랜치, 커밋, DB/Redis, 클라이언트 정보를 적어 주세요.
       placeholder: |
-        - OS: Ubuntu 22.04
-        - Java: 17
-        - Spring Boot: 3.x
-        - Database: MySQL 8.0
-        - 브라우저: Chrome 120 (프론트엔드 관련 시)
+        - Profile: local
+        - Branch: feat/hold-lock
+        - Commit: abc1234
+        - DB: H2 file
+        - Redis: docker compose local
+        - Client: Swagger / Postman / Chrome
+    validations:
+      required: false
+
+  - type: textarea
+    id: suspected_root_cause
+    attributes:
+      label: 추정 원인
+      description: 원인을 이미 어느 정도 파악했다면 적어 주세요.
+      placeholder: |
+        `StartOrderUseCase` 진입 전 좌석 락 범위가 충분하지 않거나,
+        hold 생성과 `PENDING` 주문 생성 사이의 정합성 보장이 약해 보입니다.
     validations:
       required: false
 
   - type: textarea
     id: logs
     attributes:
-      label: 📋 로그 및 에러 메시지
-      description: 관련된 로그나 에러 메시지를 첨부해주세요.
+      label: 로그 / 에러 / 요청-응답 예시
+      description: 재현 당시 핵심 로그나 응답 본문을 붙여 주세요.
       render: shell
       placeholder: |
-        예시:
-        java.lang.RuntimeException: Seat already reserved
-            at com.ticket.core.domain.reservation.ReservationService.addReservation(...)
+        2026-04-02 10:32:10 INFO  ... StartOrderUseCase
+        2026-04-02 10:32:10 INFO  ... holdKey=...
+        2026-04-02 10:32:11 WARN  ... duplicated pending order ...
     validations:
       required: false
 
-  - type: textarea
-    id: additional
+  - type: checkboxes
+    id: checklist
     attributes:
-      label: 📎 추가 정보
-      description: 스크린샷, 관련 PR, 또는 기타 참고 사항이 있다면 작성해주세요.
-    validations:
-      required: false
+      label: 확인 사항
+      options:
+        - label: 동일하거나 유사한 이슈가 이미 있는지 확인했습니다.
+          required: true
+        - label: 민감한 정보(토큰, 개인정보, 결제정보)는 제거했습니다.
+          required: true
+        - label: 재현 절차와 기대 결과/실제 결과를 구분해서 작성했습니다.
+          required: true

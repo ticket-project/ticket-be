@@ -1,5 +1,5 @@
-name: ✨ 기능 요청
-description: 새로운 기능이나 개선 사항을 제안해주세요.
+name: 기능 제안 (구조화 폼)
+description: 신규 기능, 사용자 흐름 개선, API/운영 기능 제안을 구조화해서 남깁니다.
 title: "[Feature] "
 labels: ["enhancement", "needs-review"]
 assignees: []
@@ -8,93 +8,192 @@ body:
   - type: markdown
     attributes:
       value: |
-        새로운 기능 제안을 환영합니다! 아래 항목들을 작성해주시면 검토에 큰 도움이 됩니다.
+        이 템플릿은 "무엇을 만들고 싶은가"보다 "어떤 문제를 어떤 기준으로 해결할 것인가"를 분명히 하기 위한 폼입니다.
 
-  - type: textarea
-    id: problem
-    attributes:
-      label: 🤔 해결하고자 하는 문제
-      description: 어떤 문제나 불편함을 경험하셨나요?
-      placeholder: |
-        예: 현재 좌석 선점 시간이 5분으로 고정되어 있어, 결제 시간이 오래 걸리는 사용자에게는 부족합니다.
-    validations:
-      required: true
-
-  - type: textarea
-    id: solution
-    attributes:
-      label: 💡 제안하는 해결 방법
-      description: 어떤 기능이나 개선이 이 문제를 해결할 수 있을까요?
-      placeholder: |
-        예: 사용자가 선택한 결제 수단에 따라 선점 시간을 동적으로 조정하는 기능을 추가합니다.
-        - 간편 결제: 5분
-        - 카드 결제: 10분
-        - 계좌이체: 15분
-    validations:
-      required: true
+        아래 내용을 최대한 구체적으로 적어 주세요.
+        - 현재 문제와 왜 지금 필요한지
+        - 성공 조건(acceptance criteria)
+        - 영향받는 도메인/API/운영 흐름
+        - 제외 범위(out of scope)
 
   - type: dropdown
-    id: component
+    id: request_type
     attributes:
-      label: 🎯 관련 컴포넌트
-      description: 어느 영역과 관련된 기능인가요?
-      multiple: true
+      label: 요청 유형
+      description: 어떤 종류의 기능 제안인지 선택해 주세요.
       options:
-        - 인증/회원 (Auth/Member)
-        - 공연 관리 (Performance)
-        - 좌석 관리 (Seat)
-        - 예매 (Reservation)
-        - 선점 (Hold)
-        - 결제 (Payment)
-        - 동시성 처리 (Concurrency)
-        - API/컨트롤러
-        - 데이터베이스
-        - 스케줄러
-        - 성능 최적화
-        - 모니터링/로깅
+        - 신규 사용자 기능
+        - 기존 흐름 개선
+        - 운영/관리 기능
+        - API 계약 변경
+        - 성능/확장성 개선
+        - 보안/권한 강화
+        - 개발 생산성 개선
         - 기타
     validations:
       required: true
 
   - type: dropdown
+    id: affected_area
+    attributes:
+      label: 관련 영역
+      description: 영향받는 기능이나 모듈을 모두 선택해 주세요.
+      multiple: true
+      options:
+        - Auth / Member
+        - Show / Performance
+        - Seat / PerformanceSeat
+        - Hold
+        - Order
+        - Queue
+        - Redis / Expiration / Lock
+        - WebSocket / Realtime
+        - API / Controller / Security
+        - Build / Deploy / Configuration
+        - Database / Query
+        - Logging / Monitoring
+        - 기타
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem_statement
+    attributes:
+      label: 해결하려는 문제
+      description: 지금 어떤 불편, 병목, 리스크가 있는지 적어 주세요.
+      placeholder: |
+        현재 hold 만료 시간이 고정되어 있어 결제 수단에 따른 처리 시간을 반영하지 못합니다.
+        카드 결제보다 느린 흐름에서 불필요한 주문 만료가 발생할 수 있습니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why_now
+    attributes:
+      label: 왜 지금 필요한가
+      description: 우선순위를 높여야 하는 이유를 적어 주세요.
+      placeholder: |
+        - 최근 주문 만료/재시도 문의 증가
+        - 다음 스프린트에서 결제 흐름 확장 예정
+        - 운영 대응 비용 증가
+    validations:
+      required: true
+
+  - type: textarea
+    id: user_scenario
+    attributes:
+      label: 사용자 시나리오 / 운영 시나리오
+      description: 누가 언제 어떤 흐름에서 이 기능을 쓰는지 적어 주세요.
+      placeholder: |
+        사용자가 좌석 hold 후 결제 수단을 선택하면,
+        시스템은 결제 수단별 제한 시간을 반영해서 주문 만료 시점을 계산해야 합니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 제안 내용
+      description: 구체적으로 어떤 기능/변경을 원하는지 적어 주세요.
+      placeholder: |
+        결제 수단별로 hold/order 만료 시간을 다르게 적용합니다.
+        예를 들어 간편 결제는 5분, 카드 결제는 10분, 무통장 입금은 15분으로 구분합니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: 수용 기준
+      description: 완료로 볼 수 있는 조건을 체크 가능한 문장으로 적어 주세요.
+      placeholder: |
+        - [ ] 결제 수단별 만료 시간이 설정 가능하다.
+        - [ ] 주문 생성 시 만료 시간이 해당 결제 수단 규칙을 따른다.
+        - [ ] 만료 처리와 Redis TTL이 일관되게 동작한다.
+        - [ ] API 또는 관리자 화면에서 현재 정책을 확인할 수 있다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: api_or_domain_impact
+    attributes:
+      label: API / 도메인 영향
+      description: 바뀌는 요청/응답, 도메인 규칙, 이벤트, 배치가 있다면 적어 주세요.
+      placeholder: |
+        - `POST /api/v1/performances/{performanceId}/holds` 요청에 결제 수단 정보가 필요할 수 있음
+        - 주문 만료 계산 규칙 변경
+        - Redis hold meta 저장 구조 변경 가능
+    validations:
+      required: false
+
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: 제외 범위
+      description: 이번 요청에서 하지 않을 일도 함께 적어 주세요.
+      placeholder: |
+        - 실제 결제 연동 구현은 제외
+        - 관리자 UI 신규 개발은 제외
+        - 기존 주문 데이터 일괄 마이그레이션은 제외
+    validations:
+      required: false
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: 제약 조건 / 의존성
+      description: 일정, 기술, 운영 제약이나 선행 조건이 있으면 적어 주세요.
+      placeholder: |
+        - 현재 ArchUnit 규칙을 깨면 안 됨
+        - Redis TTL과 스케줄러 보정 로직이 함께 유지되어야 함
+        - 외부 결제사 규격 확정 전까지 임시 정책일 수 있음
+    validations:
+      required: false
+
+  - type: dropdown
     id: priority
     attributes:
-      label: ⚡ 우선순위
-      description: 이 기능의 중요도는 어느 정도인가요?
+      label: 우선순위
+      description: 상대적인 중요도를 선택해 주세요.
       options:
-        - High (핵심 기능, 빠른 구현 필요)
-        - Medium (유용하지만 필수는 아님)
-        - Low (있으면 좋은 기능)
+        - High - 다음 작업 사이클에 반영 필요
+        - Medium - 계획에 포함되면 좋음
+        - Low - 아이디어 보관 성격
     validations:
       required: true
 
   - type: textarea
     id: alternatives
     attributes:
-      label: 🔄 대안
-      description: 다른 해결 방법을 고려해보셨나요?
+      label: 고려한 대안
+      description: 다른 접근 방식이나 임시 우회안이 있다면 적어 주세요.
       placeholder: |
-        예: Redis를 사용한 TTL 기반 선점 관리도 고려해볼 수 있습니다.
+        - 전 결제 수단 공통 10분으로 상향
+        - 운영 설정값으로만 관리하고 API 입력은 유지
+        - Redis TTL만 조정하고 DB 정책은 추후 반영
     validations:
       required: false
 
   - type: textarea
-    id: implementation
+    id: references
     attributes:
-      label: 🛠️ 구현 아이디어 (선택)
-      description: 기술적인 구현 방법에 대한 아이디어가 있다면 공유해주세요.
+      label: 참고 자료
+      description: 관련 이슈, PR, 문서, 화면, API 예시가 있으면 적어 주세요.
       placeholder: |
-        예:
-        - SeatHoldEntity에 holdDuration 필드 추가
-        - PaymentType enum 추가 및 duration 매핑 테이블 생성
-        - HoldExpireScheduler 로직 수정
+        - 관련 이슈: #123
+        - 관련 문서: README_ARCHITECTURE.md
+        - 관련 클래스: HoldManager, StartOrderUseCase
     validations:
       required: false
 
-  - type: textarea
-    id: additional
+  - type: checkboxes
+    id: checklist
     attributes:
-      label: 📎 추가 정보
-      description: 참고 자료, 다른 시스템 사례, 또는 기타 참고 사항이 있다면 작성해주세요.
-    validations:
-      required: false
+      label: 확인 사항
+      options:
+        - label: 문제와 제안 내용을 분리해서 작성했습니다.
+          required: true
+        - label: 수용 기준을 구체적으로 적었습니다.
+          required: true
+        - label: 이번 요청의 제외 범위를 확인했습니다.
+          required: true

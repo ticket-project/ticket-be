@@ -1,121 +1,40 @@
-name: 🔧 코드 개선
-description: 코드 품질, 성능, 구조 개선을 제안해주세요.
+---
+name: 리팩터링 / 구조 개선 제안 (자유 서술)
+about: 기능 추가가 아닌 구조 개선, 경계 정리, 기술 부채 상환 아이디어를 자유 형식으로 남깁니다.
 title: "[Improvement] "
-labels: ["refactoring", "needs-review"]
-assignees: []
+labels: refactoring, needs-review
+assignees: ""
+---
 
-body:
-- type: markdown
-  attributes:
-  value: |
-  코드 개선 제안을 환영합니다! 더 나은 코드베이스를 만들어가요.
+## 현재 문제
+- 지금 구조가 왜 문제인가요?
+- 유지보수, 테스트, 성능, 운영 대응 측면에서 어떤 비용이 있나요?
 
-- type: textarea
-  id: current
-  attributes:
-  label: 🔍 현재 상황
-  description: 개선이 필요한 현재 코드나 구조를 설명해주세요.
-  placeholder: |
-  예: ReservationServiceV0과 V1이 중복 코드가 많고, 각각 독립적으로 관리되어 유지보수가 어렵습니다.
-  validations:
-  required: true
+## 왜 지금 필요한가
+- 이 시점에 정리해야 하는 배경을 적어 주세요.
 
-- type: textarea
-  id: problem
-  attributes:
-  label: ❓ 문제점
-  description: 현재 코드의 어떤 점이 문제인가요?
-  placeholder: |
-  예:
-  - 중복 코드로 인한 유지보수 비용 증가
-  - 새로운 기능 추가 시 모든 버전을 수정해야 함
-  - 테스트 코드도 중복 작성 필요
-  validations:
-  required: true
+## 대상 범위
+- 경로 / 패키지 / 클래스 / 도메인 이름을 적어 주세요.
 
-- type: textarea
-  id: suggestion
-  attributes:
-  label: 💡 개선 제안
-  description: 어떻게 개선하면 좋을까요?
-  placeholder: |
-  예:
-  - Strategy 패턴을 사용하여 락 전략을 분리
-  - 공통 로직은 추상 클래스로 추출
-  - 버전별 차이만 구체 클래스에서 구현
-  validations:
-  required: true
+## 개선 제안
+- 어떤 방식으로 구조를 바꾸고 싶은가요?
 
-- type: dropdown
-  id: category
-  attributes:
-  label: 🏷️ 개선 카테고리
-  description: 어떤 종류의 개선인가요?
-  multiple: true
-  options:
-  - 코드 중복 제거 (DRY)
-  - 설계 패턴 적용
-  - 성능 최적화
-  - 가독성 향상
-  - 테스트 커버리지 향상
-  - 에러 핸들링 개선
-  - 로깅 개선
-  - 문서화 개선
-  - 의존성 정리
-  - 네이밍 개선
-  - 기타
-  validations:
-  required: true
+## 기대 효과
+- 무엇이 좋아지며, 어떤 기준으로 좋아졌다고 볼 수 있나요?
 
-- type: dropdown
-  id: impact
-  attributes:
-  label: 📊 영향 범위
-  description: 이 개선이 미치는 영향은?
-  options:
-  - Large (전체 아키텍처 변경, 여러 모듈 영향)
-  - Medium (특정 도메인/모듈 전체)
-  - Small (단일 클래스/메서드 수준)
-  validations:
-  required: true
+## 리스크 / 트레이드오프
+- 이 변경이 가져올 수 있는 부작용은 무엇인가요?
 
-- type: checkboxes
-  id: benefits
-  attributes:
-  label: ✅ 기대 효과
-  description: 이 개선으로 얻을 수 있는 이점을 선택해주세요.
-  options:
-  - label: 코드 유지보수성 향상
-  - label: 성능 개선
-  - label: 가독성 향상
-  - label: 테스트 용이성 향상
-  - label: 버그 가능성 감소
-  - label: 확장성 향상
-  - label: 기술 부채 해소
+## 하지 않을 일
+- 이번 제안에서 제외할 범위를 적어 주세요.
 
-- type: textarea
-  id: code_example
-  attributes:
-  label: 💻 코드 예시 (선택)
-  description: 개선 전/후 코드 예시를 보여주시면 좋습니다.
-  render: java
-  placeholder: |
-  // Before
-  public void method1() {
-  // ...
-  }
+## 영향 범위
+- Small / Medium / Large 중 어느 정도인가요?
 
-      // After
-      public void method1() {
-        // ...
-      }
-  validations:
-  required: false
+## 검증 계획
+- 예: `:core:core-api:compileJava`
+- 예: `:core:core-domain:test`
+- 예: 관련 단위/통합 테스트
 
-- type: textarea
-  id: additional
-  attributes:
-  label: 📎 추가 정보
-  description: 기타 참고 사항이나 관련 이슈/PR이 있다면 작성해주세요.
-  validations:
-  required: false
+## 참고 자료
+- 관련 이슈 / PR / 문서 / 아키텍처 테스트 / 운영 장애 기록
