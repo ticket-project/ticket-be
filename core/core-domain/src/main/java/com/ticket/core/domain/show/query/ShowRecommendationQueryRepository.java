@@ -50,10 +50,10 @@ public class ShowRecommendationQueryRepository {
                 .distinct()
                 .from(show)
                 .leftJoin(show.venue, venue)
-                .leftJoin(showGenre).on(showGenre.show.eq(show))
+                .join(showGenre).on(showGenre.show.eq(show))
                 .where(
                         showGenre.genre.id.in(preferredGenreIds)
-                                .and(show.id.notIn(likedShowIds))
+                                .and(likedShowIds.isEmpty() ? null : show.id.notIn(likedShowIds))
                                 .and(show.saleEndDate.goe(LocalDateTime.now(clock)))
                 )
                 .orderBy(show.viewCount.desc(), show.id.desc())
