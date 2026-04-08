@@ -50,7 +50,13 @@ public enum ErrorType {
     //대기열
     QUEUE_TOKEN_REQUIRED(HttpStatus.FORBIDDEN, ErrorCode.E8000, "좌석 페이지 입장을 위한 대기열 토큰이 필요합니다."),
     QUEUE_TOKEN_INVALID(HttpStatus.FORBIDDEN, ErrorCode.E8001, "유효하지 않은 대기열 토큰입니다."),
-    QUEUE_ENTRY_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E8002, "대기열 엔트리를 찾을 수 없습니다."),;
+    QUEUE_ENTRY_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E8002, "대기열 엔트리를 찾을 수 없습니다."),
+
+    //공연자 알림
+    PERFORMER_ALERT_ALREADY_EXISTS(HttpStatus.CONFLICT, ErrorCode.E9000, "이미 구독 중인 공연자입니다."),
+
+    //공연 대기열
+    SHOW_WAITLIST_ALREADY_EXISTS(HttpStatus.CONFLICT, ErrorCode.E9100, "이미 대기열에 등록된 공연입니다.");
 
     private final HttpStatus status;
     private final ErrorCode errorCode;
