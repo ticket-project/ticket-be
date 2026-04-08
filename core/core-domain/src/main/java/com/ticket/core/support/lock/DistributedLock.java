@@ -1,4 +1,4 @@
-package com.ticket.core.infra.lock;
+package com.ticket.core.support.lock;
 
 import com.ticket.core.support.exception.ErrorType;
 

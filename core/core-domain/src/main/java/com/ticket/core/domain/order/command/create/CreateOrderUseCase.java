@@ -1,6 +1,6 @@
 package com.ticket.core.domain.order.command.create;
 
-import com.ticket.core.infra.lock.DistributedLock;
+import com.ticket.core.support.lock.DistributedLock;
 import com.ticket.core.domain.hold.command.HoldHistoryRecorder;
 import com.ticket.core.domain.hold.event.HoldCreatedEvent;
 

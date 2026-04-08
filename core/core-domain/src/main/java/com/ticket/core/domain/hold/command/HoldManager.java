@@ -1,6 +1,6 @@
 package com.ticket.core.domain.hold.command;
 
-import com.ticket.core.infra.lock.DistributedLock;
+import com.ticket.core.support.lock.DistributedLock;
 import com.ticket.core.domain.hold.model.HoldSnapshot;
 import com.ticket.core.domain.hold.store.HoldStore;
 import com.ticket.core.domain.order.command.create.RequestedSeatIds;

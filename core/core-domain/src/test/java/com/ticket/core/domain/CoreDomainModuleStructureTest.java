@@ -84,6 +84,20 @@ class CoreDomainModuleStructureTest {
     }
 
     @Test
+    void 스케줄러는_infra_패키지에_위치해야_한다() {
+        assertThat(Files.exists(resolve("src/main/java/com/ticket/core/domain/order/infra/scheduler/OrderExpirationScheduler.java"))).isTrue();
+        assertThat(Files.exists(resolve("src/main/java/com/ticket/core/domain/order/infra/scheduler/HoldReleaseOutboxScheduler.java"))).isTrue();
+        assertThat(Files.exists(resolve("src/main/java/com/ticket/core/domain/order/command/expire/OrderExpirationScheduler.java"))).isFalse();
+        assertThat(Files.exists(resolve("src/main/java/com/ticket/core/domain/order/command/release/HoldReleaseOutboxScheduler.java"))).isFalse();
+    }
+
+    @Test
+    void DistributedLock_어노테이션은_support_패키지에_있고_infra_lock에는_없어야_한다() {
+        assertThat(Files.exists(resolve("src/main/java/com/ticket/core/support/lock/DistributedLock.java"))).isTrue();
+        assertThat(Files.exists(resolve("src/main/java/com/ticket/core/infra/lock/DistributedLock.java"))).isFalse();
+    }
+
+    @Test
     void http_cookie_유틸리티는_core_api에_있고_core_domain에는_없어야_한다() {
         assertThat(Files.exists(resolve("src/main/java/com/ticket/core/support/util/CookieUtils.java"))).isFalse();
         assertThat(Files.exists(resolve("../core-api/src/main/java/com/ticket/core/support/util/CookieUtils.java"))).isTrue();

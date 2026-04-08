@@ -1,6 +1,6 @@
 package com.ticket.core.domain.queue.command.exit;
 
-import com.ticket.core.infra.lock.DistributedLock;
+import com.ticket.core.support.lock.DistributedLock;
 import com.ticket.core.domain.queue.model.QueueEntryId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -2,6 +2,7 @@ package com.ticket.core.infra.lock;
 
 import com.ticket.core.support.CustomSpringELParser;
 import com.ticket.core.support.exception.CoreException;
+import com.ticket.core.support.lock.DistributedLock;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -28,7 +29,7 @@ public class DistributedLockAop {
 
     private final RedissonClient redissonClient;
 
-    @Around("@annotation(com.ticket.core.infra.lock.DistributedLock)")
+    @Around("@annotation(com.ticket.core.support.lock.DistributedLock)")
     public Object around(final ProceedingJoinPoint joinPoint) throws Throwable {
         final MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         final DistributedLock distributedLock = signature.getMethod().getAnnotation(DistributedLock.class);

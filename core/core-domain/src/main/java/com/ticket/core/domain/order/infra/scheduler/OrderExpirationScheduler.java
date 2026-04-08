@@ -1,8 +1,9 @@
-package com.ticket.core.domain.order.command.expire;
+package com.ticket.core.domain.order.infra.scheduler;
 
+import com.ticket.core.domain.order.command.expire.ExpireOrderUseCase;
 import com.ticket.core.domain.order.model.Order;
-import com.ticket.core.domain.order.repository.OrderRepository;
 import com.ticket.core.domain.order.model.OrderState;
+import com.ticket.core.domain.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
