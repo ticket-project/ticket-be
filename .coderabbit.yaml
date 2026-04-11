@@ -3,9 +3,28 @@
 language: ko-KR
 tone_instructions: >
   모든 리뷰, 요약, 제안은 한국어로 작성하세요.
-  리뷰는 항상 심층적으로 수행하고, 패치만 보지 말고 주변 코드, 관련 테스트, 설정, 모듈 경계까지 함께 확인하세요.
-  스타일 취향보다 실제 결함 가능성, 회귀 위험, 동시성 문제, 트랜잭션 경계, Redis TTL/만료 처리, 보안, 테스트 공백을 우선 지적하세요.
+  이 저장소는 에이전트가 리뷰 코멘트를 읽고 자동으로 수정하는 워크플로우를 사용합니다.
+
+
+  **심각도 태그 필수**: 모든 인라인 코멘트 앞에 반드시 심각도 태그를 붙이세요.
+  - `[P0-Bug]`: 버그, 데이터 손실, 보안 취약점 — 반드시 수정
+  - `[P0-Arch]`: 아키텍처 위반 (모듈 경계, 인프라 격리 규칙) — 반드시 수정
+  - `[P1-Concurrency]`: 동시성, 분산 락, TTL 정합성 문제 — 수정 권장
+  - `[P1-Test]`: 테스트 누락, 기존 테스트와 불일치 — 수정 권장
+  - `[P2-Suggestion]`: 설계 개선, 네이밍, 리팩터링 제안 — 판단 필요
+  - `[P2-Style]`: 코드 스타일, 포맷팅 — 무시 가능
+
+
+  **리뷰 기준 문서**: 이 저장소의 아키텍처 규칙과 설계 원칙은 다음 파일에 정의되어 있습니다.
+  - `CLAUDE.md` — 전체 맵 (계층 규칙, 스킬, 검증 명령어)
+  - `docs/ARCHITECTURE.md` — 모듈 의존 방향, 인프라 격리 규칙
+  - `docs/RELIABILITY.md` — 분산 락, TTL, 트랜잭션 이벤트 규칙
+  - `docs/design-docs/core-beliefs.md` — 8가지 핵심 설계 원칙
+
+
+  P0/P1만 집중하고 P2는 최소한으로 남기세요.
   근거가 약한 코멘트는 남기지 말고, 재현 조건이나 실패 시나리오가 분명한 문제를 중심으로 리뷰하세요.
+  스타일 취향 코멘트는 남기지 마세요.
 
 reviews:
   profile: assertive
@@ -40,30 +59,35 @@ reviews:
   path_instructions:
     - path: "core/core-api/**"
       instructions: |
-        - 항상 한국어로 리뷰하세요.
-        - Controller, config, security, websocket 계층에서 비즈니스 규칙이나 직접적인 저장소 접근이 섞였는지 집중 확인하세요.
-        - 인증/인가 누락, 공개 API 노출, 요청 검증 누락, 응답 스키마 호환성 문제를 우선 찾으세요.
-        - 단순 스타일보다 실제 장애 시나리오와 회귀 위험을 중심으로 지적하세요.
+        - 한국어로 리뷰. 모든 코멘트에 심각도 태그 [P0/P1/P2] 필수.
+        - [P0-Arch] core-api에 비즈니스 규칙이나 직접 저장소 접근이 들어갔는지 확인. 규칙: docs/ARCHITECTURE.md#core-api-소유물
+        - [P0-Bug] 인증/인가 누락, 공개 API 노출, 요청 검증 누락
+        - [P1-Test] 컨트롤러 변경에 슬라이스/통합 테스트가 동반되었는지
+        - P2 스타일 코멘트는 남기지 마세요.
     - path: "core/core-domain/**"
       instructions: |
-        - 항상 한국어로 리뷰하세요.
-        - 이 경로는 가장 엄격하게 심층 리뷰하세요.
-        - hold, order, performanceseat, auth, queue 도메인의 상태 전이, 동시성, 분산 락, Redis TTL/expiration, scheduler/listener 정합성을 우선 확인하세요.
-        - 트랜잭션 경계 오류, 부분 저장, 이벤트 누락, 만료 처리 불일치를 집중적으로 찾으세요.
-        - 관련 테스트가 충분한지도 함께 보세요.
+        - 한국어로 리뷰. 모든 코멘트에 심각도 태그 [P0/P1/P2] 필수.
+        - 가장 엄격하게 리뷰하세요.
+        - [P0-Bug] 상태 전이 오류, 부분 저장, 이벤트 누락
+        - [P0-Arch] infra 패키지 밖에서 Redisson/Redis/Messaging 직접 참조. 규칙: docs/ARCHITECTURE.md#인프라-격리-규칙
+        - [P1-Concurrency] 분산 락 누락, TTL/expiration 불일치, 트랜잭션 경계 오류. 규칙: docs/RELIABILITY.md
+        - [P1-Test] hold, order, queue 변경에 동시성 시나리오 테스트 동반 여부
     - path: "storage/redis-core/**"
       instructions: |
-        - 항상 한국어로 리뷰하세요.
-        - Redis/Redisson 설정, key 전략, TTL, connection 설정, 락 사용 방식이 상위 도메인 흐름과 충돌하지 않는지 보세요.
+        - 한국어로 리뷰. 심각도 태그 필수.
+        - [P1-Concurrency] Redis key 전략, TTL, connection 설정이 도메인 흐름과 충돌하지 않는지
     - path: ".github/**"
       instructions: |
-        - 항상 한국어로 리뷰하세요.
-        - workflow, review 설정, 배포 설정 변경은 CI 실패, 보안 노출, 잘못된 자동화 동작을 중심으로 확인하세요.
+        - 한국어로 리뷰. 심각도 태그 필수.
+        - [P0-Bug] CI 실패, 보안 노출, 잘못된 자동화 동작
+    - path: "docs/**"
+      instructions: |
+        - 한국어로 리뷰. 심각도 태그 필수.
+        - [P1-Test] 문서 내용이 현재 코드와 일치하는지, 교차 링크가 유효한지 확인
     - path: "**/*"
       instructions: |
-        - 항상 한국어로 리뷰하세요.
-        - 패치만 보지 말고 주변 코드와 관련 테스트까지 확인하세요.
-        - 버그, 보안, 동시성, 트랜잭션, 회귀 위험, 테스트 공백을 우선 지적하세요.
+        - 한국어로 리뷰. 모든 코멘트에 심각도 태그 [P0/P1/P2] 필수.
+        - P0/P1 위주로 리뷰. P2-Style은 남기지 마세요.
   tools:
     gitleaks:
       enabled: true
