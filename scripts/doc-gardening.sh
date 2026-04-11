@@ -60,11 +60,16 @@ echo ""
 # 2. 교차 링크 유효성
 # ──────────────────────────────────────────────
 echo "[2. 교차 링크]"
-LINK_ISSUES=0
+LINK_OK=true
 for md_file in CLAUDE.md AGENTS.md $(find docs -name "*.md" -type f 2>/dev/null); do
-    grep -oP '\[.*?\]\(\K[^)]+' "$md_file" 2>/dev/null | while read -r link; do
-        [[ "$link" == http* ]] && continue
-        [[ "$link" == \#* ]] && continue
+    [ -f "$md_file" ] || continue
+    # 마크다운 링크 추출: [text](path) → path
+    LINKS=$(sed -n 's/.*\](\([^)]*\)).*/\1/p' "$md_file" 2>/dev/null || true)
+    for link in $LINKS; do
+        # 외부 URL, 앵커 스킵
+        case "$link" in
+            http*|https*|\#*) continue ;;
+        esac
         # 앵커 제거
         clean_link="${link%%#*}"
         [ -z "$clean_link" ] && continue
@@ -78,11 +83,11 @@ for md_file in CLAUDE.md AGENTS.md $(find docs -name "*.md" -type f 2>/dev/null)
 
         if [ ! -f "$RESOLVED" ] && [ ! -d "$RESOLVED" ]; then
             issue "$md_file → 깨진 링크: $link"
-            LINK_ISSUES=$((LINK_ISSUES + 1))
+            LINK_OK=false
         fi
     done
 done
-[ "$LINK_ISSUES" -eq 0 ] && ok "모든 교차 링크 유효"
+[ "$LINK_OK" = true ] && ok "모든 교차 링크 유효"
 echo ""
 
 # ──────────────────────────────────────────────
@@ -119,7 +124,7 @@ if [ -d "$DOMAIN_ROOT" ]; then
     done
 
     # 문서에는 있지만 실제로는 없는 도메인
-    DOCUMENTED_DOMAINS=$(grep -oP '`(\w+)`\s*\|' CLAUDE.md 2>/dev/null | grep -oP '`\K\w+' | sort -u)
+    DOCUMENTED_DOMAINS=$(grep -o '`[a-z]*`' CLAUDE.md 2>/dev/null | tr -d '`' | sort -u)
     for domain in $DOCUMENTED_DOMAINS; do
         if [ ! -d "$DOMAIN_ROOT/$domain" ]; then
             issue "CLAUDE.md에 '$domain' 도메인이 있지만, 실제 패키지가 존재하지 않습니다"
@@ -133,7 +138,7 @@ echo ""
 # ──────────────────────────────────────────────
 echo "[5. QUALITY_SCORE.md 신선도]"
 if [ -f "docs/QUALITY_SCORE.md" ]; then
-    LAST_UPDATE=$(grep -oP '마지막 업데이트: \K[\d-]+' docs/QUALITY_SCORE.md 2>/dev/null || echo "")
+    LAST_UPDATE=$(grep '마지막 업데이트:' docs/QUALITY_SCORE.md 2>/dev/null | sed 's/.*마지막 업데이트: //' | sed 's/[^0-9-]//g' || echo "")
     if [ -n "$LAST_UPDATE" ]; then
         DAYS_AGO=$(( ($(date +%s) - $(date -d "$LAST_UPDATE" +%s 2>/dev/null || echo "0")) / 86400 ))
         if [ "$DAYS_AGO" -gt 30 ]; then
