@@ -42,10 +42,20 @@ P2-Style (순수 스타일/포맷팅) 코멘트는 남기지 마세요.
 
 ## 아키텍처 규칙
 
-계층 규칙: `Types → Config → Repo → Service → Runtime → UI` (단방향)
-
+모듈 의존 방향 (단방향):
 ```
-core-api  ──depends──▶  core-domain  ──depends──▶  redis-core
+core-api (HTTP 진입점) ──▶ core-domain (비즈니스 로직) ──▶ redis-core (인프라)
+```
+
+도메인 패키지 내부 구조:
+```
+domain/{도메인명}/
+├── model/      ← 엔티티, 값 객체, 열거형 (의존 없음)
+├── command/    ← 쓰기 유스케이스
+├── query/      ← 읽기 유스케이스
+├── event/      ← 도메인 이벤트, 리스너
+├── infra/      ← 외부 시스템 연동 (Redis, 메시징, HTTP 클라이언트)
+└── store/      ← 저장소 구현
 ```
 
 - core-domain은 순수 비즈니스 로직만 포함
