@@ -99,7 +99,9 @@ CAPTURE_SCREENSHOTS=true ./scripts/verify-fix.sh
 
 # PR 생성 + 리뷰
 ./scripts/pr-create.sh "제목" "요약"
-./scripts/review-respond.sh      # PR 리뷰 상태 확인
+./scripts/review-respond.sh              # 현재 상태만 확인
+./scripts/review-respond.sh --wait       # 리뷰 봇 응답 대기 후 확인 (최대 10분)
+./scripts/review-respond.sh --wait 42    # 특정 PR에 대해 대기
 
 # E2E + 스크린샷 (Playwright)
 cd scripts/e2e && npm install && npm run install-browsers
@@ -115,9 +117,11 @@ node scripts/e2e/e2e-api-flow.js # 전체 API 흐름 테스트
 3. `./gradlew :core:core-domain:test` 통과 확인
 4. `./scripts/verify-fix.sh` 실행 (앱 부팅 + 스모크 테스트)
 5. `./scripts/pr-create.sh` 로 PR 생성
-6. `./scripts/review-respond.sh` 로 리뷰 확인
-7. 리뷰 피드백이 있으면 수정 → 재푸시 → 6으로 돌아감
-8. 리뷰 통과 시 완료 보고
+6. `./scripts/review-respond.sh --wait` 로 리뷰 대기 (최대 10분)
+7. 종료 코드에 따라 분기:
+   - `0` (READY_TO_MERGE) → 완료 보고
+   - `2` (CHANGES_REQUESTED / CI_FAILED) → 코멘트 읽고 수정 → 재푸시 → 6으로
+   - `3` (PENDING) → 잠시 후 재확인
 
 ### new-feature
 1. `docs/exec-plans/active/` 에 실행 계획 작성
@@ -125,7 +129,7 @@ node scripts/e2e/e2e-api-flow.js # 전체 API 흐름 테스트
 3. `./scripts/verify-fix.sh` 실행
 4. 관련 문서 업데이트
 5. `./scripts/pr-create.sh` 로 PR 생성
-6. 리뷰 루프 (review-respond.sh → 수정 → 재푸시)
+6. `./scripts/review-respond.sh --wait` 로 리뷰 대기 + 피드백 루프
 7. 완료 후 실행 계획을 `completed/`로 이동
 
 ### refactor
@@ -134,7 +138,7 @@ node scripts/e2e/e2e-api-flow.js # 전체 API 흐름 테스트
 3. 리팩터링 수행
 4. `./scripts/verify-fix.sh` 실행
 5. `./scripts/pr-create.sh` 로 PR 생성
-6. 리뷰 루프
+6. `./scripts/review-respond.sh --wait` 로 리뷰 대기 + 피드백 루프
 
 ## 코딩 표준
 
