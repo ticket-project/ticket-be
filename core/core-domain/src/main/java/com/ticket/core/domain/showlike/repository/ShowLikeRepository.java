@@ -11,4 +11,6 @@ public interface ShowLikeRepository extends JpaRepository<ShowLike, Long> {
     Optional<ShowLike> findByMember_IdAndShow_Id(Long memberId, Long showId);
 
     long countByShow_Id(Long showId);
+
+    long countByMember_Id(Long memberId);
 }
