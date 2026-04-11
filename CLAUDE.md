@@ -121,5 +121,6 @@ Types → Config → Repo → Service → Runtime → UI
 
 - **CodeRabbit**: PR 자동 리뷰 (`.coderabbit.yaml`)
 - **PR Agent**: PR 설명/리뷰 자동 생성 (`.pr_agent.toml`)
-- **GitHub Actions**: master push 시 Docker 빌드 → 배포 (`.github/workflows/deploy.yml`)
-- **ArchUnit**: 아키텍처 규칙 테스트 자동 실행
+- **GitHub Actions — test.yml**: PR 시 컴파일 + 아키텍처/도메인 테스트 + 문서 검증 자동 실행
+- **GitHub Actions — deploy.yml**: master push 시 Docker 빌드 → 배포
+- **ArchUnit**: 아키텍처 규칙 테스트 자동 실행 (에이전트용 수정 지침 포함)
