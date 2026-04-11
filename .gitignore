@@ -40,3 +40,10 @@ out/
 
 # MySQL data (Docker volume)
 mysql-data/
+
+### Agent Scripts ###
+scripts/.app.pid
+scripts/.app.log
+scripts/e2e/screenshots/
+scripts/e2e/node_modules/
+scripts/e2e/package-lock.json

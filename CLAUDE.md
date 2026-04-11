@@ -83,29 +83,58 @@ Types → Config → Repo → Service → Runtime → UI
 - [docs/design-docs/core-beliefs.md](docs/design-docs/core-beliefs.md) — 설계 원칙
 - [docs/QUALITY_SCORE.md](docs/QUALITY_SCORE.md) — 도메인별 품질 등급
 
+## 검증 스크립트
+
+```bash
+# 전체 검증 (컴파일 → 테스트 → 앱 부팅 → 스모크 테스트 → 정리)
+./scripts/verify-fix.sh
+
+# 스크린샷 포함 검증
+CAPTURE_SCREENSHOTS=true ./scripts/verify-fix.sh
+
+# 개별 실행
+./scripts/app-start.sh          # 앱 부팅 (Redis + Spring Boot local)
+./scripts/smoke-test.sh          # API 스모크 테스트
+./scripts/app-stop.sh            # 앱 + Redis 정리
+
+# PR 생성 + 리뷰
+./scripts/pr-create.sh "제목" "요약"
+./scripts/review-respond.sh      # PR 리뷰 상태 확인
+
+# E2E + 스크린샷 (Playwright)
+cd scripts/e2e && npm install && npm run install-browsers
+node scripts/e2e/capture.js      # Swagger UI + API 스크린샷
+node scripts/e2e/e2e-api-flow.js # 전체 API 흐름 테스트
+```
+
 ## 에이전트 작업 스킬
 
-### bug-fix
+### bug-fix (전체 자율 루프)
 1. 버그 재현 테스트 작성 (실패 확인)
 2. 최소 범위 수정
-3. 테스트 통과 확인
-4. `./gradlew :core:core-domain:test` 통과 확인
-5. PR 생성
+3. `./gradlew :core:core-domain:test` 통과 확인
+4. `./scripts/verify-fix.sh` 실행 (앱 부팅 + 스모크 테스트)
+5. `./scripts/pr-create.sh` 로 PR 생성
+6. `./scripts/review-respond.sh` 로 리뷰 확인
+7. 리뷰 피드백이 있으면 수정 → 재푸시 → 6으로 돌아감
+8. 리뷰 통과 시 완료 보고
 
 ### new-feature
 1. `docs/exec-plans/active/` 에 실행 계획 작성
 2. 구현 (테스트 포함)
-3. 아키텍처 테스트 통과 확인
+3. `./scripts/verify-fix.sh` 실행
 4. 관련 문서 업데이트
-5. PR 생성
-6. 완료 후 실행 계획을 `completed/`로 이동
+5. `./scripts/pr-create.sh` 로 PR 생성
+6. 리뷰 루프 (review-respond.sh → 수정 → 재푸시)
+7. 완료 후 실행 계획을 `completed/`로 이동
 
 ### refactor
 1. 영향 범위 분석 (의존 패키지, 테스트)
 2. 기존 테스트 전부 통과 확인 (before)
 3. 리팩터링 수행
-4. 기존 테스트 전부 통과 확인 (after)
-5. PR 생성
+4. `./scripts/verify-fix.sh` 실행
+5. `./scripts/pr-create.sh` 로 PR 생성
+6. 리뷰 루프
 
 ## 코딩 표준
 

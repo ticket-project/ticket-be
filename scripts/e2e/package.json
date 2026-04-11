@@ -1,0 +1,14 @@
+{
+  "name": "ticket-e2e",
+  "private": true,
+  "description": "에이전트용 E2E 검증 및 스크린샷 캡처",
+  "scripts": {
+    "install-browsers": "npx playwright install chromium",
+    "capture": "node capture.js",
+    "e2e": "node e2e-api-flow.js",
+    "verify": "node capture.js && node e2e-api-flow.js"
+  },
+  "dependencies": {
+    "playwright": "^1.52.0"
+  }
+}
