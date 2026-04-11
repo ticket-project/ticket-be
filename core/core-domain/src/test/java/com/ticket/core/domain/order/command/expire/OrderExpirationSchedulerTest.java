@@ -52,8 +52,8 @@ class OrderExpirationSchedulerTest {
     void due_orders_are_expired_with_clock_now() {
         OrderExpirationScheduler scheduler = new OrderExpirationScheduler(expireOrderUseCase, orderRepository, fixedClock);
         LocalDateTime expectedNow = LocalDateTime.of(2026, 3, 15, 10, 0);
-        Order first = createOrder(1L, null);
-        Order second = createOrder(2L, null);
+        Order first = createOrder(1L, "order-1");
+        Order second = createOrder(2L, "order-2");
         Slice<Order> slice = new SliceImpl<>(List.of(first, second));
         when(orderRepository.findAllByStatusAndExpiresAtBefore(eq(OrderState.PENDING), eq(expectedNow), any()))
                 .thenReturn(slice);
