@@ -128,33 +128,36 @@ node scripts/e2e/e2e-api-flow.js # 전체 API 흐름 테스트
 ## 에이전트 작업 스킬
 
 ### bug-fix (전체 자율 루프)
-1. 버그 재현 테스트 작성 (실패 확인)
-2. 최소 범위 수정
-3. `./gradlew :core:core-domain:test` 통과 확인
-4. `./scripts/verify-fix.sh` 실행 (앱 부팅 + 스모크 테스트)
-5. `./scripts/pr-create.sh` 로 PR 생성
-6. `./scripts/review-respond.sh --wait --auto-merge` 로 리뷰 대기 + 자동 병합
+1. `git checkout -b fix/<간단한-설명> master` 로 피처 브랜치 생성
+2. 버그 재현 테스트 작성 (실패 확인)
+3. 최소 범위 수정
+4. `./gradlew :core:core-domain:test` 통과 확인
+5. `./scripts/verify-fix.sh` 실행 (앱 부팅 + 스모크 테스트)
+6. 커밋 후 `./scripts/pr-create.sh` 로 PR 생성
+7. `./scripts/review-respond.sh --wait --auto-merge` 로 리뷰 대기 + 자동 병합
 7. 종료 코드에 따라 분기:
    - `0` (병합 완료/가능) → 완료 보고
    - `2` (P0 이슈 / CI 실패) → 코멘트 읽고 수정 → 재푸시 → 6으로
    - `3` (대기 중) → 잠시 후 재확인
 
 ### new-feature
-1. `docs/exec-plans/active/` 에 실행 계획 작성
-2. 구현 (테스트 포함)
-3. `./scripts/verify-fix.sh` 실행
-4. 관련 문서 업데이트
-5. `./scripts/pr-create.sh` 로 PR 생성
-6. `./scripts/review-respond.sh --wait --auto-merge` 로 리뷰 대기 + 자동 병합
-7. 완료 후 실행 계획을 `completed/`로 이동
+1. `git checkout -b feat/<간단한-설명> master` 로 피처 브랜치 생성
+2. `docs/exec-plans/active/` 에 실행 계획 작성
+3. 구현 (테스트 포함)
+4. `./scripts/verify-fix.sh` 실행
+5. 관련 문서 업데이트
+6. 커밋 후 `./scripts/pr-create.sh` 로 PR 생성
+7. `./scripts/review-respond.sh --wait --auto-merge` 로 리뷰 대기 + 자동 병합
+8. 완료 후 실행 계획을 `completed/`로 이동
 
 ### refactor
-1. 영향 범위 분석 (의존 패키지, 테스트)
-2. 기존 테스트 전부 통과 확인 (before)
-3. 리팩터링 수행
-4. `./scripts/verify-fix.sh` 실행
-5. `./scripts/pr-create.sh` 로 PR 생성
-6. `./scripts/review-respond.sh --wait --auto-merge` 로 리뷰 대기 + 자동 병합
+1. `git checkout -b refactor/<간단한-설명> master` 로 피처 브랜치 생성
+2. 영향 범위 분석 (의존 패키지, 테스트)
+3. 기존 테스트 전부 통과 확인 (before)
+4. 리팩터링 수행
+5. `./scripts/verify-fix.sh` 실행
+6. 커밋 후 `./scripts/pr-create.sh` 로 PR 생성
+7. `./scripts/review-respond.sh --wait --auto-merge` 로 리뷰 대기 + 자동 병합
 
 ### doc-gardening (정기 실행)
 1. `./scripts/doc-gardening.sh` 로 문서 정합성 검사
