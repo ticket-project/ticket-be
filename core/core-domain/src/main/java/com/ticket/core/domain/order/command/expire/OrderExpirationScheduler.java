@@ -53,10 +53,12 @@ public class OrderExpirationScheduler {
         int processedCount = 0;
         for (final Order order : expiredOrders.getContent()) {
             try {
+                log.info("주문 만료 처리 시작 orderId={}, orderKey={}", order.getId(), order.getOrderKey());
                 expireOrderUseCase.expireByOrderId(order.getId(), now);
+                log.info("주문 만료 처리 완료 orderId={}, orderKey={}", order.getId(), order.getOrderKey());
                 processedCount++;
             } catch (final RuntimeException e) {
-                log.error("주문 만료 처리 실패: orderKey={}, orderId={}", order.getOrderKey(), order.getId(), e);
+                log.warn("주문 만료 처리 실패 orderId={}, orderKey={}", order.getId(), order.getOrderKey(), e);
             }
         }
         return processedCount;
