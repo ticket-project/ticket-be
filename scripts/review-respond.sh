@@ -2,12 +2,13 @@
 # PR 리뷰 상태 확인 + 대기 모드 지원
 #
 # 사용법:
-#   ./scripts/review-respond.sh              # 현재 상태만 확인
-#   ./scripts/review-respond.sh --wait       # 리뷰 도착할 때까지 대기 후 확인
-#   ./scripts/review-respond.sh --wait 42    # PR #42에 대해 대기
+#   ./scripts/review-respond.sh                    # 현재 상태만 확인
+#   ./scripts/review-respond.sh --wait             # 리뷰 도착할 때까지 대기 후 확인
+#   ./scripts/review-respond.sh --wait --auto-merge # 대기 후 P0 없으면 자동 병합
+#   ./scripts/review-respond.sh --auto-merge 42    # PR #42 자동 병합
 #
 # 종료 코드:
-#   0 = 병합 가능 (APPROVED + CI 통과)
+#   0 = 병합 완료 또는 병합 가능
 #   1 = 에러
 #   2 = 변경 요청됨 (수정 필요)
 #   3 = 아직 대기 중 (리뷰 미완료)
@@ -15,12 +16,14 @@
 set -euo pipefail
 
 WAIT_MODE=false
+AUTO_MERGE=false
 PR_NUMBER=""
 
 # 인자 파싱
 for arg in "$@"; do
     case "$arg" in
         --wait) WAIT_MODE=true ;;
+        --auto-merge) AUTO_MERGE=true ;;
         *)
             if [[ "$arg" =~ ^[0-9]+$ ]]; then
                 PR_NUMBER="$arg"
@@ -152,6 +155,40 @@ echo "[판단]"
 REVIEW_STATE=$(gh pr view "$PR_NUMBER" --json reviewDecision -q '.reviewDecision' 2>/dev/null || echo "")
 MERGEABLE=$(gh pr view "$PR_NUMBER" --json mergeable -q '.mergeable' 2>/dev/null || echo "")
 
+# P0 코멘트 존재 여부 확인 (자동 병합 차단 기준)
+ALL_COMMENTS=$(gh api "repos/{owner}/{repo}/issues/$PR_NUMBER/comments" --jq '.[].body' 2>/dev/null || echo "")
+ALL_REVIEW_COMMENTS=$(gh api "repos/{owner}/{repo}/pulls/$PR_NUMBER/comments" --jq '.[].body' 2>/dev/null || echo "")
+ALL_TEXT="$ALL_COMMENTS"$'\n'"$ALL_REVIEW_COMMENTS"
+
+P0_COUNT=$(echo "$ALL_TEXT" | grep -c '\[P0' || echo "0")
+P1_COUNT=$(echo "$ALL_TEXT" | grep -c '\[P1' || echo "0")
+P2_COUNT=$(echo "$ALL_TEXT" | grep -c '\[P2' || echo "0")
+
+echo "  심각도: P0=${P0_COUNT}건, P1=${P1_COUNT}건, P2=${P2_COUNT}건"
+echo ""
+
+# 자동 병합 함수
+try_auto_merge() {
+    if [ "$AUTO_MERGE" != true ]; then
+        return 1
+    fi
+
+    # P0이 있으면 자동 병합 차단
+    if [ "$P0_COUNT" -gt 0 ]; then
+        echo "  [AUTO-MERGE] 차단 — P0 이슈 ${P0_COUNT}건이 있습니다. 수정이 필요합니다."
+        return 1
+    fi
+
+    echo "  [AUTO-MERGE] P0 이슈 없음. 자동 병합을 시도합니다..."
+    if gh pr merge "$PR_NUMBER" --squash --delete-branch 2>&1; then
+        echo "  [AUTO-MERGE] 병합 완료"
+        return 0
+    else
+        echo "  [AUTO-MERGE] 병합 실패. 수동으로 확인하세요."
+        return 1
+    fi
+}
+
 if [ "$FAILED_CHECKS" -gt 0 ]; then
     echo "  STATUS: CI_FAILED"
     echo "  --> CI 체크 실패. 위 실패 항목을 확인하고 수정 후 재푸시하세요."
@@ -159,7 +196,6 @@ if [ "$FAILED_CHECKS" -gt 0 ]; then
 elif [ "$PENDING_CHECKS" -gt 0 ]; then
     echo "  STATUS: PENDING"
     echo "  --> CI 체크 진행 중 (${PENDING_CHECKS}건). 완료 후 다시 확인하세요."
-    echo "  --> 대기 모드: ./scripts/review-respond.sh --wait $PR_NUMBER"
     exit 3
 elif [ "$REVIEW_STATE" = "CHANGES_REQUESTED" ]; then
     echo "  STATUS: CHANGES_REQUESTED"
@@ -167,7 +203,9 @@ elif [ "$REVIEW_STATE" = "CHANGES_REQUESTED" ]; then
     exit 2
 elif [ "$REVIEW_STATE" = "APPROVED" ] && [ "$MERGEABLE" = "MERGEABLE" ]; then
     echo "  STATUS: READY_TO_MERGE"
-    echo "  --> 병합 가능 상태입니다."
+    if try_auto_merge; then
+        exit 0
+    fi
     echo "  --> 병합하려면: gh pr merge $PR_NUMBER --squash"
     exit 0
 else
@@ -178,13 +216,27 @@ else
 
     if [ "$BOT_COMMENT_COUNT" -eq 0 ]; then
         echo "  STATUS: WAITING_FOR_REVIEWS"
-        echo "  --> 리뷰 봇 응답 대기 중 (아직 코멘트 없음)."
-        echo "  --> 대기 모드: ./scripts/review-respond.sh --wait $PR_NUMBER"
+        echo "  --> 리뷰 봇 응답 대기 중."
         exit 3
     else
         echo "  STATUS: REVIEWS_RECEIVED"
-        echo "  --> 리뷰 ${BOT_COMMENT_COUNT}건 수신됨. 위 코멘트를 확인하세요."
-        echo "  --> 추가 변경 없이 병합 가능하면: gh pr merge $PR_NUMBER --squash"
-        exit 0
+        echo "  --> 리뷰 ${BOT_COMMENT_COUNT}건 수신됨."
+
+        # P0 없고 auto-merge면 병합 시도
+        if try_auto_merge; then
+            exit 0
+        fi
+
+        if [ "$P0_COUNT" -gt 0 ]; then
+            echo "  --> P0 이슈 ${P0_COUNT}건. 반드시 수정 후 재푸시하세요."
+            exit 2
+        elif [ "$P1_COUNT" -gt 0 ]; then
+            echo "  --> P1 이슈 ${P1_COUNT}건. 수정 권장. 판단 후 병합 가능."
+            exit 0
+        else
+            echo "  --> P0/P1 이슈 없음. 병합 가능합니다."
+            echo "  --> 병합하려면: gh pr merge $PR_NUMBER --squash"
+            exit 0
+        fi
     fi
 fi

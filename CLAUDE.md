@@ -108,9 +108,14 @@ CAPTURE_SCREENSHOTS=true ./scripts/verify-fix.sh
 
 # PR 생성 + 리뷰
 ./scripts/pr-create.sh "제목" "요약"
-./scripts/review-respond.sh              # 현재 상태만 확인
-./scripts/review-respond.sh --wait       # 리뷰 봇 응답 대기 후 확인 (최대 10분)
-./scripts/review-respond.sh --wait 42    # 특정 PR에 대해 대기
+./scripts/review-respond.sh                    # 현재 상태만 확인
+./scripts/review-respond.sh --wait             # 리뷰 봇 응답 대기 후 확인 (최대 10분)
+./scripts/review-respond.sh --wait --auto-merge # 대기 후 P0 없으면 자동 병합
+./scripts/review-respond.sh --auto-merge 42    # 특정 PR 자동 병합
+
+# 문서 정합성 검사
+./scripts/doc-gardening.sh               # 검사만
+./scripts/doc-gardening.sh --fix         # 검사 + 수정 지시 출력
 
 # E2E + 스크린샷 (Playwright)
 cd scripts/e2e && npm install && npm run install-browsers
@@ -126,11 +131,11 @@ node scripts/e2e/e2e-api-flow.js # 전체 API 흐름 테스트
 3. `./gradlew :core:core-domain:test` 통과 확인
 4. `./scripts/verify-fix.sh` 실행 (앱 부팅 + 스모크 테스트)
 5. `./scripts/pr-create.sh` 로 PR 생성
-6. `./scripts/review-respond.sh --wait` 로 리뷰 대기 (최대 10분)
+6. `./scripts/review-respond.sh --wait --auto-merge` 로 리뷰 대기 + 자동 병합
 7. 종료 코드에 따라 분기:
-   - `0` (READY_TO_MERGE) → 완료 보고
-   - `2` (CHANGES_REQUESTED / CI_FAILED) → 코멘트 읽고 수정 → 재푸시 → 6으로
-   - `3` (PENDING) → 잠시 후 재확인
+   - `0` (병합 완료/가능) → 완료 보고
+   - `2` (P0 이슈 / CI 실패) → 코멘트 읽고 수정 → 재푸시 → 6으로
+   - `3` (대기 중) → 잠시 후 재확인
 
 ### new-feature
 1. `docs/exec-plans/active/` 에 실행 계획 작성
@@ -138,7 +143,7 @@ node scripts/e2e/e2e-api-flow.js # 전체 API 흐름 테스트
 3. `./scripts/verify-fix.sh` 실행
 4. 관련 문서 업데이트
 5. `./scripts/pr-create.sh` 로 PR 생성
-6. `./scripts/review-respond.sh --wait` 로 리뷰 대기 + 피드백 루프
+6. `./scripts/review-respond.sh --wait --auto-merge` 로 리뷰 대기 + 자동 병합
 7. 완료 후 실행 계획을 `completed/`로 이동
 
 ### refactor
@@ -147,7 +152,13 @@ node scripts/e2e/e2e-api-flow.js # 전체 API 흐름 테스트
 3. 리팩터링 수행
 4. `./scripts/verify-fix.sh` 실행
 5. `./scripts/pr-create.sh` 로 PR 생성
-6. `./scripts/review-respond.sh --wait` 로 리뷰 대기 + 피드백 루프
+6. `./scripts/review-respond.sh --wait --auto-merge` 로 리뷰 대기 + 자동 병합
+
+### doc-gardening (정기 실행)
+1. `./scripts/doc-gardening.sh` 로 문서 정합성 검사
+2. 이슈가 있으면 수정
+3. `./scripts/doc-gardening.sh` 재실행으로 확인
+4. 커밋 + PR
 
 ## 리뷰 코멘트 판단 기준
 
