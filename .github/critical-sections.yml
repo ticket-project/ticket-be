@@ -1,0 +1,80 @@
+# 크리티컬 섹션 정의
+# PR에서 변경된 파일이 아래 패턴에 해당하면 개발자가 직접 리뷰해야 합니다.
+# AI 리뷰(CodeRabbit, Qodo)는 모든 파일을 리뷰하지만, 크리티컬 파일은 반드시 사람이 확인합니다.
+
+critical:
+  # ── 금전/주문 관련 ──
+  - pattern: "**/order/**"
+    domain: order
+    reason: "주문 생성·취소·상태 변경 — 금전 직결"
+
+  - pattern: "**/hold/**"
+    domain: hold
+    reason: "좌석 홀드·만료·TTL — 결제 전 점유 로직"
+
+  - pattern: "**/payment/**"
+    domain: payment
+    reason: "결제 처리 — 금전 직결"
+
+  # ── 좌석 상태 전이 ──
+  - pattern: "**/performanceseat/**"
+    domain: performanceseat
+    reason: "좌석 상태 전이(선택→홀드→확정→취소) — 동시성·정합성 위험"
+
+  # ── 대기열/공정성 ──
+  - pattern: "**/queue/**"
+    domain: queue
+    reason: "대기열 진입·순서 관리 — 공정성 위험"
+
+  # ── 인증/보안 ──
+  - pattern: "**/auth/**"
+    domain: auth
+    reason: "인증·인가 로직 — 보안 위험"
+
+  - pattern: "**/config/Security*"
+    domain: auth
+    reason: "Spring Security 설정 — 보안 위험"
+
+  - pattern: "**/config/Jwt*"
+    domain: auth
+    reason: "JWT 설정 — 보안 위험"
+
+  - pattern: "**/config/OAuth*"
+    domain: auth
+    reason: "OAuth2 설정 — 보안 위험"
+
+  # ── 인프라/배포 ──
+  - pattern: "Dockerfile"
+    domain: infra
+    reason: "컨테이너 이미지 변경 — 배포 영향"
+
+  - pattern: "docker-compose.yml"
+    domain: infra
+    reason: "로컬/운영 인프라 구성 변경"
+
+  - pattern: ".github/workflows/deploy.yml"
+    domain: infra
+    reason: "배포 파이프라인 변경"
+
+  - pattern: "build.gradle"
+    domain: infra
+    reason: "빌드·의존성 변경 — 런타임 영향 가능"
+
+  - pattern: "settings.gradle"
+    domain: infra
+    reason: "모듈 구조 변경"
+
+  # ── Redis/분산 락 ──
+  - pattern: "storage/redis-core/**"
+    domain: redis
+    reason: "Redis 설정·키 전략·TTL — 분산 상태 관리"
+
+# 키워드 기반 추가 탐지
+# diff 내용에 아래 키워드가 포함되면 해당 파일을 크리티컬로 승격
+keywords:
+  - pattern: "price|amount|결제|환불|refund|charge"
+    reason: "금전 관련 키워드 감지"
+  - pattern: "DROP\\s|TRUNCATE\\s|DELETE\\s+FROM"
+    reason: "파괴적 SQL 감지"
+  - pattern: "@Scheduled|@EventListener.*Expired"
+    reason: "스케줄러/이벤트 리스너 변경 — 비동기 부작용 위험"
