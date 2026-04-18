@@ -11,7 +11,7 @@ Favor concrete defects and regression risks over style-only commentary.
 When invoked:
 1. Run `git diff -- '*.java'` to see recent Java file changes
 2. Read related configuration, controller, repository, and test code around the patch
-3. Run `./gradlew :core:core-api:compileJava` or `./gradlew :core:core-domain:test` when useful and available
+3. Run `./gradlew :core:core-api:compileJava` or `./gradlew :core:core-business:test` when useful and available
 4. Focus on modified `.java` files, but include surrounding flow when needed
 5. Begin review immediately
 
@@ -90,7 +90,7 @@ If any CRITICAL security issue is found, escalate to `security-reviewer`.
 ```bash
 git diff -- '*.java'
 ./gradlew :core:core-api:compileJava
-./gradlew :core:core-domain:test
+./gradlew :core:core-business:test
 ```
 
 Read `build.gradle` and `settings.gradle` before finalizing the review.

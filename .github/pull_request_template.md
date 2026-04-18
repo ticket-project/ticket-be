@@ -23,7 +23,7 @@
 ## 테스트
 
 - [ ] `./gradlew :core:core-api:compileJava`
-- [ ] `./gradlew :core:core-domain:test`
+- [ ] `./gradlew :core:core-business:test`
 - [ ] 로컬 실행 또는 수동 검증 수행
 
 ### 테스트 결과

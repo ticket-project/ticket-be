@@ -21,7 +21,7 @@ Add or update the narrowest test that describes the expected behavior.
 ### 2. Run the Test and Verify It FAILS
 
 ```bash
-./gradlew :core:core-domain:test --tests "fully.qualified.TestClass"
+./gradlew :core:core-business:test --tests "fully.qualified.TestClass"
 ./gradlew :core:core-api:test --tests "fully.qualified.TestClass"
 ```
 
@@ -37,7 +37,7 @@ Remove duplication and clarify names while keeping tests green.
 ### 6. Verify Broader Scope
 
 ```bash
-./gradlew :core:core-domain:test --console=plain
+./gradlew :core:core-business:test --console=plain
 ./gradlew :core:core-api:test --console=plain
 ```
 

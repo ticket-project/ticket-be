@@ -2,16 +2,17 @@
 
 ## 1. 프로젝트 개요
 
-현재 프로젝트는 멀티모듈 Gradle 구조이지만, 실제 아키텍처 성격은 `core-api + core-domain` 중심의 모듈러 모놀리스에 가깝다. `storage:redis-core`, `support:logging`은 얇은 지원 모듈이고, 실제 비즈니스 중심은 `core-api + core-domain` 조합에 있다.
+현재 프로젝트는 멀티모듈 Gradle 구조이지만, 실제 아키텍처 성격은 `core-api + core-business` 중심의 모듈러 모놀리스에 가깝다. `storage:redis-core`, `support:logging`은 얇은 지원 모듈이고, 실제 비즈니스 중심은 `core-api + core-business` 조합에 있다.
 
 실제 포함 모듈은 다음 4개다.
 
 - `core:core-api`
-- `core:core-domain`
+- `core:core-business`
 - `storage:redis-core`
 - `support:logging`
 
 `core-enum` 모듈은 현재 존재하지 않는다.
+Gradle 프로젝트 이름은 `core:core-business`지만, 현재 소스 디렉터리는 아직 `core/core-domain` 경로를 사용한다.
 
 ## 2. 모듈 책임과 의존 방향
 
@@ -29,14 +30,14 @@
 
 의존:
 
-- `core:core-domain`
+- `core:core-business`
 - `support:logging`
 
-### 2.2 `core:core-domain`
+### 2.2 `core:core-business`
 
 비즈니스 기능의 중심이 되는 business core 모듈이다. 이름만 보면 순수 도메인 계층처럼 보이지만, 현재 실제 책임은 순수 도메인 모델에 한정되지 않는다. application, domain, infra 성격의 코드가 함께 들어가 있으며, 점진적으로 `infra` 패키지로 기술 의존을 분리하는 중이다.
 
-즉 현재 문맥에서 `core-domain`은 "순수 domain module"이 아니라 "비즈니스 규칙, 유스케이스, 저장소, 일부 기술 구현을 함께 담는 핵심 비즈니스 모듈"로 이해하는 것이 맞다.
+즉 현재 문맥에서 Gradle 모듈 `core:core-business`는 "순수 domain module"이 아니라 "비즈니스 규칙, 유스케이스, 저장소, 일부 기술 구현을 함께 담는 핵심 비즈니스 모듈"로 이해하는 것이 맞다.
 
 주요 책임:
 

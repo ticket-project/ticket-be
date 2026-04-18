@@ -76,11 +76,11 @@ PR 리뷰 요청을 받으면 아래 순서를 기본으로 따른다.
 
 ```bash
 ./gradlew :core:core-api:compileJava
-./gradlew :core:core-domain:compileJava
-./gradlew :core:core-domain:test
+./gradlew :core:core-business:compileJava
+./gradlew :core:core-business:test
 ./gradlew :core:core-api:test
-./gradlew :core:core-domain:test --tests "com.ticket.core.domain.CoreDomainArchitectureTest"
-./gradlew :core:core-domain:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"
+./gradlew :core:core-business:test --tests "com.ticket.core.domain.CoreDomainArchitectureTest"
+./gradlew :core:core-business:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"
 ```
 
 ## 멀티 에이전트 사용 기준

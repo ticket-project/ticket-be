@@ -10,7 +10,7 @@
   - 예: "기능 추가"보다 "특정 테스트 통과", "특정 API 수정", "문서 정리"
 - 요청되지 않은 추상화, 대규모 리팩터링, 부가 에러 처리 추가는 피한다.
 - 변경은 수술적으로 한다. 작업 범위 바깥 파일은 건드리지 않는다.
-- 구조 변경이나 모듈 경계를 건드리면 `:core:core-domain:test` 검증을 먼저 떠올린다.
+- 구조 변경이나 모듈 경계를 건드리면 `:core:core-business:test` 검증을 먼저 떠올린다.
 
 ## 문서 우선순위
 
@@ -257,7 +257,7 @@ HTTP/WebSocket 요청
 docker compose up -d redis
 ./gradlew :core:core-api:bootRun
 ./gradlew :core:core-api:compileJava
-./gradlew :core:core-domain:test
+./gradlew :core:core-business:test
 ./gradlew clean :core:core-api:bootJar -x test
 ```
 
@@ -265,7 +265,7 @@ docker compose up -d redis
 
 - `bootRun`: 로컬 API 실행
 - `compileJava`: 빠른 컴파일 검증
-- `:core:core-domain:test`: 도메인 로직과 ArchUnit 구조 규칙 검증
+- `:core:core-business:test`: 도메인 로직과 ArchUnit 구조 규칙 검증
 - `bootJar`: 현재 배포 workflow와 맞물리는 산출물 생성
 
 ## 작업 시 빠른 판단 기준

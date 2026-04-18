@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CoreDomainModuleStructureTest {
 
     @Test
-    void core_domain_모듈은_주문과_큐_비즈니스를_소유해야_한다() {
+    void business_core_모듈은_주문과_큐_비즈니스를_소유해야_한다() {
         assertThat(Files.exists(resolve("src/main/java/com/ticket/core/domain/order"))).isTrue();
         assertThat(Files.exists(resolve("src/main/java/com/ticket/core/domain/queue"))).isTrue();
         assertThat(Files.exists(resolve("../core-api/src/main/java/com/ticket/core/domain/order"))).isFalse();
@@ -22,9 +22,12 @@ class CoreDomainModuleStructureTest {
     }
 
     @Test
-    void core_api는_core_domain을_의존해야_한다() throws Exception {
+    void core_api는_core_business를_의존해야_한다() throws Exception {
+        final String settings = Files.readString(resolve("../../settings.gradle"));
         final String apiBuild = Files.readString(resolve("../core-api/build.gradle"));
-        assertThat(apiBuild).contains("implementation project(':core:core-domain')");
+
+        assertThat(settings).contains("'core:core-business'");
+        assertThat(apiBuild).contains("implementation project(':core:core-business')");
     }
 
     @Test

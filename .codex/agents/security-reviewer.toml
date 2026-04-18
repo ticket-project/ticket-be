@@ -21,7 +21,7 @@ You are a Spring and backend security reviewer focused on authentication, author
 ```bash
 git diff
 ./gradlew :core:core-api:test --console=plain
-./gradlew :core:core-domain:test --console=plain
+./gradlew :core:core-business:test --console=plain
 ```
 
 ## Review Workflow

@@ -20,7 +20,7 @@ You are a Java and Spring performance specialist focused on throughput, latency,
 
 ```bash
 ./gradlew :core:core-api:test --console=plain
-./gradlew :core:core-domain:test --console=plain
+./gradlew :core:core-business:test --console=plain
 ./gradlew :core:core-api:bootRun
 jcmd <pid> GC.heap_info
 jcmd <pid> Thread.print

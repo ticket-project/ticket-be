@@ -28,7 +28,7 @@ You validate critical application journeys across the running Spring Boot backen
 docker compose up -d redis
 ./gradlew :core:core-api:bootRun
 ./gradlew :core:core-api:test --console=plain
-./gradlew :core:core-domain:test --console=plain
+./gradlew :core:core-business:test --console=plain
 ```
 
 ## Workflow

@@ -9,7 +9,7 @@ tasks.named('jar') {
 }
 
 dependencies {
-    implementation project(':core:core-domain')
+    implementation project(':core:core-business')
     implementation project(':support:logging')
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
