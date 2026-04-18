@@ -26,7 +26,7 @@
 - `core/core-api`에 비즈니스 규칙이나 직접적인 저장소 접근 로직을 넣지 않는다.
 - `core/core-domain`은 비즈니스 규칙 중심 모듈이다.
 - Redis, Redisson, expiration listener, distributed lock 같은 기술 세부 구현은 가능한 한 도메인 `store` 또는 `infra`에 둔다.
-- 모듈 경계나 패키지 구조를 건드리면 `:core:core-business:test` 기준의 구조 규칙을 우선 확인한다.
+- 모듈 경계나 패키지 구조를 건드리면 `:core:core-domain:test` 기준의 구조 규칙을 우선 확인한다.
 
 ## 리뷰 우선순위
 
@@ -50,7 +50,7 @@
 ## 권장 검증
 
 - 빠른 검증: `./gradlew :core:core-api:compileJava`
-- 구조 및 도메인 검증: `./gradlew :core:core-business:test`
+- 구조 및 도메인 검증: `./gradlew :core:core-domain:test`
 
 ## 리뷰 스타일
 

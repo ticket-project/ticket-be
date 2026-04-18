@@ -213,14 +213,12 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 
 - `core:core-api`
   - 실제 Spring Boot API 애플리케이션
-- `core:core-business`
+- `core:core-domain`
   - 비즈니스 규칙, 유스케이스, 저장소, 일부 인프라 구현을 포함한 business core 모듈
 - `storage:redis-core`
   - Redis 관련 공통 설정/리소스
 - `support:logging`
   - 로깅 관련 공통 리소스
-
-Gradle 프로젝트 이름은 `core:core-business`이고, 현재 소스 디렉터리는 `core/core-domain` 경로를 사용한다.
 
 ### 5.2 core-api 패키지 흐름
 

@@ -18,9 +18,9 @@ You are a Java refactoring specialist focused on safe cleanup, dead code removal
 ## Detection Commands
 
 ```bash
-./gradlew :core:core-business:compileJava
+./gradlew :core:core-domain:compileJava
 ./gradlew :core:core-api:compileJava
-./gradlew :core:core-business:test --console=plain
+./gradlew :core:core-domain:test --console=plain
 git grep "TODO\\|FIXME"
 ```
 

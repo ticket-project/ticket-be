@@ -27,18 +27,18 @@ assertThat(Files.exists(Path.of("../../core-domain/build.gradle"))).isTrue();
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `./gradlew :core:core-business:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
+Run: `./gradlew :core:core-domain:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
 Expected: FAIL because module or test source set is missing
 
 - [ ] **Step 3: Write minimal implementation**
 
 ```gradle
-include("core:core-business")
+include("core:core-domain")
 ```
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `./gradlew :core:core-business:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
+Run: `./gradlew :core:core-domain:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
 Expected: PASS
 
 ## Chunk 2: Dependency Rewire
@@ -57,7 +57,7 @@ Add structure assertions in `CoreDomainModuleStructureTest` for:
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `./gradlew :core:core-business:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
+Run: `./gradlew :core:core-domain:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
 Expected: FAIL with missing dependency declaration text
 
 - [ ] **Step 3: Write minimal implementation**
@@ -66,7 +66,7 @@ Move JPA/Querydsl/Redis-related dependencies from `core-api` to `core-domain`, k
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `./gradlew :core:core-business:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
+Run: `./gradlew :core:core-domain:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
 Expected: PASS
 
 ## Chunk 3: Source Relocation
@@ -89,7 +89,7 @@ Add file-path assertions in `CoreDomainModuleStructureTest` for:
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `./gradlew :core:core-business:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
+Run: `./gradlew :core:core-domain:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
 Expected: FAIL because files have not moved
 
 - [ ] **Step 3: Write minimal implementation**
@@ -98,7 +98,7 @@ Move sources and fix package/import references without changing behavior.
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `./gradlew :core:core-business:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
+Run: `./gradlew :core:core-domain:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
 Expected: PASS
 
 ## Chunk 4: Test Relocation and Verification
@@ -118,7 +118,7 @@ Add assertions in `CoreDomainModuleStructureTest` for:
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `./gradlew :core:core-business:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
+Run: `./gradlew :core:core-domain:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
 Expected: FAIL because tests have not moved
 
 - [ ] **Step 3: Write minimal implementation**
@@ -127,15 +127,15 @@ Move tests and adjust references.
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `./gradlew :core:core-business:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
+Run: `./gradlew :core:core-domain:test --tests "com.ticket.core.domain.CoreDomainModuleStructureTest"`
 Expected: PASS
 
 - [ ] **Step 5: Run module compilation checks**
 
-Run: `./gradlew :core:core-business:compileJava :core:core-api:compileJava`
+Run: `./gradlew :core:core-domain:compileJava :core:core-api:compileJava`
 Expected: both PASS
 
 - [ ] **Step 6: Run available module tests**
 
-Run: `./gradlew :core:core-business:test`
+Run: `./gradlew :core:core-domain:test`
 Expected: PASS if no unrelated cross-module compile issue remains

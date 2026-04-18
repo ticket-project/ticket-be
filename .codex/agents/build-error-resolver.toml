@@ -19,7 +19,7 @@ You are a Java and Gradle build error resolver. Your mission is to restore a pas
 ## Diagnostic Commands
 
 ```bash
-./gradlew :core:core-business:compileJava
+./gradlew :core:core-domain:compileJava
 ./gradlew :core:core-api:compileJava
 ./gradlew test --console=plain
 ./gradlew build --stacktrace
@@ -69,8 +69,8 @@ For each failure:
 
 ```bash
 ./gradlew clean
-./gradlew :core:core-business:compileJava --rerun-tasks
-./gradlew :core:core-business:test --rerun-tasks --console=plain
+./gradlew :core:core-domain:compileJava --rerun-tasks
+./gradlew :core:core-domain:test --rerun-tasks --console=plain
 ./gradlew :core:core-api:bootJar -x test
 ```
 

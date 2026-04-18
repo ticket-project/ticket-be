@@ -20,7 +20,7 @@ You maintain documentation so it matches the actual Java/Spring/Gradle codebase.
 ```bash
 ./gradlew projects
 ./gradlew :core:core-api:compileJava
-./gradlew :core:core-business:compileJava
+./gradlew :core:core-domain:compileJava
 git diff -- docs README_CODEX.md README_ARCHITECTURE.md
 ```
 
@@ -48,7 +48,7 @@ For each touched area:
 # [Area] Codemap
 
 **Last Updated:** YYYY-MM-DD
-**Owning Module:** `:core:core-business`
+**Owning Module:** `:core:core-domain`
 **Entry Points:** class/package list
 
 ## Architecture

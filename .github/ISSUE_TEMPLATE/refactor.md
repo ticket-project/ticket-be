@@ -33,7 +33,7 @@ assignees: ""
 
 ## 검증 계획
 - 예: `:core:core-api:compileJava`
-- 예: `:core:core-business:test`
+- 예: `:core:core-domain:test`
 - 예: 관련 단위/통합 테스트
 
 ## 참고 자료

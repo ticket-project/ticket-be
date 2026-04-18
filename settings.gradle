@@ -17,10 +17,8 @@ pluginManagement {
 rootProject.name = 'ticket'
 
 include(
-        'core:core-business',
+        'core:core-domain',
         'core:core-api',
         'storage:redis-core',
         'support:logging'
 )
-
-project(':core:core-business').projectDir = file('core/core-domain')
