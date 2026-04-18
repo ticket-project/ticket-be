@@ -123,7 +123,7 @@ class CoreDomainModuleStructureTest {
             return content.contains("io.swagger.v3.oas.annotations")
                     || content.contains("org.springdoc");
         } catch (final IOException exception) {
-            throw new IllegalStateException("?뚯씪???쎌쓣 ???놁뒿?덈떎: " + path, exception);
+            throw new IllegalStateException("파일을 읽을 수 없습니다: " + path, exception);
         }
     }
 
