@@ -58,18 +58,21 @@
 
 ### 2.3 `storage:redis-core`
 
-Redis 관련 공통 의존성을 제공하는 저장소 모듈이다.
+Redis 관련 공통 의존성과 최소 부트스트랩 설정을 제공하는 얇은 shared leaf module이다. 이 모듈의 목적은 Redis/Redisson wiring과 공통 리소스를 한곳에 두고, 실제 비즈니스 Redis 사용 구현은 `core-domain`에 남기는 것이다.
 
 주요 책임:
 
 - `spring-boot-starter-data-redis`
 - `redisson-spring-boot-starter`
+- `redis.yml` 과 `RedissonConfig` 제공
 
-실제 Redis 사용 구현체는 현재 `core-domain`의 각 기능별 `infra` 패키지에 위치한다.
+실제 Redis 사용 구현체는 현재 `core-domain`의 각 기능별 `infra` 패키지에 위치한다. `core-api`는 [application.yml](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/resources/application.yml) 에서 `redis.yml` 을 import해 이 모듈의 리소스를 소비한다.
 
 ### 2.4 `support:logging`
 
-로깅 관련 공통 설정 리소스를 제공하는 보조 모듈이다. 현재 Java 소스 없이 설정 리소스 중심으로 사용된다.
+로깅 관련 공통 설정 리소스를 제공하는 얇은 shared leaf module이다. 현재 Java 소스 없이 리소스만 담고 있으며, 목적은 실행 모듈에서 로깅 설정 파일을 직접 들고 있지 않도록 분리하는 것이다.
+
+`core-api`는 [application.yml](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/resources/application.yml) 에서 `logging.yml` 을 import해 이 모듈의 리소스를 소비한다.
 
 ## 3. 현재 패키지 구조
 
