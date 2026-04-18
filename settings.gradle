@@ -1,6 +1,6 @@
 pluginManagement {
-    def springBootVersion = settings.hasProperty('springBootVersion') ? settings.springBootVersion : '4.0.2'
-    def springDependencyManagementVersion = settings.hasProperty('springDependencyManagementVersion') ? settings.springDependencyManagementVersion : '1.1.7'
+    def springBootVersion = settings.springBootVersion
+    def springDependencyManagementVersion = settings.springDependencyManagementVersion
 
     resolutionStrategy {
         eachPlugin {
