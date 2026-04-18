@@ -1,5 +1,4 @@
 package com.ticket.core.infra.redis;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -43,9 +42,9 @@ public class RedisExpirationListenerConfig {
                 }
 
                 connection.serverCommands().setConfig(NOTIFY_KEYSPACE_EVENTS, REQUIRED_NOTIFY_OPTIONS);
-                log.info("?덈뵒???ㅼ뒪?섏씠???뚮┝???쒖꽦?뷀뻽?듬땲?? ?ㅼ젙媛?{}", REQUIRED_NOTIFY_OPTIONS);
+                log.info("레디스 키스페이스 알림을 활성화했습니다. 설정값={}", REQUIRED_NOTIFY_OPTIONS);
             } catch (final Exception e) {
-                log.warn("?덈뵒???ㅼ뒪?섏씠???뚮┝ ?ㅼ젙???ㅽ뙣?덉뒿?덈떎. 留뚮즺 ?대깽??由ъ뒪?덇? ?숈옉?섏? ?딆쓣 ???덉뒿?덈떎.", e);
+                log.warn("레디스 키스페이스 알림 설정에 실패했습니다. 만료 이벤트 리스너가 동작하지 않을 수 있습니다.", e);
             } finally {
                 if (connection != null) {
                     connection.close();

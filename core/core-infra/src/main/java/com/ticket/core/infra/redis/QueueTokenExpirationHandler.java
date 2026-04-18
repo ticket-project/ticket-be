@@ -22,7 +22,7 @@ public class QueueTokenExpirationHandler implements RedisKeyExpirationHandler {
     @Override
     public void handle(final String expiredKey) {
         final QueueRedisKey.TokenKey tokenKey = QueueRedisKey.tryParseTokenStorageKey(expiredKey)
-                .orElseThrow(() -> new IllegalArgumentException("吏?먰븯吏 ?딅뒗 ?湲곗뿴 ?좏겙 留뚮즺 ?ㅼ엯?덈떎: " + expiredKey));
+                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 대기열 토큰 만료 키입니다: " + expiredKey));
         final String queueToken = tokenKey.performanceId() + ":" + tokenKey.queueEntryId() + ":" + tokenKey.tokenId();
 
         queueAdmissionAdvancer.handleTokenExpired(
@@ -30,7 +30,7 @@ public class QueueTokenExpirationHandler implements RedisKeyExpirationHandler {
                 QueueEntryId.from(tokenKey.queueEntryId()),
                 queueToken
         );
-        log.info("?湲곗뿴 ?좏겙 留뚮즺 ?대깽??泥섎━: performanceId={}, queueEntryId={}",
+        log.info("대기열 토큰 만료 이벤트 처리: performanceId={}, queueEntryId={}",
                 tokenKey.performanceId(), tokenKey.queueEntryId());
     }
 }

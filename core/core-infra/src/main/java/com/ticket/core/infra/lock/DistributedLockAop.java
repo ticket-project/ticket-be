@@ -47,7 +47,7 @@ public class DistributedLockAop {
                     distributedLock.timeUnit()
             );
             if (!available) {
-                log.warn("遺꾩궛 ???띾뱷???ㅽ뙣?덉뒿?덈떎. keys={}", keys);
+                log.warn("분산 락 획득에 실패했습니다. keys={}", keys);
                 throw new CoreException(distributedLock.errorType(), resolveMessage(distributedLock));
             }
             return joinPoint.proceed();
@@ -86,9 +86,9 @@ public class DistributedLockAop {
         try {
             lock.unlock();
         } catch (final IllegalMonitorStateException e) {
-            log.debug("遺꾩궛 ???댁젣 ?쒖젏???꾩옱 ?ㅻ젅?쒓? ?쎌쓣 ?뚯쑀?섍퀬 ?덉? ?딆뒿?덈떎. keys={}", keys, e);
+            log.debug("분산 락 해제 시점에 현재 스레드가 락을 소유하고 있지 않습니다. keys={}", keys, e);
         } catch (final RuntimeException e) {
-            log.error("遺꾩궛 ???댁젣 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎. keys={}", keys, e);
+            log.error("분산 락 해제 중 오류가 발생했습니다. keys={}", keys, e);
         }
     }
 }

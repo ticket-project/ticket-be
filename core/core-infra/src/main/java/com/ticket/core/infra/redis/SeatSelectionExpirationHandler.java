@@ -23,10 +23,10 @@ public class SeatSelectionExpirationHandler implements RedisKeyExpirationHandler
     @Override
     public void handle(final String expiredKey) {
         final SeatRedisKey.SelectKey selectKey = SeatRedisKey.tryParseSelectKey(expiredKey)
-                .orElseThrow(() -> new IllegalArgumentException("吏?먰븯吏 ?딅뒗 醫뚯꽍 ?좏깮 留뚮즺 ?ㅼ엯?덈떎: " + expiredKey));
+                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 좌석 선택 만료 키입니다: " + expiredKey));
 
         seatEventPort.publish(selectKey.performanceId(), selectKey.seatId(), DESELECTED);
-        log.info("醫뚯꽍 ?좏깮 留뚮즺 ?대깽??泥섎━: performanceId={}, seatId={}",
+        log.info("좌석 선택 만료 이벤트 처리: performanceId={}, seatId={}",
                 selectKey.performanceId(), selectKey.seatId());
     }
 }

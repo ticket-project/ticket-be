@@ -42,7 +42,7 @@ public class RedissonHoldStore implements HoldStore {
             redissonClient.getBucket(SeatRedisKey.holdMeta(snapshot.holdKey()), StringCodec.INSTANCE).set(json, ttl);
         } catch (final Exception e) {
             rollback(createdKeys, snapshot.holdKey());
-            throw new IllegalStateException("hold Redis ??μ뿉 ?ㅽ뙣?덉뒿?덈떎.", e);
+            throw new IllegalStateException("hold Redis 저장에 실패했습니다.", e);
         }
     }
 
@@ -83,13 +83,13 @@ public class RedissonHoldStore implements HoldStore {
             try {
                 redissonClient.getBucket(key, StringCodec.INSTANCE).delete();
             } catch (final Exception rollbackException) {
-                log.warn("???濡ㅻ갚???ㅽ뙣?덉뒿?덈떎. key={}", key, rollbackException);
+                log.warn("홀드 롤백에 실패했습니다. key={}", key, rollbackException);
             }
         }
         try {
             redissonClient.getBucket(SeatRedisKey.holdMeta(holdKey), StringCodec.INSTANCE).delete();
         } catch (final Exception rollbackException) {
-            log.warn("???硫뷀? 濡ㅻ갚???ㅽ뙣?덉뒿?덈떎. holdKey={}", holdKey, rollbackException);
+            log.warn("홀드 메타 롤백에 실패했습니다. holdKey={}", holdKey, rollbackException);
         }
     }
 
