@@ -6,7 +6,7 @@ plugins {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+        languageVersion = JavaLanguageVersion.of(property('javaVersion') as Integer)
     }
 }
 
@@ -22,20 +22,17 @@ allprojects {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'java-library'
-    apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${property('springBootVersion')}"
+        }
+    }
 
     dependencies {
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    }
-
-    tasks.named('bootJar') {
-        enabled = false
-    }
-
-    tasks.named('jar') {
-        enabled = true
     }
 
     tasks.named('test') {

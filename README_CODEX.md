@@ -5,20 +5,21 @@
 
 ## 1. 프로젝트 요약
 
-이 프로젝트는 공연/전시 티켓팅 백엔드다. 현재 구현의 중심은 아래 4가지다.
+이 프로젝트는 공연/전시 티켓팅 백엔드다. 현재 구현의 중심은 아래 5가지다.
 
 - 인증/회원: 이메일 회원가입, 로그인, JWT 갱신, OAuth2 로그인 URL 조회 및 토큰 교환
 - 공연/전시 조회: 쇼, 장르, 메타 코드, 회차/좌석 레이아웃 조회
 - 좌석 선택/선점: Redis 기반 selection, hold, 만료 처리, 실시간 좌석 상태 반영
 - 주문: `PENDING` 주문 생성, 조회, 취소, 만료 처리
+- 대기열: 회차별 대기열 진입, 상태 조회, 이탈, 입장 토큰 발급
 
 아직 없는 영역도 분명하다.
 
 - 결제 승인/실패/콜백 처리: 아직 미구현
-- 대기열(Queue): 아직 미구현
 - 최종 좌석 판매 확정 플로우: 상태 모델은 일부 준비되어 있으나 실제 결제 유스케이스는 없음
+  - 대기열은 기본 진입/조회/이탈 흐름과 토큰 발급까지 구현되어 있고, 정책 고도화가 남아 있다.
 
-즉 현재 프로젝트는 "티켓팅 핵심 선점/주문 흐름까지 구현된 상태"이고, 결제와 대기열은 다음 단계다.
+즉 현재 프로젝트는 "티켓팅 핵심 선점/주문 흐름과 기본 대기열까지 구현된 상태"이고, 결제와 대기열 정책 고도화가 다음 단계다.
 
 ## 2. 현재 구현 상태
 
@@ -59,8 +60,8 @@
 
 - [ShowController.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/api/controller/ShowController.java)
 - [PerformanceController.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/api/controller/PerformanceController.java)
-- [GetSeatStatusUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/performanceseat/query/usecase/GetSeatStatusUseCase.java)
-- [GetSeatAvailabilityUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/performanceseat/query/usecase/GetSeatAvailabilityUseCase.java)
+- [GetSeatStatusUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/performanceseat/query/GetSeatStatusUseCase.java)
+- [GetSeatAvailabilityUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/performanceseat/query/GetSeatAvailabilityUseCase.java)
 
 ### 2.3 좌석 선택(selection)
 
@@ -79,7 +80,7 @@
 관련 코드:
 
 - [SeatSelectionController.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/api/controller/SeatSelectionController.java)
-- [SeatSelectionService.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/performanceseat/command/SeatSelectionService.java)
+- [SeatSelectionService.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/performanceseat/command/SeatSelectionService.java)
 
 ### 2.4 좌석 선점(hold) + 주문 시작
 
@@ -104,9 +105,9 @@
 관련 코드:
 
 - [HoldController.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/api/controller/HoldController.java)
-- [StartOrderUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/order/command/usecase/StartOrderUseCase.java)
-- [HoldManager.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/hold/support/HoldManager.java)
-- [HoldHistoryRecorder.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/hold/application/HoldHistoryRecorder.java)
+- [CreateOrderUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/order/command/create/CreateOrderUseCase.java)
+- [HoldManager.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/hold/command/HoldManager.java)
+- [HoldHistoryRecorder.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/hold/command/HoldHistoryRecorder.java)
 
 ### 2.5 주문 종료
 
@@ -123,15 +124,42 @@
 현재 정책:
 
 - 외부 식별자는 `orderKey`
-- 주문 종료 진입점은 `TerminateOrderUseCase` 로 모아둔 상태
+- 주문 조회는 `GetOrderDetailUseCase`, 취소는 `CancelOrderUseCase` 로 분리되어 있다
 - 주문 취소/만료 후 hold 해제와 좌석 상태 broadcast가 이어진다
 
 관련 코드:
 
 - [OrderController.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/api/controller/OrderController.java)
-- [TerminateOrderUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/order/command/usecase/TerminateOrderUseCase.java)
-- [OrderExpirationScheduler.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/order/command/OrderExpirationScheduler.java)
-- [RedisKeyExpirationListener.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/hold/event/RedisKeyExpirationListener.java)
+- [GetOrderDetailUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/order/query/GetOrderDetailUseCase.java)
+- [CancelOrderUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/order/command/cancel/CancelOrderUseCase.java)
+- [OrderExpirationScheduler.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/order/command/expire/OrderExpirationScheduler.java)
+- [RedisKeyExpirationListener.java](c:/Users/mn040/IdeaProjects/ticket/core/core-infra/src/main/java/com/ticket/core/infra/redis/RedisKeyExpirationListener.java)
+
+### 2.6 대기열(queue)
+
+- `POST /api/v1/queue/performances/{performanceId}/enter`
+- `GET /api/v1/queue/performances/{performanceId}/status`
+- `POST /api/v1/queue/performances/{performanceId}/leave`
+
+현재 구현:
+
+- 회차별 대기열 진입
+- 현재 대기 상태 또는 입장 토큰 상태 조회
+- 대기 또는 입장 상태 종료
+- 설정 기반 기본 정책(`app.queue`) 적용
+
+현재 정책:
+
+- 회차 단위로 대기열을 운영한다
+- 즉시 입장 가능하면 토큰을 발급하고, 아니면 현재 순번을 반환한다
+- 입장/이탈은 분산락으로 직렬화한다
+
+관련 코드:
+
+- [QueueController.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/api/controller/QueueController.java)
+- [JoinQueueUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/queue/command/join/JoinQueueUseCase.java)
+- [GetQueueStatusUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/queue/query/status/GetQueueStatusUseCase.java)
+- [ExitQueueUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/queue/command/exit/ExitQueueUseCase.java)
 
 ## 3. 현재 핵심 도메인 모델
 
@@ -163,7 +191,7 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 ## 4. 기술 스택
 
 - Java 25 toolchain
-- Spring Boot 3.2
+- Spring Boot 4.0.2
 - Spring Web
 - Spring Security + JWT + OAuth2 Client
 - Spring Data JPA
@@ -185,27 +213,36 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 
 - `core:core-api`
   - 실제 Spring Boot API 애플리케이션
-- `core:core-enum`
-  - 공통 enum
+- `core:core-domain`
+  - 비즈니스 규칙, 유스케이스, 저장소, 도메인 포트를 포함한 business core 모듈
+- `core:core-infra`
+  - `core-domain` 포트를 구현하는 기술 어댑터 모듈
 - `storage:redis-core`
-  - Redis 관련 공통 설정/구성
+  - Redis 관련 공통 설정/리소스
 - `support:logging`
-  - 로깅 지원
+  - 로깅 관련 공통 리소스
 
 ### 5.2 core-api 패키지 흐름
 
 - `api/controller`
   - HTTP 진입점
-- `domain/*/usecase`
-  - 요청 단위 오케스트레이션
-- `domain/*/application`
-  - 응용 서비스, 기록/생성 보조 컴포넌트
-- `domain/*/domainservice`
-  - 상태 전이 규칙
-- `domain/*/repository`, `finder`
-  - 저장/조회
 - `config`
   - 보안, WebSocket, Redis expiration listener, 스케줄링 등
+- `support`
+  - 공통 응답, 인증 보조 유틸리티
+
+### 5.3 core-domain 패키지 흐름
+
+- `domain/*/command`
+  - 상태 변경 유스케이스
+- `domain/*/query`
+  - 조회 유스케이스와 조회 전용 모델
+- `domain/*/model`, `repository`, `store`
+  - 도메인 모델과 영속/임시 저장소
+- `domain/*/infra`
+  - 기능별 기술 구현체
+- `infra`
+  - Querydsl, Redis listener, 분산락 등 공통 인프라
 
 ## 6. 실시간 처리 구조
 
@@ -222,7 +259,7 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 관련 코드:
 
 - [WebSocketConfig.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/config/WebSocketConfig.java)
-- [SeatEventPublisher.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/performanceseat/support/SeatEventPublisher.java)
+- [SeatEventPublisher.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/performanceseat/infra/realtime/SeatEventPublisher.java)
 
 ### 6.2 Redis expiration listener
 
@@ -233,8 +270,8 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 
 관련 코드:
 
-- [RedisExpirationListenerConfig.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/config/RedisExpirationListenerConfig.java)
-- [RedisKeyExpirationListener.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/hold/event/RedisKeyExpirationListener.java)
+- [RedisExpirationListenerConfig.java](c:/Users/mn040/IdeaProjects/ticket/core/core-infra/src/main/java/com/ticket/core/infra/redis/RedisExpirationListenerConfig.java)
+- [RedisKeyExpirationListener.java](c:/Users/mn040/IdeaProjects/ticket/core/core-infra/src/main/java/com/ticket/core/infra/redis/RedisKeyExpirationListener.java)
 
 ## 7. 동시성 전략
 
@@ -252,8 +289,8 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 
 관련 코드:
 
-- [DistributedLock.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/aop/DistributedLock.java)
-- [DistributedLockAop.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/aop/DistributedLockAop.java)
+- [DistributedLock.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/infra/lock/DistributedLock.java)
+- [DistributedLockAop.java](c:/Users/mn040/IdeaProjects/ticket/core/core-infra/src/main/java/com/ticket/core/infra/lock/DistributedLockAop.java)
 
 ## 8. 로컬 실행
 
@@ -330,21 +367,21 @@ Swagger:
 
 현재 상태:
 
-- 코드상 queue 도메인은 없다.
-- 현재는 hold/order 동시성 제어만 구현되어 있다.
+- queue 도메인과 API가 구현되어 있다.
+- 회차별 진입/상태 조회/이탈과 입장 토큰 발급까지 동작한다.
 
 예정 범위:
 
-- 공연/회차 단위 대기열 토큰 발급
-- 허용 윈도우 기반 진입 제어
-- Redis 기반 position/TTL 관리
+- 레벨별 정책 고도화
+- 공연/회차별 운영 정책 분리
+- 입장 허용 윈도우와 운영 관제 기준 정교화
 
 ## 11. 개선이 필요한 지점
 
 현재 코드 기준으로 우선순위가 높은 항목들이다.
 
 - 결제 도메인 추가와 `CONFIRMED` 전이 완성
-- 대기열 도입 전, 공연 단위 트래픽 제어 정책 확정
+- 대기열 정책과 공연 단위 트래픽 제어 기준 고도화
 - Redis key scan 기반 조회 구조 최적화
 - hold/order 관련 DB 마이그레이션 정리
 - 인코딩 깨진 기존 문서 및 일부 주석 정리

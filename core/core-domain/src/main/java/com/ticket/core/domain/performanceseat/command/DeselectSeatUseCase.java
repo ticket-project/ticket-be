@@ -1,6 +1,5 @@
 package com.ticket.core.domain.performanceseat.command;
 
-import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
 import com.ticket.core.domain.performanceseat.support.SeatStatusMessage.SeatAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,12 +9,12 @@ import org.springframework.stereotype.Service;
 public class DeselectSeatUseCase {
 
     private final SeatSelectionService seatSelectionService;
-    private final SeatEventPublisher seatEventPublisher;
+    private final SeatEventPort seatEventPort;
 
     public record Input(Long performanceId, Long seatId, Long memberId) {}
 
     public void execute(final Input input) {
         seatSelectionService.deselect(input.performanceId(), input.seatId(), input.memberId());
-        seatEventPublisher.publish(input.performanceId(), input.seatId(), SeatAction.DESELECTED);
+        seatEventPort.publish(input.performanceId(), input.seatId(), SeatAction.DESELECTED);
     }
 }

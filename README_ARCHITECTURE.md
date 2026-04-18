@@ -2,12 +2,13 @@
 
 ## 1. 프로젝트 개요
 
-현재 프로젝트는 멀티모듈 Gradle 구조이지만, 실제 아키텍처 성격은 `core-api + core-domain` 중심의 모듈러 모놀리스에 가깝다.
+현재 프로젝트는 멀티모듈 Gradle 구조이지만, 실제 아키텍처 성격은 `core-api + core-domain + core-infra` 중심의 모듈러 모놀리스에 가깝다. `storage:redis-core`, `support:logging`은 얇은 지원 모듈이고, 실제 비즈니스 중심은 `core-domain`과 이를 실행/연결하는 `core-api`, `core-infra` 조합에 있다.
 
-실제 포함 모듈은 다음 4개다.
+실제 포함 모듈은 다음 5개다.
 
 - `core:core-api`
 - `core:core-domain`
+- `core:core-infra`
 - `storage:redis-core`
 - `support:logging`
 
@@ -30,11 +31,14 @@
 의존:
 
 - `core:core-domain`
+- `core:core-infra`
 - `support:logging`
 
 ### 2.2 `core:core-domain`
 
-비즈니스 기능의 중심 모듈이다. 단, 이름과 달리 순수 도메인 모델만 담는 모듈은 아니다. 현재는 application, domain, infra 성격의 코드가 함께 들어가 있으며, 점진적으로 `infra` 패키지로 기술 의존을 분리하는 중이다.
+비즈니스 기능의 중심이 되는 business core 모듈이다. 이름만 보면 순수 도메인 계층처럼 보이지만, 현재 실제 책임은 순수 도메인 모델에 한정되지 않는다. application, domain, infra 성격의 코드가 함께 들어가 있으며, 점진적으로 `infra` 패키지로 기술 의존을 분리하는 중이다.
+
+즉 현재 문맥에서 `core-domain`은 "순수 domain module"이 아니라 "비즈니스 규칙, 유스케이스, 저장소, 일부 기술 구현을 함께 담는 핵심 비즈니스 모듈"로 이해하는 것이 맞다.
 
 주요 책임:
 
@@ -43,29 +47,53 @@
 - query repository
 - 도메인 규칙
 - Redis 기반 store
-- WebSocket publish 보조
 - 외부 HTTP interface client
-- 분산락 AOP
+- 도메인 포트와 일부 Redis 기반 기술 추상화
 
 의존:
 
 - `storage:redis-core`
-- Spring Web / WebSocket / Data JPA / Querydsl / P6Spy
+- Spring Web / Data JPA / Querydsl
+- Oracle / H2 드라이버와 annotation processor
 
-### 2.3 `storage:redis-core`
+### 2.3 `core:core-infra`
 
-Redis 관련 공통 의존성을 제공하는 저장소 모듈이다.
+`core-domain`의 포트를 구현하는 기술 어댑터 모듈이다. 공통 설정과 Redis listener, Redisson 기반 저장 구현, WebSocket seat event publisher 같은 실행 기술을 이 모듈로 분리했다.
+
+주요 책임:
+
+- `com.ticket.core.infra.config`
+  - Querydsl, P6Spy 설정
+- `com.ticket.core.infra.lock`
+  - 분산락 AOP 구현
+- `com.ticket.core.infra.redis`
+  - Redis 만료 listener와 handler
+- `com.ticket.core.domain.*.infra`
+  - Redisson store, WebSocket publisher 같은 도메인별 기술 어댑터
+
+의존:
+
+- `core:core-domain`
+- `storage:redis-core`
+- Spring WebSocket / Data JPA / Querydsl / P6Spy
+
+### 2.4 `storage:redis-core`
+
+Redis 관련 공통 의존성과 최소 부트스트랩 설정을 제공하는 얇은 shared leaf module이다. 이 모듈의 목적은 Redis/Redisson wiring과 공통 리소스를 한곳에 두고, 실제 비즈니스 Redis 사용 구현은 `core-domain`에 남기는 것이다.
 
 주요 책임:
 
 - `spring-boot-starter-data-redis`
 - `redisson-spring-boot-starter`
+- `redis.yml` 과 `RedissonConfig` 제공
 
-실제 Redis 사용 구현체는 현재 `core-domain`의 각 기능별 `infra` 패키지에 위치한다.
+실제 Redis 사용 구현체는 현재 `core-domain`의 각 기능별 `infra` 패키지에 위치한다. `core-api`는 [application.yml](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/resources/application.yml) 에서 `redis.yml` 을 import해 이 모듈의 리소스를 소비한다.
 
-### 2.4 `support:logging`
+### 2.5 `support:logging`
 
-로깅 관련 공통 설정 리소스를 제공하는 보조 모듈이다. 현재 Java 소스 없이 설정 리소스 중심으로 사용된다.
+로깅 관련 공통 설정 리소스를 제공하는 얇은 shared leaf module이다. 현재 Java 소스 없이 리소스만 담고 있으며, 목적은 실행 모듈에서 로깅 설정 파일을 직접 들고 있지 않도록 분리하는 것이다.
+
+`core-api`는 [application.yml](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/resources/application.yml) 에서 `logging.yml` 을 import해 이 모듈의 리소스를 소비한다.
 
 ## 3. 현재 패키지 구조
 
@@ -86,7 +114,7 @@ Redis 관련 공통 의존성을 제공하는 저장소 모듈이다.
 
 ### 3.2 `core-domain`
 
-기능별 패키지를 기본 축으로 잡고 있다.
+기능별 패키지를 기본 축으로 잡고 있다. 다만 이 모듈은 "엔티티만 있는 도메인 계층"이 아니라 business core이므로, 기능 패키지 안에 유스케이스, 저장소, 기술 구현체가 함께 존재한다.
 
 - `com.ticket.core.domain.auth`
 - `com.ticket.core.domain.member`
@@ -107,7 +135,7 @@ Redis 관련 공통 의존성을 제공하는 저장소 모듈이다.
 - `event`
 - `infra`
 
-현재는 기술 의존 코드가 `infra` 하위로 점진적으로 이동되어 있다.
+현재는 `core-domain` 밖으로 공통 기술 구현을 분리하기 시작한 단계다. 완전히 분리된 `application/domain/infra` 3계층 모듈 구조라기보다, `core-domain`과 `core-infra`를 나눠 패키지 경계를 강화하는 단계에 가깝다.
 
 예시:
 
@@ -244,11 +272,12 @@ Redis 구현체는 기능별 `infra` 패키지에 위치한다.
 
 - 여전히 `core-domain` 하나에 많은 역할이 모여 있다.
 - JPA, Redis, WebSocket, 외부 HTTP client가 같은 모듈에 공존한다.
+- 모듈 이름만 보면 순수 도메인 계층으로 오해하기 쉽다.
 - 완전한 모듈 분리보다 패키지 경계 강화 단계에 가깝다.
 
 ## 10. 다음 정리 방향
 
-현재 추천 방향은 빅뱅 리팩터링이 아니라 점진적 정리다.
+현재 추천 방향은 빅뱅 리팩터링이 아니라 점진적 정리다. 당장은 이름을 바꾸거나 모듈을 크게 쪼개기보다, 문서와 테스트에서 `core-domain`을 business core로 명확히 정의하고 경계를 강화하는 편이 맞다.
 
 1. 기능별 기술 구현을 `infra` 패키지로 계속 이동한다.
 2. query 전용 view/model과 application output을 분리 유지한다.

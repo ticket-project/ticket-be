@@ -1,6 +1,5 @@
 package com.ticket.core.domain.performanceseat.command;
 
-import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
 import com.ticket.core.infra.lock.DistributedLock;
 import com.ticket.core.domain.performanceseat.support.SeatSelectionAvailabilityValidator;
 import com.ticket.core.domain.performanceseat.support.SeatStatusMessage.SeatAction;
@@ -13,7 +12,7 @@ public class SelectSeatUseCase {
 
     private final SeatSelectionService seatSelectionService;
     private final SeatSelectionAvailabilityValidator seatSelectionAvailabilityValidator;
-    private final SeatEventPublisher seatEventPublisher;
+    private final SeatEventPort seatEventPort;
 
     public record Input(Long performanceId, Long seatId, Long memberId) {}
 
@@ -24,6 +23,6 @@ public class SelectSeatUseCase {
     public void execute(final Input input) {
         seatSelectionAvailabilityValidator.validate(input.performanceId(), input.seatId());
         seatSelectionService.select(input.performanceId(), input.seatId(), input.memberId());
-        seatEventPublisher.publish(input.performanceId(), input.seatId(), SeatAction.SELECTED);
+        seatEventPort.publish(input.performanceId(), input.seatId(), SeatAction.SELECTED);
     }
 }

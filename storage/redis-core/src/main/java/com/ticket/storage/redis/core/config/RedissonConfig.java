@@ -21,6 +21,7 @@ public class RedissonConfig {
 
     @Bean
     public RedissonClient redissonClient() {
+        // Keep the shared Redisson bootstrap in this thin support module.
         Config config = new Config();
         config.setCodec(StringCodec.INSTANCE);
         config.useSingleServer()

@@ -1,6 +1,5 @@
 package com.ticket.core.domain.performanceseat.command;
 
-import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,17 +12,17 @@ import static com.ticket.core.domain.performanceseat.support.SeatStatusMessage.S
 @RequiredArgsConstructor
 public class SeatStatusPublisher {
 
-    private final SeatEventPublisher seatEventPublisher;
+    private final SeatEventPort seatEventPort;
 
     public void publishHeld(final Long performanceId, final List<Long> seatIds) {
         for (final Long seatId : seatIds) {
-            seatEventPublisher.publish(performanceId, seatId, HELD);
+            seatEventPort.publish(performanceId, seatId, HELD);
         }
     }
 
     public void publishReleased(final Long performanceId, final List<Long> seatIds) {
         for (final Long seatId : seatIds) {
-            seatEventPublisher.publish(performanceId, seatId, RELEASED);
+            seatEventPort.publish(performanceId, seatId, RELEASED);
         }
     }
 }

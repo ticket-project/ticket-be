@@ -1,6 +1,6 @@
 package com.ticket.core.infra.redis;
 
-import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
+import com.ticket.core.domain.performanceseat.command.SeatEventPort;
 import com.ticket.core.domain.performanceseat.support.SeatRedisKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import static com.ticket.core.domain.performanceseat.support.SeatStatusMessage.S
 @RequiredArgsConstructor
 public class SeatSelectionExpirationHandler implements RedisKeyExpirationHandler {
 
-    private final SeatEventPublisher seatEventPublisher;
+    private final SeatEventPort seatEventPort;
 
     @Override
     public boolean supports(final String expiredKey) {
@@ -25,7 +25,7 @@ public class SeatSelectionExpirationHandler implements RedisKeyExpirationHandler
         final SeatRedisKey.SelectKey selectKey = SeatRedisKey.tryParseSelectKey(expiredKey)
                 .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 좌석 선택 만료 키입니다: " + expiredKey));
 
-        seatEventPublisher.publish(selectKey.performanceId(), selectKey.seatId(), DESELECTED);
+        seatEventPort.publish(selectKey.performanceId(), selectKey.seatId(), DESELECTED);
         log.info("좌석 선택 만료 이벤트 처리: performanceId={}, seatId={}",
                 selectKey.performanceId(), selectKey.seatId());
     }

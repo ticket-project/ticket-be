@@ -14,7 +14,7 @@ class QueueNamingRefactorTest {
     void queue_핵심_타입은_비즈니스_의미_중심_이름을_사용한다() {
         assertPresent("src/main/java/com/ticket/core/domain/queue/runtime/QueueTicket.java");
         assertPresent("src/main/java/com/ticket/core/domain/queue/runtime/QueueTicketStore.java");
-        assertPresent("src/main/java/com/ticket/core/domain/queue/infra/RedisQueueTicketStore.java");
+        assertPresent("../core-infra/src/main/java/com/ticket/core/domain/queue/infra/RedisQueueTicketStore.java");
         assertPresent("src/main/java/com/ticket/core/domain/queue/command/join/JoinQueueUseCase.java");
         assertPresent("src/main/java/com/ticket/core/domain/queue/command/join/QueueReentryCleaner.java");
         assertPresent("src/main/java/com/ticket/core/domain/queue/command/join/QueueJoinProcessor.java");
