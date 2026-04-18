@@ -36,15 +36,17 @@
 4. `core/core-api`
    - 외부 진입점, 보안, HTTP/WebSocket 설정을 본다.
 5. `core/core-domain`
-   - 비즈니스 흐름, 저장소, Redis 연동, 락, 만료 처리 등을 본다.
-6. `core/core-domain` 테스트
+   - 비즈니스 흐름, 유스케이스, 저장소, 도메인 포트를 본다.
+6. `core/core-infra`
+   - Redis listener, Redisson 구현, Querydsl/P6Spy 설정 같은 기술 어댑터를 본다.
+7. `core/core-domain` 테스트
    - ArchUnit과 도메인 테스트로 실제로 강제되는 규칙을 확인한다.
 
 ## 최상위 폴더 구조
 
 ### `core/`
 
-애플리케이션 본체다. 실행 모듈과 도메인 모듈이 함께 있다.
+애플리케이션 본체다. 실행 모듈, business core 모듈, infra adapter 모듈이 함께 있다.
 
 - `core/core-api`
   - Spring Boot 실행 모듈이다.
@@ -71,10 +73,18 @@
   - 관계:
     - `core-api`의 Controller는 여기 있는 command/query 흐름을 호출한다.
     - `repository`는 영속 저장소를, `store`는 Redis 같은 임시 상태 저장소를 다룬다.
-    - `infra`는 락, Redis listener, 외부 OAuth2/토큰 저장 같은 기술 구현을 도메인 흐름에 연결한다.
+    - `infra`는 아직 business core 안에 남아 있는 기술 구현 위치이고, 공통/실행 기술은 점진적으로 `core/core-infra`로 이동한다.
     - `performanceseat`는 좌석 선택/홀드/실시간 상태 반영이 얽혀 있어 `repository`, `store`, `support`, `infra`가 함께 동작한다.
     - `order`는 주문 상태를 들고, `hold`는 주문 시작 전후의 Redis hold 수명주기와 연결된다.
     - `queue`는 대기열 토큰과 만료 처리에 연결된다.
+
+- `core/core-infra`
+  - `core/core-domain`의 포트를 구현하는 기술 어댑터 모듈이다.
+  - `src/main/java/com/ticket/core/infra`에는 Querydsl, P6Spy, 분산락 AOP, Redis expiration listener 같은 공통 인프라가 있다.
+  - `src/main/java/com/ticket/core/domain/*/infra`에는 Redisson store, WebSocket seat event publisher 같은 도메인별 기술 구현이 있다.
+  - 관계:
+    - `core-api`가 이 모듈을 함께 로딩해 실행 시 필요한 bean을 조립한다.
+    - `core-domain`은 포트와 유스케이스를 유지하고, 이 모듈이 실제 기술 구현을 제공한다.
 
 - `core/build/`
   - Gradle 산출물이다. 소스가 아니라 결과물이다.
@@ -213,7 +223,8 @@ Gradle wrapper 파일을 둔다.
 HTTP/WebSocket 요청
   -> core/core-api 의 controller, config/security
   -> core/core-domain 의 command/query/service
-  -> repository(JPA/RDB) + store(Redis) + infra(외부 기술 구현)
+  -> repository(JPA/RDB) + port
+  -> core/core-infra 의 Redis/WebSocket/AOP 구현
   -> 필요 시 support/event/publisher
   -> core/core-api 응답 DTO 또는 WebSocket 메시지
 ```
@@ -230,7 +241,7 @@ HTTP/WebSocket 요청
   - `core/core-api/.../SeatSelectionController.java`, `HoldController.java`
   - `core/core-domain/.../performanceseat/*`
   - `core/core-domain/.../hold/*`
-  - `core/core-domain/.../infra/redis/*`
+  - `core/core-infra/.../redis/*`
   - 관계: API 요청이 좌석 상태 변경을 시작하고, Redis store와 expiration handler가 TTL 기반 상태를 관리하며, 이벤트 발행기가 실시간 상태 전파를 담당한다.
 
 - 주문
@@ -272,7 +283,7 @@ docker compose up -d redis
 
 - API 입력/응답을 바꾸면 먼저 `core/core-api`를 본다.
 - 도메인 규칙, 주문/홀드/좌석/대기열 로직을 바꾸면 `core/core-domain`를 본다.
-- Redis 키, TTL, 만료 이벤트를 바꾸면 `storage/redis-core`보다 `core/core-domain`의 `store`/`infra`를 먼저 본다.
+- Redis 키, TTL, 만료 이벤트를 바꾸면 `storage/redis-core`보다 `core/core-domain`의 `store`/`port`, `core/core-infra`의 구현을 먼저 본다.
 - 로깅 형식이나 공통 로그 설정은 `support/logging`을 본다.
 - 큰 구조 변경은 `docs/superpowers/specs`와 `docs/superpowers/plans`를 함께 갱신할지 확인한다.
 - 모듈 경계를 건드리면 `settings.gradle`, 각 모듈 `build.gradle`, ArchUnit 테스트를 같이 본다.

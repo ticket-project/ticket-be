@@ -1,7 +1,6 @@
 package com.ticket.core.domain.performanceseat.command;
 
 import com.ticket.core.domain.member.query.MemberFinder;
-import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
 import com.ticket.core.domain.performanceseat.support.SeatStatusMessage.SeatAction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +25,7 @@ class DeselectAllSeatsUseCaseTest {
     private SeatSelectionService seatSelectionService;
 
     @Mock
-    private SeatEventPublisher seatEventPublisher;
+    private SeatEventPort seatEventPort;
 
     @InjectMocks
     private DeselectAllSeatsUseCase useCase;
@@ -39,8 +38,8 @@ class DeselectAllSeatsUseCaseTest {
 
         verify(memberFinder).findActiveMemberById(1L);
         verify(seatSelectionService).deselectAll(10L, 1L);
-        verify(seatEventPublisher).publish(10L, 20L, SeatAction.DESELECTED);
-        verify(seatEventPublisher).publish(10L, 21L, SeatAction.DESELECTED);
-        verify(seatEventPublisher, times(2)).publish(org.mockito.ArgumentMatchers.anyLong(), org.mockito.ArgumentMatchers.anyLong(), org.mockito.ArgumentMatchers.any());
+        verify(seatEventPort).publish(10L, 20L, SeatAction.DESELECTED);
+        verify(seatEventPort).publish(10L, 21L, SeatAction.DESELECTED);
+        verify(seatEventPort, times(2)).publish(org.mockito.ArgumentMatchers.anyLong(), org.mockito.ArgumentMatchers.anyLong(), org.mockito.ArgumentMatchers.any());
     }
 }

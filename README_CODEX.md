@@ -133,7 +133,7 @@
 - [GetOrderDetailUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/order/query/GetOrderDetailUseCase.java)
 - [CancelOrderUseCase.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/order/command/cancel/CancelOrderUseCase.java)
 - [OrderExpirationScheduler.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/order/command/expire/OrderExpirationScheduler.java)
-- [RedisKeyExpirationListener.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/infra/redis/RedisKeyExpirationListener.java)
+- [RedisKeyExpirationListener.java](c:/Users/mn040/IdeaProjects/ticket/core/core-infra/src/main/java/com/ticket/core/infra/redis/RedisKeyExpirationListener.java)
 
 ### 2.6 대기열(queue)
 
@@ -214,7 +214,9 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 - `core:core-api`
   - 실제 Spring Boot API 애플리케이션
 - `core:core-domain`
-  - 비즈니스 규칙, 유스케이스, 저장소, 일부 인프라 구현을 포함한 business core 모듈
+  - 비즈니스 규칙, 유스케이스, 저장소, 도메인 포트를 포함한 business core 모듈
+- `core:core-infra`
+  - `core-domain` 포트를 구현하는 기술 어댑터 모듈
 - `storage:redis-core`
   - Redis 관련 공통 설정/리소스
 - `support:logging`
@@ -268,8 +270,8 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 
 관련 코드:
 
-- [RedisExpirationListenerConfig.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/infra/redis/RedisExpirationListenerConfig.java)
-- [RedisKeyExpirationListener.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/infra/redis/RedisKeyExpirationListener.java)
+- [RedisExpirationListenerConfig.java](c:/Users/mn040/IdeaProjects/ticket/core/core-infra/src/main/java/com/ticket/core/infra/redis/RedisExpirationListenerConfig.java)
+- [RedisKeyExpirationListener.java](c:/Users/mn040/IdeaProjects/ticket/core/core-infra/src/main/java/com/ticket/core/infra/redis/RedisKeyExpirationListener.java)
 
 ## 7. 동시성 전략
 
@@ -288,7 +290,7 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 관련 코드:
 
 - [DistributedLock.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/infra/lock/DistributedLock.java)
-- [DistributedLockAop.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/infra/lock/DistributedLockAop.java)
+- [DistributedLockAop.java](c:/Users/mn040/IdeaProjects/ticket/core/core-infra/src/main/java/com/ticket/core/infra/lock/DistributedLockAop.java)
 
 ## 8. 로컬 실행
 

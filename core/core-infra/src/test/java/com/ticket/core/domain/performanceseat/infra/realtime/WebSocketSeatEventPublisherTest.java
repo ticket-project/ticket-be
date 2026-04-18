@@ -1,6 +1,6 @@
-package com.ticket.core.domain.performanceseat.support;
+package com.ticket.core.domain.performanceseat.infra.realtime;
 
-import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
+import com.ticket.core.domain.performanceseat.support.SeatStatusMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
-class SeatEventPublisherTest {
+class WebSocketSeatEventPublisherTest {
 
     @Mock
     private SimpMessagingTemplate messagingTemplate;
@@ -27,8 +27,8 @@ class SeatEventPublisherTest {
     private final Clock fixedClock = Clock.fixed(Instant.parse("2026-03-15T01:00:00Z"), ZoneId.of("Asia/Seoul"));
 
     @Test
-    void 좌석_이벤트_발행_시_Clock_기준_시간이_메시지에_포함된다() {
-        SeatEventPublisher publisher = new SeatEventPublisher(messagingTemplate, fixedClock);
+    void 좌석_이벤트_발행은_Clock_기준_시간을_메시지에_포함한다() {
+        WebSocketSeatEventPublisher publisher = new WebSocketSeatEventPublisher(messagingTemplate, fixedClock);
         ArgumentCaptor<SeatStatusMessage> captor = ArgumentCaptor.forClass(SeatStatusMessage.class);
 
         publisher.publish(10L, 20L, SeatStatusMessage.SeatAction.HELD);

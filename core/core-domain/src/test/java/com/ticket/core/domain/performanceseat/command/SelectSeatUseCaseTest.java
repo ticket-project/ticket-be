@@ -1,6 +1,5 @@
 package com.ticket.core.domain.performanceseat.command;
 
-import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
 import com.ticket.core.domain.performanceseat.support.SeatSelectionAvailabilityValidator;
 import com.ticket.core.domain.performanceseat.support.SeatStatusMessage.SeatAction;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ class SelectSeatUseCaseTest {
     private SeatSelectionAvailabilityValidator seatSelectionAvailabilityValidator;
 
     @Mock
-    private SeatEventPublisher seatEventPublisher;
+    private SeatEventPort seatEventPort;
 
     @InjectMocks
     private SelectSeatUseCase useCase;
@@ -34,9 +33,9 @@ class SelectSeatUseCaseTest {
 
         useCase.execute(input);
 
-        InOrder inOrder = inOrder(seatSelectionAvailabilityValidator, seatSelectionService, seatEventPublisher);
+        InOrder inOrder = inOrder(seatSelectionAvailabilityValidator, seatSelectionService, seatEventPort);
         inOrder.verify(seatSelectionAvailabilityValidator).validate(10L, 20L);
         inOrder.verify(seatSelectionService).select(10L, 20L, 1L);
-        inOrder.verify(seatEventPublisher).publish(10L, 20L, SeatAction.SELECTED);
+        inOrder.verify(seatEventPort).publish(10L, 20L, SeatAction.SELECTED);
     }
 }
