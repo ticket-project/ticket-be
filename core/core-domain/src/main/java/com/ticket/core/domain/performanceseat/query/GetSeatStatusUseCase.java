@@ -42,7 +42,7 @@ public class GetSeatStatusUseCase {
         }
 
         final List<SeatStateView> merged = dbStates.stream()
-                .map(seat -> seat.status() == SeatStatus.AVAILABLE && redisOccupiedIds.contains(seat.seatId())
+                .map(seat -> redisOccupiedIds.contains(seat.seatId())
                         ? new SeatStateView(seat.seatId(), SeatStatus.OCCUPIED)
                         : seat)
                 .toList();
