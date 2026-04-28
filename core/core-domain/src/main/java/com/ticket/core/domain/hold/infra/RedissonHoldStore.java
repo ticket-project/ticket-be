@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RSetCache;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.LongCodec;
 import org.redisson.client.codec.StringCodec;
 import org.springframework.stereotype.Component;
 
@@ -94,7 +95,7 @@ public class RedissonHoldStore implements HoldStore {
     }
 
     private RSetCache<Long> holdSeatIndex(final Long performanceId) {
-        return redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(performanceId));
+        return redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(performanceId), LongCodec.INSTANCE);
     }
 
     private HoldSnapshot readSnapshot(final String holdKey) {

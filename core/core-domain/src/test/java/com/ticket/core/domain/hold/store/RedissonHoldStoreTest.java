@@ -12,6 +12,7 @@ import org.redisson.api.RBucket;
 import org.redisson.api.RKeys;
 import org.redisson.api.RSetCache;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.LongCodec;
 import org.redisson.client.codec.StringCodec;
 
 import java.time.Duration;
@@ -55,7 +56,7 @@ class RedissonHoldStoreTest {
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 10L), StringCodec.INSTANCE)).thenReturn(seat10);
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 20L), StringCodec.INSTANCE)).thenReturn(seat20);
         when(redissonClient.getBucket(SeatRedisKey.holdMeta("hold-key"), StringCodec.INSTANCE)).thenReturn(meta);
-        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L))).thenReturn(holdSeatIndex);
+        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L), LongCodec.INSTANCE)).thenReturn(holdSeatIndex);
         when(holdSnapshotCodec.encode(any(HoldSnapshot.class))).thenReturn("payload");
 
         //when
@@ -83,7 +84,7 @@ class RedissonHoldStoreTest {
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 10L), StringCodec.INSTANCE)).thenReturn(seat10);
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 20L), StringCodec.INSTANCE)).thenReturn(seat20);
         when(redissonClient.getBucket(SeatRedisKey.holdMeta("hold-key"), StringCodec.INSTANCE)).thenReturn(meta);
-        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L))).thenReturn(holdSeatIndex);
+        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L), LongCodec.INSTANCE)).thenReturn(holdSeatIndex);
         doThrow(new RuntimeException("boom")).when(seat20).set("hold-key", ttl);
 
         //when
@@ -108,7 +109,7 @@ class RedissonHoldStoreTest {
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 10L), StringCodec.INSTANCE)).thenReturn(seat10);
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 20L), StringCodec.INSTANCE)).thenReturn(seat20);
         when(redissonClient.getBucket(SeatRedisKey.holdMeta("hold-key"), StringCodec.INSTANCE)).thenReturn(meta);
-        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L))).thenReturn(holdSeatIndex);
+        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L), LongCodec.INSTANCE)).thenReturn(holdSeatIndex);
         when(meta.get()).thenReturn("{\"holdKey\":\"hold-key\",\"memberId\":7,\"performanceId\":1,\"seatIds\":[10,20],\"expiresAt\":\"2026-03-15T19:05:00\"}");
         when(holdSnapshotCodec.decode("{\"holdKey\":\"hold-key\",\"memberId\":7,\"performanceId\":1,\"seatIds\":[10,20],\"expiresAt\":\"2026-03-15T19:05:00\"}"))
                 .thenReturn(new HoldSnapshot("hold-key", 7L, 1L, List.of(10L, 20L), LocalDateTime.of(2026, 3, 15, 19, 5)));
@@ -134,7 +135,7 @@ class RedissonHoldStoreTest {
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 10L), StringCodec.INSTANCE)).thenReturn(seat10);
         when(redissonClient.getBucket(SeatRedisKey.hold(1L, 20L), StringCodec.INSTANCE)).thenReturn(seat20);
         when(redissonClient.getBucket(SeatRedisKey.holdMeta("hold-key"), StringCodec.INSTANCE)).thenReturn(meta);
-        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L))).thenReturn(holdSeatIndex);
+        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L), LongCodec.INSTANCE)).thenReturn(holdSeatIndex);
         when(meta.get()).thenReturn(payload);
         when(holdSnapshotCodec.decode(payload))
                 .thenReturn(new HoldSnapshot("hold-key", 7L, 1L, List.of(10L, 20L), LocalDateTime.of(2026, 3, 15, 19, 5)));
@@ -153,7 +154,7 @@ class RedissonHoldStoreTest {
         //given
         @SuppressWarnings("unchecked")
         RSetCache<Object> holdSeatIndex = mock(RSetCache.class);
-        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L))).thenReturn(holdSeatIndex);
+        when(redissonClient.getSetCache(SeatRedisKey.holdSeatIndex(1L), LongCodec.INSTANCE)).thenReturn(holdSeatIndex);
         when(holdSeatIndex.readAll()).thenReturn(Set.of(30L, 10L));
 
         //when
