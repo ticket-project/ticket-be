@@ -28,13 +28,22 @@ require_tests_review = true
 require_estimate_effort_to_review = true
 extra_instructions = """\
 - 모든 요약, 리뷰, 제안은 한국어로 작성하세요.
-- 항상 심층 리뷰를 수행하세요. 패치만 보지 말고 관련 클래스, 설정, 테스트, 호출 흐름까지 읽으세요.
-- 스타일 취향보다 실제 결함 가능성을 우선 검토하세요.
-- 버그, 동시성 문제, 트랜잭션 경계, 보안, Redis TTL/만료 처리, 분산 락 누락, 회귀 위험, 테스트 공백을 우선 지적하세요.
-- controller가 repository를 직접 다루는지, core-api에 비즈니스 규칙이 들어갔는지, core-domain 경계를 깨는지 확인하세요.
-- auth, hold, order, performanceseat, queue 변경은 경쟁 상태와 만료 처리 누락을 집중적으로 보세요.
-- 점수, 테스트 공백, 보안 우려, 아키텍처 위반 가능성을 빠짐없이 평가하세요.
-- 근거가 약한 지적은 남기지 말고, 재현 조건이나 실패 시나리오가 분명할 때만 이슈로 올리세요.
+- 이 저장소는 에이전트가 리뷰를 읽고 자동 수정하는 워크플로우를 사용합니다.
+
+**심각도 태그 필수**: 모든 이슈/코멘트 앞에 심각도 태그를 붙이세요.
+  - [P0-Bug]: 버그, 데이터 손실, 보안 — 반드시 수정
+  - [P0-Arch]: 아키텍처 위반 (모듈 경계, 인프라 격리) — 반드시 수정
+  - [P1-Concurrency]: 동시성, 분산 락, TTL 정합성 — 수정 권장
+  - [P1-Test]: 테스트 누락/불일치 — 수정 권장
+  - [P2-Suggestion]: 개선 제안 — 판단 필요
+  P2-Style (순수 스타일) 코멘트는 남기지 마세요.
+
+**아키텍처 규칙 참조**: docs/ARCHITECTURE.md, docs/RELIABILITY.md, docs/design-docs/core-beliefs.md
+- core-api에 비즈니스 규칙 → [P0-Arch]
+- infra 밖에서 Redisson/Redis 직접 참조 → [P0-Arch]
+- 분산 락 누락, TTL 불일치 → [P1-Concurrency]
+
+P0/P1 위주로 리뷰하고, 근거가 약한 지적은 남기지 마세요.
 """
 
 [review_agent]
@@ -42,18 +51,21 @@ comments_location_policy = "both"
 inline_comments_severity_threshold = 1
 issues_user_guidelines = """\
 리뷰는 한국어로 작성하세요.
-가능한 한 많은 유효한 피드백을 남기세요.
-요약과 인라인을 모두 활용하세요.
-문제 제기 시 왜 문제가 되는지와 어떤 조건에서 깨지는지 짧게 설명하세요.
+모든 이슈 앞에 심각도 태그 [P0-Bug], [P0-Arch], [P1-Concurrency], [P1-Test], [P2-Suggestion] 중 하나를 붙이세요.
+P2-Style 코멘트는 남기지 마세요.
+문제 제기 시 왜 문제가 되는지, 어떤 조건에서 깨지는지, 어떻게 수정하면 되는지 짧게 설명하세요.
+수정 방향이 명확하면 코드 제안도 함께 포함하세요.
 """
 compliance_user_guidelines = """\
 리뷰는 한국어로 작성하세요.
-이 저장소의 규칙:
+이 저장소의 규칙 (상세: CLAUDE.md, docs/ARCHITECTURE.md, docs/RELIABILITY.md):
 - 문서와 기본 응답은 한국어
 - 변경은 수술적으로, 요청 범위만 수정
 - 단순함 우선, 불필요한 추상화 금지
 - core-api는 진입점/설정, core-domain은 비즈니스 규칙
-- Redis, 락, 만료 이벤트는 core-domain의 store/infra 중심으로 유지
+- Redisson/Redis/Messaging은 infra 패키지에서만 사용
+- 분산 락 규칙, TTL 정합성은 docs/RELIABILITY.md 참조
+- 설계 원칙은 docs/design-docs/core-beliefs.md 참조
 """
 
 [pr_code_suggestions]

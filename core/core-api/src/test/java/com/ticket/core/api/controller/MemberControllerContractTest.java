@@ -4,6 +4,7 @@ import com.ticket.core.config.LoginMemberArgumentResolver;
 import com.ticket.core.config.security.MemberPrincipal;
 import com.ticket.core.domain.member.query.GetCurrentMemberUseCase;
 import com.ticket.core.domain.member.command.WithdrawCurrentMemberUseCase;
+import com.ticket.core.domain.showlike.query.CountMyShowLikesUseCase;
 import com.ticket.core.domain.showlike.query.GetMyShowLikesUseCase;
 import com.ticket.core.domain.member.model.Role;
 import com.ticket.core.support.ApiControllerAdvice;
@@ -33,7 +34,8 @@ class MemberControllerContractTest {
         MemberController controller = new MemberController(
                 getCurrentMemberUseCase,
                 Mockito.mock(WithdrawCurrentMemberUseCase.class),
-                Mockito.mock(GetMyShowLikesUseCase.class)
+                Mockito.mock(GetMyShowLikesUseCase.class),
+                Mockito.mock(CountMyShowLikesUseCase.class)
         );
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setCustomArgumentResolvers(new LoginMemberArgumentResolver())

@@ -3,6 +3,7 @@ package com.ticket.core.api.controller.docs;
 import com.ticket.core.config.security.MemberPrincipal;
 import com.ticket.core.domain.member.query.GetCurrentMemberUseCase;
 import com.ticket.core.domain.member.command.WithdrawCurrentMemberUseCase;
+import com.ticket.core.domain.showlike.query.CountMyShowLikesUseCase;
 import com.ticket.core.domain.showlike.query.GetMyShowLikesUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
@@ -29,6 +30,15 @@ public interface MemberControllerDocs {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
     ApiResponse<WithdrawCurrentMemberUseCase.Output> withdrawCurrentMember(
+            @Parameter(hidden = true) MemberPrincipal memberPrincipal
+    );
+
+    @Operation(summary = "내 찜 수 조회", description = "로그인한 회원이 찜한 공연 수를 조회합니다.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패")
+    })
+    ApiResponse<CountMyShowLikesUseCase.Output> getMyLikesCount(
             @Parameter(hidden = true) MemberPrincipal memberPrincipal
     );
 

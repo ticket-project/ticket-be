@@ -4,6 +4,7 @@ import com.ticket.core.api.controller.docs.MemberControllerDocs;
 import com.ticket.core.config.security.MemberPrincipal;
 import com.ticket.core.domain.member.query.GetCurrentMemberUseCase;
 import com.ticket.core.domain.member.command.WithdrawCurrentMemberUseCase;
+import com.ticket.core.domain.showlike.query.CountMyShowLikesUseCase;
 import com.ticket.core.domain.showlike.query.GetMyShowLikesUseCase;
 import com.ticket.core.support.response.ApiResponse;
 import com.ticket.core.support.response.SliceResponse;
@@ -21,6 +22,7 @@ public class MemberController implements MemberControllerDocs {
     private final GetCurrentMemberUseCase getCurrentMemberUseCase;
     private final WithdrawCurrentMemberUseCase withdrawCurrentMemberUseCase;
     private final GetMyShowLikesUseCase getMyShowLikesUseCase;
+    private final CountMyShowLikesUseCase countMyShowLikesUseCase;
 
     @Override
     @GetMapping
@@ -36,6 +38,13 @@ public class MemberController implements MemberControllerDocs {
         final WithdrawCurrentMemberUseCase.Output output = withdrawCurrentMemberUseCase.execute(input);
         SecurityContextHolder.clearContext();
         return ApiResponse.success(output);
+    }
+
+    @Override
+    @GetMapping("/me/likes/count")
+    public ApiResponse<CountMyShowLikesUseCase.Output> getMyLikesCount(final MemberPrincipal memberPrincipal) {
+        final CountMyShowLikesUseCase.Input input = new CountMyShowLikesUseCase.Input(memberPrincipal.getMemberId());
+        return ApiResponse.success(countMyShowLikesUseCase.execute(input));
     }
 
     @Override
