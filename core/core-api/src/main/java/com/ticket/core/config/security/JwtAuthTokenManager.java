@@ -3,7 +3,7 @@ package com.ticket.core.config.security;
 import com.ticket.core.domain.auth.token.AuthRefreshToken;
 import com.ticket.core.domain.auth.token.AuthTokenManager;
 import com.ticket.core.domain.auth.token.IssuedAuthTokens;
-import com.ticket.core.domain.auth.infra.token.RefreshTokenService;
+import com.ticket.core.domain.auth.token.RefreshTokenStore;
 import com.ticket.core.domain.member.model.Member;
 import com.ticket.core.config.security.MemberPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +17,13 @@ public class JwtAuthTokenManager implements AuthTokenManager {
 
     private final JwtTokenService jwtTokenService;
     private final JwtProperties jwtProperties;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenStore refreshTokenStore;
 
     @Override
     public IssuedAuthTokens issueTokens(final Member member) {
         final MemberPrincipal principal = new MemberPrincipal(member.getId(), member.getRole());
         final String accessToken = jwtTokenService.createAccessToken(principal);
-        final String refreshToken = refreshTokenService.createRefreshToken(
+        final String refreshToken = refreshTokenStore.createRefreshToken(
                 member.getId(),
                 jwtProperties.getRefreshTokenExpirationSeconds()
         );
@@ -42,7 +42,7 @@ public class JwtAuthTokenManager implements AuthTokenManager {
             final Member member,
             final AuthRefreshToken refreshToken
     ) {
-        final String newRefreshToken = refreshTokenService.rotate(
+        final String newRefreshToken = refreshTokenStore.rotate(
                 refreshToken,
                 member.getId(),
                 jwtProperties.getRefreshTokenExpirationSeconds()

@@ -26,6 +26,7 @@ dependencies {
     testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.1.15")
     testImplementation 'org.springframework.boot:spring-boot-security-test'
     testImplementation 'org.springframework.boot:spring-boot-webmvc-test'
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.4.1'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

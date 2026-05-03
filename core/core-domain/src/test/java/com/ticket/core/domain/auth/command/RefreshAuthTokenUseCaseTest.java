@@ -3,7 +3,7 @@ package com.ticket.core.domain.auth.command;
 import com.ticket.core.domain.auth.token.AuthRefreshToken;
 import com.ticket.core.domain.auth.token.AuthTokenManager;
 import com.ticket.core.domain.auth.token.IssuedAuthTokens;
-import com.ticket.core.domain.auth.infra.token.RefreshTokenService;
+import com.ticket.core.domain.auth.token.RefreshTokenStore;
 import com.ticket.core.domain.member.model.Member;
 import com.ticket.core.domain.member.query.MemberFinder;
 import com.ticket.core.support.exception.AuthException;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 class RefreshAuthTokenUseCaseTest {
 
     @Mock
-    private RefreshTokenService refreshTokenService;
+    private RefreshTokenStore refreshTokenStore;
 
     @Mock
     private MemberFinder memberFinder;
@@ -44,7 +44,7 @@ class RefreshAuthTokenUseCaseTest {
         IssuedAuthTokens response = new IssuedAuthTokens("access-token-value", "new-refresh-token-value", "Bearer", 1800L, 3L);
 
         AuthRefreshToken refreshToken = AuthRefreshToken.from("refresh-token");
-        when(refreshTokenService.validate(refreshToken)).thenReturn(Optional.of(3L));
+        when(refreshTokenStore.validate(refreshToken)).thenReturn(Optional.of(3L));
         when(memberFinder.findActiveMemberById(3L)).thenReturn(member);
         when(authTokenManager.rotateTokens(member, refreshToken)).thenReturn(response);
 
@@ -60,7 +60,7 @@ class RefreshAuthTokenUseCaseTest {
         assertThat(result.toString())
                 .doesNotContain("access-token-value")
                 .doesNotContain("new-refresh-token-value");
-        verify(refreshTokenService).validate(refreshToken);
+        verify(refreshTokenStore).validate(refreshToken);
         verify(memberFinder).findActiveMemberById(3L);
         verify(authTokenManager).rotateTokens(member, refreshToken);
     }
@@ -68,7 +68,7 @@ class RefreshAuthTokenUseCaseTest {
     @Test
     void invalid_refresh_token_throws_auth_exception() {
         AuthRefreshToken refreshToken = AuthRefreshToken.from("refresh-token");
-        when(refreshTokenService.validate(refreshToken)).thenReturn(Optional.empty());
+        when(refreshTokenStore.validate(refreshToken)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> useCase.execute(new RefreshAuthTokenUseCase.Input(refreshToken)))
                 .isInstanceOf(AuthException.class)

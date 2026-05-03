@@ -37,4 +37,11 @@ class CoreDomainArchitectureTest {
             noClasses()
                     .that().resideOutsideOfPackages("..infra..", "com.ticket.core.config..")
                     .should().dependOnClassesThat().resideInAnyPackage("org.springframework.web.service.annotation..");
+
+    @ArchTest
+    static final ArchRule domain_auth_application_packages_should_not_depend_on_auth_infra =
+            noClasses()
+                    .that().resideInAnyPackage("..domain.auth.command..", "..domain.auth.oauth2..")
+                    .should().dependOnClassesThat().resideInAnyPackage("..domain.auth.infra..");
+
 }

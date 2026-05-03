@@ -3,7 +3,7 @@ package com.ticket.core.domain.auth.command;
 import com.ticket.core.domain.auth.token.AuthRefreshToken;
 import com.ticket.core.domain.auth.token.AuthTokenManager;
 import com.ticket.core.domain.auth.token.IssuedAuthTokens;
-import com.ticket.core.domain.auth.infra.token.RefreshTokenService;
+import com.ticket.core.domain.auth.token.RefreshTokenStore;
 import com.ticket.core.domain.member.model.Member;
 import com.ticket.core.domain.member.query.MemberFinder;
 import com.ticket.core.support.exception.AuthException;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RefreshAuthTokenUseCase {
 
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenStore refreshTokenStore;
     private final MemberFinder memberFinder;
     private final AuthTokenManager authTokenManager;
 
@@ -49,7 +49,7 @@ public class RefreshAuthTokenUseCase {
     }
 
     public Result execute(final Input input) {
-        final Long memberId = refreshTokenService.validate(input.refreshToken())
+        final Long memberId = refreshTokenStore.validate(input.refreshToken())
                 .orElseThrow(() -> new AuthException(ErrorType.AUTHENTICATION_ERROR, "유효하지 않거나 만료된 리프레시 토큰입니다."));
         final Member member = memberFinder.findActiveMemberById(memberId);
         final IssuedAuthTokens result = authTokenManager.rotateTokens(member, input.refreshToken());
