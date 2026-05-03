@@ -1,6 +1,6 @@
 package com.ticket.core.domain.performanceseat.command;
 
-import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
+import com.ticket.core.domain.performanceseat.support.SeatStatusEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 class SeatStatusPublisherTest {
 
     @Mock
-    private SeatEventPublisher seatEventPublisher;
+    private SeatStatusEventPublisher seatEventPublisher;
 
     @InjectMocks
     private SeatStatusPublisher seatStatusPublisher;

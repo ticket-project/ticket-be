@@ -1,6 +1,6 @@
 package com.ticket.core.domain.support;
 
-import com.ticket.core.infra.config.QuerydslConfig;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.domain.member.model.Member;
 import com.ticket.core.domain.member.model.Email;
 import com.ticket.core.domain.performance.model.Performance;
@@ -63,7 +63,7 @@ import java.time.ZoneId;
 })
 @Transactional
 @Import({
-        QuerydslConfig.class,
+        QueryRepositoryTestSupport.QuerydslTestConfig.class,
         QueryRepositoryTestSupport.TestConfig.class,
         QueryRepositoryTestSupport.AuditingTestConfig.class,
         ShowQueryHelper.class,
@@ -223,6 +223,14 @@ public abstract class QueryRepositoryTestSupport {
         @Bean
         Clock clock() {
             return Clock.fixed(Instant.parse("2026-03-15T01:00:00Z"), ZoneId.of("Asia/Seoul"));
+        }
+    }
+
+    static class QuerydslTestConfig {
+
+        @Bean
+        JPAQueryFactory jpaQueryFactory(final EntityManager entityManager) {
+            return new JPAQueryFactory(entityManager);
         }
     }
 

@@ -185,25 +185,27 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 
 - `core:core-api`
   - 실제 Spring Boot API 애플리케이션
-- `core:core-enum`
-  - 공통 enum
+- `core:core-domain`
+  - use case, 도메인 모델, JPA/query repository, port 인터페이스
+- `core:core-infra`
+  - Redis/WebSocket/외부 HTTP/AOP/기술 설정 구현체
 - `storage:redis-core`
   - Redis 관련 공통 설정/구성
 - `support:logging`
   - 로깅 지원
 
-### 5.2 core-api 패키지 흐름
+### 5.2 core 계층 흐름
 
 - `api/controller`
   - HTTP 진입점
-- `domain/*/usecase`
-  - 요청 단위 오케스트레이션
-- `domain/*/application`
-  - 응용 서비스, 기록/생성 보조 컴포넌트
-- `domain/*/domainservice`
-  - 상태 전이 규칙
-- `domain/*/repository`, `finder`
-  - 저장/조회
+- `core-domain`의 `domain/*/command`, `domain/*/query`
+  - 요청 단위 use case와 비즈니스 흐름
+- `core-domain`의 `domain/*/model`, `domain/*/repository`
+  - JPA 모델과 RDB 저장/조회
+- `core-domain`의 `domain/*/store`, `domain/*/support`
+  - Redis/WebSocket/외부 HTTP 같은 기술 구현을 감추는 port
+- `core-infra`의 `infra/*`, `core/infra`
+  - port 구현체와 기술 설정
 - `config`
   - 보안, WebSocket, Redis expiration listener, 스케줄링 등
 
@@ -222,7 +224,8 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 관련 코드:
 
 - [WebSocketConfig.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/config/WebSocketConfig.java)
-- [SeatEventPublisher.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/performanceseat/support/SeatEventPublisher.java)
+- [SeatStatusEventPublisher.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/domain/performanceseat/support/SeatStatusEventPublisher.java)
+- [SeatEventPublisher.java](c:/Users/mn040/IdeaProjects/ticket/core/core-infra/src/main/java/com/ticket/core/infra/performanceseat/realtime/SeatEventPublisher.java)
 
 ### 6.2 Redis expiration listener
 
@@ -233,8 +236,8 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 
 관련 코드:
 
-- [RedisExpirationListenerConfig.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/config/RedisExpirationListenerConfig.java)
-- [RedisKeyExpirationListener.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/domain/hold/event/RedisKeyExpirationListener.java)
+- [RedisExpirationListenerConfig.java](c:/Users/mn040/IdeaProjects/ticket/core/core-infra/src/main/java/com/ticket/core/infra/redis/RedisExpirationListenerConfig.java)
+- [RedisKeyExpirationListener.java](c:/Users/mn040/IdeaProjects/ticket/core/core-infra/src/main/java/com/ticket/core/infra/redis/RedisKeyExpirationListener.java)
 
 ## 7. 동시성 전략
 
@@ -252,8 +255,8 @@ hold는 현재 DB 엔티티가 아니라 Redis 기반 임시 점유 상태이며
 
 관련 코드:
 
-- [DistributedLock.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/aop/DistributedLock.java)
-- [DistributedLockAop.java](c:/Users/mn040/IdeaProjects/ticket/core/core-api/src/main/java/com/ticket/core/aop/DistributedLockAop.java)
+- [DistributedLock.java](c:/Users/mn040/IdeaProjects/ticket/core/core-domain/src/main/java/com/ticket/core/support/lock/DistributedLock.java)
+- [DistributedLockAop.java](c:/Users/mn040/IdeaProjects/ticket/core/core-infra/src/main/java/com/ticket/core/infra/lock/DistributedLockAop.java)
 
 ## 8. 로컬 실행
 
