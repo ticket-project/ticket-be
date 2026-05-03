@@ -15,6 +15,11 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 class CoreDomainArchitectureTest {
 
     @ArchTest
+    static final ArchRule core_domain_module_should_not_contain_infra_packages =
+            noClasses()
+                    .should().resideInAnyPackage("com.ticket.core.infra..", "..domain.*.infra..");
+
+    @ArchTest
     static final ArchRule infra_패키지_밖에서는_redisson에_직접_의존하지_않는다 =
             noClasses()
                     .that().resideOutsideOfPackages("..infra..")
@@ -42,6 +47,6 @@ class CoreDomainArchitectureTest {
     static final ArchRule domain_auth_application_packages_should_not_depend_on_auth_infra =
             noClasses()
                     .that().resideInAnyPackage("..domain.auth.command..", "..domain.auth.oauth2..")
-                    .should().dependOnClassesThat().resideInAnyPackage("..domain.auth.infra..");
+                    .should().dependOnClassesThat().resideInAnyPackage("com.ticket.core.infra.auth..");
 
 }

@@ -1,7 +1,7 @@
 package com.ticket.core.domain.performanceseat.command;
 
-import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
-import com.ticket.core.infra.lock.DistributedLock;
+import com.ticket.core.domain.performanceseat.support.SeatStatusEventPublisher;
+import com.ticket.core.support.lock.DistributedLock;
 import com.ticket.core.domain.performanceseat.support.SeatSelectionAvailabilityValidator;
 import com.ticket.core.domain.performanceseat.support.SeatStatusMessage.SeatAction;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ public class SelectSeatUseCase {
 
     private final SeatSelectionService seatSelectionService;
     private final SeatSelectionAvailabilityValidator seatSelectionAvailabilityValidator;
-    private final SeatEventPublisher seatEventPublisher;
+    private final SeatStatusEventPublisher seatEventPublisher;
 
     public record Input(Long performanceId, Long seatId, Long memberId) {}
 

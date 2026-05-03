@@ -1,6 +1,6 @@
 package com.ticket.core.domain.show.query;
 
-import com.ticket.core.infra.config.QuerydslConfig;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticket.core.domain.show.BookingStatus;
 import com.ticket.core.domain.show.image.ShowCardImagePathConverter;
 import com.ticket.core.domain.show.meta.Region;
@@ -55,7 +55,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 })
 @Transactional
 @Import({
-        QuerydslConfig.class,
+        ShowListQueryRepositoryTest.QuerydslTestConfig.class,
         ShowListQueryRepositoryTest.TestConfig.class,
         ShowListQueryRepositoryTest.AuditingTestConfig.class,
         ShowListQueryRepository.class,
@@ -225,6 +225,14 @@ class ShowListQueryRepositoryTest {
         @Bean
         Clock clock() {
             return Clock.systemDefaultZone();
+        }
+    }
+
+    static class QuerydslTestConfig {
+
+        @Bean
+        JPAQueryFactory jpaQueryFactory(final EntityManager entityManager) {
+            return new JPAQueryFactory(entityManager);
         }
     }
 

@@ -1,6 +1,4 @@
 dependencies {
-    implementation project(':storage:redis-core')
-
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-jackson'
