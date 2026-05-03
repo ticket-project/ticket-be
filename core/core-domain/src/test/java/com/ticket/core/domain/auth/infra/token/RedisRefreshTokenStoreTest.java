@@ -1,6 +1,7 @@
-package com.ticket.core.domain.auth.token;
+package com.ticket.core.domain.auth.infra.token;
 
-import com.ticket.core.domain.auth.infra.token.RefreshTokenService;
+import com.ticket.core.domain.auth.token.AuthRefreshToken;
+import com.ticket.core.support.random.UuidSupplier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -14,13 +15,13 @@ import java.time.Duration;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
-class RefreshTokenServiceTest {
+class RedisRefreshTokenStoreTest {
 
     @Mock
     private RedissonClient redissonClient;
@@ -29,22 +30,19 @@ class RefreshTokenServiceTest {
     private RBucket<String> bucket;
 
     @Mock
-    private com.ticket.core.support.random.UuidSupplier uuidSupplier;
+    private UuidSupplier uuidSupplier;
 
     @InjectMocks
-    private RefreshTokenService refreshTokenService;
+    private RedisRefreshTokenStore refreshTokenStore;
 
     @Test
-    void 리프레시토큰을_생성하고_memberId를_저장한다() {
-        //given
-        doReturn(bucket).when(redissonClient).getBucket(org.mockito.ArgumentMatchers.anyString());
+    void creates_refresh_token_and_stores_member_id() {
+        doReturn(bucket).when(redissonClient).getBucket(anyString());
         when(uuidSupplier.get()).thenReturn(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
 
-        String token = refreshTokenService.createRefreshToken(3L, 120L);
+        String token = refreshTokenStore.createRefreshToken(3L, 120L);
 
-        //when
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
-        //then
         verify(redissonClient).getBucket(keyCaptor.capture());
         verify(bucket).set("3", Duration.ofSeconds(120L));
         assertThat(keyCaptor.getValue()).isEqualTo("refresh_token:123e4567-e89b-12d3-a456-426614174000");
@@ -52,48 +50,36 @@ class RefreshTokenServiceTest {
     }
 
     @Test
-    void validate는_토큰을_소비하고_memberId를_반환한다() {
-        //given
-        //when
+    void validate_consumes_token_and_returns_member_id() {
         doReturn(bucket).when(redissonClient).getBucket("refresh_token:token-value");
         when(bucket.getAndDelete()).thenReturn("3");
 
-        //then
-        assertThat(refreshTokenService.validate(AuthRefreshToken.from("token-value"))).contains(3L);
+        assertThat(refreshTokenStore.validate(AuthRefreshToken.from("token-value"))).contains(3L);
     }
 
     @Test
-    void validateWithoutConsume는_토큰을_소비하지_않고_memberId를_반환한다() {
-        //given
-        //when
+    void validate_without_consume_returns_member_id() {
         doReturn(bucket).when(redissonClient).getBucket("refresh_token:token-value");
         when(bucket.get()).thenReturn("3");
 
-        //then
-        assertThat(refreshTokenService.validateWithoutConsume(AuthRefreshToken.from("token-value"))).contains(3L);
+        assertThat(refreshTokenStore.validateWithoutConsume(AuthRefreshToken.from("token-value"))).contains(3L);
     }
 
     @Test
-    void 저장된_memberId가_숫자가_아니면_empty를_반환한다() {
-        //given
-        //when
+    void validate_returns_empty_when_stored_member_id_is_not_number() {
         doReturn(bucket).when(redissonClient).getBucket("refresh_token:token-value");
         when(bucket.getAndDelete()).thenReturn("not-a-number");
 
-        //then
-        assertThat(refreshTokenService.validate(AuthRefreshToken.from("token-value"))).isEmpty();
+        assertThat(refreshTokenStore.validate(AuthRefreshToken.from("token-value"))).isEmpty();
     }
 
     @Test
-    void 소유자가_일치하면_compareAndSet으로_무효화한다() {
-        //given
+    void revoke_if_owned_deletes_only_matching_owner_token() {
         doReturn(bucket).when(redissonClient).getBucket("refresh_token:token-value");
         when(bucket.compareAndSet("3", null)).thenReturn(true);
 
-        //when
-        boolean revoked = refreshTokenService.revokeIfOwned(AuthRefreshToken.from("token-value"), 3L);
+        boolean revoked = refreshTokenStore.revokeIfOwned(AuthRefreshToken.from("token-value"), 3L);
 
-        //then
         assertThat(revoked).isTrue();
         verify(bucket).compareAndSet("3", null);
     }

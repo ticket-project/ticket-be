@@ -1,6 +1,6 @@
 package com.ticket.core.domain.auth.command;
 
-import com.ticket.core.domain.auth.infra.oauth2.OAuth2AuthCodeService;
+import com.ticket.core.domain.auth.oauth2.OAuth2AuthCodeStore;
 import com.ticket.core.domain.auth.token.AuthTokenManager;
 import com.ticket.core.domain.auth.token.IssuedAuthTokens;
 import com.ticket.core.domain.member.model.Member;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 class ExchangeOAuth2TokenUseCaseTest {
 
     @Mock
-    private OAuth2AuthCodeService oAuth2AuthCodeService;
+    private OAuth2AuthCodeStore oAuth2AuthCodeStore;
 
     @Mock
     private MemberFinder memberFinder;
@@ -42,7 +42,7 @@ class ExchangeOAuth2TokenUseCaseTest {
         Member member = mock(Member.class);
         IssuedAuthTokens response = new IssuedAuthTokens("access-token-value", "refresh-token-value", "Bearer", 1800L, 7L);
 
-        when(oAuth2AuthCodeService.consumeCode("oauth-code")).thenReturn(Optional.of(7L));
+        when(oAuth2AuthCodeStore.consumeCode("oauth-code")).thenReturn(Optional.of(7L));
         when(memberFinder.findActiveMemberById(7L)).thenReturn(member);
         when(authTokenManager.issueTokens(member)).thenReturn(response);
 
@@ -58,14 +58,14 @@ class ExchangeOAuth2TokenUseCaseTest {
         assertThat(result.toString())
                 .doesNotContain("access-token-value")
                 .doesNotContain("refresh-token-value");
-        verify(oAuth2AuthCodeService).consumeCode("oauth-code");
+        verify(oAuth2AuthCodeStore).consumeCode("oauth-code");
         verify(memberFinder).findActiveMemberById(7L);
         verify(authTokenManager).issueTokens(member);
     }
 
     @Test
     void invalid_code_throws_auth_exception() {
-        when(oAuth2AuthCodeService.consumeCode("invalid")).thenReturn(Optional.empty());
+        when(oAuth2AuthCodeStore.consumeCode("invalid")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> useCase.execute(new ExchangeOAuth2TokenUseCase.Input("invalid")))
                 .isInstanceOf(AuthException.class)

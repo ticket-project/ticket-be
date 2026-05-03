@@ -1,6 +1,6 @@
-package com.ticket.core.domain.auth;
+package com.ticket.core.domain.auth.infra.oauth2;
 
-import com.ticket.core.domain.auth.infra.oauth2.OAuth2AuthCodeService;
+import com.ticket.core.support.random.UuidSupplier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -14,13 +14,13 @@ import java.time.Duration;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
-class OAuth2AuthCodeServiceTest {
+class RedisOAuth2AuthCodeStoreTest {
 
     @Mock
     private RedissonClient redissonClient;
@@ -29,22 +29,19 @@ class OAuth2AuthCodeServiceTest {
     private RBucket<String> bucket;
 
     @Mock
-    private com.ticket.core.support.random.UuidSupplier uuidSupplier;
+    private UuidSupplier uuidSupplier;
 
     @InjectMocks
-    private OAuth2AuthCodeService oauth2AuthCodeService;
+    private RedisOAuth2AuthCodeStore oauth2AuthCodeStore;
 
     @Test
-    void 일회용_인증코드를_생성하고_memberId를_저장한다() {
-        //given
-        doReturn(bucket).when(redissonClient).getBucket(org.mockito.ArgumentMatchers.anyString());
+    void creates_one_time_auth_code_and_stores_member_id() {
+        doReturn(bucket).when(redissonClient).getBucket(anyString());
         when(uuidSupplier.get()).thenReturn(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
 
-        String code = oauth2AuthCodeService.createCode(7L);
+        String code = oauth2AuthCodeStore.createCode(7L);
 
-        //when
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
-        //then
         verify(redissonClient).getBucket(keyCaptor.capture());
         verify(bucket).set("7", Duration.ofSeconds(30));
         assertThat(keyCaptor.getValue()).isEqualTo("oauth2_auth_code:123e4567-e89b-12d3-a456-426614174000");
@@ -52,25 +49,18 @@ class OAuth2AuthCodeServiceTest {
     }
 
     @Test
-    void consumeCode는_인증코드를_소비하고_memberId를_반환한다() {
-        //given
-        //when
+    void consume_code_deletes_code_and_returns_member_id() {
         doReturn(bucket).when(redissonClient).getBucket("oauth2_auth_code:code");
         when(bucket.getAndDelete()).thenReturn("7");
 
-        //then
-        assertThat(oauth2AuthCodeService.consumeCode("code")).contains(7L);
+        assertThat(oauth2AuthCodeStore.consumeCode("code")).contains(7L);
     }
 
     @Test
-    void consumeCode는_저장값이_없거나_숫자가_아니면_empty를_반환한다() {
-        //given
-        //when
+    void consume_code_returns_empty_when_value_is_missing_or_not_number() {
         doReturn(bucket).when(redissonClient).getBucket("oauth2_auth_code:code");
         when(bucket.getAndDelete()).thenReturn("not-a-number");
 
-        //then
-        assertThat(oauth2AuthCodeService.consumeCode("code")).isEmpty();
+        assertThat(oauth2AuthCodeStore.consumeCode("code")).isEmpty();
     }
 }
-

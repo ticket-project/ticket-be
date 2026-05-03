@@ -1,6 +1,6 @@
 package com.ticket.core.domain.auth.command;
 
-import com.ticket.core.domain.auth.infra.oauth2.OAuth2AuthCodeService;
+import com.ticket.core.domain.auth.oauth2.OAuth2AuthCodeStore;
 import com.ticket.core.domain.auth.token.AuthTokenManager;
 import com.ticket.core.domain.auth.token.IssuedAuthTokens;
 import com.ticket.core.domain.member.model.Member;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ExchangeOAuth2TokenUseCase {
 
-    private final OAuth2AuthCodeService oAuth2AuthCodeService;
+    private final OAuth2AuthCodeStore oAuth2AuthCodeStore;
     private final MemberFinder memberFinder;
     private final AuthTokenManager authTokenManager;
 
@@ -48,7 +48,7 @@ public class ExchangeOAuth2TokenUseCase {
     }
 
     public Result execute(final Input input) {
-        final Long memberId = oAuth2AuthCodeService.consumeCode(input.code())
+        final Long memberId = oAuth2AuthCodeStore.consumeCode(input.code())
                 .orElseThrow(() -> new AuthException(ErrorType.AUTHENTICATION_ERROR, "유효하지 않거나 만료된 인증 코드입니다."));
         final Member member = memberFinder.findActiveMemberById(memberId);
         final IssuedAuthTokens result = authTokenManager.issueTokens(member);
