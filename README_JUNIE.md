@@ -1,3 +1,18 @@
+# 보관 후보: 과거 AI 초안
+
+이 문서는 과거 AI가 작성한 요구사항/설계 초안이다. 현재 코드와 다를 수 있으므로 개발 기준으로 사용하지 않는다.
+
+현재 기준 문서는 아래 순서로 본다.
+
+1. [README_CODEX.md](README_CODEX.md)
+2. [README_ARCHITECTURE.md](README_ARCHITECTURE.md)
+3. [README_PRODUCT.md](README_PRODUCT.md)
+4. [README.md](README.md)
+
+후속 정리에서 이 문서를 `docs/archive/`로 이동하거나 삭제할지 결정한다.
+
+---
+
 # 선착순 티켓 예매 서비스 (TDD 중심) README - by AI
 
 

@@ -1,109 +1,99 @@
-# 선착순 티켓 예매 사이트 by TDD
+# Ticket
 
-프로젝트 목적 : 티켓 선착순 예매를 위해 대용량 트래픽이 순간적으로 몰렸을 때, 적절한 처리 방안을 모색하고
-구현하며 트러블 슈팅을 하는 소규모 사이드 프로젝트
-추가: 관리자 기능은 따로 만들지 않을 것이기에, 공연(한화이글스 vs LG트윈스 한국시리즈), 좌석, 최대 구매 가능 티켓 수 등은 임의로 생성
-------------------------------------------------------------------------
-## 비즈니스 요구사항 정리 (비개발자랑 소통해야 함. 전문 용어 사용x)
+공연/전시 티켓팅 백엔드 프로젝트다. 순간 트래픽, 대기열, 좌석 선택/선점, 주문 흐름을 Spring Boot 멀티 모듈 구조에서 검증한다.
 
-### auth
-1. 회원가입을 할 수 있어야 한다.
-    1. 비밀번호는 해시로 저장되어야 한다. (암호화 종류, 장단점 조사분석)
-    2. 아이디는 이메일로 진행하고, 중복 가입은 허용되지 않는다. (검증 방식은 여러개? 검증 코드는 어디에 두나? 클래스 위치)
-2. 로그인을 할 수 있어야 한다.
-    1. 로그인 시간은 30분 이고 만료되면 재 로그인 해야 한다.
+## 문서 읽는 순서
 
-### reservation
-1. 로그인한 회원은 회차당 최대 n개 티켓을 예매 가능하다. (한 번에 n개? 총 n개?) => 총 n개
-    1. 로그인하지 않은 회원은 예매할 수 없다.
-2. 좌석 선택 후 예매하기를 클릭할 시 좌석은 예매된다.
-3. 클라이언트 측에서 예매 가능한 회차만 화면에 보여준다고 가정. but 혹시 모르니 서버에서도 검증 필요
-    1. 예매하려는 공연-회차가 정상적인 시간인지(과거x, 진행중x), 정상적인 상황인지(예매 오픈 상태)
-    2. 등등
-4. 일정 요청 수가 넘어가면 대기큐를 생성하여 진입하여야 한다.
-5. 회차의 재고가 1 이상이면 좌석 선택 창으로 이동할 수 있다.(회차 당 좌석 상세 정보 조회 가능)
-    1. 회차의 재고가 0 이하면 좌석 선택 창으로 넘어갈 수 없다(회차 당 좌석 상세 정보 조회 불가능)
-6. 같은 회차의 같은 좌석을 예매하려고 하면 실패한다.
-7. 한 명의 회원은 공연별, 회차별, 좌석별로 다양한 예매를 할 수 있다.
-    1. (공연 1의 회차 1의 좌석 1, 2), (공연 1의 회차 1의 좌석 3, 4), (공연 1의 회차 2의 좌석 1, 2), (공연 2의 회차 1의 좌석 1)
+현재 개발과 리뷰 기준은 아래 순서로 본다.
 
-### hold
-1. 한 좌석은 같은 시점에 오직 한 사용자에게만 선점 가능하다.
-2. 여러 좌석을 한 번에 선점 시도할 때는 전부 성공 or 전부 실패여야 한다.(All or Nothing)
-3. 선점을 하면 만료시간(선점한 시간으로부터 5분) 안에 결제까지 진행해야 한다.
-    1. 진행하지 않을 시 선점이 취소된다.
-   2. 결제 성공 시 좌석 상태를 SOLD로 확정한다.
-4. 회원당 한 회차에 최대 4개의 좌석만 선점 가능하다.
-    1. 한 번의 선점 요청 당 최대 4개까지 가능하다.
-5. 사용자가 선점을 명시적으로 취소할 수 있어야 한다.
-6. 동일 사용자가 동일 좌석을 중복 선점 시도하면 기존 선점 정보를 반환한다(멱등성).
+1. [README_CODEX.md](README_CODEX.md)
+   - 현재 코드 기준 개발자 온보딩 문서
+   - API, 도메인 흐름, 로컬 실행, 미구현 범위 확인
+2. [README_ARCHITECTURE.md](README_ARCHITECTURE.md)
+   - Gradle 모듈, 패키지 경계, 구조 테스트 기준 확인
+3. [README_PRODUCT.md](README_PRODUCT.md)
+   - 제품 관점의 사용자 흐름과 구현 범위 확인
+4. [AGENTS.md](AGENTS.md)
+   - Codex/에이전트 작업 기준과 문서 우선순위 확인
+5. [README_JUNIE.md](README_JUNIE.md)
+   - 과거 AI 초안 문서
+   - 현재 개발 기준 문서가 아니며, 요구사항 아이디어 참고용으로만 본다.
 
+## 로컬 실행
 
-## *기술 부채 최소화하자.*
------------------------------------------------------------------------------------
-## 기술 정리
+```bash
+docker compose up -d redis
+./gradlew :core:core-api:bootRun
+```
 
-### auth
-1. 인메모리 세션으로 우선 구현한 뒤, redis session, jwt로 수정 보완할 계획
-2. customArgumentResolver를 구현하여 controller에서 session을 통해 로그인한 member 가져오기
-3. 이후 권한이 들어가면 인가 처리를 interceptor를 구현할 예정
-4. 필터는 언제?
+빠른 검증은 아래 명령을 우선 사용한다.
 
-### hold
-1. SEAT_HOLD 테이블에 선점 내역 저장 후, 스케쥴링을 통해 만료된 선점 원복 처리.
-2. Redis 이용한 선점 저장, 만료 처리
-3. v1: Redisson 분산락(multiLock) 도입
-    - 단일/다중 좌석 선점 시 분산락으로 동시성 제어
-    - 다중 좌석 선점 시 multiLock으로 All or Nothing 보장
-    - 락 획득 실패 시 빠른 실패로 DB 부하 감소
-4. 선점 해제는 Redis의 TTL 기능을 사용한다. (실시간성 중요)
-5. 결제 성공 시 Redis의 선점 key를 즉시 삭제한다.
+```bash
+./gradlew :core:core-api:compileJava
+./gradlew :core:core-domain:test
+./gradlew clean :core:core-api:bootJar -x test
+```
 
--------------------------------------------------------------------------------------------
+Windows PowerShell에서는 `gradlew.bat`를 사용한다.
 
-## TDD
+```powershell
+.\gradlew.bat :core:core-api:compileJava
+.\gradlew.bat :core:core-domain:test
+```
 
-- [ ] member
-    - [x] 정상 입력값이면 Member가 생성된다
-    - [x] 비밀번호는 해시로 암호화되어 저장된다.
-    - [x] 회원 단일 조회를 성공한다.
-    - [x] 존재하지 않는 id는 회원조회를 실패한다.
-    - [x] 정상적인 값이라면 로그인을 성공한다.
-    - [x] 비밀번호가 일치하지 않으면 로그인이 실패한다.
-    - [x] 존재하지 않는 이메일로 로그인하면_실패한다.
-- [ ] email
-    - [x] 올바르지 않은 이메일이면 Email 생성을 실패한다
-    - [x] 올바른 이메일이면 Email 생성을 성공한다
-    - [x] 중복 이메일은 허용하지 않는다.
-- [ ] password
-    - [ ] 비밀번호가 정책에 맞지 않으면 회원가입에 실패한다.
+## 주요 폴더
 
-- [ ] reservation
-    - [x] 재고가 있다면 예매를 성공한다.
-    - [x] 재고가 없다면 예매를 실패한다.
-    - [x] 과거 회차는 예매가 불가능하다.
-    - [x] 예매 오픈 시간 전에는 예매가 불가능하다.
+- `core/core-api`
+  - Spring Boot 실행 모듈
+  - HTTP/WebSocket 진입점, 보안 설정, API 응답 DTO를 둔다.
+- `core/core-domain`
+  - 비즈니스 규칙 중심 모듈
+  - auth, hold, order, queue, performanceseat, show 등 도메인 흐름을 둔다.
+- `core/core-infra`
+  - Redis, Redisson, 외부 HTTP, WebSocket publisher, AOP 같은 기술 구현을 둔다.
+- `storage/redis-core`
+  - Redis 관련 공통 의존성 모듈
+- `support/logging`
+  - 공통 로깅 설정 모듈
+- `docs`
+  - 설계 문서, 구현 계획, SQL 메모, 부하 테스트 문서
+- `load-tests`
+  - 로컬 부하 테스트 자산
 
-- [ ] performance
-    - [x] 회차 시작 시간이 종료 시간보다 느리면 예외가 발생한다.
-    - [x] 회차의 재고가 0 이하라면 예매 가능한 전체 좌석 조회는 실패한다.
-    - [x] 회차의 재고가 1 이상이라면 예매 가능한 전체 좌석 조회가 성공한다.
+## AI와 에이전트 설정
 
-- [ ] seat-hold
-    - [ ] 같은 좌석을 동시에 선점하려 하면 한 명만 성공한다.
-    - [ ] 여러 좌석을 한 번에 선점 시도할 때는 전부 성공하거나 전부 실패한다.
-    - [ ] 선점을 하면 선점 상태가 PENDING으로 변경된다.
-    - [ ] 선점 후 5분 이내에 결제를 완료하면 선점 상태를 CONFIRMED로 변경한다.
-    - [ ] 스케줄러가 만료된 선점을 정리하여 좌석을 AVAILABLE로 복원한다.
-    - [ ] 스케쥴러는 만료된 좌석 선점 상태를 RESTORED로 복원한다.
-    - 
---------------------------------------------------------------------
+AI 관련 설정은 자동화 동작과 연결될 수 있으므로 임의로 이동하거나 삭제하지 않는다.
 
-## 테이블 연관관계 정리
-1. Performances(회차) <-> PerformanceSeat(회차별 좌석) (1 : N)
-2. seat(좌석) <-> PerformanceSeat(회차별 좌석) (1 : N)
-3. Performance(회차) <-> Reservation(예매 정보) (1 : N)
-4. Reservation(예매 정보) <-> ReservationSeat(예매별 좌석) (1 : N)
-5. ReservationSeat(예매별 좌석) <-> PerformanceSeat(회차별 좌석) (1 : 1)
-6. SeatHold(좌석 선점) <-> Member(회원) (N : 1)
-7. SeatHold(좌석 선점) <-> PerformanceSeat(회차별 좌석) (N : 1)
+- [AGENTS.md](AGENTS.md)
+  - 저장소 공통 작업 기준
+- [.codex/AGENTS.md](.codex/AGENTS.md)
+  - Codex 리뷰 보조 지침
+- [.codex/config.toml](.codex/config.toml)
+  - Codex 런타임, MCP, 멀티 에이전트 설정
+- `.codex/agents/*.toml`
+  - Codex 역할별 에이전트 정의
+- `.agents/skills`
+  - 프로젝트 로컬 스킬
+- [.agents/plugins/marketplace.json](.agents/plugins/marketplace.json)
+  - 로컬 플러그인 메타데이터
+- [.github/copilot-instructions.md](.github/copilot-instructions.md)
+  - GitHub Copilot용 저장소 지침
+- `.github/instructions/*.md`
+  - GitHub AI 리뷰용 보조 지침
+- `.github/workflows/claude*.yml`
+  - Claude GitHub Action 워크플로
+- [.pr_agent.toml](.pr_agent.toml)
+  - PR-Agent/Qodo 계열 리뷰 설정
+- [.coderabbit.yaml](.coderabbit.yaml)
+  - CodeRabbit 리뷰 설정
+
+## 초안과 보관 후보
+
+[README_JUNIE.md](README_JUNIE.md)는 과거 AI 작성 초안이다. 현재 코드와 다른 내용이 섞여 있을 수 있으므로 개발 기준으로 사용하지 않는다.
+
+후속 정리에서 아래를 별도로 결정한다.
+
+- `README_JUNIE.md`를 `docs/archive/`로 이동할지 여부
+- `.codex/agents` 중 현재 저장소와 맞지 않는 범용 에이전트 유지 여부
+- `.agents/skills` 하위 외부 범용 스킬 유지 여부
+- Copilot, Claude, CodeRabbit, PR-Agent 지침 중복 축소 여부
