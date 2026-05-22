@@ -3,7 +3,6 @@ package com.ticket.core.domain.queue;
 import com.ticket.core.support.lock.DistributedLock;
 import com.ticket.core.domain.queue.command.QueueAdmissionAdvancer;
 import com.ticket.core.domain.queue.command.exit.ExitQueueUseCase;
-import com.ticket.core.domain.queue.command.join.JoinQueueUseCase;
 import com.ticket.core.domain.queue.model.QueueEntryId;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +15,6 @@ class QueueLockConsistencyTest {
 
     @Test
     void queue_상태전이는_공연기준_하나의_락_네임스페이스를_쓴다() throws NoSuchMethodException {
-        assertThat(lockOf(JoinQueueUseCase.class, "execute", JoinQueueUseCase.Input.class).prefix()).isEqualTo("queue");
         assertThat(lockOf(ExitQueueUseCase.class, "execute", ExitQueueUseCase.Input.class).prefix()).isEqualTo("queue");
         assertThat(lockOf(QueueAdmissionAdvancer.class, "advance", Long.class).prefix()).isEqualTo("queue");
         assertThat(lockOf(QueueAdmissionAdvancer.class, "handleTokenExpired", Long.class, QueueEntryId.class, String.class).prefix())

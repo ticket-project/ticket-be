@@ -2,15 +2,20 @@ package com.ticket.core.infra.queue;
 
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.model.QueueEntryId;
+import com.ticket.core.domain.queue.model.QueueLevel;
+import com.ticket.core.domain.queue.runtime.QueueJoinResult;
 import com.ticket.core.domain.queue.runtime.QueueRedisKey;
 import com.ticket.core.domain.queue.runtime.QueueTicket;
+import com.ticket.core.domain.queue.support.QueuePolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.redisson.api.RBucket;
 import org.redisson.api.RMap;
+import org.redisson.api.RScript;
 import org.redisson.api.RSet;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
@@ -18,11 +23,16 @@ import org.redisson.client.codec.StringCodec;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -45,6 +55,67 @@ class RedisQueueTicketStoreTest {
     @BeforeEach
     void setUp() {
         this.redisQueueTicketStore = new RedisQueueTicketStore(redissonClient, uuidSupplier);
+    }
+
+    @Test
+    void enter_executes_lua_script_and_returns_waiting_result() {
+        //given
+        RScript script = mock(RScript.class);
+        when(uuidSupplier.get())
+                .thenReturn(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
+                .thenReturn(UUID.fromString("123e4567-e89b-12d3-a456-426614174001"))
+                .thenReturn(UUID.fromString("123e4567-e89b-12d3-a456-426614174002"));
+        when(redissonClient.getScript(StringCodec.INSTANCE)).thenReturn(script);
+        when(script.<List<Object>>eval(
+                eq(RScript.Mode.READ_WRITE),
+                anyString(),
+                eq(RScript.ReturnType.LIST),
+                anyList(),
+                any(Object[].class)
+        )).thenReturn(List.of("WAITING", "qe-lua", "7", "", ""));
+        final QueuePolicy policy = new QueuePolicy(true, QueueLevel.LEVEL_1, 300, Duration.ofMinutes(10), Duration.ofHours(1));
+
+        //when
+        QueueJoinResult result = redisQueueTicketStore.enter(10L, 200L, policy, FIXED_NOW);
+
+        //then
+        assertThat(result.status()).isEqualTo(QueueEntryStatus.WAITING);
+        assertThat(result.queueEntryId()).isEqualTo("qe-lua");
+        assertThat(result.position()).isEqualTo(7L);
+        assertThat(result.queueToken()).isNull();
+        assertThat(result.expiresAt()).isNull();
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<Object>> keysCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<Object[]> argsCaptor = ArgumentCaptor.forClass(Object[].class);
+        verify(script).eval(
+                eq(RScript.Mode.READ_WRITE),
+                anyString(),
+                eq(RScript.ReturnType.LIST),
+                keysCaptor.capture(),
+                argsCaptor.capture()
+        );
+        assertThat(keysCaptor.getValue()).containsExactly(
+                QueueRedisKey.waiting(10L),
+                QueueRedisKey.active(10L),
+                QueueRedisKey.sequence(10L),
+                QueueRedisKey.memberEntry(10L, 200L)
+        );
+        assertThat(argsCaptor.getValue()).containsExactly(
+                "10",
+                "200",
+                "123e4567-e89b-12d3-a456-426614174000",
+                "123e4567-e89b-12d3-a456-426614174001",
+                "123e4567-e89b-12d3-a456-426614174002",
+                "1",
+                "300",
+                "600000",
+                "3600000",
+                "2026-03-15T19:10",
+                QueueRedisKey.entryPrefix(),
+                QueueRedisKey.tokenPrefix(),
+                QueueRedisKey.memberEntryPrefix(10L)
+        );
     }
 
     @Test

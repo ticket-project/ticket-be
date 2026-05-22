@@ -32,8 +32,16 @@ public final class QueueRedisKey {
         return WAITING_PREFIX + requirePerformanceId(performanceId) + MEMBER_PREFIX + requireMemberId(memberId);
     }
 
+    public static String memberEntryPrefix(final Long performanceId) {
+        return WAITING_PREFIX + requirePerformanceId(performanceId) + MEMBER_PREFIX;
+    }
+
     public static String entry(final String queueEntryId) {
         return ENTRY_PREFIX + requireText(queueEntryId, "queueEntryId");
+    }
+
+    public static String entryPrefix() {
+        return ENTRY_PREFIX;
     }
 
     public static String createToken(final Long performanceId, final String queueEntryId, final String tokenId) {
@@ -46,6 +54,10 @@ public final class QueueRedisKey {
 
     public static String tokenStorageKey(final String queueToken) {
         return TOKEN_PREFIX + requireText(queueToken, "queueToken");
+    }
+
+    public static String tokenPrefix() {
+        return TOKEN_PREFIX;
     }
 
     public static Optional<TokenKey> tryParseTokenStorageKey(final String key) {

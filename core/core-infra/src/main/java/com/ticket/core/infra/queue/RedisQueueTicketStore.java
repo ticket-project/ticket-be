@@ -2,9 +2,11 @@ package com.ticket.core.infra.queue;
 
 import com.ticket.core.domain.queue.model.QueueEntryStatus;
 import com.ticket.core.domain.queue.model.QueueEntryId;
+import com.ticket.core.domain.queue.runtime.QueueJoinResult;
 import com.ticket.core.domain.queue.runtime.QueueRedisKey;
 import com.ticket.core.domain.queue.runtime.QueueTicket;
 import com.ticket.core.domain.queue.runtime.QueueTicketStore;
+import com.ticket.core.domain.queue.support.QueuePolicy;
 import com.ticket.core.support.random.UuidSupplier;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.*;
@@ -13,12 +15,173 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class RedisQueueTicketStore implements QueueTicketStore {
+
+    private static final String ENTER_SCRIPT = """
+            local waitingKey = KEYS[1]
+            local activeKey = KEYS[2]
+            local sequenceKey = KEYS[3]
+            local memberKey = KEYS[4]
+
+            local performanceId = ARGV[1]
+            local memberId = ARGV[2]
+            local queueEntryId = ARGV[3]
+            local tokenId = ARGV[4]
+            local advanceTokenId = ARGV[5]
+            local enabled = ARGV[6]
+            local maxActiveUsers = tonumber(ARGV[7])
+            local entryTokenTtlMillis = tonumber(ARGV[8])
+            local entryRetentionMillis = tonumber(ARGV[9])
+            local expiresAt = ARGV[10]
+            local entryPrefix = ARGV[11]
+            local tokenPrefix = ARGV[12]
+            local memberEntryPrefix = ARGV[13]
+
+            local function to_map(values)
+                local map = {}
+                for i = 1, #values, 2 do
+                    map[values[i]] = values[i + 1]
+                end
+                return map
+            end
+
+            local function clear_member_if_current(entryId)
+                if redis.call('GET', memberKey) == entryId then
+                    redis.call('DEL', memberKey)
+                end
+            end
+
+            local function mark_left(entryKey)
+                redis.call('HSET', entryKey, 'status', 'LEFT')
+                redis.call('HDEL', entryKey, 'queueToken', 'expiresAt')
+            end
+
+            local function admit_waiting(entryId, admitTokenId)
+                local entryKey = entryPrefix .. entryId
+                local values = redis.call('HGETALL', entryKey)
+                if #values == 0 then
+                    return false
+                end
+
+                local entry = to_map(values)
+                if entry['status'] ~= 'WAITING' then
+                    return false
+                end
+
+                local admittedMemberId = entry['memberId']
+                local queueToken = performanceId .. ':' .. entryId .. ':' .. admitTokenId
+                redis.call('SET', tokenPrefix .. queueToken, entryId, 'PX', entryTokenTtlMillis)
+                redis.call('SADD', activeKey, queueToken)
+                redis.call(
+                    'HSET',
+                    entryKey,
+                    'performanceId', performanceId,
+                    'memberId', admittedMemberId,
+                    'status', 'ADMITTED',
+                    'queueToken', queueToken,
+                    'expiresAt', expiresAt
+                )
+                redis.call('PEXPIRE', entryKey, entryRetentionMillis)
+                if admittedMemberId ~= false and admittedMemberId ~= nil then
+                    redis.call('SET', memberEntryPrefix .. admittedMemberId, entryId, 'PX', entryRetentionMillis)
+                end
+                return true
+            end
+
+            local function advance_one()
+                if redis.call('SCARD', activeKey) >= maxActiveUsers then
+                    return
+                end
+
+                local candidates = redis.call('ZCARD', waitingKey)
+                for i = 1, candidates do
+                    local nextEntries = redis.call('ZRANGE', waitingKey, 0, 0)
+                    local nextEntryId = nextEntries[1]
+                    if nextEntryId == nil then
+                        return
+                    end
+
+                    redis.call('ZREM', waitingKey, nextEntryId)
+                    if admit_waiting(nextEntryId, advanceTokenId) then
+                        return
+                    end
+                end
+            end
+
+            local existingEntryId = redis.call('GET', memberKey)
+            if existingEntryId ~= false and existingEntryId ~= nil then
+                local existingEntryKey = entryPrefix .. existingEntryId
+                local values = redis.call('HGETALL', existingEntryKey)
+                if #values == 0 then
+                    redis.call('DEL', memberKey)
+                else
+                    local existingEntry = to_map(values)
+                    if existingEntry['performanceId'] == performanceId and existingEntry['memberId'] == memberId then
+                        if existingEntry['status'] == 'WAITING' then
+                            redis.call('ZREM', waitingKey, existingEntryId)
+                            mark_left(existingEntryKey)
+                            clear_member_if_current(existingEntryId)
+                        elseif existingEntry['status'] == 'ADMITTED' then
+                            local existingToken = existingEntry['queueToken']
+                            if existingToken ~= false and existingToken ~= nil then
+                                redis.call('SREM', activeKey, existingToken)
+                                redis.call('DEL', tokenPrefix .. existingToken)
+                            end
+                            mark_left(existingEntryKey)
+                            clear_member_if_current(existingEntryId)
+                            advance_one()
+                        else
+                            redis.call('DEL', memberKey)
+                        end
+                    else
+                        redis.call('DEL', memberKey)
+                    end
+                end
+            end
+
+            local activeUsers = redis.call('SCARD', activeKey)
+            local waitingUsers = redis.call('ZCARD', waitingKey)
+            if (enabled == '0' or activeUsers < maxActiveUsers) and waitingUsers == 0 then
+                local queueToken = performanceId .. ':' .. queueEntryId .. ':' .. tokenId
+                redis.call('SET', tokenPrefix .. queueToken, queueEntryId, 'PX', entryTokenTtlMillis)
+                redis.call('SADD', activeKey, queueToken)
+                local entryKey = entryPrefix .. queueEntryId
+                redis.call(
+                    'HSET',
+                    entryKey,
+                    'performanceId', performanceId,
+                    'memberId', memberId,
+                    'status', 'ADMITTED',
+                    'queueToken', queueToken,
+                    'expiresAt', expiresAt
+                )
+                redis.call('PEXPIRE', entryKey, entryRetentionMillis)
+                redis.call('SET', memberKey, queueEntryId, 'PX', entryRetentionMillis)
+                return {'ADMITTED', queueEntryId, '', queueToken, expiresAt}
+            end
+
+            local sequence = redis.call('INCR', sequenceKey)
+            local position = waitingUsers + 1
+            redis.call('ZADD', waitingKey, sequence, queueEntryId)
+            local entryKey = entryPrefix .. queueEntryId
+            redis.call(
+                'HSET',
+                entryKey,
+                'performanceId', performanceId,
+                'memberId', memberId,
+                'status', 'WAITING',
+                'sequence', tostring(sequence)
+            )
+            redis.call('PEXPIRE', entryKey, entryRetentionMillis)
+            redis.call('SET', memberKey, queueEntryId, 'PX', entryRetentionMillis)
+            return {'WAITING', queueEntryId, tostring(position), '', ''}
+            """;
 
     private static final String FIELD_PERFORMANCE_ID = "performanceId";
     private static final String FIELD_MEMBER_ID = "memberId";
@@ -29,6 +192,50 @@ public class RedisQueueTicketStore implements QueueTicketStore {
 
     private final RedissonClient redissonClient;
     private final UuidSupplier uuidSupplier;
+
+    @Override
+    public QueueJoinResult enter(
+            final Long performanceId,
+            final Long memberId,
+            final QueuePolicy policy,
+            final LocalDateTime now
+    ) {
+        final String queueEntryId = uuidSupplier.get().toString();
+        final String tokenId = uuidSupplier.get().toString();
+        final String advanceTokenId = uuidSupplier.get().toString();
+        final LocalDateTime expiresAt = now.plus(policy.entryTokenTtl());
+
+        final List<Object> keys = List.of(
+                QueueRedisKey.waiting(performanceId),
+                QueueRedisKey.active(performanceId),
+                QueueRedisKey.sequence(performanceId),
+                QueueRedisKey.memberEntry(performanceId, memberId)
+        );
+        final Object[] arguments = {
+                String.valueOf(performanceId),
+                String.valueOf(memberId),
+                queueEntryId,
+                tokenId,
+                advanceTokenId,
+                policy.enabled() ? "1" : "0",
+                String.valueOf(policy.maxActiveUsers()),
+                String.valueOf(policy.entryTokenTtl().toMillis()),
+                String.valueOf(policy.entryRetention().toMillis()),
+                expiresAt.toString(),
+                QueueRedisKey.entryPrefix(),
+                QueueRedisKey.tokenPrefix(),
+                QueueRedisKey.memberEntryPrefix(performanceId)
+        };
+
+        final List<Object> result = redissonClient.getScript(StringCodec.INSTANCE).eval(
+                RScript.Mode.READ_WRITE,
+                ENTER_SCRIPT,
+                RScript.ReturnType.LIST,
+                keys,
+                arguments
+        );
+        return toJoinResult(result);
+    }
 
     @Override
     public long countActive(final Long performanceId) {
@@ -259,6 +466,35 @@ public class RedisQueueTicketStore implements QueueTicketStore {
         if (queueEntryId.equals(currentEntryId)) {
             bucket.delete();
         }
+    }
+
+    private QueueJoinResult toJoinResult(final List<Object> values) {
+        return new QueueJoinResult(
+                QueueEntryStatus.valueOf(requiredString(values, 0)),
+                requiredString(values, 1),
+                parseLong(emptyToNull(valueAt(values, 2))),
+                emptyToNull(valueAt(values, 3)),
+                parseDateTime(emptyToNull(valueAt(values, 4)))
+        );
+    }
+
+    private String requiredString(final List<Object> values, final int index) {
+        final String value = valueAt(values, index);
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException("Redis queue enter script returned blank value at index " + index);
+        }
+        return value;
+    }
+
+    private String valueAt(final List<Object> values, final int index) {
+        if (values == null || values.size() <= index || values.get(index) == null) {
+            return null;
+        }
+        return String.valueOf(values.get(index));
+    }
+
+    private String emptyToNull(final String value) {
+        return value == null || value.isBlank() ? null : value;
     }
 
     private Long parseLong(final String value) {

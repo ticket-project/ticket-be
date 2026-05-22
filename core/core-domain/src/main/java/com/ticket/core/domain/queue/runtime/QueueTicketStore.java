@@ -1,12 +1,15 @@
 package com.ticket.core.domain.queue.runtime;
 
 import com.ticket.core.domain.queue.model.QueueEntryId;
+import com.ticket.core.domain.queue.support.QueuePolicy;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface QueueTicketStore {
+
+    QueueJoinResult enter(Long performanceId, Long memberId, QueuePolicy policy, LocalDateTime now);
 
     long countActive(Long performanceId);
 

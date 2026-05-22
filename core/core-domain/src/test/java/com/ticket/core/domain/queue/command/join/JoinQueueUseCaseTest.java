@@ -18,15 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
 class JoinQueueUseCaseTest {
 
     @Mock
     private QueuePolicyResolver queuePolicyResolver;
-
-    @Mock
-    private QueueReentryCleaner queueReentryCleaner;
 
     @Mock
     private QueueJoinProcessor queueJoinProcessor;
@@ -35,11 +31,11 @@ class JoinQueueUseCaseTest {
 
     @BeforeEach
     void setUp() {
-        joinQueueUseCase = new JoinQueueUseCase(queuePolicyResolver, queueReentryCleaner, queueJoinProcessor);
+        joinQueueUseCase = new JoinQueueUseCase(queuePolicyResolver, queueJoinProcessor);
     }
 
     @Test
-    void 정책조회와_재진입정리_후_입장처리를_위임한다() {
+    void resolves_policy_and_delegates_to_join_processor() {
         final QueuePolicy policy = new QueuePolicy(false, QueueLevel.LEVEL_1, 300, Duration.ofMinutes(10), Duration.ofHours(1));
         final JoinQueueUseCase.Input input = new JoinQueueUseCase.Input(10L, 101L);
         final JoinQueueUseCase.Output output = new JoinQueueUseCase.Output(
@@ -55,9 +51,8 @@ class JoinQueueUseCaseTest {
         final JoinQueueUseCase.Output result = joinQueueUseCase.execute(input);
 
         assertThat(result).isSameAs(output);
-        final InOrder inOrder = inOrder(queuePolicyResolver, queueReentryCleaner, queueJoinProcessor);
+        final InOrder inOrder = inOrder(queuePolicyResolver, queueJoinProcessor);
         inOrder.verify(queuePolicyResolver).resolve(10L);
-        inOrder.verify(queueReentryCleaner).cleanup(10L, 101L);
         inOrder.verify(queueJoinProcessor).join(input, policy);
     }
 }
