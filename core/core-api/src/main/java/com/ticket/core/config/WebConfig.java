@@ -19,11 +19,9 @@ public class WebConfig implements WebMvcConfigurer {
         resolvers.add(new LoginMemberArgumentResolver());
     }
 
-//    @Override
-//    public void addInterceptors(final InterceptorRegistry registry) {
-//        registry.addInterceptor(queueAdmissionInterceptor)
-//                .addPathPatterns(
-//                        "/api/v1/performances/*/**"
-//                );
-//    }
+    @Override
+    public void addInterceptors(final InterceptorRegistry registry) {
+        registry.addInterceptor(queueAdmissionInterceptor)
+                .addPathPatterns("/api/v1/performances/*/**");
+    }
 }

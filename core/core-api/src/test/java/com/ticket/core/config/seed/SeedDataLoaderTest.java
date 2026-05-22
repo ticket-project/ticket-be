@@ -1,6 +1,11 @@
 package com.ticket.core.config.seed;
 
+import com.ticket.core.domain.member.model.Member;
+import com.ticket.core.domain.member.model.Role;
+import com.ticket.core.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.lang.reflect.Method;
 import java.nio.file.Files;
@@ -17,10 +22,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class SeedDataLoaderTest {
 
@@ -174,7 +187,7 @@ class SeedDataLoaderTest {
 
     @Test
     void rewrite_performance_statement_preserves_null_max_can_hold_count() throws Exception {
-        final SeedDataLoader loader = new SeedDataLoader(null, null);
+        final SeedDataLoader loader = new SeedDataLoader(null, null, null, null);
         final Method method = SeedDataLoader.class.getDeclaredMethod("rewritePerformanceStatement", String.class, LocalDate.class);
         method.setAccessible(true);
 
@@ -186,6 +199,45 @@ class SeedDataLoaderTest {
         assertThat(rewritten).contains("'2026-03-05 19:00:00'");
         assertThat(rewritten).contains("'2026-03-05 21:00:00'");
         assertThat(rewritten).contains("'2026-03-05 20:00:00'");
+    }
+
+    @Test
+    void seed_load_test_members_creates_default_accounts_with_encoded_password() {
+        final MemberRepository memberRepository = mock(MemberRepository.class);
+        final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        when(memberRepository.findByEmail_EmailAndDeletedAtIsNull(anyString())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("password1234")).thenReturn("{noop}encoded-password");
+        final SeedDataLoader loader = new SeedDataLoader(null, null, memberRepository, passwordEncoder);
+
+        loader.seedLoadTestMembers();
+
+        final ArgumentCaptor<Member> memberCaptor = ArgumentCaptor.forClass(Member.class);
+        verify(memberRepository, times(100)).save(memberCaptor.capture());
+        final List<Member> members = memberCaptor.getAllValues();
+
+        assertThat(members.get(0).getEmail().getEmail()).isEqualTo("loadtest1@test.com");
+        assertThat(members.get(99).getEmail().getEmail()).isEqualTo("loadtest100@test.com");
+        assertThat(members)
+                .allSatisfy(member -> {
+                    assertThat(member.getEncodedPassword().getPassword()).isEqualTo("{noop}encoded-password");
+                    assertThat(member.getEncodedPassword().getPassword()).isNotEqualTo("password1234");
+                    assertThat(member.getRole()).isEqualTo(Role.MEMBER);
+                });
+        verify(passwordEncoder, times(1)).encode("password1234");
+    }
+
+    @Test
+    void seed_load_test_members_skips_existing_accounts() {
+        final MemberRepository memberRepository = mock(MemberRepository.class);
+        final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        final Member existingMember = mock(Member.class);
+        when(memberRepository.findByEmail_EmailAndDeletedAtIsNull(anyString())).thenReturn(Optional.of(existingMember));
+        when(passwordEncoder.encode("password1234")).thenReturn("{noop}encoded-password");
+        final SeedDataLoader loader = new SeedDataLoader(null, null, memberRepository, passwordEncoder);
+
+        loader.seedLoadTestMembers();
+
+        verify(memberRepository, never()).save(any(Member.class));
     }
 
     @Test
@@ -242,7 +294,7 @@ class SeedDataLoaderTest {
 
     @SuppressWarnings("unchecked")
     private List<String> parseStatements() throws Exception {
-        final SeedDataLoader loader = new SeedDataLoader(null, null);
+        final SeedDataLoader loader = new SeedDataLoader(null, null, null, null);
         final Method method = SeedDataLoader.class.getDeclaredMethod("parseStatements");
         method.setAccessible(true);
         return (List<String>) method.invoke(loader);

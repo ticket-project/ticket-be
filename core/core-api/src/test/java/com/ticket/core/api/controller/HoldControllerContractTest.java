@@ -1,6 +1,7 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.config.LoginMemberArgumentResolver;
+import com.ticket.core.config.RequireQueueAdmission;
 import com.ticket.core.config.security.MemberPrincipal;
 import com.ticket.core.domain.order.command.create.CreateOrderUseCase;
 import com.ticket.core.domain.order.model.OrderState;
@@ -16,9 +17,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -93,5 +96,17 @@ class HoldControllerContractTest {
                 .andExpect(jsonPath("$.error.code").value("E400"));
 
         verifyNoInteractions(createOrderUseCase);
+    }
+
+    @Test
+    void hold_생성_API는_대기열_입장을_요구한다() throws Exception {
+        final Method method = HoldController.class.getDeclaredMethod(
+                "createHold",
+                Long.class,
+                com.ticket.core.api.controller.request.CreateHoldRequest.class,
+                MemberPrincipal.class
+        );
+
+        assertThat(method.isAnnotationPresent(RequireQueueAdmission.class)).isTrue();
     }
 }
