@@ -17,7 +17,7 @@ You are a senior software architect specializing in Java, Spring Boot, modular b
 
 ### 1. Current State Analysis
 - Review existing module and package boundaries
-- Identify conventions from `README_CODEX.md` and `README_ARCHITECTURE.md`
+- Identify conventions from `docs/development.md` and `docs/architecture.md`
 - Check whether the change affects `core-api`, `core-domain`, `storage:redis-core`, or `support:logging`
 
 ### 2. Requirements Gathering
