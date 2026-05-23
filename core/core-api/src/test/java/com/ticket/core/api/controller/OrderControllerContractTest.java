@@ -1,6 +1,7 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.config.LoginMemberArgumentResolver;
+import com.ticket.core.config.RequireQueueAdmission;
 import com.ticket.core.config.security.MemberPrincipal;
 import com.ticket.core.domain.order.command.cancel.CancelOrderUseCase;
 import com.ticket.core.domain.order.command.create.CreateOrderUseCase;
@@ -18,9 +19,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -120,5 +123,16 @@ class OrderControllerContractTest {
                 .andExpect(jsonPath("$.error.code").value("E400"));
 
         verifyNoInteractions(createOrderUseCase);
+    }
+
+    @Test
+    void create_order_api_does_not_require_queue_admission() throws Exception {
+        final Method method = OrderController.class.getDeclaredMethod(
+                "createOrder",
+                com.ticket.core.api.controller.request.CreateOrderRequest.class,
+                MemberPrincipal.class
+        );
+
+        assertThat(method.isAnnotationPresent(RequireQueueAdmission.class)).isFalse();
     }
 }

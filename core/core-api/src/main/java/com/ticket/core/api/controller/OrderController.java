@@ -2,7 +2,6 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.OrderControllerDocs;
 import com.ticket.core.api.controller.request.CreateOrderRequest;
-import com.ticket.core.config.RequireQueueAdmission;
 import com.ticket.core.config.security.MemberPrincipal;
 import com.ticket.core.domain.order.command.cancel.CancelOrderUseCase;
 import com.ticket.core.domain.order.command.create.CreateOrderUseCase;
@@ -31,7 +30,6 @@ public class OrderController implements OrderControllerDocs {
     private final CancelOrderUseCase cancelOrderUseCase;
 
     @Override
-    @RequireQueueAdmission
     @PostMapping
     public ResponseEntity<ApiResponse<CreateOrderUseCase.Output>> createOrder(
             @Valid @RequestBody final CreateOrderRequest request,

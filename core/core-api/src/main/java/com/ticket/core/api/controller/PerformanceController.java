@@ -1,7 +1,6 @@
 package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.PerformanceControllerDocs;
-import com.ticket.core.config.RequireQueueAdmission;
 import com.ticket.core.domain.performance.query.GetPerformanceScheduleListUseCase;
 import com.ticket.core.domain.performance.query.GetPerformanceSummaryUseCase;
 import com.ticket.core.domain.performanceseat.query.GetSeatAvailabilityUseCase;
@@ -39,7 +38,6 @@ public class PerformanceController implements PerformanceControllerDocs {
     }
 
     @Override
-    @RequireQueueAdmission
     @GetMapping("/{performanceId}/seats/availability")
     public ApiResponse<GetSeatAvailabilityUseCase.Output> getSeatAvailability(
             @PathVariable final Long performanceId
@@ -49,7 +47,6 @@ public class PerformanceController implements PerformanceControllerDocs {
     }
 
     @Override
-    @RequireQueueAdmission
     @GetMapping("/{performanceId}/seats/status")
     public ApiResponse<GetSeatStatusUseCase.Output> getSeatStatus(
             @PathVariable final Long performanceId

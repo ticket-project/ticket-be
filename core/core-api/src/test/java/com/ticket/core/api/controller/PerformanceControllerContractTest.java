@@ -16,17 +16,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PerformanceControllerContractTest {
 
     @Test
-    void 좌석_상태_조회_API는_대기열_입장을_요구한다() throws Exception {
+    void 좌석_상태_조회_API는_대기열_입장을_요구하지_않는다() throws Exception {
         final Method method = PerformanceController.class.getDeclaredMethod("getSeatStatus", Long.class);
 
-        assertThat(method.isAnnotationPresent(RequireQueueAdmission.class)).isTrue();
+        assertThat(method.isAnnotationPresent(RequireQueueAdmission.class)).isFalse();
     }
 
     @Test
-    void 좌석_잔여수_조회_API는_대기열_입장을_요구한다() throws Exception {
+    void 좌석_잔여수_조회_API는_대기열_입장을_요구하지_않는다() throws Exception {
         final Method method = PerformanceController.class.getDeclaredMethod("getSeatAvailability", Long.class);
 
-        assertThat(method.isAnnotationPresent(RequireQueueAdmission.class)).isTrue();
+        assertThat(method.isAnnotationPresent(RequireQueueAdmission.class)).isFalse();
     }
 
     @Test

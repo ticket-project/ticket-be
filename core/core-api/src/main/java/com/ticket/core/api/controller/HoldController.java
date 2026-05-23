@@ -2,7 +2,6 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.HoldControllerDocs;
 import com.ticket.core.api.controller.request.CreateHoldRequest;
-import com.ticket.core.config.RequireQueueAdmission;
 import com.ticket.core.config.security.MemberPrincipal;
 import com.ticket.core.domain.order.command.create.CreateOrderUseCase;
 import com.ticket.core.support.response.ApiResponse;
@@ -26,7 +25,6 @@ public class HoldController implements HoldControllerDocs {
     private final CreateOrderUseCase createOrderUseCase;
 
     @Override
-    @RequireQueueAdmission
     @PostMapping
     public ResponseEntity<ApiResponse<CreateOrderUseCase.Output>> createHold(
             @PathVariable final Long performanceId,

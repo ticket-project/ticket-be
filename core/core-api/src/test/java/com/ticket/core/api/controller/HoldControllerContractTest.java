@@ -99,7 +99,7 @@ class HoldControllerContractTest {
     }
 
     @Test
-    void hold_생성_API는_대기열_입장을_요구한다() throws Exception {
+    void hold_생성_API는_대기열_입장을_요구하지_않는다() throws Exception {
         final Method method = HoldController.class.getDeclaredMethod(
                 "createHold",
                 Long.class,
@@ -107,6 +107,6 @@ class HoldControllerContractTest {
                 MemberPrincipal.class
         );
 
-        assertThat(method.isAnnotationPresent(RequireQueueAdmission.class)).isTrue();
+        assertThat(method.isAnnotationPresent(RequireQueueAdmission.class)).isFalse();
     }
 }
