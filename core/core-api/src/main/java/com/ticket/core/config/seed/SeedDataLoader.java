@@ -1,5 +1,10 @@
 package com.ticket.core.config.seed;
 
+import com.ticket.core.domain.member.model.Email;
+import com.ticket.core.domain.member.model.EncodedPassword;
+import com.ticket.core.domain.member.model.Member;
+import com.ticket.core.domain.member.model.Role;
+import com.ticket.core.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,6 +13,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -33,8 +39,12 @@ import java.util.regex.Pattern;
 public class SeedDataLoader implements ApplicationRunner {
 
     private static final int DEFAULT_BATCH_SIZE = 500;
+    private static final int DEFAULT_LOAD_TEST_MEMBER_COUNT = 100;
     private static final String SEED_SQL_RESOURCE = "seed/kopis-curated.sql";
     private static final String SEED_CHECK_SQL = "SELECT COUNT(*) FROM CATEGORIES";
+    private static final String DEFAULT_LOAD_TEST_MEMBER_PASSWORD = "password1234";
+    private static final String LOAD_TEST_MEMBER_EMAIL_PREFIX = "loadtest";
+    private static final String LOAD_TEST_MEMBER_EMAIL_SUFFIX = "@test.com";
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
     private static final Pattern SHOW_INSERT_PATTERN = Pattern.compile(
         "INSERT INTO SHOWS .*?VALUES \\((\\d+), .*?, '([0-9]{4}-[0-9]{2}-[0-9]{2})', '([0-9]{4}-[0-9]{2}-[0-9]{2})', .*?, '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})', '([0-9]{4}-[0-9]{2}-[0-9]{2}) ([0-9:]{8})',",
@@ -47,25 +57,74 @@ public class SeedDataLoader implements ApplicationRunner {
 
     private final JdbcTemplate jdbcTemplate;
     private final TransactionTemplate transactionTemplate;
+    private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${app.seed.batch-size:" + DEFAULT_BATCH_SIZE + "}")
     private int batchSize;
+
+    @Value("${app.seed.load-test-members.enabled:true}")
+    private boolean loadTestMembersEnabled = true;
+
+    @Value("${app.seed.load-test-members.count:" + DEFAULT_LOAD_TEST_MEMBER_COUNT + "}")
+    private int loadTestMemberCount = DEFAULT_LOAD_TEST_MEMBER_COUNT;
+
+    @Value("${app.seed.load-test-members.password:" + DEFAULT_LOAD_TEST_MEMBER_PASSWORD + "}")
+    private String loadTestMemberPassword = DEFAULT_LOAD_TEST_MEMBER_PASSWORD;
 
     @Override
     public void run(final ApplicationArguments args) {
         if (!shouldSeed()) {
             log.info("시드 적재를 건너뜁니다. CATEGORIES 테이블에 이미 데이터가 있습니다.");
+            seedLoadTestMembers();
             return;
         }
 
         final List<String> statements = parseStatements();
         if (statements.isEmpty()) {
             log.info("시드 적재를 건너뜁니다. 실행할 SQL 문이 없습니다.");
+            seedLoadTestMembers();
             return;
         }
 
-        transactionTemplate.executeWithoutResult(status -> executeInBatches(statements));
+        transactionTemplate.executeWithoutResult(status -> {
+            executeInBatches(statements);
+            seedLoadTestMembers();
+        });
         log.info("시드 적재를 완료했습니다. statements={}, batchSize={}", statements.size(), batchSize);
+    }
+
+    void seedLoadTestMembers() {
+        if (!loadTestMembersEnabled) {
+            log.info("부하 테스트 회원 시드를 건너뜁니다. app.seed.load-test-members.enabled=false");
+            return;
+        }
+
+        final int count = Math.max(0, loadTestMemberCount);
+        if (count == 0) {
+            log.info("부하 테스트 회원 시드를 건너뜁니다. count=0");
+            return;
+        }
+
+        final String encodedPassword = passwordEncoder.encode(loadTestMemberPassword);
+        int created = 0;
+
+        for (int memberNo = 1; memberNo <= count; memberNo++) {
+            final String email = LOAD_TEST_MEMBER_EMAIL_PREFIX + memberNo + LOAD_TEST_MEMBER_EMAIL_SUFFIX;
+            if (memberRepository.findByEmail_EmailAndDeletedAtIsNull(email).isPresent()) {
+                continue;
+            }
+
+            memberRepository.save(new Member(
+                    Email.create(email),
+                    EncodedPassword.create(encodedPassword),
+                    LOAD_TEST_MEMBER_EMAIL_PREFIX + memberNo,
+                    Role.MEMBER
+            ));
+            created++;
+        }
+
+        log.info("부하 테스트 회원 시드를 완료했습니다. requested={}, created={}", count, created);
     }
 
     private boolean shouldSeed() {

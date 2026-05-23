@@ -5,7 +5,7 @@
 ## 빠른 시작
 
 ```bash
-docker compose up -d redis
+docker run --name ticket-redis -p 6379:6379 -d redis:7
 ./gradlew :core:core-api:bootRun
 ```
 
@@ -28,6 +28,8 @@ Swagger:
   - Gradle 모듈 책임, 패키지 경계, 아키텍처 규칙
 - [docs/operations.md](docs/operations.md)
   - 로컬 실행, 검증 명령, 프로파일, 배포 기준
+- [docs/load-test.md](docs/load-test.md)
+  - 예매 오픈 부하 테스트 진입점
 - [AGENTS.md](AGENTS.md)
   - 사람/AI 공통 작업 규칙
 
@@ -46,7 +48,7 @@ Swagger:
 - `core/core-infra`: Redis, WebSocket, 외부 HTTP, AOP 같은 기술 구현
 - `storage/redis-core`: Redis 공통 의존성
 - `support/logging`: 공통 로깅 설정
-- `docs`: 개발, 구조, 운영 문서
+- `docs`: 개발, 구조, 운영, 부하 테스트 문서
 - `.codex`, `.github`, `.agents`: AI 도구와 자동화 설정
 
 ## AI 작업 기준
