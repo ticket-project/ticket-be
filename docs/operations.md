@@ -15,7 +15,7 @@
 Redis 실행:
 
 ```bash
-docker compose up -d redis
+docker run --name ticket-redis -p 6379:6379 -d redis:7
 ```
 
 API 실행:
@@ -98,6 +98,21 @@ GitHub Actions 배포 workflow는 아래 명령과 맞물린다.
 관련 파일:
 
 - `.github/workflows/deploy.yml`
+
+## 부하 테스트
+
+예매 오픈 부하 테스트는 [load-test.md](load-test.md)에서 시작한다.
+
+상세 실행 문서:
+
+- `docs/load-test/ticket-open-local.md`
+
+Gatling 프로젝트는 루트 Gradle wrapper로 실행한다.
+
+```powershell
+.\gradlew.bat -p load-tests/gatling test
+.\gradlew.bat -p load-tests/gatling gatlingClasses
+```
 
 ## 운영 반영 시 주의점
 
