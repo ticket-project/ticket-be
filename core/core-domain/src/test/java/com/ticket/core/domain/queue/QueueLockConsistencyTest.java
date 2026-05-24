@@ -1,6 +1,6 @@
 package com.ticket.core.domain.queue;
 
-import com.ticket.core.infra.lock.DistributedLock;
+import com.ticket.core.support.lock.DistributedLock;
 import com.ticket.core.domain.queue.command.QueueAdmissionAdvancer;
 import com.ticket.core.domain.queue.command.exit.ExitQueueUseCase;
 import com.ticket.core.domain.queue.command.join.JoinQueueUseCase;

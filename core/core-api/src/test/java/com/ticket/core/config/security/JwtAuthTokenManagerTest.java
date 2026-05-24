@@ -2,7 +2,7 @@ package com.ticket.core.config.security;
 
 import com.ticket.core.domain.auth.token.AuthRefreshToken;
 import com.ticket.core.domain.auth.token.IssuedAuthTokens;
-import com.ticket.core.domain.auth.infra.token.RefreshTokenService;
+import com.ticket.core.domain.auth.token.RefreshTokenStore;
 import com.ticket.core.domain.member.model.Member;
 import com.ticket.core.domain.member.model.Email;
 import com.ticket.core.domain.member.model.EncodedPassword;
@@ -30,7 +30,7 @@ class JwtAuthTokenManagerTest {
     private JwtProperties jwtProperties;
 
     @Mock
-    private RefreshTokenService refreshTokenService;
+    private RefreshTokenStore refreshTokenStore;
 
     @InjectMocks
     private JwtAuthTokenManager jwtAuthTokenManager;
@@ -41,7 +41,7 @@ class JwtAuthTokenManagerTest {
         when(jwtTokenService.createAccessToken(any())).thenReturn("access-token");
         when(jwtTokenService.getAccessTokenExpirationSeconds()).thenReturn(1800L);
         when(jwtProperties.getRefreshTokenExpirationSeconds()).thenReturn(1209600L);
-        when(refreshTokenService.createRefreshToken(7L, 1209600L)).thenReturn("refresh-token");
+        when(refreshTokenStore.createRefreshToken(7L, 1209600L)).thenReturn("refresh-token");
 
         IssuedAuthTokens result = jwtAuthTokenManager.issueTokens(member);
 
@@ -56,14 +56,14 @@ class JwtAuthTokenManagerTest {
     void rotate_tokens_returns_new_access_and_refresh_tokens() {
         Member member = createMember(7L);
         AuthRefreshToken refreshToken = AuthRefreshToken.from("old-refresh");
-        when(refreshTokenService.rotate(refreshToken, 7L, 1209600L)).thenReturn("new-refresh");
+        when(refreshTokenStore.rotate(refreshToken, 7L, 1209600L)).thenReturn("new-refresh");
         when(jwtProperties.getRefreshTokenExpirationSeconds()).thenReturn(1209600L);
         when(jwtTokenService.createAccessToken(any())).thenReturn("new-access");
         when(jwtTokenService.getAccessTokenExpirationSeconds()).thenReturn(1800L);
 
         IssuedAuthTokens result = jwtAuthTokenManager.rotateTokens(member, refreshToken);
 
-        verify(refreshTokenService).rotate(refreshToken, 7L, 1209600L);
+        verify(refreshTokenStore).rotate(refreshToken, 7L, 1209600L);
         assertThat(result.accessToken()).isEqualTo("new-access");
         assertThat(result.refreshToken()).isEqualTo("new-refresh");
         assertThat(result.memberId()).isEqualTo(7L);

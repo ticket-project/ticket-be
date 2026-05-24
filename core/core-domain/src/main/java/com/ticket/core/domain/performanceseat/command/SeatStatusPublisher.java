@@ -1,6 +1,6 @@
 package com.ticket.core.domain.performanceseat.command;
 
-import com.ticket.core.domain.performanceseat.infra.realtime.SeatEventPublisher;
+import com.ticket.core.domain.performanceseat.support.SeatStatusEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ import static com.ticket.core.domain.performanceseat.support.SeatStatusMessage.S
 @RequiredArgsConstructor
 public class SeatStatusPublisher {
 
-    private final SeatEventPublisher seatEventPublisher;
+    private final SeatStatusEventPublisher seatEventPublisher;
 
     public void publishHeld(final Long performanceId, final List<Long> seatIds) {
         for (final Long seatId : seatIds) {

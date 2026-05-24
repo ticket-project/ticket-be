@@ -1,8 +1,7 @@
 package com.ticket.core.domain.auth.command;
 
 import com.ticket.core.domain.auth.token.AuthRefreshToken;
-import com.ticket.core.domain.auth.token.AuthTokenManager;
-import com.ticket.core.domain.auth.infra.token.RefreshTokenService;
+import com.ticket.core.domain.auth.token.RefreshTokenStore;
 import com.ticket.core.support.exception.AuthException;
 import com.ticket.core.support.exception.ErrorType;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ import static org.mockito.Mockito.when;
 class LogoutUseCaseTest {
 
     @Mock
-    private RefreshTokenService refreshTokenService;
+    private RefreshTokenStore refreshTokenStore;
 
     @InjectMocks
     private LogoutUseCase useCase;
@@ -31,18 +30,18 @@ class LogoutUseCaseTest {
     @Test
     void owned_token_is_revoked() {
         AuthRefreshToken refreshToken = AuthRefreshToken.from("refresh-token");
-        when(refreshTokenService.revokeIfOwned(refreshToken, 1L)).thenReturn(true);
+        when(refreshTokenStore.revokeIfOwned(refreshToken, 1L)).thenReturn(true);
 
         useCase.execute(new LogoutUseCase.Input(1L, refreshToken));
 
-        verify(refreshTokenService).revokeIfOwned(refreshToken, 1L);
+        verify(refreshTokenStore).revokeIfOwned(refreshToken, 1L);
     }
 
     @Test
     void foreign_token_throws_authorization_exception() {
         AuthRefreshToken refreshToken = AuthRefreshToken.from("refresh-token");
-        when(refreshTokenService.revokeIfOwned(refreshToken, 1L)).thenReturn(false);
-        when(refreshTokenService.validateWithoutConsume(refreshToken)).thenReturn(Optional.of(2L));
+        when(refreshTokenStore.revokeIfOwned(refreshToken, 1L)).thenReturn(false);
+        when(refreshTokenStore.validateWithoutConsume(refreshToken)).thenReturn(Optional.of(2L));
 
         assertThatThrownBy(() -> useCase.execute(new LogoutUseCase.Input(1L, refreshToken)))
                 .isInstanceOf(AuthException.class)
@@ -52,8 +51,8 @@ class LogoutUseCaseTest {
     @Test
     void missing_owner_check_result_throws_authentication_exception() {
         AuthRefreshToken refreshToken = AuthRefreshToken.from("refresh-token");
-        when(refreshTokenService.revokeIfOwned(refreshToken, 1L)).thenReturn(false);
-        when(refreshTokenService.validateWithoutConsume(refreshToken)).thenReturn(Optional.empty());
+        when(refreshTokenStore.revokeIfOwned(refreshToken, 1L)).thenReturn(false);
+        when(refreshTokenStore.validateWithoutConsume(refreshToken)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> useCase.execute(new LogoutUseCase.Input(1L, refreshToken)))
                 .isInstanceOf(AuthException.class)

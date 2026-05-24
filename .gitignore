@@ -40,3 +40,6 @@ out/
 
 # MySQL data (Docker volume)
 mysql-data/
+
+# Local Docker Compose file with machine-local secrets
+docker-compose.yml
