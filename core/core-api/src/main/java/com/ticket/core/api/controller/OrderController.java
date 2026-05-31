@@ -2,7 +2,8 @@ package com.ticket.core.api.controller;
 
 import com.ticket.core.api.controller.docs.OrderControllerDocs;
 import com.ticket.core.api.controller.request.CreateOrderRequest;
-import com.ticket.core.config.security.MemberPrincipal;
+import com.ticket.core.config.admission.AdmissionTokenValidator;
+import com.ticket.support.passport.Passport;
 import com.ticket.core.domain.order.command.cancel.CancelOrderUseCase;
 import com.ticket.core.domain.order.command.create.CreateOrderUseCase;
 import com.ticket.core.domain.order.query.GetOrderDetailUseCase;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -28,17 +30,20 @@ public class OrderController implements OrderControllerDocs {
     private final CreateOrderUseCase createOrderUseCase;
     private final GetOrderDetailUseCase getOrderDetailUseCase;
     private final CancelOrderUseCase cancelOrderUseCase;
+    private final AdmissionTokenValidator admissionTokenValidator;
 
     @Override
     @PostMapping
     public ResponseEntity<ApiResponse<CreateOrderUseCase.Output>> createOrder(
             @Valid @RequestBody final CreateOrderRequest request,
-            final MemberPrincipal memberPrincipal
+            @RequestHeader(value = AdmissionTokenValidator.HEADER, required = false) final String admissionToken,
+            final Passport memberPrincipal
     ) {
+        admissionTokenValidator.validate(request.getPerformanceId(), admissionToken);
         final CreateOrderUseCase.Input input = new CreateOrderUseCase.Input(
                 request.getPerformanceId(),
                 request.getSeatIds(),
-                memberPrincipal.getMemberId()
+                memberPrincipal.memberId()
         );
         final CreateOrderUseCase.Output output = createOrderUseCase.execute(input);
         return ResponseEntity.created(URI.create("/api/v1/orders/" + output.orderKey()))
@@ -50,9 +55,9 @@ public class OrderController implements OrderControllerDocs {
     @GetMapping("/{orderKey}")
     public ApiResponse<GetOrderDetailUseCase.Output> getOrder(
             @PathVariable final String orderKey,
-            final MemberPrincipal memberPrincipal
+            final Passport memberPrincipal
     ) {
-        final GetOrderDetailUseCase.Input input = new GetOrderDetailUseCase.Input(orderKey, memberPrincipal.getMemberId());
+        final GetOrderDetailUseCase.Input input = new GetOrderDetailUseCase.Input(orderKey, memberPrincipal.memberId());
         final GetOrderDetailUseCase.Output output = getOrderDetailUseCase.execute(input);
         return ApiResponse.success(output);
     }
@@ -61,9 +66,9 @@ public class OrderController implements OrderControllerDocs {
     @DeleteMapping("/{orderKey}")
     public ApiResponse<Void> cancelOrder(
             @PathVariable final String orderKey,
-            final MemberPrincipal memberPrincipal
+            final Passport memberPrincipal
     ) {
-        cancelOrderUseCase.execute(new CancelOrderUseCase.Input(orderKey, memberPrincipal.getMemberId()));
+        cancelOrderUseCase.execute(new CancelOrderUseCase.Input(orderKey, memberPrincipal.memberId()));
         return ApiResponse.success();
     }
 }
